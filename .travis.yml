@@ -1,0 +1,20 @@
+language: python
+sudo: required
+
+services:
+  - docker
+
+python:
+  - 3.5
+  - 3.6
+
+install:
+  - pip install -r requirements.txt
+
+env:
+  global:
+  - secure: "xR2xoqHvGaGcs0Y+r82c2nBWWBTodNr3Otvu8IlgYrR261g3lY0Pbuur+NQitENSmjX0/CoqlYFHXcaS+a6ltKQtWQUFnt+um5sCjD4ls3mLa5alsyhz/Jw1IlVQvXyAvMv7BUHi4qcpk+bmi2uaVDCCigcZqBEp5HpUEwUwbOmvZe1j7rQraVxw7PAhfcar0IwvDApQTwo8NZRA1v7gA9M2teyXG0cExf8J1Pdv+bJw7bQlFmnwqG9p5hDaAFjJVl9F934GyIWNedl2MiKcOgGsSn865PG1I02kI/YIpq7Eggnj4VXVVoLIBzJNfbq8DFFkFfgDIujgKL4rHdgJ769syIT8PC7ViQnZwtHEWMkm4ZKtDuI5wIyupkGdIsgnAPRscN6ABhH+EYpmNb0Tz6B70zLJre9Skajtk/wqPJgTvZX6ahE5E/P1AHJqwwRVOLgqdEYx6eBRXxgRJFGDFxLs/qGWDK31+MIK4kh1lWdTDrui3c8nKStrJq6kM9RezUwPqeQfpJHHwZVzWjKr7ioL8mjszxSXSmLuqWjY3TBFmg+Ht6a2aVp/FlfbsaRDkf+GfS1ZN7tfgfh7Hd7oG36XXmMd8bO4X98uSP+WxFEUjp8ANpA5P7hN8KvUU+fzOrcvmV5dEGi2vngmUARbfzZlFs+gc8SCuU187ACXT50="
+  - PYPI_USER_NAME: "chaostoolkit"
+
+script: 
+  - bash ci.bash
