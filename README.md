@@ -1,5 +1,5 @@
-# chaostoolkit-api
+# chaostoolkit-lib
 
 [![Build Status](https://travis-ci.org/chaostoolkit/chaostoolkit-lib.svg?branch=master)](https://travis-ci.org/chaostoolkit/chaostoolkit-lib)
 
-The Chaos Toolkit API
+The Chaos Toolkit core library.
