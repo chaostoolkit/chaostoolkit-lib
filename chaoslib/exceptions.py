@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __all__ = ["UnknownProbe", "UnknownAction", "InvalidPlan", "InvalidProbe",
-           "FailedProbe"]
+           "FailedProbe", "InvalidExperiment"]
 
 
 class UnknownProbe(LookupError):
@@ -25,4 +25,8 @@ class InvalidProbe(BaseException):
 
 
 class FailedProbe(BaseException):
+    pass
+
+
+class InvalidExperiment(BaseException):
     pass
