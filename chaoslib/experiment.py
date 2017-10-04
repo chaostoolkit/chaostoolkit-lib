@@ -70,7 +70,7 @@ def ensure_experiment_is_valid(experiment: Experiment):
 def run_experiment(experiment: Experiment):
     """
     Run the given `experiment` method step by step, in the following sequence:
-    steady probe, action, close probe. 
+    steady probe, action, close probe.
     """
     method = experiment.get("method")
     for step in method:
