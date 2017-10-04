@@ -1,8 +1,27 @@
 # -*- coding: utf-8 -*-
-from chaoslib.types import Action, Layer
+import sys
 
-__all__ = ["ensure_layer_action_is_valid"]
+from chaoslib.activity import ensure_activity_is_valid, run_activity
+from chaoslib.exceptions import FailedActivity, FailedAction, InvalidActivity,\
+    InvalidAction
+from chaoslib.types import Action
+
+__all__ = ["ensure_action_is_valid", "run_action"]
 
 
-def ensure_layer_action_is_valid(action: Action, layer: Layer):
-    return True
+def ensure_action_is_valid(action: Action):
+    try:
+        return ensure_activity_is_valid(action)
+    except InvalidActivity as x:
+        m = str(x)
+        m = m.replace("activity", "action")
+        raise InvalidAction(m).with_traceback(sys.exc_info()[2])
+
+
+def run_action(action: Action):
+    try:
+        return run_activity(action)
+    except FailedActivity as x:
+        m = str(x)
+        m = m.replace("activity", "action")
+        raise FailedAction(m).with_traceback(sys.exc_info()[2])

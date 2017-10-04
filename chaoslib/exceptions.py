@@ -1,26 +1,18 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ["UnknownProbe", "UnknownAction", "InvalidPlan", "InvalidProbe",
-           "FailedProbe", "InvalidExperiment"]
+__all__ = ["InvalidActivity", "InvalidProbe", "InvalidAction",
+           "FailedAction", "FailedActivity", "FailedProbe"]
 
 
-class UnknownProbe(LookupError):
-    def __init__(self, name: str):
-        LookupError.__init__(
-            self, "probe '{name}' is not implemented".format(name=name))
-
-
-class UnknownAction(LookupError):
-    def __init__(self, name: str):
-        LookupError.__init__(
-            self, "action '{name}' is not implemented".format(name=name))
-
-
-class InvalidPlan(BaseException):
+class InvalidAction(BaseException):
     pass
 
 
 class InvalidProbe(BaseException):
+    pass
+
+
+class InvalidActivity(BaseException):
     pass
 
 
@@ -29,4 +21,12 @@ class FailedProbe(BaseException):
 
 
 class InvalidExperiment(BaseException):
+    pass
+
+
+class FailedActivity(BaseException):
+    pass
+
+
+class FailedAction(BaseException):
     pass

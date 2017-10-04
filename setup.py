@@ -38,9 +38,11 @@ packages = [
     'chaoslib'
 ]
 
+data_files = [('chaoslib/schema.json', ['chaoslib/schema.json'])]
 needs_pytest = set(['pytest', 'test']).intersection(sys.argv)
 pytest_runner = ['pytest_runner'] if needs_pytest else []
 test_require = [
+    'requests-mock',
     'coverage',
     'pytest>=2.8',
     'pytest-cov',
@@ -63,6 +65,7 @@ setup_params = dict(
     url=url,
     license=license,
     packages=packages,
+    data_files=data_files,
     include_package_data=True,
     install_requires=install_require,
     tests_require=test_require,

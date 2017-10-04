@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 __all__ = ["MicroservicesStatus", "Probe", "Action", "Experiment", "Layer",
-           "TargetLayers"]
+           "TargetLayers", "Activity"]
 
 
 Action = Dict[str, Any]
 Experiment = Dict[str, Any]
 Probe = Dict[str, Any]
+
+Activity = Union[Probe, Action]
 
 Layer = Any
 TargetLayers = Dict[str, List[Dict[str, Any]]]
