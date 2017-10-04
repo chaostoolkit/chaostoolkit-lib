@@ -1,10 +1,21 @@
 # -*- coding: utf-8 -*-
+import io
+import json
+
 from chaoslib.action import ensure_action_is_valid, run_action
 from chaoslib.exceptions import InvalidExperiment
 from chaoslib.probe import ensure_probe_is_valid, run_probe
 from chaoslib.types import Experiment
 
-__all__ = ["ensure_experiment_is_valid"]
+__all__ = ["ensure_experiment_is_valid", "run_experiment"]
+
+
+def load_experiment(path: str) -> Experiment:
+    """
+    Parse the given experiment from `path` and return it.
+    """
+    with io.open(path) as f:
+        return json.load(f)
 
 
 def ensure_experiment_is_valid(experiment: Experiment):
@@ -54,3 +65,25 @@ def ensure_experiment_is_valid(experiment: Experiment):
             close = probes.get("close")
             if close:
                 ensure_probe_is_valid(close)
+
+
+def run_experiment(experiment: Experiment):
+    """
+    Run the given `experiment` method step by step, in the following sequence:
+    steady probe, action, close probe. 
+    """
+    method = experiment.get("method")
+    for step in method:
+        probes = step.get("probes", {})
+
+        steady = probes.get("steady")
+        if steady:
+            run_probe(steady)
+
+        action = step.get("action")
+        if action:
+            run_action(action)
+
+        close = probes.get("close")
+        if close:
+            run_probe(close)
