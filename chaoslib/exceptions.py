@@ -1,32 +1,36 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ["InvalidActivity", "InvalidProbe", "InvalidAction",
-           "FailedAction", "FailedActivity", "FailedProbe"]
+__all__ = ["ChaosException", "InvalidActivity", "InvalidProbe",
+           "InvalidAction", "FailedAction", "FailedActivity", "FailedProbe"]
 
 
-class InvalidAction(BaseException):
+class ChaosException(Exception):
     pass
 
 
-class InvalidProbe(BaseException):
+class InvalidAction(ChaosException):
     pass
 
 
-class InvalidActivity(BaseException):
+class InvalidProbe(ChaosException):
     pass
 
 
-class FailedProbe(BaseException):
+class InvalidActivity(ChaosException):
     pass
 
 
-class InvalidExperiment(BaseException):
+class FailedProbe(ChaosException):
     pass
 
 
-class FailedActivity(BaseException):
+class InvalidExperiment(ChaosException):
     pass
 
 
-class FailedAction(BaseException):
+class FailedActivity(ChaosException):
+    pass
+
+
+class FailedAction(ChaosException):
     pass
