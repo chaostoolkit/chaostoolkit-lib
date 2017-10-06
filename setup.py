@@ -10,7 +10,7 @@ sys.path.insert(0, ".")
 from chaoslib import __version__
 sys.path.remove(".")
 
-name = 'chaoslib'
+name = 'chaostoolkit-lib'
 desc = 'Chaos engineering toolkit core library'
 
 with io.open('README.md', encoding='utf-8') as strm:
