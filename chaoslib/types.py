@@ -2,7 +2,7 @@
 from typing import Any, Dict, List, Tuple, Union
 
 __all__ = ["MicroservicesStatus", "Probe", "Action", "Experiment", "Layer",
-           "TargetLayers", "Activity"]
+           "TargetLayers", "Activity", "Journal", "Run"]
 
 
 Action = Dict[str, Any]
@@ -15,3 +15,5 @@ Layer = Any
 TargetLayers = Dict[str, List[Dict[str, Any]]]
 
 MicroservicesStatus = Tuple[Dict[str, Any], Dict[str, Any]]
+Journal = Dict[str, Any]
+Run = Dict[str, Any]

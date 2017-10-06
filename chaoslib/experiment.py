@@ -1,11 +1,20 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 import io
 import json
+import platform
+import time
+import traceback
+from typing import Any, Callable
 
+from logzero import logger
+
+from chaoslib import __version__
 from chaoslib.action import ensure_action_is_valid, run_action
-from chaoslib.exceptions import InvalidExperiment
+from chaoslib.exceptions import FailedAction, FailedActivity, FailedProbe,\
+    InvalidExperiment
 from chaoslib.probe import ensure_probe_is_valid, run_probe
-from chaoslib.types import Experiment
+from chaoslib.types import Activity, Experiment, Journal, Run
 
 __all__ = ["ensure_experiment_is_valid", "run_experiment"]
 
@@ -52,6 +61,9 @@ def ensure_experiment_is_valid(experiment: Experiment):
                                 "at least one activity")
 
     for step in method:
+        if "title" not in step:
+            raise InvalidExperiment("an activity step must have a title")
+
         action = step.get("action")
         if action:
             ensure_action_is_valid(action)
@@ -67,23 +79,75 @@ def ensure_experiment_is_valid(experiment: Experiment):
                 ensure_probe_is_valid(close)
 
 
-def run_experiment(experiment: Experiment):
+def run_experiment(experiment: Experiment) -> Journal:
     """
     Run the given `experiment` method step by step, in the following sequence:
     steady probe, action, close probe.
     """
+    logger.info("Running experiment: {t}".format(t=experiment["title"]))
+
+    started_at = time.time()
+    journal = {
+        "chaoslib-version": __version__,
+        "platform": platform.platform(),
+        "node": platform.node(),
+        "experiment": experiment.copy(),
+        "start": datetime.utcnow().isoformat(),
+        "run": []
+    }
+
     method = experiment.get("method")
     for step in method:
         probes = step.get("probes", {})
 
         steady = probes.get("steady")
         if steady:
-            run_probe(steady)
+            run = run_activity(steady, "steady state", func=run_probe)
+            journal["run"].append(run)
 
         action = step.get("action")
         if action:
-            run_action(action)
+            run = run_activity(action, "action", func=run_action)
+            journal["run"].append(run)
 
         close = probes.get("close")
         if close:
-            run_probe(close)
+            run = run_activity(close, "close state", func=run_probe)
+            journal["run"].append(run)
+
+    journal["end"] = datetime.utcnow().isoformat()
+    journal["duration"] = time.time() - started_at
+
+    logger.info("Experiment is now complete")
+
+    return journal
+
+
+def run_activity(activity: Activity, kind: str,
+                 func: Callable[[Activity], Any]) -> Run:
+    logger.info("Observing {n}: {t}".format(n=kind, t=activity["title"]))
+    start = datetime.utcnow()
+
+    run = {
+        "activity": activity,
+        "kind": kind
+    }
+
+    try:
+        result = func(activity)
+        run["status"] = "succeeded"
+        run["output"] = result
+        logger.info("{n} suceeeded".format(n=kind.title()))
+    except FailedActivity as x:
+        error_msg = str(x)
+        run["status"] = "failed"
+        run["output"] = str(x)
+        run["exception"] = traceback.format_exception(type(x), x, None)
+        logger.error("{n} failed: {x}".format(n=kind.title(), x=error_msg))
+
+    end = datetime.utcnow()
+    run["start"] = start.isoformat()
+    run["end"] = end.isoformat()
+    run["duration"] = (end - start).total_seconds()
+
+    return run

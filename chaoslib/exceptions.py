@@ -8,19 +8,15 @@ class ChaosException(Exception):
     pass
 
 
-class InvalidAction(ChaosException):
-    pass
-
-
-class InvalidProbe(ChaosException):
-    pass
-
-
 class InvalidActivity(ChaosException):
     pass
 
 
-class FailedProbe(ChaosException):
+class InvalidAction(InvalidActivity):
+    pass
+
+
+class InvalidProbe(InvalidActivity):
     pass
 
 
@@ -32,5 +28,9 @@ class FailedActivity(ChaosException):
     pass
 
 
-class FailedAction(ChaosException):
+class FailedAction(FailedActivity):
+    pass
+
+
+class FailedProbe(FailedActivity):
     pass

@@ -7,6 +7,7 @@ import os
 import os.path
 import subprocess
 import sys
+import traceback
 from typing import Any
 
 import requests
@@ -106,7 +107,15 @@ def run_python_activity(activity: Activity) -> Any:
     func_name = activity["func"]
     mod = importlib.import_module(mod_path)
     func = getattr(mod, func_name)
-    return func(**activity.get("arguments", {}))
+
+    try:
+        return func(**activity.get("arguments", {}))
+    except Exception as x:
+        title = activity["title"]
+        raise FailedActivity(
+            traceback.format_exception_only(
+                type(x), x)[0].strip()).with_traceback(
+                    sys.exc_info()[2])
 
 
 def run_process_activity(activity: Activity) -> Any:
@@ -169,7 +178,7 @@ def run_http_activity(activity: Activity) -> Any:
         raise FailedActivity("activity took too long to complete")
 
     if r.status_code > 399:
-        raise FailedActivity("activity failed with: {x}".format(x=r.text))
+        raise FailedActivity(r.text)
 
     if r.headers.get("Content-Type") == "application/json":
         return r.json()
@@ -193,8 +202,9 @@ def validate_python_activity(activity: Activity):
 
     This should be considered as a private function.
     """
-    mod = activity.get("module")
-    if not mod:
+    title = activity["title"]
+    mod_name = activity.get("module")
+    if not mod_name:
         raise InvalidActivity("a Python activity must have a module path")
 
     func = activity.get("func")
@@ -202,14 +212,18 @@ def validate_python_activity(activity: Activity):
         raise InvalidActivity("a Python activity must have a function name")
 
     try:
-        mod = importlib.import_module(mod)
+        mod = importlib.import_module(mod_name)
     except ImportError:
-        raise InvalidActivity(
-            "could not find Python module '{mod}'".format(mod=mod))
+        raise InvalidActivity("could not find Python module '{mod}' "
+                              "in activity '{title}'".format(
+                                  mod=mod_name, title=title))
 
     found_func = False
     arguments = activity.get("arguments", {})
-    for (name, cb) in inspect.getmembers(mod, inspect.isfunction):
+    candidates = set(
+        inspect.getmembers(mod, inspect.isfunction)).union(
+            inspect.getmembers(mod, inspect.isbuiltin))
+    for (name, cb) in candidates:
         if name == func:
             found_func = True
 
@@ -225,13 +239,14 @@ def validate_python_activity(activity: Activity):
                 if "missing" in msg:
                     arg = msg.rsplit(":", 1)[1].strip()
                     raise InvalidActivity(
-                        "required argument {name} is missing".format(
-                            name=arg))
+                        "required argument {name} is missing from "
+                        "activity '{title}'".format(name=arg, title=title))
                 elif "unexpected" in msg:
                     arg = msg.rsplit(" ", 1)[1].strip()
                     raise InvalidActivity(
                         "argument {name} is not part of the "
-                        "function signature".format(name=arg))
+                        "function signature in activity '{title}'".format(
+                            name=arg, title=title))
                 else:
                     # another error? let's fail fast
                     raise
@@ -239,7 +254,8 @@ def validate_python_activity(activity: Activity):
 
     if not found_func:
         raise InvalidActivity(
-            "'{mod}' does not expose '${func}'".format(mod=mod, func=func))
+            "'{mod}' does not expose '{func}' in activity '{title}'".format(
+                mod=mod_name, func=func, title=title))
 
 
 def validate_process_activity(activity: Activity):
@@ -255,16 +271,20 @@ def validate_process_activity(activity: Activity):
 
     This should be considered as a private function.
     """
+    title = activity["title"]
     path = activity.get("path")
     if not path:
         raise InvalidActivity("a process activity must have a path")
 
     if not os.path.isfile(path):
-        raise InvalidActivity("'{path}' cannot be found".format(path=path))
+        raise InvalidActivity(
+            "'{path}' cannot be found in activity '{title}'".format(
+                path=path, title=title))
 
     if not os.access(path, os.X_OK):
         raise InvalidActivity(
-            "no access permission to '{path}'".format(path=path))
+            "no access permission to '{path}' in activity '{title}'".format(
+                path=path, title=title))
 
 
 def validate_http_activity(activity: Activity):

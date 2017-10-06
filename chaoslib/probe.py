@@ -22,6 +22,8 @@ def run_probe(probe: Probe):
     try:
         return run_activity(probe)
     except FailedActivity as x:
+        if probe.get("negate") is True:
+            return
         m = str(x)
         m = m.replace("activity", "probe")
         raise FailedProbe(m).with_traceback(sys.exc_info()[2])
