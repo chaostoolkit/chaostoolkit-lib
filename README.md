@@ -1,7 +1,7 @@
 # chaostoolkit-lib
 
 [![Build Status](https://travis-ci.org/chaostoolkit/chaostoolkit-lib.svg?branch=master)](https://travis-ci.org/chaostoolkit/chaostoolkit-lib)
-[![Python versions](https://img.shields.io/pypi/pyversions/chaostoolkit-tlib.svg)](https://www.python.org/)
+[![Python versions](https://img.shields.io/pypi/pyversions/chaostoolkit-lib.svg)](https://www.python.org/)
 [![Requirements Status](https://requires.io/github/chaostoolkit/chaostoolkit-lib/requirements.svg?branch=master)](https://requires.io/github/chaostoolkit/chaostoolkit-lib/requirements/?branch=master)
 
 The Chaos Toolkit core library.
