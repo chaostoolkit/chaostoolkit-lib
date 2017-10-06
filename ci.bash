@@ -17,7 +17,7 @@ function run-test () {
 }
 
 function release () {
-    echo "Releasing the pachaage"
+    echo "Releasing the package"
     python setup.py release
 
     echo "Publishing to PyPI"
