@@ -13,7 +13,7 @@ The purpose of this library is to provide the core of the Chaos Toolkit
 
 [concepts]: http://chaostoolkit.org/overview/concepts/
 
-## Fetaures
+## Features
 
 The library performs the followings:
 
