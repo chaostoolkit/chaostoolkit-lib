@@ -14,7 +14,8 @@ from chaoslib.action import ensure_action_is_valid, run_action
 from chaoslib.exceptions import FailedAction, FailedActivity, FailedProbe,\
     InvalidExperiment
 from chaoslib.probe import ensure_probe_is_valid, run_probe
-from chaoslib.types import Activity, Experiment, Journal, Run
+from chaoslib.secret import load_secrets
+from chaoslib.types import Activity, Experiment, Journal, Run, Secrets
 
 __all__ = ["ensure_experiment_is_valid", "run_experiment"]
 
@@ -128,7 +129,8 @@ def run_experiment(experiment: Experiment) -> Journal:
 
 
 def run_activity(activity: Activity, kind: str,
-                 func: Callable[[Activity], Any]) -> Run:
+                 func: Callable[[Activity], Any],
+                 secrets: Secrets) -> Run:
     logger.info("Observing {n}: {t}".format(n=kind, t=activity["title"]))
     start = datetime.utcnow()
 
@@ -138,7 +140,7 @@ def run_activity(activity: Activity, kind: str,
     }
 
     try:
-        result = func(activity)
+        result = func(activity, secrets)
         run["status"] = "succeeded"
         run["output"] = result
         logger.info("{n} suceeeded".format(n=kind.title()))
