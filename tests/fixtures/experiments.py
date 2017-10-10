@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from fixtures.probes import PythonModuleProbe
 
+Secrets = {}
+
 EmptyExperiment = {}
 
 MissingTitleExperiment = {

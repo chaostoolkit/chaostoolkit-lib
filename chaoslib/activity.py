@@ -13,7 +13,7 @@ from typing import Any
 import requests
 
 from chaoslib.exceptions import FailedActivity, InvalidActivity
-from chaoslib.types import Activity
+from chaoslib.types import Activity, Secrets
 
 __all__ = ["ensure_activity_is_valid", "run_activity"]
 
@@ -70,7 +70,7 @@ def ensure_activity_is_valid(activity: Activity):
         validate_http_activity(activity)
 
 
-def run_activity(activity: Activity) -> Any:
+def run_activity(activity: Activity, secrets: Secrets) -> Any:
     """
     Run the given activity and return its result. If the activity defines a
     `timeout` this function raises :exc:`FailedActivity`.
@@ -82,11 +82,11 @@ def run_activity(activity: Activity) -> Any:
     """
     activity_type = activity["type"]
     if activity_type == "python":
-        return run_python_activity(activity)
+        return run_python_activity(activity, secrets)
     elif activity_type == "process":
-        return run_process_activity(activity)
+        return run_process_activity(activity, secrets)
     elif activity_type == "http":
-        return run_http_activity(activity)
+        return run_http_activity(activity, secrets)
 
 
 ###############################################################################
@@ -94,7 +94,7 @@ def run_activity(activity: Activity) -> Any:
 ###############################################################################
 
 
-def run_python_activity(activity: Activity) -> Any:
+def run_python_activity(activity: Activity, secrets: Secrets) -> Any:
     """
     Run a Python activity.
 
@@ -107,9 +107,13 @@ def run_python_activity(activity: Activity) -> Any:
     func_name = activity["func"]
     mod = importlib.import_module(mod_path)
     func = getattr(mod, func_name)
+    arguments = activity.get("arguments", {}).copy()
+
+    if "secrets" in activity:
+        arguments["secrets"] = secrets.get(activity["secrets"]).copy()
 
     try:
-        return func(**activity.get("arguments", {}))
+        return func(**arguments)
     except Exception as x:
         title = activity["title"]
         raise FailedActivity(
@@ -118,7 +122,7 @@ def run_python_activity(activity: Activity) -> Any:
                     sys.exc_info()[2])
 
 
-def run_process_activity(activity: Activity) -> Any:
+def run_process_activity(activity: Activity, secrets: Secrets) -> Any:
     """
     Run the a process activity.
 
@@ -149,7 +153,7 @@ def run_process_activity(activity: Activity) -> Any:
     return proc.stdout
 
 
-def run_http_activity(activity: Activity) -> Any:
+def run_http_activity(activity: Activity, secrets: Secrets) -> Any:
     """
     Run a HTTP activity.
 
@@ -220,6 +224,7 @@ def validate_python_activity(activity: Activity):
 
     found_func = False
     arguments = activity.get("arguments", {})
+    needs_secrets = "secrets" in activity
     candidates = set(
         inspect.getmembers(mod, inspect.isfunction)).union(
             inspect.getmembers(mod, inspect.isbuiltin))
@@ -231,7 +236,16 @@ def validate_python_activity(activity: Activity):
             # signature see if they match
             sig = inspect.signature(cb)
             try:
-                sig.bind(**arguments)
+                # secrets are provided through a `secrets` parameter to an
+                # activity that needs them. However, they are declared out of
+                # band of the `arguments` mapping. Here, we simply ensure the
+                # signature of the activity is valid by injecting a fake
+                # `secrets` argument into the mapping.
+                args = arguments.copy()
+                if needs_secrets:
+                    args["secrets"] = None
+
+                sig.bind(**args)
             except TypeError as x:
                 # I dislike this sort of lookup but not sure we can
                 # differentiate them otherwise

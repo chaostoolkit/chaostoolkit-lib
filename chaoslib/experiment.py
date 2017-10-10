@@ -96,23 +96,27 @@ def run_experiment(experiment: Experiment) -> Journal:
         "run": []
     }
 
+    secrets = load_secrets(experiment.get("secrets", {}))
     method = experiment.get("method")
     for step in method:
         probes = step.get("probes", {})
 
         steady = probes.get("steady")
         if steady:
-            run = run_activity(steady, "steady state", func=run_probe)
+            run = run_activity(
+                steady, "steady state", func=run_probe, secrets=secrets)
             journal["run"].append(run)
 
         action = step.get("action")
         if action:
-            run = run_activity(action, "action", func=run_action)
+            run = run_activity(
+                action, "action", func=run_action, secrets=secrets)
             journal["run"].append(run)
 
         close = probes.get("close")
         if close:
-            run = run_activity(close, "close state", func=run_probe)
+            run = run_activity(
+                close, "close state", func=run_probe, secrets=secrets)
             journal["run"].append(run)
 
     journal["end"] = datetime.utcnow().isoformat()
