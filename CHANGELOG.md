@@ -13,6 +13,7 @@
 -   A first draft to loading secrets from environment
 -   Passing those secrets as a mapping to actions and probes expecting them
 -   Added support for background activities
+-   Dry mode support
 
 ### Removed
 

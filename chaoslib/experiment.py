@@ -90,9 +90,13 @@ def run_experiment(experiment: Experiment) -> Journal:
     `"background"` property set to `true`. In that case, the activity is run in
     a thread. By the end of runs, those threads block until they are all
     complete.
+
+    If the experiment has the `"dry"` property set to `False`, the experiment
+    runs without actually executing the activities.
     """
     logger.info("Running experiment: {t}".format(t=experiment["title"]))
 
+    dry = experiment.get("dry", False)
     started_at = time.time()
     journal = {
         "chaoslib-version": __version__,
@@ -128,10 +132,10 @@ def run_experiment(experiment: Experiment) -> Journal:
             if steady.get("background"):
                 logger.debug("steady probe will run in the background")
                 run = pool.submit(run_activity, steady, "steady state",
-                                  func=run_probe, secrets=secrets)
+                                  func=run_probe, secrets=secrets, dry=dry)
             else:
                 run = run_activity(steady, "steady state", func=run_probe,
-                                   secrets=secrets)
+                                   secrets=secrets, dry=dry)
             runs.append(run)
 
         action = step.get("action")
@@ -139,10 +143,10 @@ def run_experiment(experiment: Experiment) -> Journal:
             if action.get("background"):
                 logger.debug("action will run in the background")
                 run = pool.submit(run_activity, action, "action",
-                                  func=run_action, secrets=secrets)
+                                  func=run_action, secrets=secrets, dry=dry)
             else:
                 run = run_activity(action, "action", func=run_action,
-                                   secrets=secrets)
+                                   secrets=secrets, dry=dry)
             runs.append(run)
 
         close = probes.get("close")
@@ -150,10 +154,10 @@ def run_experiment(experiment: Experiment) -> Journal:
             if close.get("background"):
                 logger.debug("close probe will run in the background")
                 run = pool.submit(run_activity, close, "close state",
-                                  func=run_probe, secrets=secrets)
+                                  func=run_probe, secrets=secrets, dry=dry)
             else:
                 run = run_activity(close, "close state", func=run_probe,
-                                   secrets=secrets)
+                                   secrets=secrets, dry=dry)
             runs.append(run)
 
     journal["end"] = datetime.utcnow().isoformat()
@@ -176,19 +180,21 @@ def run_experiment(experiment: Experiment) -> Journal:
 
 def run_activity(activity: Activity, kind: str,
                  func: Callable[[Activity], Any],
-                 secrets: Secrets) -> Run:
+                 secrets: Secrets, dry: bool = False) -> Run:
     logger.info("{n}: {t}".format(n=kind.title(), t=activity["title"]))
     start = datetime.utcnow()
 
     run = {
         "activity": activity,
-        "kind": kind
+        "kind": kind,
+        "output": None
     }
 
     try:
-        result = func(activity, secrets)
+        if not dry:
+            result = func(activity, secrets)
+            run["output"] = result
         run["status"] = "succeeded"
-        run["output"] = result
         logger.info("{n} succeeded".format(n=kind.title()))
     except FailedActivity as x:
         error_msg = str(x)

@@ -5,7 +5,7 @@ import pytest
 import requests_mock
 
 from chaoslib.exceptions import InvalidExperiment
-from chaoslib.experiment import ensure_experiment_is_valid
+from chaoslib.experiment import ensure_experiment_is_valid, run_experiment
 from chaoslib.types import Experiment
 
 from fixtures import experiments
@@ -45,3 +45,11 @@ def test_experiment_must_have_a_description():
 
 def test_valid_experiment():
     assert ensure_experiment_is_valid(experiments.Experiment) is None
+
+
+def test_can_run_experiment_in_dry_mode():
+    experiment = experiments.Experiment.copy()
+    experiment["dry"] = True
+
+    journal = run_experiment(experiment)
+    assert isinstance(journal, dict)
