@@ -97,6 +97,9 @@ def run_experiment(experiment: Experiment) -> Journal:
     logger.info("Running experiment: {t}".format(t=experiment["title"]))
 
     dry = experiment.get("dry", False)
+    if dry:
+        logger.warning("Dry mode enabled")
+
     started_at = time.time()
     journal = {
         "chaoslib-version": __version__,
