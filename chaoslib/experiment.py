@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 import io
 import json
@@ -84,6 +85,11 @@ def run_experiment(experiment: Experiment) -> Journal:
     """
     Run the given `experiment` method step by step, in the following sequence:
     steady probe, action, close probe.
+
+    Activities can be executed in background when they have the
+    `"background"` property set to `true`. In that case, the activity is run in
+    a thread. By the end of runs, those threads block until they are all
+    complete.
     """
     logger.info("Running experiment: {t}".format(t=experiment["title"]))
 
@@ -99,29 +105,69 @@ def run_experiment(experiment: Experiment) -> Journal:
 
     secrets = load_secrets(experiment.get("secrets", {}))
     method = experiment.get("method")
+
+    background_count = 0
+    for step in method:
+        action = step.get("action")
+        if action and action.get("background"):
+            background_count = background_count + 1
+
+    pool = None
+    if background_count:
+        logger.debug(
+            "{c} activities will be run in the background".format(
+                c=background_count))
+        pool = ThreadPoolExecutor(background_count)
+
+    runs = []
     for step in method:
         probes = step.get("probes", {})
 
         steady = probes.get("steady")
         if steady:
-            run = run_activity(
-                steady, "steady state", func=run_probe, secrets=secrets)
-            journal["run"].append(run)
+            if steady.get("background"):
+                logger.debug("steady probe will run in the background")
+                run = pool.submit(run_activity, steady, "steady state",
+                                  func=run_probe, secrets=secrets)
+            else:
+                run = run_activity(steady, "steady state", func=run_probe,
+                                   secrets=secrets)
+            runs.append(run)
 
         action = step.get("action")
         if action:
-            run = run_activity(
-                action, "action", func=run_action, secrets=secrets)
-            journal["run"].append(run)
+            if action.get("background"):
+                logger.debug("action will run in the background")
+                run = pool.submit(run_activity, action, "action",
+                                  func=run_action, secrets=secrets)
+            else:
+                run = run_activity(action, "action", func=run_action,
+                                   secrets=secrets)
+            runs.append(run)
 
         close = probes.get("close")
         if close:
-            run = run_activity(
-                close, "close state", func=run_probe, secrets=secrets)
-            journal["run"].append(run)
+            if close.get("background"):
+                logger.debug("close probe will run in the background")
+                run = pool.submit(run_activity, close, "close state",
+                                  func=run_probe, secrets=secrets)
+            else:
+                run = run_activity(close, "close state", func=run_probe,
+                                   secrets=secrets)
+            runs.append(run)
 
     journal["end"] = datetime.utcnow().isoformat()
     journal["duration"] = time.time() - started_at
+
+    if pool:
+        logger.debug("Waiting for background actions to complete...")
+        pool.shutdown(wait=True)
+
+    for run in runs:
+        if isinstance(run, dict):
+            journal["run"].append(run)
+        else:
+            journal["run"].append(run.result())
 
     logger.info("Experiment is now complete")
 
@@ -131,7 +177,7 @@ def run_experiment(experiment: Experiment) -> Journal:
 def run_activity(activity: Activity, kind: str,
                  func: Callable[[Activity], Any],
                  secrets: Secrets) -> Run:
-    logger.info("Observing {n}: {t}".format(n=kind, t=activity["title"]))
+    logger.info("{n}: {t}".format(n=kind.title(), t=activity["title"]))
     start = datetime.utcnow()
 
     run = {
@@ -143,7 +189,7 @@ def run_activity(activity: Activity, kind: str,
         result = func(activity, secrets)
         run["status"] = "succeeded"
         run["output"] = result
-        logger.info("{n} suceeeded".format(n=kind.title()))
+        logger.info("{n} succeeded".format(n=kind.title()))
     except FailedActivity as x:
         error_msg = str(x)
         run["status"] = "failed"

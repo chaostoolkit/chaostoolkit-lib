@@ -62,6 +62,10 @@ def ensure_activity_is_valid(activity: Activity):
         if after is not None and not isinstance(after, numbers.Number):
             raise InvalidActivity("activity after pause must be a number")
 
+    if "background" in activity:
+        if not isinstance(activity["background"], bool):
+            raise InvalidActivity("activity background must be a boolean")
+
     if activity_type == "python":
         validate_python_activity(activity)
     elif activity_type == "process":

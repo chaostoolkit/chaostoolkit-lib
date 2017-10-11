@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from fixtures.probes import PythonModuleProbe
+from fixtures.probes import PythonModuleProbe, BackgroundPythonModuleProbe
 
 Secrets = {}
 
@@ -28,6 +28,6 @@ Experiment = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",
     "method": [
-        PythonModuleProbe
+        PythonModuleProbe, BackgroundPythonModuleProbe
     ]
 }

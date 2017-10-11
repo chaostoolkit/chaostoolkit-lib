@@ -124,3 +124,15 @@ HTTPProbe = {
         "after": 5
     }
 }
+
+BackgroundPythonModuleProbe = {
+    "title": "This probe is a Python probe",
+    "type": "python",
+    "module": "os.path",
+    "func": "exists",
+    "layer": "kubernetes",
+    "arguments": {
+        "path": __file__,
+    },
+    "background": True
+}
