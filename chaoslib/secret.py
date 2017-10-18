@@ -16,7 +16,7 @@ def load_secrets(secrets_info: Dict[str, Dict[str, str]]) -> Secrets:
     the secrets whenever they relate to external sources such as environmental
     variables (or in the future from vault secrets).
     """
-    logger.info("Loading secrets...")
+    logger.debug("Loading secrets...")
     secrets = {}
 
     for (target, keys) in secrets_info.items():

@@ -94,7 +94,7 @@ def run_experiment(experiment: Experiment) -> Journal:
     If the experiment has the `"dry"` property set to `False`, the experiment
     runs without actually executing the activities.
     """
-    logger.info("Running experiment: {t}".format(t=experiment["title"]))
+    logger.info("Experiment: {t}".format(t=experiment["title"]))
 
     dry = experiment.get("dry", False)
     if dry:
@@ -128,6 +128,8 @@ def run_experiment(experiment: Experiment) -> Journal:
 
     runs = []
     for step in method:
+        logger.info("Step: {t}".format(t=step.get("title")))
+
         probes = step.get("probes", {})
 
         steady = probes.get("steady")
@@ -184,7 +186,7 @@ def run_experiment(experiment: Experiment) -> Journal:
 def run_activity(activity: Activity, kind: str,
                  func: Callable[[Activity], Any],
                  secrets: Secrets, dry: bool = False) -> Run:
-    logger.info("{n}: {t}".format(n=kind.title(), t=activity["title"]))
+    logger.info("  {n}: {t}".format(n=kind.title(), t=activity["title"]))
     start = datetime.utcnow()
 
     run = {
@@ -198,13 +200,13 @@ def run_activity(activity: Activity, kind: str,
             result = func(activity, secrets)
             run["output"] = result
         run["status"] = "succeeded"
-        logger.info("{n} succeeded".format(n=kind.title()))
+        logger.info("  => succeeded with '{r}'".format(r=result))
     except FailedActivity as x:
         error_msg = str(x)
         run["status"] = "failed"
         run["output"] = str(x)
         run["exception"] = traceback.format_exception(type(x), x, None)
-        logger.error("{n} failed: {x}".format(n=kind.title(), x=error_msg))
+        logger.error("   => failed: {x}".format(x=error_msg))
 
     end = datetime.utcnow()
     run["start"] = start.isoformat()
