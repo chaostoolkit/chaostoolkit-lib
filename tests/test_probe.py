@@ -122,3 +122,17 @@ def test_run_http_probe_should_fail_when_return_code_is_above_400():
         with pytest.raises(FailedProbe) as exc:
             run_probe(probes.HTTPProbe, experiments.Secrets)
         assert "Not found!" in str(exc)
+
+
+def test_run_http_probe_can_expect_failure():
+    with requests_mock.mock() as m:
+        m.post(
+            'http://example.com', status_code=404, text="Not found!")
+
+        probe = probes.HTTPProbe.copy()
+        probe["expected_status"] = 404
+
+        try:
+            run_probe(probe, experiments.Secrets)
+        except FailedProbe:
+            pytest.fail("probe should not have failed")

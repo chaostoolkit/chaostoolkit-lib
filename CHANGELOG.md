@@ -2,7 +2,16 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.2.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.3.0...HEAD
+
+## [0.3.0][] - 2017-10-18
+
+[0.3.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.2.0...0.3.0
+
+### Added
+
+-   An `expected_status` for HTTP probe to consider HTTP errors as expected in
+    some cases
 
 ## [0.2.0][] - 2017-10-10
 

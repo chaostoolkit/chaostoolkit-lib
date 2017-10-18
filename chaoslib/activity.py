@@ -174,6 +174,7 @@ def run_http_activity(activity: Activity, secrets: Secrets) -> Any:
     headers = activity.get("headers", None)
     timeout = activity.get("timeout", None)
     args = activity.get("arguments", {})
+    expected_status = activity.get("expected_status", 200)
 
     try:
         if method == "GET":
@@ -185,7 +186,7 @@ def run_http_activity(activity: Activity, secrets: Secrets) -> Any:
     except requests.exceptions.Timeout:
         raise FailedActivity("activity took too long to complete")
 
-    if r.status_code > 399:
+    if r.status_code != expected_status:
         raise FailedActivity(r.text)
 
     if r.headers.get("Content-Type") == "application/json":
