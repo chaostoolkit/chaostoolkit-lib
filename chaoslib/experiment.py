@@ -6,7 +6,7 @@ import json
 import platform
 import time
 import traceback
-from typing import Any, Callable
+from typing import Any, Callable, Dict, Iterator
 
 from logzero import logger
 
@@ -81,6 +81,37 @@ def ensure_experiment_is_valid(experiment: Experiment):
                 ensure_probe_is_valid(close)
 
 
+def initialize_run_journal(experiment: Experiment) -> Dict[str, Any]:
+    return {
+        "chaoslib-version": __version__,
+        "platform": platform.platform(),
+        "node": platform.node(),
+        "experiment": experiment.copy(),
+        "start": datetime.utcnow().isoformat(),
+        "run": []
+    }
+
+
+def get_background_pool(experiment: Experiment) -> ThreadPoolExecutor:
+    """
+    Create a pool for background activities. The pool is as big as the number
+    of declared background activities. If none are declared, returned `None`.
+    """
+    method = experiment.get("method")
+
+    background_count = 0
+    for step in method:
+        action = step.get("action")
+        if action and action.get("background"):
+            background_count = background_count + 1
+
+    if background_count:
+        logger.debug(
+            "{c} activities will be run in the background".format(
+                c=background_count))
+        return ThreadPoolExecutor(background_count)
+
+
 def run_experiment(experiment: Experiment) -> Journal:
     """
     Run the given `experiment` method step by step, in the following sequence:
@@ -101,69 +132,12 @@ def run_experiment(experiment: Experiment) -> Journal:
         logger.warning("Dry mode enabled")
 
     started_at = time.time()
-    journal = {
-        "chaoslib-version": __version__,
-        "platform": platform.platform(),
-        "node": platform.node(),
-        "experiment": experiment.copy(),
-        "start": datetime.utcnow().isoformat(),
-        "run": []
-    }
-
     secrets = load_secrets(experiment.get("secrets", {}))
-    method = experiment.get("method")
+    pool = get_background_pool(experiment)
 
-    background_count = 0
-    for step in method:
-        action = step.get("action")
-        if action and action.get("background"):
-            background_count = background_count + 1
+    journal = initialize_run_journal(experiment)
 
-    pool = None
-    if background_count:
-        logger.debug(
-            "{c} activities will be run in the background".format(
-                c=background_count))
-        pool = ThreadPoolExecutor(background_count)
-
-    runs = []
-    for step in method:
-        logger.info("Step: {t}".format(t=step.get("title")))
-
-        probes = step.get("probes", {})
-
-        steady = probes.get("steady")
-        if steady:
-            if steady.get("background"):
-                logger.debug("steady probe will run in the background")
-                run = pool.submit(run_activity, steady, "steady state",
-                                  func=run_probe, secrets=secrets, dry=dry)
-            else:
-                run = run_activity(steady, "steady state", func=run_probe,
-                                   secrets=secrets, dry=dry)
-            runs.append(run)
-
-        action = step.get("action")
-        if action:
-            if action.get("background"):
-                logger.debug("action will run in the background")
-                run = pool.submit(run_activity, action, "action",
-                                  func=run_action, secrets=secrets, dry=dry)
-            else:
-                run = run_activity(action, "action", func=run_action,
-                                   secrets=secrets, dry=dry)
-            runs.append(run)
-
-        close = probes.get("close")
-        if close:
-            if close.get("background"):
-                logger.debug("close probe will run in the background")
-                run = pool.submit(run_activity, close, "close state",
-                                  func=run_probe, secrets=secrets, dry=dry)
-            else:
-                run = run_activity(close, "close state", func=run_probe,
-                                   secrets=secrets, dry=dry)
-            runs.append(run)
+    runs = list(run_steps(experiment, pool, dry))
 
     journal["end"] = datetime.utcnow().isoformat()
     journal["duration"] = time.time() - started_at
@@ -181,6 +155,48 @@ def run_experiment(experiment: Experiment) -> Journal:
     logger.info("Experiment is now complete")
 
     return journal
+
+
+def run_steps(experiment: Experiment,
+              pool: ThreadPoolExecutor, dry: bool) -> Iterator[Dict[str, Any]]:
+    method = experiment.get("method")
+    for step in method:
+        logger.info("Step: {t}".format(t=step.get("title")))
+
+        probes = step.get("probes", {})
+
+        steady = probes.get("steady")
+        if steady:
+            if steady.get("background"):
+                logger.debug("steady probe will run in the background")
+                run = pool.submit(run_activity, steady, "steady state",
+                                  func=run_probe, secrets=secrets, dry=dry)
+            else:
+                run = run_activity(steady, "steady state", func=run_probe,
+                                   secrets=secrets, dry=dry)
+            yield run
+
+        action = step.get("action")
+        if action:
+            if action.get("background"):
+                logger.debug("action will run in the background")
+                run = pool.submit(run_activity, action, "action",
+                                  func=run_action, secrets=secrets, dry=dry)
+            else:
+                run = run_activity(action, "action", func=run_action,
+                                   secrets=secrets, dry=dry)
+            yield run
+
+        close = probes.get("close")
+        if close:
+            if close.get("background"):
+                logger.debug("close probe will run in the background")
+                run = pool.submit(run_activity, close, "close state",
+                                  func=run_probe, secrets=secrets, dry=dry)
+            else:
+                run = run_activity(close, "close state", func=run_probe,
+                                   secrets=secrets, dry=dry)
+            yield run
 
 
 def run_activity(activity: Activity, kind: str,

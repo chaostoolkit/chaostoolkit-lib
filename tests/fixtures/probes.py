@@ -90,7 +90,7 @@ PythonModuleProbe = {
     "timeout": 30,
     "pauses": {
         "before": 0,
-        "after": 5
+        "after": 0.1
     }
 }
 
@@ -105,7 +105,7 @@ ProcProbe = {
     "timeout": 1,
     "pauses": {
         "before": 0,
-        "after": 5
+        "after": 0.1
     }
 }
 
@@ -121,7 +121,7 @@ HTTPProbe = {
     "timeout": 30,
     "pauses": {
         "before": 0,
-        "after": 5
+        "after": 0.1
     }
 }
 

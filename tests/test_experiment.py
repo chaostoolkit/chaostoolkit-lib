@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 import sys
+import types
 
 import pytest
 import requests_mock
 
 from chaoslib.exceptions import InvalidExperiment
-from chaoslib.experiment import ensure_experiment_is_valid, run_experiment
+from chaoslib.experiment import ensure_experiment_is_valid, run_experiment, \
+    run_steps
 from chaoslib.types import Experiment
 
 from fixtures import experiments
@@ -53,3 +55,8 @@ def test_can_run_experiment_in_dry_mode():
 
     journal = run_experiment(experiment)
     assert isinstance(journal, dict)
+
+
+def test_can_iterate_over_steps():
+    g = run_steps(experiments.Experiment, pool=None, dry=False)
+    assert  isinstance(g, types.GeneratorType)

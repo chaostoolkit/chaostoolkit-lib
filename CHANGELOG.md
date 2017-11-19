@@ -4,6 +4,17 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.4.0...HEAD
 
+## [0.5.0][] - 2017-11-19
+
+[0.5.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.4.0...0.5.0
+
+### Changed
+
+-   Split the inner of `run_experiment` into various functions for better
+    composability
+-   Pause before/after activity
+
+
 ## [0.4.0][] - 2017-10-18
 
 [0.4.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.3.0...0.4.0
