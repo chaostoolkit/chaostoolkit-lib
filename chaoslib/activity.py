@@ -7,6 +7,7 @@ import os
 import os.path
 import subprocess
 import sys
+import time
 import traceback
 from typing import Any
 
@@ -84,13 +85,24 @@ def run_activity(activity: Activity, secrets: Secrets) -> Any:
     function without validating its input as this could be a security issue
     or simply fails miserably.
     """
+    pauses = activity.get("pauses", {})
+    pause_before = pauses.get("before")
+    if pause_before:
+        time.sleep(pause_before)
+
     activity_type = activity["type"]
     if activity_type == "python":
-        return run_python_activity(activity, secrets)
+        result = run_python_activity(activity, secrets)
     elif activity_type == "process":
-        return run_process_activity(activity, secrets)
+        result = run_process_activity(activity, secrets)
     elif activity_type == "http":
-        return run_http_activity(activity, secrets)
+        result = run_http_activity(activity, secrets)
+
+    pause_after = pauses.get("after")
+    if pause_after:
+        time.sleep(pause_after)
+
+    return result
 
 
 ###############################################################################
