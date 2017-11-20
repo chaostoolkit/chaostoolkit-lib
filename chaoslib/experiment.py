@@ -183,7 +183,7 @@ def run_steady_probe(step: Step, secrets: Secrets = None,
                               func=run_probe, secrets=secrets, dry=dry)
         else:
             run = run_activity(steady, "steady state", func=run_probe,
-                                secrets=secrets, dry=dry)
+                               secrets=secrets, dry=dry)
         return run
 
 
@@ -195,10 +195,10 @@ def run_action(step: Step, secrets: Secrets = None,
         if action.get("background"):
             logger.debug("action will run in the background")
             run = pool.submit(run_activity, action, "action",
-                                func=run_action, secrets=secrets, dry=dry)
+                              func=run_action, secrets=secrets, dry=dry)
         else:
             run = run_activity(action, "action", func=run_action,
-                                secrets=secrets, dry=dry)
+                               secrets=secrets, dry=dry)
         return run
 
 
@@ -211,10 +211,10 @@ def run_close_probe(step: Step, secrets: Secrets = None,
         if close.get("background"):
             logger.debug("close probe will run in the background")
             run = pool.submit(run_activity, close, "close state",
-                                func=run_probe, secrets=secrets, dry=dry)
+                              func=run_probe, secrets=secrets, dry=dry)
         else:
             run = run_activity(close, "close state", func=run_probe,
-                                secrets=secrets, dry=dry)
+                               secrets=secrets, dry=dry)
         return run
 
 
