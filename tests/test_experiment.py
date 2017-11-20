@@ -58,5 +58,5 @@ def test_can_run_experiment_in_dry_mode():
 
 
 def test_can_iterate_over_steps():
-    g = run_steps(experiments.Experiment, pool=None, dry=False)
+    g = run_steps(experiments.Experiment, secrets=None, pool=None, dry=False)
     assert  isinstance(g, types.GeneratorType)

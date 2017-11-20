@@ -16,7 +16,8 @@ from chaoslib.exceptions import FailedAction, FailedActivity, FailedProbe,\
     InvalidExperiment
 from chaoslib.probe import ensure_probe_is_valid, run_probe
 from chaoslib.secret import load_secrets
-from chaoslib.types import Activity, Experiment, Journal, Run, Secrets
+from chaoslib.types import Activity, Experiment, Journal, Run, Secrets, Step
+
 
 __all__ = ["ensure_experiment_is_valid", "run_experiment"]
 
@@ -137,7 +138,7 @@ def run_experiment(experiment: Experiment) -> Journal:
 
     journal = initialize_run_journal(experiment)
 
-    runs = list(run_steps(experiment, pool, dry))
+    runs = list(run_steps(experiment, secrets, pool, dry))
 
     journal["end"] = datetime.utcnow().isoformat()
     journal["duration"] = time.time() - started_at
@@ -147,6 +148,8 @@ def run_experiment(experiment: Experiment) -> Journal:
         pool.shutdown(wait=True)
 
     for run in runs:
+        if not run:
+            continue
         if isinstance(run, dict):
             journal["run"].append(run)
         else:
@@ -157,46 +160,62 @@ def run_experiment(experiment: Experiment) -> Journal:
     return journal
 
 
-def run_steps(experiment: Experiment,
-              pool: ThreadPoolExecutor, dry: bool) -> Iterator[Dict[str, Any]]:
+def run_steps(experiment: Experiment, secrets: Secrets,
+              pool: ThreadPoolExecutor, dry: bool = False) -> Iterator[Run]:
     method = experiment.get("method")
     for step in method:
         logger.info("Step: {t}".format(t=step.get("title")))
 
-        probes = step.get("probes", {})
+        yield run_steady_probe(step, secrets, pool, dry)
+        yield run_action(step, secrets, pool, dry)
+        yield run_close_probe(step, secrets, pool, dry)
 
-        steady = probes.get("steady")
-        if steady:
-            if steady.get("background"):
-                logger.debug("steady probe will run in the background")
-                run = pool.submit(run_activity, steady, "steady state",
-                                  func=run_probe, secrets=secrets, dry=dry)
-            else:
-                run = run_activity(steady, "steady state", func=run_probe,
-                                   secrets=secrets, dry=dry)
-            yield run
 
-        action = step.get("action")
-        if action:
-            if action.get("background"):
-                logger.debug("action will run in the background")
-                run = pool.submit(run_activity, action, "action",
-                                  func=run_action, secrets=secrets, dry=dry)
-            else:
-                run = run_activity(action, "action", func=run_action,
-                                   secrets=secrets, dry=dry)
-            yield run
+def run_steady_probe(step: Step, secrets: Secrets = None,
+                     pool: ThreadPoolExecutor = None,
+                     dry: bool = False) -> Run:
+    probes = step.get("probes", {})
+    steady = probes.get("steady")
+    if steady:
+        if steady.get("background"):
+            logger.debug("steady probe will run in the background")
+            run = pool.submit(run_activity, steady, "steady state",
+                              func=run_probe, secrets=secrets, dry=dry)
+        else:
+            run = run_activity(steady, "steady state", func=run_probe,
+                                secrets=secrets, dry=dry)
+        return run
 
-        close = probes.get("close")
-        if close:
-            if close.get("background"):
-                logger.debug("close probe will run in the background")
-                run = pool.submit(run_activity, close, "close state",
-                                  func=run_probe, secrets=secrets, dry=dry)
-            else:
-                run = run_activity(close, "close state", func=run_probe,
-                                   secrets=secrets, dry=dry)
-            yield run
+
+def run_action(step: Step, secrets: Secrets = None,
+               pool: ThreadPoolExecutor = None,
+               dry: bool = False) -> Run:
+    action = step.get("action")
+    if action:
+        if action.get("background"):
+            logger.debug("action will run in the background")
+            run = pool.submit(run_activity, action, "action",
+                                func=run_action, secrets=secrets, dry=dry)
+        else:
+            run = run_activity(action, "action", func=run_action,
+                                secrets=secrets, dry=dry)
+        return run
+
+
+def run_close_probe(step: Step, secrets: Secrets = None,
+                    pool: ThreadPoolExecutor = None,
+                    dry: bool = False) -> Run:
+    probes = step.get("probes", {})
+    close = probes.get("close")
+    if close:
+        if close.get("background"):
+            logger.debug("close probe will run in the background")
+            run = pool.submit(run_activity, close, "close state",
+                                func=run_probe, secrets=secrets, dry=dry)
+        else:
+            run = run_activity(close, "close state", func=run_probe,
+                                secrets=secrets, dry=dry)
+        return run
 
 
 def run_activity(activity: Activity, kind: str,
