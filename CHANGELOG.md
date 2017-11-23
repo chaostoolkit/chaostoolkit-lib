@@ -2,7 +2,18 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.4.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.5.1...HEAD
+
+## [0.5.1][] - 2017-11-23
+
+[0.5.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.5.0...0.5.1
+
+### Changed
+
+-   Do not shadow functions
+-   Log full errors on debug level
+-   Always pause even if activity failed
+
 
 ## [0.5.0][] - 2017-11-19
 

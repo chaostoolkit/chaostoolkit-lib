@@ -167,7 +167,7 @@ def run_steps(experiment: Experiment, secrets: Secrets,
         logger.info("Step: {t}".format(t=step.get("title")))
 
         yield run_steady_probe(step, secrets, pool, dry)
-        yield run_action(step, secrets, pool, dry)
+        yield apply_action(step, secrets, pool, dry)
         yield run_close_probe(step, secrets, pool, dry)
 
 
@@ -187,9 +187,9 @@ def run_steady_probe(step: Step, secrets: Secrets = None,
         return run
 
 
-def run_action(step: Step, secrets: Secrets = None,
-               pool: ThreadPoolExecutor = None,
-               dry: bool = False) -> Run:
+def apply_action(step: Step, secrets: Secrets = None,
+                 pool: ThreadPoolExecutor = None,
+                 dry: bool = False) -> Run:
     action = step.get("action")
     if action:
         if action.get("background"):
