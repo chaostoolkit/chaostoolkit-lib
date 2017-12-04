@@ -11,12 +11,12 @@ from typing import Any, Callable, Dict, Iterator
 from logzero import logger
 
 from chaoslib import __version__
-from chaoslib.action import ensure_action_is_valid, run_action
-from chaoslib.exceptions import FailedAction, FailedActivity, FailedProbe,\
+from chaoslib.activity import ensure_activity_is_valid, run_activity
+from chaoslib.exceptions import FailedActivity, InvalidActivity, \
     InvalidExperiment
-from chaoslib.probe import ensure_probe_is_valid, run_probe
 from chaoslib.secret import load_secrets
-from chaoslib.types import Activity, Experiment, Journal, Run, Secrets, Step
+from chaoslib.types import Action, Activity, Experiment, Journal, Probe, Run, \
+    Secrets, Step
 
 
 __all__ = ["ensure_experiment_is_valid", "run_experiment"]
@@ -58,31 +58,57 @@ def ensure_experiment_is_valid(experiment: Experiment):
     if not experiment.get("description"):
         raise InvalidExperiment("experiment requires a description")
 
+    tags = experiment.get("tags")
+    if tags:
+        if list(filter(lambda t: t == '' or not isinstance(t, str), tags)):
+            raise InvalidExperiment(
+                "experiment tags must be a non-empty string")
+
+    ensure_hypothesis_is_valid(experiment)
+
     method = experiment.get("method")
     if not method:
         raise InvalidExperiment("an experiment requires a method with "
                                 "at least one activity")
 
     for step in method:
-        if "title" not in step:
-            raise InvalidExperiment("an activity step must have a title")
+        if "name" not in step:
+            raise InvalidExperiment("an activity must have a name")
 
-        action = step.get("action")
-        if action:
-            ensure_action_is_valid(action)
+        if "type" not in step:
+            raise InvalidExperiment("an activity must have a type")
 
-        probes = step.get("probes")
-        if probes:
-            steady = probes.get("steady")
-            if steady:
-                ensure_probe_is_valid(steady)
+        if step["type"] not in ("action", "probe"):
+            raise InvalidExperiment(
+                "only 'action' and 'probe' activities are supported")
 
-            close = probes.get("close")
-            if close:
-                ensure_probe_is_valid(close)
+        ensure_activity_is_valid(step)
 
 
-def initialize_run_journal(experiment: Experiment) -> Dict[str, Any]:
+def ensure_hypothesis_is_valid(experiment: Experiment):
+    """
+    Validates that the steady state hypothesis entry has the expected schema
+    or raises :exc:`InvalidExperiment` or :exc:`InvalidProbe`.
+    """
+    hypo = experiment.get("steady-state-hypothesis")
+    if hypo is None:
+        raise InvalidExperiment(
+            "experiment must declare a steady-state-hypothesis")
+
+    if not hypo.get("title"):
+        raise InvalidExperiment("hypothesis requires a title")
+
+    probes = hypo.get("probes")
+    if probes:
+        for probe in probes:
+            ensure_probe_is_valid(probe)
+
+            if "tolerance" not in probe:
+                raise InvalidProbe(
+                    "hypothesis probe must have a tolerance entry")
+
+
+def initialize_run_journal(experiment: Experiment) -> Journal:
     return {
         "chaoslib-version": __version__,
         "platform": platform.platform(),
@@ -101,9 +127,8 @@ def get_background_pool(experiment: Experiment) -> ThreadPoolExecutor:
     method = experiment.get("method")
 
     background_count = 0
-    for step in method:
-        action = step.get("action")
-        if action and action.get("background"):
+    for activity in method:
+        if activity and activity.get("background"):
             background_count = background_count + 1
 
     if background_count:
@@ -138,7 +163,7 @@ def run_experiment(experiment: Experiment) -> Journal:
 
     journal = initialize_run_journal(experiment)
 
-    runs = list(run_steps(experiment, secrets, pool, dry))
+    runs = list(run_activities(experiment, secrets, pool, dry))
 
     journal["end"] = datetime.utcnow().isoformat()
     journal["duration"] = time.time() - started_at
@@ -160,82 +185,52 @@ def run_experiment(experiment: Experiment) -> Journal:
     return journal
 
 
-def run_steps(experiment: Experiment, secrets: Secrets,
-              pool: ThreadPoolExecutor, dry: bool = False) -> Iterator[Run]:
+def run_activities(experiment: Experiment, secrets: Secrets,
+                   pool: ThreadPoolExecutor,
+                   dry: bool = False) -> Iterator[Run]:
+    """
+    Iternal generator that iterates over all activities and execute them.
+    Yields either the result of the run or a :class:`concurrent.futures.Future`
+    if the activity was set to run in the `background`.
+    """
     method = experiment.get("method")
-    for step in method:
-        logger.info("Step: {t}".format(t=step.get("title")))
+    for activity in method:
+        logger.info("Step: {t}".format(t=activity.get("title")))
 
-        yield run_steady_probe(step, secrets, pool, dry)
-        yield apply_action(step, secrets, pool, dry)
-        yield run_close_probe(step, secrets, pool, dry)
+        if activity.get("background"):
+            logger.debug("activity will run in the background")
+            yield pool.submit(execute_activity, activity=activity,
+                              secrets=secrets, dry=dry)
+        else:
+            yield execute_activity(activity, secrets=secrets, dry=dry)
 
 
-def run_steady_probe(step: Step, secrets: Secrets = None,
-                     pool: ThreadPoolExecutor = None,
+def execute_activity(activity: Activity, secrets: Secrets,
                      dry: bool = False) -> Run:
-    probes = step.get("probes", {})
-    steady = probes.get("steady")
-    if steady:
-        if steady.get("background"):
-            logger.debug("steady probe will run in the background")
-            run = pool.submit(run_activity, steady, "steady state",
-                              func=run_probe, secrets=secrets, dry=dry)
-        else:
-            run = run_activity(steady, "steady state", func=run_probe,
-                               secrets=secrets, dry=dry)
-        return run
-
-
-def apply_action(step: Step, secrets: Secrets = None,
-                 pool: ThreadPoolExecutor = None,
-                 dry: bool = False) -> Run:
-    action = step.get("action")
-    if action:
-        if action.get("background"):
-            logger.debug("action will run in the background")
-            run = pool.submit(run_activity, action, "action",
-                              func=run_action, secrets=secrets, dry=dry)
-        else:
-            run = run_activity(action, "action", func=run_action,
-                               secrets=secrets, dry=dry)
-        return run
-
-
-def run_close_probe(step: Step, secrets: Secrets = None,
-                    pool: ThreadPoolExecutor = None,
-                    dry: bool = False) -> Run:
-    probes = step.get("probes", {})
-    close = probes.get("close")
-    if close:
-        if close.get("background"):
-            logger.debug("close probe will run in the background")
-            run = pool.submit(run_activity, close, "close state",
-                              func=run_probe, secrets=secrets, dry=dry)
-        else:
-            run = run_activity(close, "close state", func=run_probe,
-                               secrets=secrets, dry=dry)
-        return run
-
-
-def run_activity(activity: Activity, kind: str,
-                 func: Callable[[Activity], Any],
-                 secrets: Secrets, dry: bool = False) -> Run:
-    logger.info("  {n}: {t}".format(n=kind.title(), t=activity["title"]))
+    """
+    Low-level wrapper around the actual activity provider call to collect
+    some meta data (like duration, start/end time, exceptions...) during
+    the run.
+    """
+    logger.info("  {n}: {t}".format(
+        n=activity["type"].title(), t=activity["name"]))
     start = datetime.utcnow()
 
     run = {
-        "activity": activity,
-        "kind": kind,
+        "activity": activity.copy(),
         "output": None
     }
 
     try:
+        result = None
         if not dry:
-            result = func(activity, secrets)
+            result = run_activity(activity, secrets)
             run["output"] = result
         run["status"] = "succeeded"
-        logger.info("  => succeeded with '{r}'".format(r=result))
+        if result is None:
+            logger.info("  => succeeded with '{r}'".format(r=result))
+        else:
+            logger.info("  => succeeded without any result value")
     except FailedActivity as x:
         error_msg = str(x)
         run["status"] = "failed"

@@ -13,20 +13,40 @@ MissingDescriptionExperiment = {
     "title": "kaboom"
 }
 
-MissingMethodExperiment = {
+MissingHypothesisExperiment = {
     "title": "kaboom",
     "description": "blah"
+}
+
+MissingHypothesisTitleExperiment = {
+    "title": "kaboom",
+    "description": "blah",
+    "steady-state-hypothesis": {}
+}
+
+MissingMethodExperiment = {
+    "title": "kaboom",
+    "description": "blah",
+    "steady-state-hypothesis": {
+        "title": "hello"
+    }
 }
 
 NoStepsMethodExperiment = {
     "title": "kaboom",
     "description": "blah",
+    "steady-state-hypothesis": {
+        "title": "hello"
+    },
     "method": []
 }
 
 Experiment = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",
+    "steady-state-hypothesis": {
+        "title": "hello"
+    },
     "method": [
         PythonModuleProbe, BackgroundPythonModuleProbe
     ]

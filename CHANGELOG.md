@@ -2,7 +2,21 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.5.1...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.6.0...HEAD
+
+## [0.6.0][] - 2017-12-04
+
+[0.6.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.5.1...0.6.0
+
+### Changed
+
+* [BREAKING]: The specification has changed in a non-compatible way. We are
+  working towards a 1.0 version and the initial draft was merely to set the
+  stage. The `method` has been simplified and there are no more `steady` and
+  `close` probes, only probes. We also now define a steady state hypothesis
+  that would fail the experiment should it not meet its expected state. Finally,
+  we define a `rollbacks` entry so that experiments can revert changes they
+  made.
 
 ## [0.5.1][] - 2017-11-23
 

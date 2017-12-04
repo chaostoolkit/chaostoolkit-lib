@@ -7,7 +7,7 @@ import requests_mock
 
 from chaoslib.exceptions import InvalidExperiment
 from chaoslib.experiment import ensure_experiment_is_valid, run_experiment, \
-    run_steps
+    run_activities
 from chaoslib.types import Experiment
 
 from fixtures import experiments
@@ -45,6 +45,18 @@ def test_experiment_must_have_a_description():
     assert "experiment requires a description" in str(exc)
 
 
+def test_experiment_must_have_a_hypothesis():
+    with pytest.raises(InvalidExperiment) as exc:
+        ensure_experiment_is_valid(experiments.MissingHypothesisExperiment)
+    assert "experiment must declare a steady-state-hypothesis" in str(exc)
+
+
+def test_experiment_hypothesis_must_have_a_title():
+    with pytest.raises(InvalidExperiment) as exc:
+        ensure_experiment_is_valid(experiments.MissingHypothesisTitleExperiment)
+    assert "hypothesis requires a title" in str(exc)
+
+
 def test_valid_experiment():
     assert ensure_experiment_is_valid(experiments.Experiment) is None
 
@@ -58,5 +70,6 @@ def test_can_run_experiment_in_dry_mode():
 
 
 def test_can_iterate_over_steps():
-    g = run_steps(experiments.Experiment, secrets=None, pool=None, dry=False)
+    g = run_activities(
+        experiments.Experiment, secrets=None, pool=None, dry=False)
     assert  isinstance(g, types.GeneratorType)
