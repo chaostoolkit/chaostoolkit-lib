@@ -49,7 +49,7 @@ $ pip install chaoslib
 
 ## Contribute
 
-Contributors to this project are welcome as this an open-source effort that
+Contributors to this project are welcome as this is an open-source effort that
 seeks [discussions][join] and continuous improvement.
 
 [join]: https://join.chaostoolkit.org/
