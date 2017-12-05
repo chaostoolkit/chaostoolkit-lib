@@ -31,7 +31,7 @@ classifiers = [
     'Topic :: System :: Distributed Computing'
 ]
 author = 'chaostoolkit Team'
-author_email = 'sh@defuze.org'
+author_email = 'contact@chaostoolkit.org'
 url = 'http://chaostoolkit.org'
 license = 'Apache License Version 2.0'
 packages = [
@@ -40,14 +40,9 @@ packages = [
 
 needs_pytest = set(['pytest', 'test']).intersection(sys.argv)
 pytest_runner = ['pytest_runner'] if needs_pytest else []
-test_require = [
-    'requests-mock',
-    'coverage',
-    'pytest>=2.8',
-    'pytest-cov',
-    'pytest-sugar',
-    'backports.unittest_mock',
-]
+test_require = []
+with io.open('requirements-dev.txt') as f:
+    test_require = [l.strip() for l in f if not l.startswith('#')]
 
 install_require = []
 with io.open('requirements.txt') as f:
