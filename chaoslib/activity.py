@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 import logging
 import numbers
 import os
@@ -6,20 +8,22 @@ import os.path
 import sys
 import time
 import traceback
-from typing import Any
+from typing import Any, Iterator, List
 
 from logzero import logger
 
-from chaoslib.exceptions import FailedActivity, InvalidActivity
+from chaoslib.caching import lookup_activity
+from chaoslib.exceptions import FailedActivity, InvalidActivity, \
+    InvalidExperiment
 from chaoslib.provider.http import run_http_activity, validate_http_activity
-from chaoslib.provider.native import run_python_activity, \
+from chaoslib.provider.python import run_python_activity, \
     validate_python_activity
-from chaoslib.provider.proc import run_process_activity, \
+from chaoslib.provider.process import run_process_activity, \
     validate_process_activity
-from chaoslib.types import Activity, Secrets
+from chaoslib.types import Activity, Experiment, Run, Secrets
 
 
-__all__ = ["ensure_activity_is_valid", "run_activity"]
+__all__ = ["ensure_activity_is_valid", "run_activities"]
 
 
 def ensure_activity_is_valid(activity: Activity):
@@ -38,6 +42,14 @@ def ensure_activity_is_valid(activity: Activity):
     if not activity:
         raise InvalidActivity("empty activity is no activity")
 
+    # when the activity is just a ref, there is little to validate
+    ref = activity.get("ref")
+    if ref is not None:
+        if not isinstance(ref, str) or ref == '':
+            raise InvalidActivity(
+                "reference to activity must be non-empty strings")
+        return
+
     activity_type = activity.get("type")
     if not activity_type:
         raise InvalidActivity("an activity must have a type")
@@ -45,6 +57,9 @@ def ensure_activity_is_valid(activity: Activity):
     if activity_type not in ("probe", "action"):
         raise InvalidActivity(
             "'{t}' is not a supported activity type".format(t=activity_type))
+
+    if not activity.get("name"):
+        raise InvalidActivity("an activity must have a name")
 
     provider = activity.get("provider")
     if not provider:
@@ -87,6 +102,91 @@ def ensure_activity_is_valid(activity: Activity):
         validate_http_activity(activity)
 
 
+def run_activities(experiment: Experiment, secrets: Secrets,
+                   pool: ThreadPoolExecutor,
+                   dry: bool = False) -> Iterator[Run]:
+    """
+    Iternal generator that iterates over all activities and execute them.
+    Yields either the result of the run or a :class:`concurrent.futures.Future`
+    if the activity was set to run in the `background`.
+    """
+    method = experiment.get("method")
+
+    for activity in method:
+        if activity.get("background"):
+            logger.debug("activity will run in the background")
+            yield pool.submit(execute_activity, activity=activity,
+                              secrets=secrets, dry=dry)
+        else:
+            yield execute_activity(activity, secrets=secrets, dry=dry)
+
+
+###############################################################################
+# Internal functions
+###############################################################################
+
+
+def execute_activity(activity: Activity, secrets: Secrets,
+                     dry: bool = False) -> Run:
+    """
+    Low-level wrapper around the actual activity provider call to collect
+    some meta data (like duration, start/end time, exceptions...) during
+    the run.
+    """
+    ref = activity.get("ref")
+    if ref:
+        activity = lookup_activity(ref)
+        if not activity:
+            raise FailedActivity(
+                "could not find referenced activity '{r}'".format(r=ref))
+
+    logger.info("{t}: {n}".format(
+        t=activity["type"].title(), n=activity.get("name")))
+
+    start = datetime.utcnow()
+
+    run = {
+        "activity": activity.copy(),
+        "output": None
+    }
+
+    pauses = activity.get("pauses", {})
+    pause_before = pauses.get("before")
+    if pause_before:
+        logger.info("  Pausing before for {d}s...".format(d=pause_before))
+        time.sleep(pause_before)
+
+    try:
+        result = None
+        # only run the activity itself when not in dry-mode
+        if not dry:
+            result = run_activity(activity, secrets)
+        run["output"] = result
+        run["status"] = "succeeded"
+        if result is not None:
+            logger.info("  => succeeded with '{r}'".format(r=result))
+        else:
+            logger.info("  => succeeded without any result value")
+    except FailedActivity as x:
+        error_msg = str(x)
+        run["status"] = "failed"
+        run["output"] = result
+        run["exception"] = traceback.format_exception(type(x), x, None)
+        logger.error("   => failed: {x}".format(x=error_msg))
+    finally:
+        pause_after = pauses.get("after")
+        if pause_after:
+            logger.info("  Pausing after for {d}s...".format(d=pause_after))
+            time.sleep(pause_after)
+
+    end = datetime.utcnow()
+    run["start"] = start.isoformat()
+    run["end"] = end.isoformat()
+    run["duration"] = (end - start).total_seconds()
+
+    return run
+
+
 def run_activity(activity: Activity, secrets: Secrets) -> Any:
     """
     Run the given activity and return its result. If the activity defines a
@@ -96,13 +196,10 @@ def run_activity(activity: Activity, secrets: Secrets) -> Any:
     `ensure_layer_activity_is_valid`. Please be careful not to call this
     function without validating its input as this could be a security issue
     or simply fails miserably.
-    """
-    pauses = activity.get("pauses", {})
-    pause_before = pauses.get("before")
-    if pause_before:
-        logger.info("  Pausing for {d}s...".format(d=pause_before))
-        time.sleep(pause_before)
 
+    This is an internal function and should probably avoid being called
+    outside this package.
+    """
     try:
         provider = activity["provider"]
         activity_type = provider["type"]
@@ -116,10 +213,5 @@ def run_activity(activity: Activity, secrets: Secrets) -> Any:
         # just make sure we have a full traceback
         logger.debug("Activity failed", exc_info=True)
         raise
-    finally:
-        pause_after = pauses.get("after")
-        if pause_after:
-            logger.info("  Pausing for {d}s...".format(d=pause_after))
-            time.sleep(pause_after)
 
     return result

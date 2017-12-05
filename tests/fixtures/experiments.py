@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-from fixtures.probes import PythonModuleProbe, BackgroundPythonModuleProbe
+from fixtures.probes import BackgroundPythonModuleProbe, MissingFuncArgProbe, \
+    PythonModuleProbe, PythonModuleProbeWithBoolTolerance, \
+    PythonModuleProbeWithExternalTolerance, PythonModuleProbeWithLongPause, \
+    BackgroundPythonModuleProbeWithLongPause
 
 Secrets = {}
 
@@ -41,13 +44,90 @@ NoStepsMethodExperiment = {
     "method": []
 }
 
-Experiment = {
+ExperimentWithInvalidHypoProbe = {
+    "title": "do cats live in the Internet?",
+    "description": "an experiment of importance",
+    "steady-state-hypothesis": {
+        "title": "hello",
+        "probes": [
+            MissingFuncArgProbe
+        ]
+    },
+    "method": [
+        PythonModuleProbe, BackgroundPythonModuleProbe
+    ],
+    "rollbacks": [
+        {
+            "ref": PythonModuleProbe["name"]
+        }
+    ]
+}
+
+ExperimentWithLongPause = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",
     "steady-state-hypothesis": {
         "title": "hello"
     },
     "method": [
+        PythonModuleProbeWithLongPause, 
+        BackgroundPythonModuleProbeWithLongPause
+    ],
+    "rollbacks": [
+        BackgroundPythonModuleProbe
+    ]
+}
+
+RefProbeExperiment = {
+    "title": "do cats live in the Internet?",
+    "description": "an experiment of importance",
+    "steady-state-hypothesis": {
+        "title": "hello",
+        "probes": [
+            PythonModuleProbeWithBoolTolerance,
+        ]
+    },
+    "method": [
+        PythonModuleProbe,
+        {
+            "ref": PythonModuleProbe["name"]
+        }
+    ]
+}
+
+MissingRefProbeExperiment = {
+    "title": "do cats live in the Internet?",
+    "description": "an experiment of importance",
+    "steady-state-hypothesis": {
+        "title": "hello",
+        "probes": [
+            PythonModuleProbeWithBoolTolerance,
+        ]
+    },
+    "method": [
+        PythonModuleProbe,
+        {
+            "ref": "pizza"
+        }
+    ]
+}
+
+Experiment = {
+    "title": "do cats live in the Internet?",
+    "description": "an experiment of importance",
+    "steady-state-hypothesis": {
+        "title": "hello",
+        "probes": [
+            PythonModuleProbeWithBoolTolerance,
+            PythonModuleProbeWithExternalTolerance
+        ]
+    },
+    "method": [
         PythonModuleProbe, BackgroundPythonModuleProbe
+    ],
+    "rollbacks": [
+        {
+            "ref": PythonModuleProbe["name"]
+        }
     ]
 }

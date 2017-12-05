@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os.path
 import sys
 
 
@@ -81,18 +82,18 @@ MissingHTTPUrlProbe = {
 
 MissingFuncArgProbe = {
     "type": "probe",
+    "name": "a name",
     "provider": {
         "type": "python",
         "module": "os.path",
         "func": "exists",
         "arguments": {}
-    },
-    "name": "a name"
+    }
 }
 
 TooManyFuncArgsProbe = {
     "type": "probe",
-    "name": "This probe has way too many args",
+    "name": "too-many-args-pause",
     "provider": {
         "type": "python",
         "module": "os.path",
@@ -106,7 +107,7 @@ TooManyFuncArgsProbe = {
 
 PythonModuleProbe = {
     "type": "probe",
-    "name": "This probe is a Python probe",
+    "name": "path-must-exists",
     "pauses": {
         "before": 0,
         "after": 0.1
@@ -116,11 +117,58 @@ PythonModuleProbe = {
         "module": "os.path",
         "func": "exists",
         "arguments": {
-            "path": __file__,
+            "path": os.path.abspath(__file__),
         },
         "timeout": 30
     }
 }
+
+PythonModuleProbeWithLongPause = {
+    "type": "probe",
+    "name": "probe-with-long-pause",
+    "pauses": {
+        "before": 0,
+        "after": 5
+    },
+    "provider": {
+        "type": "python",
+        "module": "os.path",
+        "func": "exists",
+        "arguments": {
+            "path": os.path.abspath(__file__),
+        },
+        "timeout": 30
+    }
+}
+
+BackgroundPythonModuleProbeWithLongPause = {
+    "type": "probe",
+    "name": "background-probe-with-long-pause",
+    "background": True,
+    "pauses": {
+        "before": 0,
+        "after": 5
+    },
+    "provider": {
+        "type": "python",
+        "module": "os.path",
+        "func": "exists",
+        "arguments": {
+            "path": os.path.abspath(__file__),
+        },
+        "timeout": 30
+    }
+}
+
+PythonModuleProbeWithBoolTolerance = PythonModuleProbe.copy()
+# tolerance can be a scalar, a range or a mapping with lower/upper keys
+PythonModuleProbeWithBoolTolerance["tolerance"] = True
+PythonModuleProbeWithBoolTolerance["name"] = "boolean-probe"
+
+PythonModuleProbeWithExternalTolerance = PythonModuleProbe.copy()
+# tolerance can be a scalar, a range or a mapping with lower/upper keys
+PythonModuleProbeWithExternalTolerance["tolerance"] = PythonModuleProbe.copy()
+PythonModuleProbeWithExternalTolerance["name"] = "external-probe"
 
 ProcProbe = {
     "type": "probe",
@@ -159,7 +207,7 @@ HTTPProbe = {
 
 BackgroundPythonModuleProbe = {
     "type": "probe",
-    "name": "This probe is a Python probe",
+    "name": "a-background-probe",
     "background": True,
     "provider": {
         "type": "python",
