@@ -6,17 +6,21 @@ import json
 import platform
 import time
 import traceback
-from typing import Any, Callable, Dict, Iterator
+from typing import Any, Callable, Dict, Iterator, List
 
 from logzero import logger
 
 from chaoslib import __version__
-from chaoslib.action import ensure_action_is_valid, run_action
-from chaoslib.exceptions import FailedAction, FailedActivity, FailedProbe,\
+from chaoslib.activity import ensure_activity_is_valid, run_activities
+from chaoslib.caching import with_cache, lookup_activity
+from chaoslib.exceptions import FailedActivity, InvalidActivity, \
     InvalidExperiment
-from chaoslib.probe import ensure_probe_is_valid, run_probe
+from chaoslib.hypothesis import ensure_hypothesis_is_valid, \
+    run_steady_state_hypothesis
+from chaoslib.rollback import run_rollbacks
 from chaoslib.secret import load_secrets
-from chaoslib.types import Activity, Experiment, Journal, Run, Secrets, Step
+from chaoslib.types import Action, Activity, Experiment, Journal, Probe, Run, \
+    Secrets, Step
 
 
 __all__ = ["ensure_experiment_is_valid", "run_experiment"]
@@ -30,6 +34,7 @@ def load_experiment(path: str) -> Experiment:
         return json.load(f)
 
 
+@with_cache
 def ensure_experiment_is_valid(experiment: Experiment):
     """
     A chaos experiment consists of a method made of activities to carry
@@ -49,6 +54,8 @@ def ensure_experiment_is_valid(experiment: Experiment):
     This function raises :exc:`InvalidExperiment`, :exc:`InvalidProbe` or
     :exc:`InvalidAction` depending on where it fails.
     """
+    logger.info("Validating experiment's syntax")
+
     if not experiment:
         raise InvalidExperiment("an empty experiment is not an experiment")
 
@@ -58,61 +65,84 @@ def ensure_experiment_is_valid(experiment: Experiment):
     if not experiment.get("description"):
         raise InvalidExperiment("experiment requires a description")
 
+    tags = experiment.get("tags")
+    if tags:
+        if list(filter(lambda t: t == '' or not isinstance(t, str), tags)):
+            raise InvalidExperiment(
+                "experiment tags must be a non-empty string")
+
+    ensure_hypothesis_is_valid(experiment)
+
     method = experiment.get("method")
     if not method:
         raise InvalidExperiment("an experiment requires a method with "
                                 "at least one activity")
 
-    for step in method:
-        if "title" not in step:
-            raise InvalidExperiment("an activity step must have a title")
+    for activity in method:
+        ensure_activity_is_valid(activity)
 
-        action = step.get("action")
-        if action:
-            ensure_action_is_valid(action)
+        # let's see if a ref is indeed found in the experiment
+        ref = activity.get("ref")
+        if ref and not lookup_activity(ref):
+            raise InvalidActivity("referenced activity '{r}' could not be "
+                                  "found in the experiment".format(r=ref))
 
-        probes = step.get("probes")
-        if probes:
-            steady = probes.get("steady")
-            if steady:
-                ensure_probe_is_valid(steady)
+    rollbacks = experiment.get("rollbacks", [])
+    for activity in rollbacks:
+        ensure_activity_is_valid(activity)
 
-            close = probes.get("close")
-            if close:
-                ensure_probe_is_valid(close)
+    logger.info("Experiment looks valid")
 
 
-def initialize_run_journal(experiment: Experiment) -> Dict[str, Any]:
+def initialize_run_journal(experiment: Experiment) -> Journal:
     return {
         "chaoslib-version": __version__,
         "platform": platform.platform(),
         "node": platform.node(),
         "experiment": experiment.copy(),
+        "interrupted": False,
         "start": datetime.utcnow().isoformat(),
-        "run": []
+        "run": [],
+        "rollbacks": []
     }
 
 
-def get_background_pool(experiment: Experiment) -> ThreadPoolExecutor:
+def get_background_pools(experiment: Experiment) -> ThreadPoolExecutor:
     """
     Create a pool for background activities. The pool is as big as the number
     of declared background activities. If none are declared, returned `None`.
     """
     method = experiment.get("method")
+    rollbacks = experiment.get("rollbacks", [])
 
-    background_count = 0
-    for step in method:
-        action = step.get("action")
-        if action and action.get("background"):
-            background_count = background_count + 1
+    activity_background_count = 0
+    for activity in method:
+        if activity and activity.get("background"):
+            activity_background_count = activity_background_count + 1
 
-    if background_count:
+    activity_pool = None
+    if activity_background_count:
         logger.debug(
             "{c} activities will be run in the background".format(
-                c=background_count))
-        return ThreadPoolExecutor(background_count)
+                c=activity_background_count))
+        activity_pool = ThreadPoolExecutor(activity_background_count)
+
+    rollback_background_pool = 0
+    for activity in rollbacks:
+        if activity and activity.get("background"):
+            rollback_background_pool = rollback_background_pool + 1
+
+    rollback_pool = None
+    if rollback_background_pool:
+        logger.debug(
+            "{c} rollbacks will be run in the background".format(
+                c=rollback_background_pool))
+        rollback_pool = ThreadPoolExecutor(rollback_background_pool)
+
+    return activity_pool, rollback_pool
 
 
+@with_cache
 def run_experiment(experiment: Experiment) -> Journal:
     """
     Run the given `experiment` method step by step, in the following sequence:
@@ -125,8 +155,16 @@ def run_experiment(experiment: Experiment) -> Journal:
 
     If the experiment has the `"dry"` property set to `False`, the experiment
     runs without actually executing the activities.
+
+    NOTE: Tricky to make a decision whether we should rollback when exiting
+    abnormally (Ctrl-C, SIGTERM...). Afterall, there is a chance we actually
+    cannot afford to rollback properly. Better bailing to a conservative
+    approach. This means we swallow :exc:`KeyboardInterrupt` and
+    :exc:`SystemExit` and do not bubble it back up to the caller. We when were
+    interrupted, we set the `interrupted` flag of the result accordingly to
+    notify the caller this was indeed not terminated properly.
     """
-    logger.info("Experiment: {t}".format(t=experiment["title"]))
+    logger.info("Running experiment: {t}".format(t=experiment["title"]))
 
     dry = experiment.get("dry", False)
     if dry:
@@ -134,118 +172,71 @@ def run_experiment(experiment: Experiment) -> Journal:
 
     started_at = time.time()
     secrets = load_secrets(experiment.get("secrets", {}))
-    pool = get_background_pool(experiment)
+    activity_pool, rollback_pool = get_background_pools(experiment)
 
     journal = initialize_run_journal(experiment)
 
-    runs = list(run_steps(experiment, secrets, pool, dry))
+    try:
+        # this may fail the entire experiment right there if any of the probes
+        # fail or fall out of their tolerance zone
+        run_steady_state_hypothesis(experiment, secrets, dry)
+
+        journal["run"] = apply_activities(
+            experiment, secrets, activity_pool, dry)
+    except (KeyboardInterrupt, SystemExit):
+        journal["interrupted"] = True
+        logger.warn("Received an exit signal, "
+                    "leaving without applying rollbacks.")
+    else:
+        journal["rollbacks"] = apply_rollbacks(
+            experiment, secrets, rollback_pool, dry)
 
     journal["end"] = datetime.utcnow().isoformat()
     journal["duration"] = time.time() - started_at
 
-    if pool:
-        logger.debug("Waiting for background actions to complete...")
-        pool.shutdown(wait=True)
-
-    for run in runs:
-        if not run:
-            continue
-        if isinstance(run, dict):
-            journal["run"].append(run)
-        else:
-            journal["run"].append(run.result())
-
-    logger.info("Experiment is now complete")
+    logger.info("Experiment is now completed")
 
     return journal
 
 
-def run_steps(experiment: Experiment, secrets: Secrets,
-              pool: ThreadPoolExecutor, dry: bool = False) -> Iterator[Run]:
-    method = experiment.get("method")
-    for step in method:
-        logger.info("Step: {t}".format(t=step.get("title")))
+def apply_activities(experiment: Experiment, secrets: Secrets,
+                     pool: ThreadPoolExecutor,
+                     dry: bool = False) -> List[Run]:
+    runs = list(run_activities(experiment, secrets, pool, dry))
 
-        yield run_steady_probe(step, secrets, pool, dry)
-        yield apply_action(step, secrets, pool, dry)
-        yield run_close_probe(step, secrets, pool, dry)
+    if pool:
+        logger.debug("Waiting for background activities to complete...")
+        pool.shutdown(wait=True)
 
-
-def run_steady_probe(step: Step, secrets: Secrets = None,
-                     pool: ThreadPoolExecutor = None,
-                     dry: bool = False) -> Run:
-    probes = step.get("probes", {})
-    steady = probes.get("steady")
-    if steady:
-        if steady.get("background"):
-            logger.debug("steady probe will run in the background")
-            run = pool.submit(run_activity, steady, "steady state",
-                              func=run_probe, secrets=secrets, dry=dry)
+    result = []
+    for run in runs:
+        if not run:
+            continue
+        if isinstance(run, dict):
+            result.append(run)
         else:
-            run = run_activity(steady, "steady state", func=run_probe,
-                               secrets=secrets, dry=dry)
-        return run
+            result.append(run.result())
+
+    return result
 
 
-def apply_action(step: Step, secrets: Secrets = None,
-                 pool: ThreadPoolExecutor = None,
-                 dry: bool = False) -> Run:
-    action = step.get("action")
-    if action:
-        if action.get("background"):
-            logger.debug("action will run in the background")
-            run = pool.submit(run_activity, action, "action",
-                              func=run_action, secrets=secrets, dry=dry)
+def apply_rollbacks(experiment: Experiment, secrets: Secrets,
+                    pool: ThreadPoolExecutor,
+                    dry: bool = False) -> List[Run]:
+    logger.info("Experiment is now complete. Let's rollback...")
+    rollbacks = list(run_rollbacks(experiment, secrets, pool, dry))
+
+    if pool:
+        logger.debug("Waiting for background rollbacks to complete...")
+        pool.shutdown(wait=True)
+
+    result = []
+    for rollback in rollbacks:
+        if not rollback:
+            continue
+        if isinstance(rollback, dict):
+            result.append(rollback)
         else:
-            run = run_activity(action, "action", func=run_action,
-                               secrets=secrets, dry=dry)
-        return run
+            result.append(rollback.result())
 
-
-def run_close_probe(step: Step, secrets: Secrets = None,
-                    pool: ThreadPoolExecutor = None,
-                    dry: bool = False) -> Run:
-    probes = step.get("probes", {})
-    close = probes.get("close")
-    if close:
-        if close.get("background"):
-            logger.debug("close probe will run in the background")
-            run = pool.submit(run_activity, close, "close state",
-                              func=run_probe, secrets=secrets, dry=dry)
-        else:
-            run = run_activity(close, "close state", func=run_probe,
-                               secrets=secrets, dry=dry)
-        return run
-
-
-def run_activity(activity: Activity, kind: str,
-                 func: Callable[[Activity], Any],
-                 secrets: Secrets, dry: bool = False) -> Run:
-    logger.info("  {n}: {t}".format(n=kind.title(), t=activity["title"]))
-    start = datetime.utcnow()
-
-    run = {
-        "activity": activity,
-        "kind": kind,
-        "output": None
-    }
-
-    try:
-        if not dry:
-            result = func(activity, secrets)
-            run["output"] = result
-        run["status"] = "succeeded"
-        logger.info("  => succeeded with '{r}'".format(r=result))
-    except FailedActivity as x:
-        error_msg = str(x)
-        run["status"] = "failed"
-        run["output"] = str(x)
-        run["exception"] = traceback.format_exception(type(x), x, None)
-        logger.error("   => failed: {x}".format(x=error_msg))
-
-    end = datetime.utcnow()
-    run["start"] = start.isoformat()
-    run["end"] = end.isoformat()
-    run["duration"] = (end - start).total_seconds()
-
-    return run
+    return result

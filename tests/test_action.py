@@ -4,14 +4,14 @@ import sys
 import pytest
 import requests_mock
 
-from chaoslib.exceptions import FailedAction, InvalidAction
-from chaoslib.action import ensure_action_is_valid, run_action
+from chaoslib.exceptions import InvalidActivity
+from chaoslib.activity import ensure_activity_is_valid
 from chaoslib.types import Action
 
 from fixtures import actions
 
 
 def test_empty_action_is_invalid():
-    with pytest.raises(InvalidAction) as exc:
-        ensure_action_is_valid(actions.EmptyAction)
-    assert "empty action is no action" in str(exc)
+    with pytest.raises(InvalidActivity) as exc:
+        ensure_activity_is_valid(actions.EmptyAction)
+    assert "empty activity is no activity" in str(exc)

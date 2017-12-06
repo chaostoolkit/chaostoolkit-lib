@@ -1,0 +1,69 @@
+# -*- coding: utf-8 -*-
+# Builds an in-memory cache of all declared activities so they can be
+# referenced from other places in the experiment
+from functools import wraps
+from typing import List, Union
+
+from logzero import logger
+
+from chaoslib.exceptions import InvalidExperiment
+from chaoslib.types import Activity, Experiment
+
+
+__all__ = ["cache_activities", "clear_cache", "lookup_activity", "with_cache"]
+
+
+# global objects are frown upon but as we write to it once
+# (from a single place) and we only read afterwards, that's likely okay.
+_cache = {}
+
+
+def cache_activities(experiment: Experiment) -> List[Activity]:
+    """
+    Cache all activities into a map so we can quickly lookup ref.
+    """
+    logger.debug("Building activity cache...")
+
+    lot = experiment.get("method", []) + \
+        experiment.get("steady-state-hypothesis", {}).get("probes", [])
+
+    for activity in lot:
+        name = activity.get("name")
+        if name:
+            _cache[name] = activity
+
+    logger.debug("Cached {d} activities".format(d=len(_cache)))
+
+
+def clear_cache():
+    """
+    Clear the cache
+    """
+    logger.debug("Clearing activities cache")
+    _cache.clear()
+
+
+def with_cache(f):
+    """
+    Ensure the activities cache is populated before calling the wrapped
+    function.
+    """
+    @wraps(f)
+    def wrapped(experiment: Experiment):
+        try:
+            if experiment:
+                cache_activities(experiment)
+            return f(experiment)
+        finally:
+            clear_cache()
+    return wrapped
+
+
+def lookup_activity(ref: str) -> Union[Activity, None]:
+    """
+    Lookup an activity by name and return it or `None`.
+    """
+    activity = _cache.get(ref)
+    if not activity:
+        logger.debug("cache miss for '{r}'".format(r=ref))
+    return activity

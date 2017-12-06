@@ -4,6 +4,23 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.5.1...HEAD
 
+### Changed
+
+* [BREAKING]: The specification has changed in a non-compatible way. We are
+  working towards a 1.0.0 version of the specification as the initial draft was
+  merely to set the stage. The `method` has been simplified and there are no
+  more `steady` and `close` probes, only probes. We also now define a steady
+  state hypothesis that would fail the experiment should it not meet its
+  expected state. Finally, we define a `rollbacks` entry so that experiments
+  can revert changes they made
+
+### Added
+
+* Experiment captures now SIGINT and system exit signals and swallows them so
+  the journal is returned and can be inspected
+* Activities can be cached and referenced from within experiment
+
+
 ## [0.5.1][] - 2017-11-23
 
 [0.5.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.5.0...0.5.1
