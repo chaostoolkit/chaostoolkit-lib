@@ -44,7 +44,7 @@ However, should you wish to integrate this library in your own Python code,
 please install it as usual:
 
 ```
-$ pip install chaoslib
+$ pip install -U chaostoolkit-lib
 ```
 
 ## Contribute
