@@ -8,7 +8,7 @@ from chaoslib.exceptions import FailedActivity, InvalidActivity
 from chaoslib.activity import ensure_activity_is_valid, run_activity
 from chaoslib.types import Probe
 
-from fixtures import experiments, probes
+from fixtures import config, experiments, probes
 
 
 def test_empty_probe_is_invalid():
@@ -86,13 +86,16 @@ def test_http_probe_must_have_a_url():
 
 def test_run_python_probe_should_return_raw_value():
     # our probe checks a file exists
-    assert run_activity(probes.PythonModuleProbe, experiments.Secrets) is True
+    assert run_activity(
+        probes.PythonModuleProbe, config.EmptyConfig,
+        experiments.Secrets) is True
 
 
 def test_run_process_probe_should_return_raw_value():
     v = "Python {v}\n".format(v=sys.version.split(" ")[0])
 
-    result = run_activity(probes.ProcProbe, experiments.Secrets)
+    result = run_activity(
+        probes.ProcProbe, config.EmptyConfig, experiments.Secrets)
     assert type(result) is bytes
     assert result.decode("utf-8") == v
 
@@ -102,7 +105,9 @@ def test_run_process_probe_can_timeout():
     probe["provider"]["timeout"] = 0.0001
 
     with pytest.raises(FailedActivity) as exc:
-        run_activity(probes.ProcProbe, experiments.Secrets).decode("utf-8")
+        run_activity(
+            probes.ProcProbe, config.EmptyConfig, 
+            experiments.Secrets).decode("utf-8")
     assert "activity took too long to complete" in str(exc)
 
 
@@ -111,12 +116,14 @@ def test_run_http_probe_should_return_raw_value():
         m.post(
             'http://example.com', json=['well done'], 
             headers={"Content-Type": "application/json"})
-        result = run_activity(probes.HTTPProbe, experiments.Secrets)
+        result = run_activity(
+            probes.HTTPProbe, config.EmptyConfig, experiments.Secrets)
         assert result == ['well done']
 
         m.post(
             'http://example.com', text="['well done']")
-        result = run_activity(probes.HTTPProbe, experiments.Secrets)
+        result = run_activity(
+            probes.HTTPProbe, config.EmptyConfig, experiments.Secrets)
         assert result == "['well done']"
 
 
@@ -126,7 +133,8 @@ def test_run_http_probe_should_fail_when_return_code_is_above_400():
             'http://example.com', status_code=404, text="Not found!")
 
         with pytest.raises(FailedActivity) as exc:
-            run_activity(probes.HTTPProbe, experiments.Secrets)
+            run_activity(
+                probes.HTTPProbe, config.EmptyConfig, experiments.Secrets)
         assert "Not found!" in str(exc)
 
 
@@ -139,6 +147,6 @@ def test_run_http_probe_can_expect_failure():
         probe['provider']["expected_status"] = 404
 
         try:
-            run_activity(probe, experiments.Secrets)
+            run_activity(probe, config.EmptyConfig, experiments.Secrets)
         except FailedActivity:
             pytest.fail("activity should not have failed")

@@ -4,6 +4,19 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.6.0...HEAD
 
+### Added
+
+- Configuration schema support
+- Lots of logging added at the DEBUG level
+- [EXPERIMENTAL] Loading secrets froom HashiCorp vault
+
+### Changed
+
+- [BREAKING] Secrets from environment variable now respects the API and do not
+  get detected by parsing the secret's value
+- Better handling of the steady hypothesis not matching its expectations
+  Now the experiment terminates cleanly
+
 ## [0.6.0][] - 2017-12-06
 
 [0.6.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.5.1...0.6.0

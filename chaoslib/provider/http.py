@@ -8,13 +8,14 @@ from logzero import logger
 import requests
 
 from chaoslib.exceptions import FailedActivity, InvalidActivity
-from chaoslib.types import Activity, Secrets
+from chaoslib.types import Activity, Configuration, Secrets
 
 
 __all__ = ["run_http_activity", "validate_http_activity"]
 
 
-def run_http_activity(activity: Activity, secrets: Secrets) -> Any:
+def run_http_activity(activity: Activity, configuration: Configuration,
+                      secrets: Secrets) -> Any:
     """
     Run a HTTP activity.
 
@@ -41,16 +42,22 @@ def run_http_activity(activity: Activity, secrets: Secrets) -> Any:
         else:
             r = requests.request(
                 method, url, data=args, headers=headers, timeout=timeout)
+
+        if r.status_code != expected_status:
+            raise FailedActivity(
+                "HTTP call failed with code {s} (expected {c}): {t}".format(
+                    s=r.status_code, c=expected_status, t=r.text))
+
+        if r.headers.get("Content-Type") == "application/json":
+            return r.json()
+
+        return r.text
+
+    except requests.exceptions.ConnectionError as cex:
+        raise FailedActivity("failed to connect to {u}: {x}".format(
+            u=url, x=str(cex)))
     except requests.exceptions.Timeout:
         raise FailedActivity("activity took too long to complete")
-
-    if r.status_code != expected_status:
-        raise FailedActivity(r.text)
-
-    if r.headers.get("Content-Type") == "application/json":
-        return r.json()
-
-    return r.text
 
 
 def validate_http_activity(activity: Activity):

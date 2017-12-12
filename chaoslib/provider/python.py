@@ -3,19 +3,21 @@ import importlib
 import inspect
 import os
 import os.path
+import sys
 import traceback
 from typing import Any
 
 from logzero import logger
 
 from chaoslib.exceptions import FailedActivity, InvalidActivity
-from chaoslib.types import Activity, Secrets
+from chaoslib.types import Activity, Configuration, Secrets
 
 
 __all__ = ["run_python_activity", "validate_python_activity"]
 
 
-def run_python_activity(activity: Activity, secrets: Secrets) -> Any:
+def run_python_activity(activity: Activity, configuration: Configuration,
+                        secrets: Secrets) -> Any:
     """
     Run a Python activity.
 
@@ -31,8 +33,14 @@ def run_python_activity(activity: Activity, secrets: Secrets) -> Any:
     func = getattr(mod, func_name)
     arguments = provider.get("arguments", {}).copy()
 
-    if "secrets" in provider:
-        arguments["secrets"] = secrets.get(provider["secrets"]).copy()
+    sig = inspect.signature(func)
+    if "secrets" in provider and "secrets" in sig.parameters:
+        arguments["secrets"] = {}
+        for s in provider["secrets"]:
+            arguments["secrets"].update(secrets.get(s, {}).copy())
+
+    if "configuration" in sig.parameters:
+        arguments["configuration"] = configuration.copy()
 
     try:
         return func(**arguments)
@@ -78,7 +86,6 @@ def validate_python_activity(activity: Activity):
 
     found_func = False
     arguments = provider.get("arguments", {})
-    needs_secrets = "secrets" in activity
     candidates = set(
         inspect.getmembers(mod, inspect.isfunction)).union(
             inspect.getmembers(mod, inspect.isbuiltin))
@@ -90,14 +97,18 @@ def validate_python_activity(activity: Activity):
             # signature see if they match
             sig = inspect.signature(cb)
             try:
-                # secrets are provided through a `secrets` parameter to an
-                # activity that needs them. However, they are declared out of
-                # band of the `arguments` mapping. Here, we simply ensure the
-                # signature of the activity is valid by injecting a fake
-                # `secrets` argument into the mapping.
+                # config and secrets are provided through specific parameters
+                # to an activity that needs them. However, they are declared
+                # out of band of the `arguments` mapping. Here, we simply
+                # ensure the signature of the activity is valid by injecting
+                # fake `configuration` and `secrets` arguments into the mapping
                 args = arguments.copy()
-                if needs_secrets:
+
+                if "secrets" in sig.parameters:
                     args["secrets"] = None
+
+                if "configuration" in sig.parameters:
+                    args["configuration"] = None
 
                 sig.bind(**args)
             except TypeError as x:

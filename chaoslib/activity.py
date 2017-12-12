@@ -20,7 +20,7 @@ from chaoslib.provider.python import run_python_activity, \
     validate_python_activity
 from chaoslib.provider.process import run_process_activity, \
     validate_process_activity
-from chaoslib.types import Activity, Experiment, Run, Secrets
+from chaoslib.types import Activity, Configuration, Experiment, Run, Secrets
 
 
 __all__ = ["ensure_activity_is_valid", "run_activities"]
@@ -102,8 +102,8 @@ def ensure_activity_is_valid(activity: Activity):
         validate_http_activity(activity)
 
 
-def run_activities(experiment: Experiment, secrets: Secrets,
-                   pool: ThreadPoolExecutor,
+def run_activities(experiment: Experiment, configuration: Configuration,
+                   secrets: Secrets, pool: ThreadPoolExecutor,
                    dry: bool = False) -> Iterator[Run]:
     """
     Iternal generator that iterates over all activities and execute them.
@@ -116,9 +116,11 @@ def run_activities(experiment: Experiment, secrets: Secrets,
         if activity.get("background"):
             logger.debug("activity will run in the background")
             yield pool.submit(execute_activity, activity=activity,
-                              secrets=secrets, dry=dry)
+                              configuration=configuration, secrets=secrets,
+                              dry=dry)
         else:
-            yield execute_activity(activity, secrets=secrets, dry=dry)
+            yield execute_activity(activity, configuration=configuration,
+                                   secrets=secrets, dry=dry)
 
 
 ###############################################################################
@@ -126,8 +128,8 @@ def run_activities(experiment: Experiment, secrets: Secrets,
 ###############################################################################
 
 
-def execute_activity(activity: Activity, secrets: Secrets,
-                     dry: bool = False) -> Run:
+def execute_activity(activity: Activity, configuration: Configuration,
+                     secrets: Secrets, dry: bool = False) -> Run:
     """
     Low-level wrapper around the actual activity provider call to collect
     some meta data (like duration, start/end time, exceptions...) during
@@ -153,30 +155,32 @@ def execute_activity(activity: Activity, secrets: Secrets,
     pauses = activity.get("pauses", {})
     pause_before = pauses.get("before")
     if pause_before:
-        logger.info("  Pausing before for {d}s...".format(d=pause_before))
+        logger.info("  Pausing before activity for {d}s...".format(
+            d=pause_before))
         time.sleep(pause_before)
 
     try:
         result = None
         # only run the activity itself when not in dry-mode
         if not dry:
-            result = run_activity(activity, secrets)
+            result = run_activity(activity, configuration, secrets)
         run["output"] = result
         run["status"] = "succeeded"
         if result is not None:
-            logger.info("  => succeeded with '{r}'".format(r=result))
+            logger.debug("  => succeeded with '{r}'".format(r=result))
         else:
-            logger.info("  => succeeded without any result value")
+            logger.debug("  => succeeded without any result value")
     except FailedActivity as x:
         error_msg = str(x)
         run["status"] = "failed"
         run["output"] = result
         run["exception"] = traceback.format_exception(type(x), x, None)
-        logger.error("   => failed: {x}".format(x=error_msg))
+        logger.error("  => failed: {x}".format(x=error_msg))
     finally:
         pause_after = pauses.get("after")
         if pause_after:
-            logger.info("  Pausing after for {d}s...".format(d=pause_after))
+            logger.info("  Pausing after activity for {d}s...".format(
+                d=pause_after))
             time.sleep(pause_after)
 
     end = datetime.utcnow()
@@ -187,7 +191,8 @@ def execute_activity(activity: Activity, secrets: Secrets,
     return run
 
 
-def run_activity(activity: Activity, secrets: Secrets) -> Any:
+def run_activity(activity: Activity, configuration: Configuration,
+                 secrets: Secrets) -> Any:
     """
     Run the given activity and return its result. If the activity defines a
     `timeout` this function raises :exc:`FailedActivity`.
@@ -204,11 +209,11 @@ def run_activity(activity: Activity, secrets: Secrets) -> Any:
         provider = activity["provider"]
         activity_type = provider["type"]
         if activity_type == "python":
-            result = run_python_activity(activity, secrets)
+            result = run_python_activity(activity, configuration, secrets)
         elif activity_type == "process":
-            result = run_process_activity(activity, secrets)
+            result = run_process_activity(activity, configuration, secrets)
         elif activity_type == "http":
-            result = run_http_activity(activity, secrets)
+            result = run_http_activity(activity, configuration, secrets)
     except Exception:
         # just make sure we have a full traceback
         logger.debug("Activity failed", exc_info=True)

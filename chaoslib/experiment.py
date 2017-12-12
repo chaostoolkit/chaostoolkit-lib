@@ -15,12 +15,13 @@ from chaoslib.activity import ensure_activity_is_valid, run_activities
 from chaoslib.caching import with_cache, lookup_activity
 from chaoslib.exceptions import FailedActivity, InvalidActivity, \
     InvalidExperiment
+from chaoslib.configuration import load_configuration
 from chaoslib.hypothesis import ensure_hypothesis_is_valid, \
     run_steady_state_hypothesis
 from chaoslib.rollback import run_rollbacks
 from chaoslib.secret import load_secrets
-from chaoslib.types import Action, Activity, Experiment, Journal, Probe, Run, \
-    Secrets, Step
+from chaoslib.types import Action, Activity, Configuration, Experiment, \
+    Journal, Probe, Run, Secrets, Step
 
 
 __all__ = ["ensure_experiment_is_valid", "run_experiment"]
@@ -171,7 +172,8 @@ def run_experiment(experiment: Experiment) -> Journal:
         logger.warning("Dry mode enabled")
 
     started_at = time.time()
-    secrets = load_secrets(experiment.get("secrets", {}))
+    config = load_configuration(experiment.get("configuration", {}))
+    secrets = load_secrets(experiment.get("secrets", {}), config)
     activity_pool, rollback_pool = get_background_pools(experiment)
 
     journal = initialize_run_journal(experiment)
@@ -179,17 +181,20 @@ def run_experiment(experiment: Experiment) -> Journal:
     try:
         # this may fail the entire experiment right there if any of the probes
         # fail or fall out of their tolerance zone
-        run_steady_state_hypothesis(experiment, secrets, dry)
-
-        journal["run"] = apply_activities(
-            experiment, secrets, activity_pool, dry)
+        try:
+            run_steady_state_hypothesis(experiment, config, secrets, dry)
+        except FailedActivity as a:
+            logger.fatal(str(a))
+        else:
+            journal["run"] = apply_activities(
+                experiment, config, secrets, activity_pool, dry)
     except (KeyboardInterrupt, SystemExit):
         journal["interrupted"] = True
         logger.warn("Received an exit signal, "
                     "leaving without applying rollbacks.")
     else:
         journal["rollbacks"] = apply_rollbacks(
-            experiment, secrets, rollback_pool, dry)
+            experiment, config, secrets, rollback_pool, dry)
 
     journal["end"] = datetime.utcnow().isoformat()
     journal["duration"] = time.time() - started_at
@@ -199,10 +204,10 @@ def run_experiment(experiment: Experiment) -> Journal:
     return journal
 
 
-def apply_activities(experiment: Experiment, secrets: Secrets,
-                     pool: ThreadPoolExecutor,
+def apply_activities(experiment: Experiment, configuration: Configuration,
+                     secrets: Secrets, pool: ThreadPoolExecutor,
                      dry: bool = False) -> List[Run]:
-    runs = list(run_activities(experiment, secrets, pool, dry))
+    runs = list(run_activities(experiment, configuration, secrets, pool, dry))
 
     if pool:
         logger.debug("Waiting for background activities to complete...")
@@ -220,11 +225,12 @@ def apply_activities(experiment: Experiment, secrets: Secrets,
     return result
 
 
-def apply_rollbacks(experiment: Experiment, secrets: Secrets,
-                    pool: ThreadPoolExecutor,
+def apply_rollbacks(experiment: Experiment, configuration: Configuration,
+                    secrets: Secrets, pool: ThreadPoolExecutor,
                     dry: bool = False) -> List[Run]:
     logger.info("Experiment is now complete. Let's rollback...")
-    rollbacks = list(run_rollbacks(experiment, secrets, pool, dry))
+    rollbacks = list(
+        run_rollbacks(experiment, configuration, secrets, pool, dry))
 
     if pool:
         logger.debug("Waiting for background rollbacks to complete...")

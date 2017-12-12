@@ -8,7 +8,7 @@ from chaoslib.activity import ensure_activity_is_valid, execute_activity, \
     run_activity
 from chaoslib.exceptions import FailedActivity, InvalidActivity, \
     InvalidExperiment
-from chaoslib.types import Experiment, Run, Secrets
+from chaoslib.types import Configuration, Experiment, Run, Secrets
 
 
 __all__ = ["ensure_hypothesis_is_valid", "run_steady_state_hypothesis"]
@@ -49,7 +49,8 @@ def ensure_hypothesis_is_valid(experiment: Experiment):
                 ensure_activity_is_valid(probe)
 
 
-def run_steady_state_hypothesis(experiment: Experiment, secrets: Secrets,
+def run_steady_state_hypothesis(experiment: Experiment,
+                                configuration: Configuration, secrets: Secrets,
                                 dry: bool = False):
     """
     Run all probes in the hypothesis and fail the experiment as soon as any of
@@ -60,7 +61,8 @@ def run_steady_state_hypothesis(experiment: Experiment, secrets: Secrets,
 
     probes = hypo.get("probes", [])
     for activity in probes:
-        run = execute_activity(activity, secrets=secrets, dry=dry)
+        run = execute_activity(
+            activity, configuration=configuration, secrets=secrets, dry=dry)
         if dry:
             # do not check for tolerance when dry mode is on
             continue

@@ -12,7 +12,7 @@ from chaoslib.experiment import ensure_experiment_is_valid, run_experiment, \
     run_activities
 from chaoslib.types import Experiment
 
-from fixtures import experiments
+from fixtures import config, experiments
 
 
 def test_empty_experiment_is_invalid():
@@ -79,7 +79,8 @@ def test_can_run_experiment_in_dry_mode():
 
 def test_can_iterate_over_activities():
     g = run_activities(
-        experiments.Experiment, secrets=None, pool=None, dry=False)
+        experiments.Experiment, configuration=None, secrets=None, pool=None,
+        dry=False)
     assert isinstance(g, types.GeneratorType)
 
 
