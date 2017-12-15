@@ -7,6 +7,7 @@ from typing import Any
 from logzero import logger
 import requests
 
+from chaoslib import substitute
 from chaoslib.exceptions import FailedActivity, InvalidActivity
 from chaoslib.types import Activity, Configuration, Secrets
 
@@ -28,20 +29,23 @@ def run_http_activity(activity: Activity, configuration: Configuration,
     This should be considered as a private function.
     """
     provider = activity["provider"]
-    url = provider["url"]
+    url = substitute(provider["url"], configuration, secrets)
     method = provider.get("method", "GET").upper()
-    headers = provider.get("headers", None)
+    headers = substitute(provider.get("headers", None), configuration, secrets)
     timeout = provider.get("timeout", None)
-    args = provider.get("arguments", {})
     expected_status = provider.get("expected_status", 200)
+    arguments = provider.get("arguments", {})
+
+    if configuration or secrets:
+        arguments = substitute(arguments, configuration, secrets)
 
     try:
         if method == "GET":
             r = requests.get(
-                url, params=args, headers=headers, timeout=timeout)
+                url, params=arguments, headers=headers, timeout=timeout)
         else:
             r = requests.request(
-                method, url, data=args, headers=headers, timeout=timeout)
+                method, url, data=arguments, headers=headers, timeout=timeout)
 
         if r.status_code != expected_status:
             raise FailedActivity(

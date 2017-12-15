@@ -4,6 +4,18 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.7.0...HEAD
 
+### Added
+
+- Substitution from configuration and secrets so values can be dynamically set
+- The journal contains now a global status of the run
+
+### Changed
+
+- Pausing activity message is logged before the activity running message for
+  better clarity
+- Arguments are now substituted with their configuration and secrets values
+  before being applied
+
 ## [0.7.0][] - 2017-12-12
 
 [0.7.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.6.0...0.7.0

@@ -9,6 +9,7 @@ from typing import Any
 
 from logzero import logger
 
+from chaoslib import substitute
 from chaoslib.exceptions import FailedActivity, InvalidActivity
 from chaoslib.types import Activity, Configuration, Secrets
 
@@ -32,6 +33,9 @@ def run_python_activity(activity: Activity, configuration: Configuration,
     mod = importlib.import_module(mod_path)
     func = getattr(mod, func_name)
     arguments = provider.get("arguments", {}).copy()
+
+    if configuration or secrets:
+        arguments = substitute(arguments, configuration, secrets)
 
     sig = inspect.signature(func)
     if "secrets" in provider and "secrets" in sig.parameters:

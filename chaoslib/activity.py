@@ -142,6 +142,13 @@ def execute_activity(activity: Activity, configuration: Configuration,
             raise FailedActivity(
                 "could not find referenced activity '{r}'".format(r=ref))
 
+    pauses = activity.get("pauses", {})
+    pause_before = pauses.get("before")
+    if pause_before:
+        logger.info("Pausing before next activity for {d}s...".format(
+            d=pause_before))
+        time.sleep(pause_before)
+
     logger.info("{t}: {n}".format(
         t=activity["type"].title(), n=activity.get("name")))
 
@@ -152,15 +159,8 @@ def execute_activity(activity: Activity, configuration: Configuration,
         "output": None
     }
 
-    pauses = activity.get("pauses", {})
-    pause_before = pauses.get("before")
-    if pause_before:
-        logger.info("  Pausing before activity for {d}s...".format(
-            d=pause_before))
-        time.sleep(pause_before)
-
+    result = None
     try:
-        result = None
         # only run the activity itself when not in dry-mode
         if not dry:
             result = run_activity(activity, configuration, secrets)
@@ -179,7 +179,7 @@ def execute_activity(activity: Activity, configuration: Configuration,
     finally:
         pause_after = pauses.get("after")
         if pause_after:
-            logger.info("  Pausing after activity for {d}s...".format(
+            logger.info("Pausing after activity for {d}s...".format(
                 d=pause_after))
             time.sleep(pause_after)
 

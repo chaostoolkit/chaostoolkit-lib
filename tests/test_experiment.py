@@ -94,7 +94,7 @@ def test_no_rollback_even_on_SIGINT():
     try:
         journal = run_experiment(experiments.ExperimentWithLongPause)
         assert isinstance(journal, dict)
-        assert journal["interrupted"]
+        assert journal["status"] == "interrupted"
     except KeyboardInterrupt:
         pytest.fail("we should have swalled the KeyboardInterrupt exception")
 
@@ -109,7 +109,7 @@ def test_no_rollback_even_on_SystemExit():
     try:
         journal = run_experiment(experiments.ExperimentWithLongPause)
         assert isinstance(journal, dict)
-        assert journal["interrupted"]
+        assert journal["status"] == "interrupted"
     except SystemExit:
         pytest.fail("we should have swalled the SystemExit exception")
 
@@ -128,6 +128,5 @@ def test_probes_missing_ref_should_fail_the_experiment():
     experiment = experiments.MissingRefProbeExperiment.copy()
     experiment["dry"] = True
 
-    with pytest.raises(FailedActivity) as exc:
-        run_experiment(experiment)
-    assert "could not find referenced activity 'pizza'" in str(exc)
+    journal = run_experiment(experiment)
+    assert journal["status"] == "aborted"

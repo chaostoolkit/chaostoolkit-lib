@@ -75,7 +75,7 @@ def test_process_probe_have_a_path():
 def test_process_probe_path_must_exist():
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.ProcessPathDoesNotExistProbe)
-    assert "'somewhere/not/here' cannot be found" in str(exc)
+    assert "path 'None' cannot be found, in activity" in str(exc)
 
 
 def test_http_probe_must_have_a_url():
@@ -96,8 +96,8 @@ def test_run_process_probe_should_return_raw_value():
 
     result = run_activity(
         probes.ProcProbe, config.EmptyConfig, experiments.Secrets)
-    assert type(result) is bytes
-    assert result.decode("utf-8") == v
+    assert type(result) is tuple
+    assert result == (0, v, '')
 
 
 def test_run_process_probe_can_timeout():

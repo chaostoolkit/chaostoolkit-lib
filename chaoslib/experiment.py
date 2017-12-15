@@ -101,8 +101,8 @@ def initialize_run_journal(experiment: Experiment) -> Journal:
         "platform": platform.platform(),
         "node": platform.node(),
         "experiment": experiment.copy(),
-        "interrupted": False,
         "start": datetime.utcnow().isoformat(),
+        "status": None,
         "run": [],
         "rollbacks": []
     }
@@ -184,22 +184,31 @@ def run_experiment(experiment: Experiment) -> Journal:
         try:
             run_steady_state_hypothesis(experiment, config, secrets, dry)
         except FailedActivity as a:
+            journal["status"] = "failed"
             logger.fatal(str(a))
         else:
-            journal["run"] = apply_activities(
-                experiment, config, secrets, activity_pool, dry)
+            try:
+                journal["run"] = apply_activities(
+                    experiment, config, secrets, activity_pool, dry)
+            except Exception as x:
+                journal["status"] = "aborted"
+                logger.fatal(
+                    "Experiment ran into an un expected fatal error, "
+                    "aborting now.", exc_info=True)
     except (KeyboardInterrupt, SystemExit):
-        journal["interrupted"] = True
+        journal["status"] = "interrupted"
         logger.warn("Received an exit signal, "
                     "leaving without applying rollbacks.")
     else:
+        journal["status"] = journal["status"] or "completed"
         journal["rollbacks"] = apply_rollbacks(
             experiment, config, secrets, rollback_pool, dry)
 
     journal["end"] = datetime.utcnow().isoformat()
     journal["duration"] = time.time() - started_at
 
-    logger.info("Experiment is now completed")
+    logger.info(
+        "Experiment ended with status: {s}".format(s=journal["status"]))
 
     return journal
 
@@ -228,7 +237,7 @@ def apply_activities(experiment: Experiment, configuration: Configuration,
 def apply_rollbacks(experiment: Experiment, configuration: Configuration,
                     secrets: Secrets, pool: ThreadPoolExecutor,
                     dry: bool = False) -> List[Run]:
-    logger.info("Experiment is now complete. Let's rollback...")
+    logger.info("Let's rollback...")
     rollbacks = list(
         run_rollbacks(experiment, configuration, secrets, pool, dry))
 
