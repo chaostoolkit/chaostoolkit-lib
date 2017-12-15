@@ -46,8 +46,7 @@ def run_process_activity(activity: Activity, configuration: Configuration,
         logger.debug("Running: {a}".format(a=" ".join(args)))
         proc = subprocess.run(
             args, timeout=timeout, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE, env=os.environ,
-            encoding='utf-8')
+            stderr=subprocess.PIPE, env=os.environ)
     except subprocess.TimeoutExpired:
         raise FailedActivity("process activity took too long to complete")
 
@@ -59,7 +58,11 @@ def run_process_activity(activity: Activity, configuration: Configuration,
                 c=proc.returncode, e=expected_return_code,
                 o=proc.stdout, r=proc.stderr))
 
-    return (proc.returncode, proc.stdout, proc.stderr)
+    return (
+        proc.returncode,
+        proc.stdout.decode('utf-8'),
+        proc.stderr.decode('utf-8')
+    )
 
 
 def validate_process_activity(activity: Activity):
