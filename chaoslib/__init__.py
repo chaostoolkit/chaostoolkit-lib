@@ -27,16 +27,16 @@ def substitute(data: Union[str, Dict[str, Any]], configuration: Configuration,
     # secrets is a mapping of mapping, only the second level is useful here
     secrets = secrets.values() if secrets else []
 
-    # let's pretend we have a single mapping of everything with the config
+    # let's pretend we have a single mapping of everything with the config
     # by the leader
     mapping = ChainMap(configuration or {}, *secrets)
 
     if isinstance(data, dict):
         return substitute_dict(data, mapping)
-    
+
     if isinstance(data, str):
         return substitute_string(data, mapping)
-    
+
     return data
 
 

@@ -41,7 +41,7 @@ def run_process_activity(activity: Activity, configuration: Configuration,
     chain = itertools.chain.from_iterable(arguments.items())
     args = list([p for p in chain if p not in (None, "")])
     args.insert(0, shutil.which(provider["path"]))
-    
+
     try:
         logger.debug("Running: {a}".format(a=" ".join(args)))
         proc = subprocess.run(
