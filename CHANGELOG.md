@@ -2,7 +2,15 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.8.1...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.8.2...HEAD
+
+## [0.8.2][] - 2017-12-18
+
+[0.8.2]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.8.1...0.8.2
+
+### Changed
+
+- Missing transitive dependency "ply"
 
 ## [0.8.1][] - 2017-12-18
 
