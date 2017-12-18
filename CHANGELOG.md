@@ -2,7 +2,15 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.8.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.8.1...HEAD
+
+## [0.8.1][] - 2017-12-18
+
+[0.8.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.8.0...0.8.1
+
+### Changed
+
+- Packaging up the dev requirements for install from the tarball
 
 ## [0.8.0][] - 2017-12-17
 
