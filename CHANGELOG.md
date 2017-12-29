@@ -7,6 +7,7 @@
 ### Changed
 
 - Logging when an activity runs in the background
+- Pause after we capture the end time of an activity
 
 ## [0.8.2][] - 2017-12-18
 

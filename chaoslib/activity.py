@@ -181,16 +181,17 @@ def execute_activity(activity: Activity, configuration: Configuration,
         run["exception"] = traceback.format_exception(type(x), x, None)
         logger.error("  => failed: {x}".format(x=error_msg))
     finally:
+        # capture the end time before we pause
+        end = datetime.utcnow()
+        run["start"] = start.isoformat()
+        run["end"] = end.isoformat()
+        run["duration"] = (end - start).total_seconds()
+
         pause_after = pauses.get("after")
         if pause_after:
             logger.info("Pausing after activity for {d}s...".format(
                 d=pause_after))
             time.sleep(pause_after)
-
-    end = datetime.utcnow()
-    run["start"] = start.isoformat()
-    run["end"] = end.isoformat()
-    run["duration"] = (end - start).total_seconds()
 
     return run
 
