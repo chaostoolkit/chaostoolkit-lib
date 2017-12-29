@@ -149,8 +149,12 @@ def execute_activity(activity: Activity, configuration: Configuration,
             d=pause_before))
         time.sleep(pause_before)
 
-    logger.info("{t}: {n}".format(
-        t=activity["type"].title(), n=activity.get("name")))
+    if activity.get("background"):
+        logger.info("{t}: {n} [in background]".format(
+            t=activity["type"].title(), n=activity.get("name")))
+    else:
+        logger.info("{t}: {n}".format(
+            t=activity["type"].title(), n=activity.get("name")))
 
     start = datetime.utcnow()
 

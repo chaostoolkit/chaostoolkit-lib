@@ -4,6 +4,10 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.8.2...HEAD
 
+### Changed
+
+- Logging when an activity runs in the background
+
 ## [0.8.2][] - 2017-12-18
 
 [0.8.2]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.8.1...0.8.2
