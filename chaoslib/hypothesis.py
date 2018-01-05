@@ -74,7 +74,7 @@ def run_steady_state_hypothesis(experiment: Experiment,
                 "Steady state probe '{p}' is not in the given tolerance "
                 "so failing this experiment".format(p=activity["name"]))
 
-    logger.info("Steady state hypothesis is met, we can carry on!")
+    logger.info("Steady state hypothesis is met!")
 
 
 @singledispatch

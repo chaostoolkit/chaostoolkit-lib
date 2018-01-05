@@ -2,7 +2,15 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.9.1...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.9.2...HEAD
+
+## [0.9.2][] - 2018-01-05
+
+[0.9.2]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.9.1...0.9.2
+
+### Changed
+
+- HTTP probe header dict must be serialiable back to JSON
 
 ## [0.9.1][] - 2018-01-05
 
