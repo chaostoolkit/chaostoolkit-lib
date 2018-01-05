@@ -33,7 +33,6 @@ def run_http_activity(activity: Activity, configuration: Configuration,
     method = provider.get("method", "GET").upper()
     headers = substitute(provider.get("headers", None), configuration, secrets)
     timeout = provider.get("timeout", None)
-    expected_status = provider.get("expected_status", 200)
     arguments = provider.get("arguments", {})
 
     if configuration or secrets:
@@ -46,11 +45,6 @@ def run_http_activity(activity: Activity, configuration: Configuration,
         else:
             r = requests.request(
                 method, url, data=arguments, headers=headers, timeout=timeout)
-
-        if r.status_code != expected_status:
-            raise FailedActivity(
-                "HTTP call failed with code {s} (expected {c}): {t}".format(
-                    s=r.status_code, c=expected_status, t=r.text))
 
         body = None
         if r.headers.get("Content-Type") == "application/json":

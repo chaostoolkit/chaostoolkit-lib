@@ -130,17 +130,6 @@ def test_run_http_probe_should_return_raw_text_value():
         assert result["body"] == "['well done']"
 
 
-def test_run_http_probe_should_fail_when_return_code_is_above_400():
-    with requests_mock.mock() as m:
-        m.post(
-            'http://example.com', status_code=404, text="Not found!")
-
-        with pytest.raises(FailedActivity) as exc:
-            run_activity(
-                probes.HTTPProbe, config.EmptyConfig, experiments.Secrets)
-        assert "Not found!" in str(exc)
-
-
 def test_run_http_probe_can_expect_failure():
     with requests_mock.mock() as m:
         m.post(
