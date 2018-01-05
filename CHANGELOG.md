@@ -2,7 +2,11 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.8.2...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.9.0...HEAD
+
+## [0.9.0][] - 2018-01-05
+
+[0.9.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.8.2...0.9.0
 
 ### Added
 
@@ -13,6 +17,8 @@
 
 - Logging when an activity runs in the background
 - Pause after we capture the end time of an activity
+- HTTP Probe now returns a dict with status code, headers and body of the
+  response
 
 [19]: https://github.com/chaostoolkit/chaostoolkit/issues/19
 [20]: https://github.com/chaostoolkit/chaostoolkit/issues/20
