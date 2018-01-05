@@ -30,7 +30,6 @@ def run_process_activity(activity: Activity, configuration: Configuration,
 
     This should be considered as a private function.
     """
-    expected_return_code = int(activity.get("expected_return_code", 0))
     provider = activity["provider"]
     timeout = provider.get("timeout", None)
     arguments = provider["arguments"]
@@ -49,14 +48,6 @@ def run_process_activity(activity: Activity, configuration: Configuration,
             stderr=subprocess.PIPE, env=os.environ)
     except subprocess.TimeoutExpired:
         raise FailedActivity("process activity took too long to complete")
-
-    if expected_return_code != proc.returncode:
-        raise FailedActivity(
-            "process activity failed with return code {c} (expected {e})\n"
-            "STDOUT: {o}\n"
-            "STDERR: {r}".format(
-                c=proc.returncode, e=expected_return_code,
-                o=proc.stdout, r=proc.stderr))
 
     return (
         proc.returncode,
@@ -80,11 +71,6 @@ def validate_process_activity(activity: Activity):
     """
     name = activity["name"]
     provider = activity["provider"]
-
-    expected_return_code = activity.get("expected_return_code")
-    if expected_return_code and not isinstance(expected_return_code, int):
-        raise InvalidActivity(
-            "return code of a process activity must be an integer")
 
     path = provider.get("path")
     if not path:

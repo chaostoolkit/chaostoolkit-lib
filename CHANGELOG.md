@@ -2,7 +2,18 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.9.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.9.1...HEAD
+
+## [0.9.1][] - 2018-01-05
+
+[0.9.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.9.0...0.9.1
+
+### Removed
+
+- HTTP activity will not check status code any longer [#10][10]
+- Process activity will not check return code any longer [#10][10]
+
+[10]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/10
 
 ## [0.9.0][] - 2018-01-05
 
