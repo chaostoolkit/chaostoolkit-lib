@@ -107,11 +107,19 @@ def _(tolerance: str, value: str, secrets: Secrets = None) -> bool:
 
 @within_tolerance.register(int)
 def _(tolerance: int, value: int, secrets: Secrets = None) -> bool:
+    if isinstance(value, dict):
+        if "status" in value:
+            return value["status"] == tolerance
+
     return value == tolerance
 
 
 @within_tolerance.register(list)
 def _(tolerance: list, value: Any, secrets: Secrets = None) -> bool:
+    if isinstance(value, dict):
+        if "status" in value:
+            return value["status"] in tolerance
+
     if len(tolerance) == 2:
         return tolerance[0] <= value <= tolerance[1]
 

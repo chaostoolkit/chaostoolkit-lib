@@ -111,20 +111,23 @@ def test_run_process_probe_can_timeout():
     assert "activity took too long to complete" in str(exc)
 
 
-def test_run_http_probe_should_return_raw_value():
+def test_run_http_probe_should_return_parse_json_value():
     with requests_mock.mock() as m:
+        headers = {"Content-Type": "application/json"}
         m.post(
-            'http://example.com', json=['well done'], 
-            headers={"Content-Type": "application/json"})
+            'http://example.com', json=['well done'], headers=headers)
         result = run_activity(
             probes.HTTPProbe, config.EmptyConfig, experiments.Secrets)
-        assert result == ['well done']
+        assert result["body"] == ['well done']
 
+
+def test_run_http_probe_should_return_raw_text_value():
+    with requests_mock.mock() as m:
         m.post(
             'http://example.com', text="['well done']")
         result = run_activity(
             probes.HTTPProbe, config.EmptyConfig, experiments.Secrets)
-        assert result == "['well done']"
+        assert result["body"] == "['well done']"
 
 
 def test_run_http_probe_should_fail_when_return_code_is_above_400():

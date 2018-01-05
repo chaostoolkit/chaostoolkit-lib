@@ -52,11 +52,17 @@ def run_http_activity(activity: Activity, configuration: Configuration,
                 "HTTP call failed with code {s} (expected {c}): {t}".format(
                     s=r.status_code, c=expected_status, t=r.text))
 
+        body = None
         if r.headers.get("Content-Type") == "application/json":
-            return r.json()
+            body = r.json()
+        else:
+            body = r.text
 
-        return r.text
-
+        return {
+            "status": r.status_code,
+            "headers": r.headers.copy(),
+            "body": body
+        }
     except requests.exceptions.ConnectionError as cex:
         raise FailedActivity("failed to connect to {u}: {x}".format(
             u=url, x=str(cex)))

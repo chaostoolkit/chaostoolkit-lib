@@ -4,8 +4,10 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.8.2...HEAD
 
-### Added 
+### Added
+
 - Steady state is now run after the method as well [#19][19]
+- Allow tolerance to be based on the HTTP status code of the probe [#20][20]
 
 ### Changed
 
@@ -13,6 +15,7 @@
 - Pause after we capture the end time of an activity
 
 [19]: https://github.com/chaostoolkit/chaostoolkit/issues/19
+[20]: https://github.com/chaostoolkit/chaostoolkit/issues/20
 
 ## [0.8.2][] - 2017-12-18
 
