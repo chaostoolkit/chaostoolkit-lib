@@ -130,3 +130,17 @@ def test_probes_missing_ref_should_fail_the_experiment():
 
     journal = run_experiment(experiment)
     assert journal["status"] == "aborted"
+
+
+def test_experiment_with_steady_state():
+    with requests_mock.mock() as m:
+        m.get('http://example.com', status_code=200)
+        journal = run_experiment(experiments.HTTPToleranceExperiment)
+        assert isinstance(journal, dict)
+        assert journal["status"] == "completed"
+
+    with requests_mock.mock() as m:
+        m.get('http://example.com', status_code=404)
+        journal = run_experiment(experiments.HTTPToleranceExperiment)
+        assert isinstance(journal, dict)
+        assert journal["status"] == "failed"

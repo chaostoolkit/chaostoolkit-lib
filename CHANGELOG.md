@@ -4,10 +4,15 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.8.2...HEAD
 
+### Added 
+- Steady state is now run after the method as well [#19][19]
+
 ### Changed
 
 - Logging when an activity runs in the background
 - Pause after we capture the end time of an activity
+
+[19]: https://github.com/chaostoolkit/chaostoolkit/issues/19
 
 ## [0.8.2][] - 2017-12-18
 

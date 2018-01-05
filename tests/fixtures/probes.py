@@ -170,6 +170,17 @@ PythonModuleProbeWithExternalTolerance = PythonModuleProbe.copy()
 PythonModuleProbeWithExternalTolerance["tolerance"] = PythonModuleProbe.copy()
 PythonModuleProbeWithExternalTolerance["name"] = "external-probe"
 
+PythonModuleProbeWithHTTPStatusTolerance = {
+    "type": "probe",
+    "name": "A dummy tolerance ready probe",
+    "tolerance": [200, 301, 302],
+    "provider": {
+        "type": "http",
+        "url": "http://example.com",
+        "timeout": 30
+    }
+}
+
 ProcProbe = {
     "type": "probe",
     "name": "This probe is a process probe",

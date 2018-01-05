@@ -2,7 +2,8 @@
 from fixtures.probes import BackgroundPythonModuleProbe, MissingFuncArgProbe, \
     PythonModuleProbe, PythonModuleProbeWithBoolTolerance, \
     PythonModuleProbeWithExternalTolerance, PythonModuleProbeWithLongPause, \
-    BackgroundPythonModuleProbeWithLongPause
+    BackgroundPythonModuleProbeWithLongPause, \
+    PythonModuleProbeWithHTTPStatusTolerance
 
 Secrets = {}
 
@@ -112,6 +113,19 @@ MissingRefProbeExperiment = {
     ]
 }
 
+HTTPToleranceExperiment = {
+    "title": "do cats live in the Internet?",
+    "description": "an experiment of importance",
+    "steady-state-hypothesis": {
+        "title": "hello",
+        "probes": [
+            PythonModuleProbeWithHTTPStatusTolerance
+        ]
+    },
+    "method": [],
+    "rollbacks": []
+}
+
 Experiment = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",
@@ -119,6 +133,7 @@ Experiment = {
         "title": "hello",
         "probes": [
             PythonModuleProbeWithBoolTolerance,
+            PythonModuleProbeWithHTTPStatusTolerance,
             PythonModuleProbeWithExternalTolerance
         ]
     },

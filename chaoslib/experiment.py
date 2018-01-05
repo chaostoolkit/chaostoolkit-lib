@@ -195,6 +195,13 @@ def run_experiment(experiment: Experiment) -> Journal:
                 logger.fatal(
                     "Experiment ran into an un expected fatal error, "
                     "aborting now.", exc_info=True)
+            else:
+                try:
+                    run_steady_state_hypothesis(
+                        experiment, config, secrets, dry)
+                except FailedActivity as a:
+                    journal["status"] = "failed"
+                    logger.fatal(str(a))
     except (KeyboardInterrupt, SystemExit):
         journal["status"] = "interrupted"
         logger.warn("Received an exit signal, "
