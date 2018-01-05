@@ -54,7 +54,7 @@ def run_http_activity(activity: Activity, configuration: Configuration,
 
         return {
             "status": r.status_code,
-            "headers": r.headers.copy(),
+            "headers": dict(**r.headers),
             "body": body
         }
     except requests.exceptions.ConnectionError as cex:

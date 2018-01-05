@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 import sys
 
 import pytest
@@ -111,7 +112,7 @@ def test_run_process_probe_can_timeout():
     assert "activity took too long to complete" in str(exc)
 
 
-def test_run_http_probe_should_return_parse_json_value():
+def test_run_http_probe_should_return_parsed_json_value():
     with requests_mock.mock() as m:
         headers = {"Content-Type": "application/json"}
         m.post(
@@ -119,6 +120,16 @@ def test_run_http_probe_should_return_parse_json_value():
         result = run_activity(
             probes.HTTPProbe, config.EmptyConfig, experiments.Secrets)
         assert result["body"] == ['well done']
+
+
+def test_run_http_probe_must_be_serializable_to_json():
+    with requests_mock.mock() as m:
+        headers = {"Content-Type": "application/json"}
+        m.post(
+            'http://example.com', json=['well done'], headers=headers)
+        result = run_activity(
+            probes.HTTPProbe, config.EmptyConfig, experiments.Secrets)
+        assert json.dumps(result) is not None
 
 
 def test_run_http_probe_should_return_raw_text_value():
