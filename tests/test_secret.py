@@ -18,5 +18,4 @@ def test_should_load_environment():
             }
         }
     }, config.EmptyConfig)
-
     assert secrets["kubernetes"]["api_server_url"] == "http://1.2.3.4"

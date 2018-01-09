@@ -2,7 +2,15 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.9.2...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.9.3...HEAD
+
+## [0.9.3][] - 2018-01-09
+
+[0.9.3]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.9.2...0.9.3
+
+### Changed
+
+- Do not forget to load inlined secrets
 
 ## [0.9.2][] - 2018-01-05
 

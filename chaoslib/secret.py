@@ -71,9 +71,29 @@ def load_secrets(secrets_info: Dict[str, Dict[str, str]],
     logger.debug("Loading secrets...")
 
     secrets = ChainMap(
+        load_inline_strings(secrets_info),
         load_secrets_from_env(secrets_info, configuration),
         load_secrets_from_vault(secrets_info, configuration)
     )
+    return secrets
+
+
+def load_inline_strings(secrets_info: Dict[str, Dict[str, str]]) -> Secrets:
+    """
+    Load secrets that are inlined in the experiments.
+    """
+    secrets = {}
+
+    for (target, keys) in secrets_info.items():
+        secrets[target] = {}
+
+        for (key, value) in keys.items():
+            if not isinstance(value, dict):
+                secrets[target][key] = value
+
+        if not secrets[target]:
+            secrets.pop(target)
+
     return secrets
 
 
@@ -88,6 +108,9 @@ def load_secrets_from_env(secrets_info: Dict[str, Dict[str, str]],
         for (key, value) in keys.items():
             if isinstance(value, dict) and value.get("type") == "env":
                 secrets[target][key] = env.get(value["key"])
+
+        if not secrets[target]:
+            secrets.pop(target)
 
     return secrets
 
@@ -107,5 +130,8 @@ def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],
         for (key, value) in keys.items():
             if isinstance(value, dict) and value.get("type") == "vault":
                 secrets[target][key] = client.read(value["key"])
+
+        if not secrets[target]:
+            secrets.pop(target)
 
     return secrets
