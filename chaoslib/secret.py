@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from collections import ChainMap
 import os
 import requests
 from typing import Dict
@@ -70,15 +69,26 @@ def load_secrets(secrets_info: Dict[str, Dict[str, str]],
     """
     logger.debug("Loading secrets...")
 
-    secrets = ChainMap(
-        load_inline_strings(secrets_info),
-        load_secrets_from_env(secrets_info, configuration),
-        load_secrets_from_vault(secrets_info, configuration)
+    loaders = (
+        load_inline_secrets,
+        load_secrets_from_env,
+        load_secrets_from_vault,
     )
+
+    secrets = {}
+    for loader in loaders:
+        for key, value in loader(secrets_info, configuration).items():
+            if key not in secrets:
+                secrets[key] = {}
+            secrets[key].update(value)
+
+    logger.debug("Secrets loaded")
+
     return secrets
 
 
-def load_inline_strings(secrets_info: Dict[str, Dict[str, str]]) -> Secrets:
+def load_inline_secrets(secrets_info: Dict[str, Dict[str, str]],
+                        configuration: Configuration = None) -> Secrets:
     """
     Load secrets that are inlined in the experiments.
     """
@@ -89,6 +99,8 @@ def load_inline_strings(secrets_info: Dict[str, Dict[str, str]]) -> Secrets:
 
         for (key, value) in keys.items():
             if not isinstance(value, dict):
+                secrets[target][key] = value
+            elif value.get("type") not in ("env", "vault"):
                 secrets[target][key] = value
 
         if not secrets[target]:
