@@ -2,7 +2,15 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.9.3...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.9.4...HEAD
+
+## [0.9.4][] - 2018-01-10
+
+[0.9.4]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.9.3...0.9.4
+
+### Changed
+
+- Proper merge of secrets from the different supported loaders
 
 ## [0.9.3][] - 2018-01-09
 
