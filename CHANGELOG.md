@@ -2,7 +2,22 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.9.4...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.10.0...HEAD
+
+## [0.10.0][] - 2018-01-16
+
+[0.9.4]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.9.4...0.10.0
+
+### Added
+
+- New discovery of extension capabilities [#16][16]
+
+### Changed
+
+- Pinning ply dependency version to 3.4 to avoid random install failures [#8][8]
+
+[8]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/8
+[16]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/16
 
 ## [0.9.4][] - 2018-01-10
 

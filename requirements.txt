@@ -1,5 +1,6 @@
 logzero
 pycodestyle
 hvac
-ply
+ply==3.4
 pyhcl>=0.2.1,<0.3.0
+pyyaml

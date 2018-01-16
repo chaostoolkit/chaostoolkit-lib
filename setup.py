@@ -36,6 +36,7 @@ url = 'http://chaostoolkit.org'
 license = 'Apache License Version 2.0'
 packages = [
     'chaoslib',
+    'chaoslib.discovery',
     'chaoslib.provider'
 ]
 
