@@ -2,11 +2,21 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.10.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.11.0...HEAD
+
+## [0.11.0][] - 2018-01-17
+
+[0.11.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.10.0...0.11.0
+
+### Changed
+
+- Steady state hypothesis is not mandatory when exploring [#18][18]
+
+[18]: https://github.com/chaostoolkit/chaostoolkit/issues/18
 
 ## [0.10.0][] - 2018-01-16
 
-[0.9.4]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.9.4...0.10.0
+[0.10.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.9.4...0.10.0
 
 ### Added
 

@@ -19,13 +19,15 @@ MissingDescriptionExperiment = {
 
 MissingHypothesisExperiment = {
     "title": "kaboom",
-    "description": "blah"
+    "description": "blah",
+    "method": [PythonModuleProbeWithBoolTolerance]
 }
 
 MissingHypothesisTitleExperiment = {
     "title": "kaboom",
     "description": "blah",
-    "steady-state-hypothesis": {}
+    "steady-state-hypothesis": {},
+    "method": []
 }
 
 MissingMethodExperiment = {
