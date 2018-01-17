@@ -21,8 +21,7 @@ def ensure_hypothesis_is_valid(experiment: Experiment):
     """
     hypo = experiment.get("steady-state-hypothesis")
     if hypo is None:
-        raise InvalidExperiment(
-            "experiment must declare a steady-state-hypothesis")
+        return
 
     if not hypo.get("title"):
         raise InvalidExperiment("hypothesis requires a title")
@@ -57,6 +56,11 @@ def run_steady_state_hypothesis(experiment: Experiment,
     the probe fails or is outside the tolerance zone.
     """
     hypo = experiment.get("steady-state-hypothesis")
+    if not hypo:
+        logger.info(
+            "No steady state hypothesis defined. That's ok, just exploring.")
+        return
+
     logger.info("Steady state hypothesis: {h}".format(h=hypo.get("title")))
 
     probes = hypo.get("probes", [])

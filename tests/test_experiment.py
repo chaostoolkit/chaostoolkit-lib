@@ -47,10 +47,9 @@ def test_experiment_must_have_a_description():
     assert "experiment requires a description" in str(exc)
 
 
-def test_experiment_must_have_a_hypothesis():
-    with pytest.raises(InvalidExperiment) as exc:
-        ensure_experiment_is_valid(experiments.MissingHypothesisExperiment)
-    assert "experiment must declare a steady-state-hypothesis" in str(exc)
+def test_experiment_may_not_have_a_hypothesis():
+    assert ensure_experiment_is_valid(
+        experiments.MissingHypothesisExperiment) is None
 
 
 def test_experiment_hypothesis_must_have_a_title():
