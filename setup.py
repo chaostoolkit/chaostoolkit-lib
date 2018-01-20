@@ -50,6 +50,14 @@ install_require = []
 with io.open('requirements.txt') as f:
     install_require = [l.strip() for l in f if not l.startswith('#')]
 
+extras_require = {
+    "vault": [
+        "ply==3.4",
+        "pyhcl>=0.2.1,<0.3.0",
+        "hvac"
+    ]
+}
+
 setup_params = dict(
     name=name,
     version=__version__,
@@ -65,6 +73,7 @@ setup_params = dict(
     install_requires=install_require,
     tests_require=test_require,
     setup_requires=pytest_runner,
+    extras_require=extras_require,
     python_requires='>=3.5.*'
 )
 

@@ -24,6 +24,10 @@ The library performs the followings:
   it tries to validate the given argument list matches the signature of the
   function to apply.
 
+* run your steady state before and after the method. The former as a gate to
+  decide if the experiment can be executed. The latter to see if the system
+  deviated from normal.
+
 * run probes and actions declared in an experiment
   It runs the steps in a experiment method sequentially, applying first steady
   probes, then actions and finally close probes.
@@ -32,6 +36,12 @@ The library performs the followings:
 
   The library supports running probes and actions defined as Python functions,
   from importable Python modules, processes and HTTP calls.
+
+* run experiment's rollbacks when provided
+
+* Load secrets from the experiments, the environ or [vault][vault].
+
+[vault]: https://www.vaultproject.io/
 
 ## Install
 
@@ -45,6 +55,12 @@ please install it as usual:
 
 ```
 $ pip install -U chaostoolkit-lib
+```
+
+If you need Vault support, also run the following command:
+
+```
+$ pip install -U chaostoolkit-lib[vault]
 ```
 
 ## Contribute
@@ -62,3 +78,9 @@ whenever you submit a PR so we keep the code reliable.
 
 [pep8]: https://pycodestyle.readthedocs.io/en/latest/
 
+The Chaos Toolkit projects require all contributors must sign a
+[Developer Certificate of Origin][dco] on each commit they would like to merge
+into the master branch of the repository. Please, make sure you can abide by
+the rules of the DCO before submitting a PR.
+
+[dco]: https://github.com/probot/dco#how-it-works

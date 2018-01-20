@@ -3,7 +3,6 @@ import os
 import requests
 from typing import Dict
 
-import hvac
 from logzero import logger
 
 from chaoslib.types import Configuration, Secrets
@@ -129,6 +128,7 @@ def load_secrets_from_env(secrets_info: Dict[str, Dict[str, str]],
 
 def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],
                             configuration: Configuration = None) -> Secrets:
+    import hvac
     secrets = {}
 
     url = configuration.get("vault_addr")
