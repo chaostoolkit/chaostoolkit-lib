@@ -2,7 +2,16 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.11.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.12.0...HEAD
+
+## [0.12.0][] - 2018-01-20
+
+[0.12.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.11.0...0.12.0
+
+### Changed
+
+- Various dependencies cleanups
+- Added the DCO notice for contributors
 
 ## [0.11.0][] - 2018-01-17
 
