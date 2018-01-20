@@ -2,7 +2,15 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.12.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.12.1...HEAD
+
+## [0.12.1][] - 2018-01-20
+
+[0.12.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.12.0...0.12.1
+
+### Changed
+
+-   yaml is not required in this package
 
 ## [0.12.0][] - 2018-01-20
 
