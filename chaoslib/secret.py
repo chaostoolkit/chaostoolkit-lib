@@ -4,6 +4,11 @@ import requests
 from typing import Dict
 
 from logzero import logger
+try:
+    import hvac
+    HAS_HVAC = True
+except ImportError:
+    HAS_HVAC = False
 
 from chaoslib.types import Configuration, Secrets
 
@@ -128,19 +133,25 @@ def load_secrets_from_env(secrets_info: Dict[str, Dict[str, str]],
 
 def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],
                             configuration: Configuration = None) -> Secrets:
-    import hvac
     secrets = {}
 
     url = configuration.get("vault_addr")
     token = configuration.get("vault_token")
 
-    client = hvac.Client(url=url, token=token)
+    client = None
+    if HAS_HVAC:
+        client = hvac.Client(url=url, token=token)
 
     for (target, keys) in secrets_info.items():
         secrets[target] = {}
 
         for (key, value) in keys.items():
             if isinstance(value, dict) and value.get("type") == "vault":
+                if not HAS_HVAC:
+                    logger.error(
+                        "Install the `hvac` package to fetch secrets "
+                        "from Vault: `pip install chaostoolkit-lib[vault]`.")
+                    return {}
                 secrets[target][key] = client.read(value["key"])
 
         if not secrets[target]:
