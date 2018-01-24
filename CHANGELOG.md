@@ -2,7 +2,17 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.12.1...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.12.2...HEAD
+
+## [0.12.2][] - 2018-01-24
+
+[0.12.2]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.12.1...0.12.2
+
+### Changed
+
+-   missing hvac dependency should not break chaos with an exception [#23][23]
+
+[23]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/23
 
 ## [0.12.1][] - 2018-01-20
 
