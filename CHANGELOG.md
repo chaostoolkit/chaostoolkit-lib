@@ -4,6 +4,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.12.2...HEAD
 
+### Changed
+
+-   HTTP provider must be able to connect to self-signed HTTPS endpoint [#25][25]
+
+[25]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/25
+
 ## [0.12.2][] - 2018-01-24
 
 [0.12.2]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.12.1...0.12.2
