@@ -3,6 +3,7 @@ import itertools
 import os
 import os.path
 from typing import Any
+import urllib3
 
 from logzero import logger
 import requests
@@ -13,6 +14,7 @@ from chaoslib.types import Activity, Configuration, Secrets
 
 
 __all__ = ["run_http_activity", "validate_http_activity"]
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def run_http_activity(activity: Activity, configuration: Configuration,
@@ -34,6 +36,7 @@ def run_http_activity(activity: Activity, configuration: Configuration,
     headers = substitute(provider.get("headers", None), configuration, secrets)
     timeout = provider.get("timeout", None)
     arguments = provider.get("arguments", {})
+    verify_tls = provider.get("verify_tls", True)
 
     if configuration or secrets:
         arguments = substitute(arguments, configuration, secrets)
@@ -41,10 +44,12 @@ def run_http_activity(activity: Activity, configuration: Configuration,
     try:
         if method == "GET":
             r = requests.get(
-                url, params=arguments, headers=headers, timeout=timeout)
+                url, params=arguments, headers=headers, timeout=timeout,
+                verify=verify_tls)
         else:
             r = requests.request(
-                method, url, data=arguments, headers=headers, timeout=timeout)
+                method, url, data=arguments, headers=headers, timeout=timeout,
+                verify=verify_tls)
 
         body = None
         if r.headers.get("Content-Type") == "application/json":
