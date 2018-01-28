@@ -71,6 +71,7 @@ def run_steady_state_hypothesis(experiment: Experiment,
     for activity in probes:
         run = execute_activity(
             activity, configuration=configuration, secrets=secrets, dry=dry)
+        run["tolerance_met"] = True
         state["probes"].append(run)
         if dry:
             # do not check for tolerance when dry mode is on
@@ -79,6 +80,7 @@ def run_steady_state_hypothesis(experiment: Experiment,
         tolerance = activity.get("tolerance")
         logger.debug("allowed tolerance is {t}".format(t=str(tolerance)))
         if not within_tolerance(tolerance, run["output"]):
+            run["tolerance_met"] = False
             state["steady_state_met"] = False
             return state
 
