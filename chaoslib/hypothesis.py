@@ -55,6 +55,10 @@ def run_steady_state_hypothesis(experiment: Experiment,
     Run all probes in the hypothesis and fail the experiment as soon as any of
     the probe fails or is outside the tolerance zone.
     """
+    state = {
+        "steady_state_met": None,
+        "probes": []
+    }
     hypo = experiment.get("steady-state-hypothesis")
     if not hypo:
         logger.info(
@@ -67,6 +71,7 @@ def run_steady_state_hypothesis(experiment: Experiment,
     for activity in probes:
         run = execute_activity(
             activity, configuration=configuration, secrets=secrets, dry=dry)
+        state["probes"].append(run)
         if dry:
             # do not check for tolerance when dry mode is on
             continue
@@ -74,11 +79,13 @@ def run_steady_state_hypothesis(experiment: Experiment,
         tolerance = activity.get("tolerance")
         logger.debug("allowed tolerance is {t}".format(t=str(tolerance)))
         if not within_tolerance(tolerance, run["output"]):
-            raise FailedActivity(
-                "Steady state probe '{p}' is not in the given tolerance "
-                "so failing this experiment".format(p=activity["name"]))
+            state["steady_state_met"] = False
+            return state
 
+    state["steady_state_met"] = True
     logger.info("Steady state hypothesis is met!")
+
+    return state
 
 
 @singledispatch

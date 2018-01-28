@@ -103,6 +103,10 @@ def initialize_run_journal(experiment: Experiment) -> Journal:
         "experiment": experiment.copy(),
         "start": datetime.utcnow().isoformat(),
         "status": None,
+        "steady_states": {
+            "before": None,
+            "after": None
+        },
         "run": [],
         "rollbacks": []
     }
@@ -182,8 +186,17 @@ def run_experiment(experiment: Experiment) -> Journal:
         # this may fail the entire experiment right there if any of the probes
         # fail or fall out of their tolerance zone
         try:
-            run_steady_state_hypothesis(experiment, config, secrets, dry)
+            state = run_steady_state_hypothesis(
+                experiment, config, secrets, dry)
+            journal["steady_states"]["before"] = state
+            if not state["steady_state_met"]:
+                p = state["probes"][-1]
+                raise FailedActivity(
+                    "Steady state probe '{p}' is not in the given tolerance "
+                    "so failing this experiment".format(
+                        p=p["activity"]["name"]))
         except FailedActivity as a:
+            journal["steady_states"]["before"] = state
             journal["status"] = "failed"
             logger.fatal(str(a))
         else:
@@ -197,8 +210,15 @@ def run_experiment(experiment: Experiment) -> Journal:
                     "aborting now.", exc_info=True)
             else:
                 try:
-                    run_steady_state_hypothesis(
+                    state = run_steady_state_hypothesis(
                         experiment, config, secrets, dry)
+                    journal["steady_states"]["after"] = state
+                    if not state["steady_state_met"]:
+                        p = state["probes"][-1]
+                        raise FailedActivity(
+                            "Steady state probe '{p}' is not in the given "
+                            "tolerance so failing this experiment".format(
+                                p=p["activity"]["name"]))
                 except FailedActivity as a:
                     journal["status"] = "failed"
                     logger.fatal(str(a))
