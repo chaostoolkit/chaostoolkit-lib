@@ -7,6 +7,7 @@
 ### Changed
 
 -   HTTP provider must be able to connect to self-signed HTTPS endpoint [#25][25]
+-   Steady state is now added to the generated json report
 
 [25]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/25
 
