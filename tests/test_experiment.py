@@ -143,3 +143,12 @@ def test_experiment_with_steady_state():
         journal = run_experiment(experiments.HTTPToleranceExperiment)
         assert isinstance(journal, dict)
         assert journal["status"] == "failed"
+
+
+def test_experiment_may_run_without_steady_state():
+    experiment = experiments.Experiment.copy()
+    experiment.pop("steady-state-hypothesis")
+    experiment["dry"] = True
+
+    journal = run_experiment(experiment)
+    assert journal is not None

@@ -189,7 +189,7 @@ def run_experiment(experiment: Experiment) -> Journal:
             state = run_steady_state_hypothesis(
                 experiment, config, secrets, dry)
             journal["steady_states"]["before"] = state
-            if not state["steady_state_met"]:
+            if state is not None and not state["steady_state_met"]:
                 p = state["probes"][-1]
                 raise FailedActivity(
                     "Steady state probe '{p}' is not in the given tolerance "
@@ -213,7 +213,7 @@ def run_experiment(experiment: Experiment) -> Journal:
                     state = run_steady_state_hypothesis(
                         experiment, config, secrets, dry)
                     journal["steady_states"]["after"] = state
-                    if not state["steady_state_met"]:
+                    if state is not None and not state["steady_state_met"]:
                         p = state["probes"][-1]
                         raise FailedActivity(
                             "Steady state probe '{p}' is not in the given "

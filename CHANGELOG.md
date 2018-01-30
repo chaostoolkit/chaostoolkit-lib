@@ -2,7 +2,15 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.13.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.13.1...HEAD
+
+## [0.13.1][] - 2018-01-30
+
+[0.13.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.13.0...0.13.1
+
+### Changed
+
+-   Steady stade is optional, so don't expect it here
 
 ## [0.13.0][] - 2018-01-28
 
