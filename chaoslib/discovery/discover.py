@@ -43,7 +43,7 @@ def initialize_discovery_result(extension_name: str, extension_version: str,
     return {
         "chaoslib_version": __version__,
         "id": str(uuid.uuid4()),
-        "type": discovery_type,
+        "target": discovery_type,
         "date": "{d}Z".format(d=datetime.utcnow().isoformat()),
         "platform": {
             "system": plt.system,
