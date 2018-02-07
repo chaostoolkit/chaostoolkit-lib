@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+from typing import List
 
-__all__ = ["many_args", "no_args_docstring", "no_args", "one_arg",
-           "one_untyped_arg", "one_arg_with_default",
+__all__ = ["many_args", "many_args_with_rich_types", "no_args_docstring",
+           "no_args", "one_arg", "one_untyped_arg", "one_arg_with_default",
            "one_untyped_arg_with_default"]
 
 
@@ -47,5 +48,19 @@ def one_untyped_arg_with_default(message = "hello"):
 def many_args(message: str, colour: str="blue"):
     """
     Many arguments.
+    """
+    pass
+
+
+class Whatever:
+    pass
+
+
+def many_args_with_rich_types(message: str, recipients: List[str],
+                              colour: str="blue", count: int=1,
+                              logit: bool=False, other: Whatever=None,
+                              **kwargs) -> str:
+    """
+    Many arguments with rich types.
     """
     pass

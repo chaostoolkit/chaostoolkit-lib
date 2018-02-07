@@ -3,6 +3,7 @@ from datetime import datetime
 import importlib
 import inspect
 import platform
+from typing import Any, Dict, List, Set
 import uuid
 
 from logzero import logger
@@ -116,20 +117,65 @@ def discover_activities(extension_mod_name: str,
             "arguments": []
         }
 
-        # if sig.return_annotation is not inspect.Signature.empty:
-        #     activity["return_type"] = sig.return_annotation
+        if sig.return_annotation is not inspect.Signature.empty:
+            activity["return_type"] = portable_type_name(sig.return_annotation)
 
         for param in sig.parameters.values():
+            if param.kind in (param.KEYWORD_ONLY, param.VAR_KEYWORD):
+                continue
+
             arg = {
                 "name": param.name,
             }
 
             if param.default is not inspect.Parameter.empty:
                 arg["default"] = param.default
-        #    if param.annotation is not inspect.Parameter.empty:
-        #         arg["type"] = param.annotation
+            if param.annotation is not inspect.Parameter.empty:
+                arg["type"] = portable_type_name(param.annotation)
             activity["arguments"].append(arg)
 
         activities.append(activity)
 
     return activities
+
+
+def portable_type_name(python_type: Any) -> str:
+    """
+    Return a fairly portable name for a Python type. The idea is to make it
+    easy for consumer to read without caring for actual Python types
+    themselves.
+
+    These are not JSON types so don't eval them directly. This function does
+    not try to be clever with rich types and will return `"object"` whenever
+    it cannot make sense of the provide type.
+    """
+    if python_type is None:
+        return "null"
+    elif python_type is bool:
+        return "boolean"
+    elif python_type is int:
+        return "integer"
+    elif python_type is float:
+        return "number"
+    elif python_type is str:
+        return "string"
+    elif python_type is bytes:
+        return "byte"
+    elif python_type is set:
+        return "set"
+    elif python_type is list:
+        return "list"
+    elif python_type is dict:
+        return "mapping"
+    elif getattr(python_type, "_gorg", None) is Dict:
+        return "mapping"
+    elif getattr(python_type, "_gorg", None) is List:
+        return "list"
+    elif getattr(python_type, "_gorg", None) is Set:
+        return "set"
+
+    logger.debug(
+        "'{}' could not be ported to something meaningful".format(
+            str(python_type)))
+
+    return "object"

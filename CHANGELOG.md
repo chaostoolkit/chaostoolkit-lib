@@ -8,7 +8,10 @@
 
 -   Do not fail the discovery when an extension is missing the `__all__`
     attribute [#28][28]
+-   Include extension activity arguments type when discovering
+    extension [#19][19]
 
+[19]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/19
 [28]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/28
 
 ## [0.13.1][] - 2018-01-30
