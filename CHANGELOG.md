@@ -4,6 +4,13 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.13.1...HEAD
 
+### Changed
+
+-   Do not fail the discovery when an extension is missing the `__all__`
+    attribute [#28][28]
+
+[28]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/28
+
 ## [0.13.1][] - 2018-01-30
 
 [0.13.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.13.0...0.13.1

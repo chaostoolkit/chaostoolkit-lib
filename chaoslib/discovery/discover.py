@@ -10,6 +10,7 @@ from logzero import logger
 from chaoslib import __version__
 from chaoslib.discovery.package import get_discover_function, install,\
     load_package
+from chaoslib.exceptions import DiscoveryFailed
 from chaoslib.types import Discovery, DiscoveredActivities
 
 
@@ -88,11 +89,18 @@ def discover_activities(extension_mod_name: str,
         mod = importlib.import_module(extension_mod_name)
     except ImportError:
         raise DiscoveryFailed(
-            "could not import Python module '{m}'".format(
+            "could not import extension module '{m}'".format(
                 m=extension_mod_name))
 
     activities = []
-    exported = getattr(mod, "__all__")
+    try:
+        exported = getattr(mod, "__all__")
+    except AttributeError as e:
+        logger.warn("'{m}' does not expose the __all__ attribute. "
+                    "It is required to determine what functions are actually "
+                    "exported as activities.".format(m=extension_mod_name))
+        return activities
+
     funcs = inspect.getmembers(mod, inspect.isfunction)
     for (name, func) in funcs:
         if exported and name not in exported:
