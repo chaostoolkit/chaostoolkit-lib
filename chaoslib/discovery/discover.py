@@ -16,7 +16,8 @@ from chaoslib.types import Discovery, DiscoveredActivities
 
 
 __all__ = ["discover", "discover_activities", "discover_actions",
-           "discover_probes", "initialize_discovery_result"]
+           "discover_probes", "initialize_discovery_result",
+           "portable_type_name", "portable_type_name_to_python_type"]
 
 
 def discover(package_name: str, discover_system: bool = True,
@@ -163,15 +164,17 @@ def portable_type_name(python_type: Any) -> str:
         return "byte"
     elif python_type is set:
         return "set"
+    elif python_type is tuple:
+        return "tuple"
     elif python_type is list:
         return "list"
     elif python_type is dict:
         return "mapping"
-    elif getattr(python_type, "_gorg", None) is Dict:
+    elif str(python_type).startswith('typing.Dict'):
         return "mapping"
-    elif getattr(python_type, "_gorg", None) is List:
+    elif str(python_type).startswith('typing.List'):
         return "list"
-    elif getattr(python_type, "_gorg", None) is Set:
+    elif str(python_type).startswith('typing.Set'):
         return "set"
 
     logger.debug(
@@ -179,3 +182,31 @@ def portable_type_name(python_type: Any) -> str:
             str(python_type)))
 
     return "object"
+
+
+def portable_type_name_to_python_type(name: str) -> Any:
+    """
+    Return the Python type associated to the given portable name.
+    """
+    if name == "null":
+        return None
+    elif name == "boolean":
+        return bool
+    elif name == "integer":
+        return int
+    elif name == "number":
+        return float
+    elif name == "string":
+        return str
+    elif name == "byte":
+        return bytes
+    elif name == "set":
+        return set
+    elif name == "list":
+        return list
+    elif name == "tuple":
+        return tuple
+    elif name == "mapping":
+        return dict
+
+    return object
