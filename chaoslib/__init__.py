@@ -9,7 +9,7 @@ __all__ = ["__version__", "substitute"]
 __version__ = '0.14.0'
 
 
-def substitute(data: Union[str, Dict[str, Any], List], 
+def substitute(data: Union[str, Dict[str, Any], List],
                configuration: Configuration,
                secrets: Secrets) -> Dict[str, Any]:
     """

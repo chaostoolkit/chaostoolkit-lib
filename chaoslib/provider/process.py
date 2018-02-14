@@ -52,7 +52,7 @@ def run_process_activity(activity: Activity, configuration: Configuration,
             stderr=subprocess.PIPE, env=os.environ)
     except subprocess.TimeoutExpired:
         raise FailedActivity("process activity took too long to complete")
-    
+
     return (
         proc.returncode,
         proc.stdout.decode('utf-8'),
