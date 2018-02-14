@@ -100,6 +100,21 @@ def test_run_process_probe_should_return_raw_value():
     assert type(result) is tuple
     assert result == (0, v, '')
 
+def test_run_process_probe_should_pass_arguments_in_dict():
+    args = "['-c', '--empty', '--number', '1', '--string', 'with spaces']\n"
+
+    result = run_activity(
+        probes.ProcEchoDictProbe, config.EmptyConfig, experiments.Secrets)
+    assert type(result) is tuple
+    assert result == (0, args, '')
+
+def test_run_process_probe_should_pass_arguments_in_array():
+    args = "['-c', '--empty', '--number', '1', '--string', 'with spaces', '--string', 'a second string with the same option']\n"
+
+    result = run_activity(
+        probes.ProcEchoArrayProbe, config.EmptyConfig, experiments.Secrets)
+    assert type(result) is tuple
+    assert result == (0, args, '')
 
 def test_run_process_probe_can_timeout():
     probe = probes.ProcProbe
