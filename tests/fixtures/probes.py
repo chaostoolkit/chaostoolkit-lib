@@ -198,26 +198,6 @@ ProcProbe = {
     }
 }
 
-ProcEchoDictProbe = {
-    "type": "probe",
-    "name": "This probe is a process probe that simply echoes its arguments passed as a dict",
-    "pauses": {
-        "before": 0,
-        "after": 0.1
-    },
-    "provider": {
-        "type": "process",
-        "path": sys.executable,
-        "arguments": {
-            "-c": "import sys; print(sys.argv)",
-            "--empty": None,
-            "--number": 1,
-            "--string": "with spaces" 
-        },
-        "timeout": 1
-    }
-}
-
 ProcEchoArrayProbe = {
     "type": "probe",
     "name": "This probe is a process probe that simply echoes its arguments passed as an array",
