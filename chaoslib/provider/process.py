@@ -59,6 +59,7 @@ def run_process_activity(activity: Activity, configuration: Configuration,
         proc.stderr.decode('utf-8')
     )
 
+
 def validate_process_activity(activity: Activity):
     """
     Validate a process activity.

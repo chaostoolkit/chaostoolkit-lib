@@ -9,7 +9,8 @@ __all__ = ["__version__", "substitute"]
 __version__ = '0.14.0'
 
 
-def substitute(data: Union[str, Dict[str, Any], List], configuration: Configuration,
+def substitute(data: Union[str, Dict[str, Any], List], 
+               configuration: Configuration,
                secrets: Secrets) -> Dict[str, Any]:
     """
     Replace forms such as `${name}` with the first value found in either the
@@ -36,7 +37,7 @@ def substitute(data: Union[str, Dict[str, Any], List], configuration: Configurat
 
     if isinstance(data, str):
         return substitute_string(data, mapping)
-    
+
     if isinstance(data, list):
         return substitute_in_sequence(data, mapping)
 
