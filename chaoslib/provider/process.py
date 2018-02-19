@@ -37,8 +37,12 @@ def run_process_activity(activity: Activity, configuration: Configuration,
     if configuration or secrets:
         arguments = substitute(arguments, configuration, secrets)
 
-    chain = itertools.chain.from_iterable(arguments.items())
-    args = list([p for p in chain if p not in (None, "")])
+    if isinstance(arguments, dict):
+        chain = itertools.chain.from_iterable(arguments.items())
+    else:
+        chain = arguments
+
+    args = list([str(p) for p in chain if p not in (None, "")])
     args.insert(0, shutil.which(provider["path"]))
 
     try:
