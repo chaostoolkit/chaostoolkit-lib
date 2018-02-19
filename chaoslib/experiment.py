@@ -56,7 +56,7 @@ def ensure_experiment_is_valid(experiment: Experiment):
     This function raises :exc:`InvalidExperiment`, :exc:`InvalidProbe` or
     :exc:`InvalidAction` depending on where it fails.
     """
-    logger.info("Validating experiment's syntax")
+    logger.info("Validating the experiment's syntax")
 
     if not experiment:
         raise InvalidExperiment("an empty experiment is not an experiment")
