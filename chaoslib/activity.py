@@ -23,7 +23,8 @@ from chaoslib.provider.process import run_process_activity, \
 from chaoslib.types import Activity, Configuration, Experiment, Run, Secrets
 
 
-__all__ = ["ensure_activity_is_valid", "run_activities"]
+__all__ = ["ensure_activity_is_valid", "get_all_activities_in_experiment",
+           "run_activities"]
 
 
 def ensure_activity_is_valid(activity: Activity):
@@ -225,3 +226,22 @@ def run_activity(activity: Activity, configuration: Configuration,
         raise
 
     return result
+
+
+def get_all_activities_in_experiment(experiment: Experiment) -> List[Activity]:
+    """
+    Handy function to return all activities from a given experiment. Useful
+    when you need to iterate over all the activities.
+    """
+    activities = []
+    hypo = experiment.get("steady-state-hypothesis")
+    if hypo:
+        activities.extend(hypo.get("probes", []))
+
+    method = experiment.get("method", [])
+    activities.extend(method)
+
+    rollbacks = experiment.get("rollbacks", [])
+    activities.extend(rollbacks)
+
+    return activities

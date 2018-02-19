@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 import json
 import sys
+import warnings
 
 import pytest
 import requests_mock
 
 from chaoslib.exceptions import FailedActivity, InvalidActivity
 from chaoslib.activity import ensure_activity_is_valid, run_activity
+from chaoslib.provider import process as chaoslib_process
 from chaoslib.types import Probe
 
 from fixtures import config, experiments, probes
@@ -100,6 +102,7 @@ def test_run_process_probe_should_return_raw_value():
     assert type(result) is tuple
     assert result == (0, v, '')
 
+
 def test_run_process_probe_should_pass_arguments_in_array():
     args = "['-c', '--empty', '--number', '1', '--string', 'with spaces', '--string', 'a second string with the same option']\n"
 
@@ -107,6 +110,7 @@ def test_run_process_probe_should_pass_arguments_in_array():
         probes.ProcEchoArrayProbe, config.EmptyConfig, experiments.Secrets)
     assert type(result) is tuple
     assert result == (0, args, '')
+
 
 def test_run_process_probe_can_timeout():
     probe = probes.ProcProbe

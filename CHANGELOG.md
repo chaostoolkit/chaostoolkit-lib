@@ -4,6 +4,21 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.14.0...HEAD
 
+### Changed
+
+-   Process activities can now take their arguments as a list rather than a
+    dictionary. The rationale is that command line arguments sometimes need
+    ordering and dictionaries only provided ordering (as in insertion ordering)
+    only [since Python 3.6][ordereddict]. Assuming older versions of Python will
+    eventually get it backported is not reasonable. Therefore, a list is more
+    appropriate now and a warning message will be displayed when your experiment
+    uses the dictionary approach. Notice that HTTP and Python activities will
+    remain mapping only. [#34][34]
+-   Added module to warn about deprecated features.
+
+[34]: https://github.com/chaostoolkit/chaostoolkit-lib/pull/34
+[ordereddict]: https://stackoverflow.com/a/39980744/1363905
+
 ## [0.14.0][] - 2018-02-06
 
 [0.14.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.13.1...0.14.0

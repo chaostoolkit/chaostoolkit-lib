@@ -13,6 +13,7 @@ from logzero import logger
 from chaoslib import __version__
 from chaoslib.activity import ensure_activity_is_valid, run_activities
 from chaoslib.caching import with_cache, lookup_activity
+from chaoslib.deprecation import warn_about_deprecated_features
 from chaoslib.exceptions import FailedActivity, InvalidActivity, \
     InvalidExperiment
 from chaoslib.configuration import load_configuration
@@ -91,6 +92,8 @@ def ensure_experiment_is_valid(experiment: Experiment):
     rollbacks = experiment.get("rollbacks", [])
     for activity in rollbacks:
         ensure_activity_is_valid(activity)
+
+    warn_about_deprecated_features(experiment)
 
     logger.info("Experiment looks valid")
 

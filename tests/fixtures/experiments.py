@@ -3,7 +3,7 @@ from fixtures.probes import BackgroundPythonModuleProbe, MissingFuncArgProbe, \
     PythonModuleProbe, PythonModuleProbeWithBoolTolerance, \
     PythonModuleProbeWithExternalTolerance, PythonModuleProbeWithLongPause, \
     BackgroundPythonModuleProbeWithLongPause, \
-    PythonModuleProbeWithHTTPStatusTolerance
+    PythonModuleProbeWithHTTPStatusTolerance, DeprecatedProcArgumentsProbe
 
 Secrets = {}
 
@@ -126,6 +126,18 @@ HTTPToleranceExperiment = {
     },
     "method": [],
     "rollbacks": []
+}
+
+DeprecatedProcArgumentsProbeTwin = DeprecatedProcArgumentsProbe.copy()
+DeprecatedProcArgumentsProbeTwin["name"] = "another-proc-probe"
+
+ExperimentWithDeprecatedProcArgsProbe = {
+    "title": "do cats live in the Internet?",
+    "description": "an experiment of importance",
+    "method": [
+        DeprecatedProcArgumentsProbe,
+        DeprecatedProcArgumentsProbeTwin
+    ]
 }
 
 Experiment = {

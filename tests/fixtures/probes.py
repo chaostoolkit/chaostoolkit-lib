@@ -191,6 +191,21 @@ ProcProbe = {
     "provider": {
         "type": "process",
         "path": sys.executable,
+        "arguments": ["-V"],
+        "timeout": 1
+    }
+}
+
+DeprecatedProcArgumentsProbe = {
+    "type": "probe",
+    "name": "This probe is a process probe",
+    "pauses": {
+        "before": 0,
+        "after": 0.1
+    },
+    "provider": {
+        "type": "process",
+        "path": sys.executable,
         "arguments": {
             "-V": None
         },
