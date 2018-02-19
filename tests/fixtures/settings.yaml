@@ -1,0 +1,7 @@
+notifications:
+  -
+    url: https://slack
+  -
+    url: https://elsewhere
+    headers:
+      - auth: "Bearer token"
