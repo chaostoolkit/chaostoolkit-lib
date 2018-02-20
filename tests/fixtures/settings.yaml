@@ -1,7 +1,13 @@
 notifications:
+  - 
+    type: plugin
+    module:
+    function: 
   -
+    type: http
     url: https://slack
   -
+    type: http
     url: https://elsewhere
     headers:
       - auth: "Bearer token"
