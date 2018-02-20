@@ -4,7 +4,7 @@ from typing import Any, Dict, Generator, List, Tuple, Union
 __all__ = ["MicroservicesStatus", "Probe", "Action", "Experiment", "Layer",
            "TargetLayers", "Activity", "Journal", "Run", "Secrets", "Step",
            "Configuration", "Discovery", "DiscoveredActivities",
-           "DiscoveredSystemInfo"]
+           "DiscoveredSystemInfo", "Settings"]
 
 
 Action = Dict[str, Any]
@@ -27,3 +27,5 @@ Configuration = Dict[str, Dict[str, str]]
 Discovery = Dict[str, Any]
 DiscoveredActivities = Dict[str, Any]
 DiscoveredSystemInfo = Dict[str, Any]
+
+Settings = Dict[str, Any]

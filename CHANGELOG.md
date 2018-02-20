@@ -15,9 +15,11 @@
     uses the dictionary approach. Notice that HTTP and Python activities will
     remain mapping only. [#34][34]
 -   Added module to warn about deprecated features.
+-   Added settings for the user-supplied configurations [#35][35]
 
 [34]: https://github.com/chaostoolkit/chaostoolkit-lib/pull/34
 [ordereddict]: https://stackoverflow.com/a/39980744/1363905
+[35]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/35
 
 ## [0.14.0][] - 2018-02-06
 

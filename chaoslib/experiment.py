@@ -22,7 +22,7 @@ from chaoslib.hypothesis import ensure_hypothesis_is_valid, \
 from chaoslib.rollback import run_rollbacks
 from chaoslib.secret import load_secrets
 from chaoslib.types import Action, Activity, Configuration, Experiment, \
-    Journal, Probe, Run, Secrets, Step
+    Journal, Probe, Run, Secrets, Settings, Step
 
 
 __all__ = ["ensure_experiment_is_valid", "run_experiment"]
@@ -151,7 +151,7 @@ def get_background_pools(experiment: Experiment) -> ThreadPoolExecutor:
 
 
 @with_cache
-def run_experiment(experiment: Experiment) -> Journal:
+def run_experiment(experiment: Experiment, settings: Settings=None) -> Journal:
     """
     Run the given `experiment` method step by step, in the following sequence:
     steady probe, action, close probe.
