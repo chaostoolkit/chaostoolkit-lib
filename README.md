@@ -11,11 +11,18 @@ The Chaos Toolkit core library.
 The purpose of this library is to provide the core of the Chaos Toolkit 
 [model][concepts] and functions it needs to render its services.
 
+Unless you wish to create your own toolkit, you will likely not use directly
+this library.
+
 [concepts]: http://chaostoolkit.org/overview/concepts/
 
 ## Features
 
-The library performs the followings:
+The library provides the followings features:
+
+* discover capabilities from extensions
+  Allows you to explore the support from an extension that would help you
+  initialize an experiment against the system this extension targets
 
 * validate a given experiment syntax
   The validation looks at various keys in the experiment and raises errors
@@ -39,7 +46,18 @@ The library performs the followings:
 
 * run experiment's rollbacks when provided
 
-* Load secrets from the experiments, the environ or [vault][vault].
+* Load secrets from the experiments, the environ or [vault][vault]
+
+* Provides event notification from Chaos Toolkit flow (although the actual
+  events are published by the CLI itself, not from this library), supported
+  events are:
+  * on experiment validation: started, failed or completed
+  * on discovery: started, failed or completed
+  * on initialization of experiments: started, failed or completed
+  * on experiment runs: started, failed or completed
+
+  For each event, the according payload is part of the event as well as a UTC
+  timestamp.
 
 [vault]: https://www.vaultproject.io/
 

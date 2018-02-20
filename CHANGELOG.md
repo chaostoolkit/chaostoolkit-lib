@@ -16,7 +16,9 @@
     remain mapping only. [#34][34]
 -   Added module to warn about deprecated features.
 -   Added settings for the user-supplied configurations [#35][35]
+-   Added event support [#33][33]
 
+[33]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/33
 [34]: https://github.com/chaostoolkit/chaostoolkit-lib/pull/34
 [ordereddict]: https://stackoverflow.com/a/39980744/1363905
 [35]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/35
