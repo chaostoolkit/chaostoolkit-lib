@@ -10,6 +10,7 @@ try:
 except ImportError:
     HAS_HVAC = False
 
+from chaoslib.exceptions import InvalidExperiment
 from chaoslib.types import Configuration, Secrets
 
 __all__ = ["load_secrets"]
@@ -123,7 +124,12 @@ def load_secrets_from_env(secrets_info: Dict[str, Dict[str, str]],
 
         for (key, value) in keys.items():
             if isinstance(value, dict) and value.get("type") == "env":
-                secrets[target][key] = env.get(value["key"])
+                env_key = value["key"]
+                if env_key not in env:
+                    raise InvalidExperiment(
+                        "Secrets make reference to an environment key "
+                        "that does not exist: {}".format(env_key))
+                secrets[target][key] = env.get(env_key)
 
         if not secrets[target]:
             secrets.pop(target)

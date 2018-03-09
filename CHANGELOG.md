@@ -2,7 +2,20 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.15.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.15.1...HEAD
+
+## [0.15.1][] - 2018-03-09
+
+[0.15.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.15.0...0.15.1
+
+### Changed
+
+-   Log a message wgen loding the configuration 
+-   Raise `InvalidExperiment` when a configuration or secret references a key
+    in the environment and that key does not exist (it may not be set however)
+    [#40][40]. This bails the experiment at validation time so before it runs.
+
+[40]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/40
 
 ## [0.15.0][] - 2018-02-20
 

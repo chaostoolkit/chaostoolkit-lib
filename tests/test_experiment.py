@@ -152,3 +152,12 @@ def test_experiment_may_run_without_steady_state():
 
     journal = run_experiment(experiment)
     assert journal is not None
+
+
+def test_should_bail_experiment_when_env_was_not_found():
+    experiment = experiments.ExperimentWithConfigurationCallingMissingEnvKey
+
+    with pytest.raises(InvalidExperiment) as x:
+        run_experiment(experiment)
+    assert "Configuration makes reference to an environment key that does " \
+           "not exist" in str(x)
