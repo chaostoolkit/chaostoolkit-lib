@@ -4,6 +4,7 @@ from typing import Dict
 
 from logzero import logger
 
+from chaoslib.exceptions import InvalidExperiment
 from chaoslib.types import Configuration
 
 __all__ = ["load_configuration"]
@@ -32,13 +33,19 @@ def load_configuration(config_info: Dict[str, str]) -> Configuration:
     configuration key is dynamically fetched from the `MY_TOKEN` environment
     variable.
     """
+    logger.debug("Loading configuration...")
     env = os.environ
     conf = {}
 
     for (key, value) in config_info.items():
         if isinstance(value, dict) and "type" in value:
             if value["type"] == "env":
-                conf[key] = env.get(value["key"])
+                env_key = value["key"]
+                if env_key not in env:
+                    raise InvalidExperiment(
+                        "Configuration makes reference to an environment key"
+                        " that does not exist: {}".format(env_key))
+                conf[key] = env.get(env_key)
         else:
             conf[key] = value
 

@@ -73,6 +73,9 @@ def ensure_experiment_is_valid(experiment: Experiment):
             raise InvalidExperiment(
                 "experiment tags must be a non-empty string")
 
+    config = load_configuration(experiment.get("configuration", {}))
+    secrets = load_secrets(experiment.get("secrets", {}), config)
+
     ensure_hypothesis_is_valid(experiment)
 
     method = experiment.get("method")

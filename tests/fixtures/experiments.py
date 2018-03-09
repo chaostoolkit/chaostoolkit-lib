@@ -160,3 +160,11 @@ Experiment = {
         }
     ]
 }
+
+ExperimentWithConfigurationCallingMissingEnvKey = Experiment.copy()
+ExperimentWithConfigurationCallingMissingEnvKey["configuration"] = {
+    "mykey": {
+        "type": "env",
+        "key": "DOES_NOT_EXIST"
+    }
+}
