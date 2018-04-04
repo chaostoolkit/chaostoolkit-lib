@@ -75,13 +75,24 @@ please install it as usual:
 $ pip install -U chaostoolkit-lib
 ```
 
-If you need Vault support, also run the following command:
+### Specific dependencies
 
+In addition to essential dependencies, the package can install a couple of
+other extra dependencies for specific use-cases. They are not mandatory and
+the library will warn you if you try to use a feature that requires them.
+
+If you need [Vault][vault] support to read secrets from, run the following
+command:
+
+[vault]: https://www.vaultproject.io/
 ```
 $ pip install -U chaostoolkit-lib[vault]
 ```
 
-If you need JSON Path support, also run the following command:
+If you need [JSON Path support][jpath] for tolerance probes in the hypothesis,
+also run the following command:
+
+[jpath]: http://goessner.net/articles/JsonPath/
 
 ```
 $ pip install -U chaostoolkit-lib[jsonpath]
