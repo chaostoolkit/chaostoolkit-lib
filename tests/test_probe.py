@@ -99,8 +99,10 @@ def test_run_process_probe_should_return_raw_value():
 
     result = run_activity(
         probes.ProcProbe, config.EmptyConfig, experiments.Secrets)
-    assert type(result) is tuple
-    assert result == (0, v, '')
+    assert type(result) is dict
+    assert result["status"] == 0
+    assert result["stdout"] == v
+    assert result["stderr"] == ''
 
 
 def test_run_process_probe_should_pass_arguments_in_array():
@@ -108,8 +110,10 @@ def test_run_process_probe_should_pass_arguments_in_array():
 
     result = run_activity(
         probes.ProcEchoArrayProbe, config.EmptyConfig, experiments.Secrets)
-    assert type(result) is tuple
-    assert result == (0, args, '')
+    assert type(result) is dict
+    assert result["status"] == 0
+    assert result["stdout"] == args
+    assert result["stderr"] == ''
 
 
 def test_run_process_probe_can_timeout():

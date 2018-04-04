@@ -53,11 +53,11 @@ def run_process_activity(activity: Activity, configuration: Configuration,
     except subprocess.TimeoutExpired:
         raise FailedActivity("process activity took too long to complete")
 
-    return (
-        proc.returncode,
-        proc.stdout.decode('utf-8'),
-        proc.stderr.decode('utf-8')
-    )
+    return {
+        "status": proc.returncode,
+        "stdout": proc.stdout.decode('utf-8'),
+        "stderr": proc.stderr.decode('utf-8')
+    }
 
 
 def validate_process_activity(activity: Activity):

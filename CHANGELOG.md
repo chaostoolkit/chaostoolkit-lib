@@ -4,13 +4,20 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.15.1...HEAD
 
+### Changed
+-   Output a dict from process probes, with keys 'status', 'stdout' and 'stderr'.
+    This is a first step to better tolerance checks on process probes. [#21][21]
+
+[21]: https://github.com/chaostoolkit/chaostoolkit/issues/21
+
+
 ## [0.15.1][] - 2018-03-09
 
 [0.15.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.15.0...0.15.1
 
 ### Changed
 
--   Log a message wgen loding the configuration 
+-   Log a message when loading the configuration 
 -   Raise `InvalidExperiment` when a configuration or secret references a key
     in the environment and that key does not exist (it may not be set however)
     [#40][40]. This bails the experiment at validation time so before it runs.
