@@ -3,7 +3,11 @@ from fixtures.probes import BackgroundPythonModuleProbe, MissingFuncArgProbe, \
     PythonModuleProbe, PythonModuleProbeWithBoolTolerance, \
     PythonModuleProbeWithExternalTolerance, PythonModuleProbeWithLongPause, \
     BackgroundPythonModuleProbeWithLongPause, \
-    PythonModuleProbeWithHTTPStatusTolerance, DeprecatedProcArgumentsProbe
+    PythonModuleProbeWithHTTPStatusTolerance, DeprecatedProcArgumentsProbe, \
+    PythonModuleProbeWithHTTPBodyTolerance, \
+    PythonModuleProbeWithProcessStatusTolerance, \
+    PythonModuleProbeWithProcessFailedStatusTolerance, \
+    PythonModuleProbeWithProcesStdoutTolerance
 
 Secrets = {}
 
@@ -167,4 +171,26 @@ ExperimentWithConfigurationCallingMissingEnvKey["configuration"] = {
         "type": "env",
         "key": "DOES_NOT_EXIST"
     }
+}
+
+
+ExperimentWithVariousTolerances = {
+    "title": "do cats live in the Internet?",
+    "description": "an experiment of importance",
+    "steady-state-hypothesis": {
+        "title": "hello",
+        "probes": [
+            PythonModuleProbeWithBoolTolerance,
+            PythonModuleProbeWithExternalTolerance,
+            PythonModuleProbeWithHTTPStatusTolerance,
+            PythonModuleProbeWithHTTPBodyTolerance,
+            PythonModuleProbeWithProcessStatusTolerance,
+            PythonModuleProbeWithProcessFailedStatusTolerance,
+            PythonModuleProbeWithProcesStdoutTolerance
+        ]
+    },
+    "method": [
+        PythonModuleProbe
+    ],
+    "rollbacks": []
 }

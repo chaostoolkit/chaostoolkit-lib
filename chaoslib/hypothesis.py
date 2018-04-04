@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
 from functools import singledispatch
-from typing import Any
+import json
+import re
+from typing import Any, Dict
+
+try:
+    from jsonpath_ng import jsonpath, parse as jparse
+    from jsonpath_ng.lexer import JsonPathLexerError
+    HAS_JSONPATH = True
+except ImportError:
+    HAS_JSONPATH = False
 
 from logzero import logger
 
@@ -8,7 +17,7 @@ from chaoslib.activity import ensure_activity_is_valid, execute_activity, \
     run_activity
 from chaoslib.exceptions import FailedActivity, InvalidActivity, \
     InvalidExperiment
-from chaoslib.types import Configuration, Experiment, Run, Secrets
+from chaoslib.types import Configuration, Experiment, Run, Secrets, Tolerance
 
 
 __all__ = ["ensure_hypothesis_is_valid", "run_steady_state_hypothesis"]
@@ -17,7 +26,7 @@ __all__ = ["ensure_hypothesis_is_valid", "run_steady_state_hypothesis"]
 def ensure_hypothesis_is_valid(experiment: Experiment):
     """
     Validates that the steady state hypothesis entry has the expected schema
-    or raises :exc:`InvalidExperiment` or :exc:`InvalidProbe`.
+    or raises :exc:`InvalidExperiment` or :exc:`InvalidActivity`.
     """
     hypo = experiment.get("steady-state-hypothesis")
     if hypo is None:
@@ -35,17 +44,88 @@ def ensure_hypothesis_is_valid(experiment: Experiment):
                 raise InvalidActivity(
                     "hypothesis probe must have a tolerance entry")
 
-            if not isinstance(probe["tolerance"], (
-                    bool, int, list, str, dict)):
-                raise InvalidActivity(
-                    "hypothesis probe tolerance must either be an integer, "
-                    "a string, a boolean or a pair of values for boundaries. "
-                    "It can also be a dictionary which is a probe activity "
-                    "definition that takes an argument called `value` with "
-                    "the value of the probe itself to be validated")
+            ensure_hypothesis_tolerance_is_valid(probe["tolerance"])
 
-            if isinstance(probe, dict):
-                ensure_activity_is_valid(probe)
+
+def ensure_hypothesis_tolerance_is_valid(tolerance: Tolerance):
+    """
+    Validate the tolerance of the hypothesis probe and raises
+    :exc:`InvalidActivity` if it isn't valid.
+    """
+    if not isinstance(tolerance, (
+            bool, int, list, str, dict)):
+        raise InvalidActivity(
+            "hypothesis probe tolerance must either be an integer, "
+            "a string, a boolean or a pair of values for boundaries. "
+            "It can also be a dictionary which is a probe activity "
+            "definition that takes an argument called `value` with "
+            "the value of the probe itself to be validated")
+
+    if isinstance(tolerance, dict):
+        tolerance_type = tolerance.get("type")
+
+        if tolerance_type == "probe":
+            ensure_activity_is_valid(tolerance)
+        elif tolerance_type == "regex":
+            check_regex_pattern(tolerance)
+        elif tolerance_type == "jsonpath":
+            check_json_path(tolerance)
+        else:
+            raise InvalidActivity(
+                "hypothesis probe tolerance type '{}' is unsupported".format(
+                    tolerance_type))
+
+
+def check_regex_pattern(tolerance: Tolerance):
+    """
+    Check the regex pattern of a tolerance and raise :exc:`InvalidActivity`
+    when the pattern is missing or invalid (meaning, cannot be compiled by
+    the Python regex engine).
+    """
+    if "pattern" not in tolerance:
+        raise InvalidActivity(
+            "hypothesis regex probe tolerance must have a `pattern` key")
+
+    pattern = tolerance["pattern"]
+    try:
+        re.compile(pattern)
+    except TypeError as t:
+        raise InvalidActivity(
+            "hypothesis probe tolerance pattern {} has an invalid type".format(
+                pattern))
+    except re.error as e:
+        raise InvalidActivity(
+            "hypothesis probe tolerance pattern {} seems invalid: {}".format(
+                e.pattern, e.msg))
+
+
+def check_json_path(tolerance: Tolerance):
+    """
+    Check the JSON path of a tolerance and raise :exc:`InvalidActivity`
+    when the path is missing or invalid.
+
+    See: https://github.com/h2non/jsonpath-ng
+    """
+    if not HAS_JSONPATH:
+        raise InvalidActivity(
+            "Install the `jsonpath_ng` package to use a JSON path tolerance: "
+            "`pip install chaostoolkit-lib[jsonpath]`.")
+
+    if "path" not in tolerance:
+        raise InvalidActivity(
+            "hypothesis jsonpath probe tolerance must have a `path` key")
+
+    try:
+        path = tolerance.get("path")
+        jparse(path)
+    except TypeError as t:
+        raise InvalidActivity(
+            "hypothesis probe tolerance path {} has an invalid type".format(
+                path))
+    except JsonPathLexerError as e:
+        raise InvalidActivity(
+            "hypothesis probe tolerance JSON path '{}' is invalid: {}".format(
+                str(e)))
 
 
 def run_steady_state_hypothesis(experiment: Experiment,
@@ -94,7 +174,7 @@ def run_steady_state_hypothesis(experiment: Experiment,
 def within_tolerance(tolerance: Any, value: Any,
                      secrets: Secrets = None) -> bool:
     """
-    Performs a quick validation of the probe's result `value` agains the
+    Performs a quick validation of the probe's result `value` against the
     `tolerance` that was provided.
 
     The tolerance is typed and is therefore dispatched to the right function
@@ -136,9 +216,52 @@ def _(tolerance: list, value: Any, secrets: Secrets = None) -> bool:
     if len(tolerance) == 2:
         return tolerance[0] <= value <= tolerance[1]
 
+    return value in tolerance
+
 
 @within_tolerance.register(dict)
 def _(tolerance: dict, value: Any, secrets: Secrets = None) -> bool:
-    tolerance["arguments"]["value"] = value
-    run = run_activity(tolerance, secrets)
-    return run["status"] == "succeeded"
+    tolerance_type = tolerance.get("type")
+
+    if tolerance_type == "probe":
+        tolerance["arguments"]["value"] = value
+        run = run_activity(tolerance, secrets)
+        return run["status"] == "succeeded"
+    elif tolerance_type == "regex":
+        target = tolerance.get("target")
+        pattern = tolerance.get("pattern")
+        rx = re.compile(pattern)
+        if target:
+            value = value.get(target, value)
+        return rx.search(value) is not None
+    elif tolerance_type == "jsonpath":
+        target = tolerance.get("target")
+        path = tolerance.get("path")
+        px = jparse(path)
+
+        if target:
+            # if no target was provided, we use the tested value as-is
+            value = value.get(target, value)
+
+        if isinstance(value, bytes):
+            value = value.decode('utf-8')
+
+        if isinstance(value, str):
+            try:
+                value = json.loads(value)
+            except json.decoder.JSONDecodeError:
+                pass
+
+        items = px.find(value)
+        if not items:
+            return False
+
+        expected_value = tolerance.get("expect")
+        if expected_value is None:
+            return True
+
+        for item in items:
+            if item.value != expected_value:
+                return False
+        else:
+            return True

@@ -5,11 +5,37 @@
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.15.1...HEAD
 
 ### Changed
+
 -   Output a dict from process probes, with keys 'status', 'stdout' and 'stderr'.
     This is a first step to better tolerance checks on process probes. [#21][21]
+-   Tolerance is richer now as well. If you provide a dictionary, it won't be
+    considered only as a new probe to run. Instead, it will look for the `type`
+    key. It's a follow-up of [#21][21]:
+
+    - if type is `"probe"`, then it is considered a new probe to run as usual,
+      and the status of the probe makes the status of the tolerance.
+    - if type is `"regex"`, then a `pattern` key must also be present with
+      a valid [Python regex][re]. If a `target` key is also present, it must
+      indicate where to find the content to search for in the tested value.
+      If the tested value comes from a process probe, the `target` key must be
+      either `"stdout"` or `"stderr"`. If it is a HTTP probe,  the `target` key
+      must be `"body"`. In all other cases, the tested value is checked as-is.
+    - if type is `"jsonpath"`, then a `path` key must also be present with
+      a valid [JSON Path][jp]. If a `target` key is also present, it must
+      indicate where to find the content to search for in the tested value.
+      If the tested value comes from a process probe, the `target` key must be
+      either `"stdout"` or `"stderr"`. If it is a HTTP probe,  the `target` key
+      must be `"body"`. In all other cases, the tested value is checked as-is.
+      Note that, when the tested value is a string (no matter where read from),
+      we try to parse it as a JSON payload first.
+      Finally, you can provide a ̀`expect` key as well, to check that matched
+      items have all the expected value. If not provided, the tolerance will
+      only care that the JSON Path matched at least one item.
+
 
 [21]: https://github.com/chaostoolkit/chaostoolkit/issues/21
-
+[re]: https://docs.python.org/3/library/re.html#module-re
+[jp]: https://github.com/h2non/jsonpath-ng
 
 ## [0.15.1][] - 2018-03-09
 

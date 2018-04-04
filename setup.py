@@ -55,6 +55,9 @@ extras_require = {
         "ply==3.4",
         "pyhcl>=0.2.1,<0.3.0",
         "hvac"
+    ],
+    "jsonpath": [
+        "jsonpath-ng"
     ]
 }
 
