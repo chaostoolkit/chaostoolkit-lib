@@ -161,3 +161,9 @@ def test_should_bail_experiment_when_env_was_not_found():
         run_experiment(experiment)
     assert "Configuration makes reference to an environment key that does " \
            "not exist" in str(x)
+
+def test_validate_all_tolerance_probes():
+    with requests_mock.mock() as m:
+        m.get("http://example.com", text="you are number 87")
+
+        ensure_experiment_is_valid(experiments.ExperimentWithVariousTolerances)

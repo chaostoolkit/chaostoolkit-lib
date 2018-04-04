@@ -181,6 +181,61 @@ PythonModuleProbeWithHTTPStatusTolerance = {
     }
 }
 
+PythonModuleProbeWithHTTPBodyTolerance = {
+    "type": "probe",
+    "name": "A dummy tolerance ready probe",
+    "tolerance": {
+        "type": "regex",
+        "target": "body",
+        "pattern": "[0-9]{2}"
+    },
+    "provider": {
+        "type": "http",
+        "url": "http://example.com",
+        "timeout": 30
+    }
+}
+
+PythonModuleProbeWithProcessStatusTolerance = {
+    "type": "probe",
+    "name": "A dummy tolerance ready probe",
+    "tolerance": 0,
+    "provider": {
+        "type": "process",
+        "path": sys.executable,
+        "arguments": ["-V"],
+        "timeout": 1
+    }
+}
+
+PythonModuleProbeWithProcessFailedStatusTolerance = {
+    "type": "probe",
+    "name": "A dummy tolerance ready probe",
+    "tolerance": 2,
+    "provider": {
+        "type": "process",
+        "path": sys.executable,
+        "arguments": ["--burp"],
+        "timeout": 1
+    }
+}
+
+PythonModuleProbeWithProcesStdoutTolerance = {
+    "type": "probe",
+    "name": "A dummy tolerance ready probe",
+    "tolerance": {
+        "type": "regex",
+        "target": "stdout",
+        "pattern": "Python [0-9]\.[0-9]\.[0-9]"
+    },
+    "provider": {
+        "type": "process",
+        "path": sys.executable,
+        "arguments": ["-V"],
+        "timeout": 1
+    }
+}
+
 ProcProbe = {
     "type": "probe",
     "name": "This probe is a process probe",

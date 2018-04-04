@@ -81,6 +81,12 @@ If you need Vault support, also run the following command:
 $ pip install -U chaostoolkit-lib[vault]
 ```
 
+If you need JSON Path support, also run the following command:
+
+```
+$ pip install -U chaostoolkit-lib[jsonpath]
+```
+
 ## Contribute
 
 Contributors to this project are welcome as this is an open-source effort that
