@@ -35,11 +35,14 @@ def run_http_activity(activity: Activity, configuration: Configuration,
     method = provider.get("method", "GET").upper()
     headers = substitute(provider.get("headers", None), configuration, secrets)
     timeout = provider.get("timeout", None)
-    arguments = provider.get("arguments", {})
+    arguments = provider.get("arguments", None)
     verify_tls = provider.get("verify_tls", True)
 
-    if configuration or secrets:
+    if arguments and (configuration or secrets):
         arguments = substitute(arguments, configuration, secrets)
+
+    if isinstance(timeout, list):
+        timeout = tuple(timeout)
 
     try:
         if method == "GET":
@@ -47,9 +50,14 @@ def run_http_activity(activity: Activity, configuration: Configuration,
                 url, params=arguments, headers=headers, timeout=timeout,
                 verify=verify_tls)
         else:
-            r = requests.request(
-                method, url, data=arguments, headers=headers, timeout=timeout,
-                verify=verify_tls)
+            if headers and headers.get("Content-Type") == "application/json":
+                r = requests.request(
+                    method, url, json=arguments, headers=headers,
+                    timeout=timeout, verify=verify_tls)
+            else:
+                r = requests.request(
+                    method, url, data=arguments, headers=headers,
+                    timeout=timeout, verify=verify_tls)
 
         body = None
         if r.headers.get("Content-Type") == "application/json":

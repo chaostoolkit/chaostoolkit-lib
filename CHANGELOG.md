@@ -6,6 +6,12 @@
 
 ### Changed
 
+-   HTTP provider can pass request body as JSON when
+    `"Content-Type: application/json"` is passed in the `headers` object of
+    the provider
+-   Process provider can also take its arguments as a string now so you can pass
+    the command line arguments as-is. This is needed because some commands do not
+    respect POSIX and this fails with Python subprocess
 -   Output a dict from process probes, with keys 'status', 'stdout' and 'stderr'.
     This is a first step to better tolerance checks on process probes. [#21][21]
 -   Tolerance is richer now as well. If you provide a dictionary, it won't be
@@ -28,9 +34,8 @@
       must be `"body"`. In all other cases, the tested value is checked as-is.
       Note that, when the tested value is a string (no matter where read from),
       we try to parse it as a JSON payload first.
-      Finally, you can provide a ̀`expect` key as well, to check that matched
-      items have all the expected value. If not provided, the tolerance will
-      only care that the JSON Path matched at least one item.
+      Finally, you can provide a ̀`count` key as well, there are exactly that
+      number of matches.
 
 
 [21]: https://github.com/chaostoolkit/chaostoolkit/issues/21

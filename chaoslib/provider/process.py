@@ -2,6 +2,7 @@
 import itertools
 import os
 import os.path
+import shlex
 import shutil
 import subprocess
 from typing import Any
@@ -32,24 +33,28 @@ def run_process_activity(activity: Activity, configuration: Configuration,
     """
     provider = activity["provider"]
     timeout = provider.get("timeout", None)
-    arguments = provider["arguments"]
+    arguments = provider.get("arguments", [])
 
-    if configuration or secrets:
+    if arguments and (configuration or secrets):
         arguments = substitute(arguments, configuration, secrets)
 
-    if isinstance(arguments, dict):
-        chain = itertools.chain.from_iterable(arguments.items())
+    shell = False
+    path = shutil.which(provider["path"])
+    if isinstance(arguments, str):
+        shell = True
+        arguments = "{} {}".format(path, arguments)
     else:
-        chain = arguments
+        if isinstance(arguments, dict):
+            arguments = itertools.chain.from_iterable(arguments.items())
 
-    args = list([str(p) for p in chain if p not in (None, "")])
-    args.insert(0, shutil.which(provider["path"]))
+        arguments = list([str(p) for p in arguments if p not in (None, "")])
+        arguments.insert(0, path)
 
     try:
-        logger.debug("Running: {a}".format(a=" ".join(args)))
+        logger.debug("Running: {a}".format(a=str(arguments)))
         proc = subprocess.run(
-            args, timeout=timeout, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE, env=os.environ)
+            arguments, timeout=timeout, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE, env=os.environ, shell=shell)
     except subprocess.TimeoutExpired:
         raise FailedActivity("process activity took too long to complete")
 

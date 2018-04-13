@@ -117,8 +117,8 @@ def test_tolerance_jsonpath_must_find_items_to_succeed():
 def test_tolerance_jsonpath_must_find_items_with_a_given_value_to_succeed():
     t = {
         "type": "jsonpath",
-        "path": "foo[0].baz",
-        "expect": 1
+        "path": "foo[?baz=2]",
+        "count": 1
     }
     ensure_hypothesis_tolerance_is_valid(t)
     assert within_tolerance(
@@ -129,7 +129,7 @@ def test_tolerance_jsonpath_must_find_items_with_a_given_value_to_succeed():
     t = {
         "type": "jsonpath",
         "path": "foo[0].baz",
-        "expect": 4
+        "count": 2
     }
     ensure_hypothesis_tolerance_is_valid(t)
     assert within_tolerance(
@@ -139,8 +139,8 @@ def test_tolerance_jsonpath_must_find_items_with_a_given_value_to_succeed():
 
     t = {
         "type": "jsonpath",
-        "path": "foo[*].baz",
-        "expect": 4
+        "path": "foo[?baz=4]",
+        "count": 2
     }
     ensure_hypothesis_tolerance_is_valid(t)
     assert within_tolerance(

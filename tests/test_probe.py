@@ -116,6 +116,17 @@ def test_run_process_probe_should_pass_arguments_in_array():
     assert result["stderr"] == ''
 
 
+def test_run_process_probe_can_pass_arguments_as_string():
+    args = "['-c', '--empty', '--number', '1', '--string', 'with spaces', '--string', 'a second string with the same option']\n"
+
+    result = run_activity(
+        probes.ProcEchoStrProbe, config.EmptyConfig, experiments.Secrets)
+    assert type(result) is dict
+    assert result["status"] == 0
+    assert result["stdout"] == args
+    assert result["stderr"] == ''
+
+
 def test_run_process_probe_can_timeout():
     probe = probes.ProcProbe
     probe["provider"]["timeout"] = 0.0001

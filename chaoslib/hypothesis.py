@@ -5,7 +5,8 @@ import re
 from typing import Any, Dict
 
 try:
-    from jsonpath_ng import jsonpath, parse as jparse
+    from jsonpath_ng import jsonpath
+    from jsonpath_ng.ext import parser as jparse
     from jsonpath_ng.lexer import JsonPathLexerError
     HAS_JSONPATH = True
 except ImportError:
@@ -117,7 +118,7 @@ def check_json_path(tolerance: Tolerance):
 
     try:
         path = tolerance.get("path")
-        jparse(path)
+        jparse.parse(path)
     except TypeError as t:
         raise InvalidActivity(
             "hypothesis probe tolerance path {} has an invalid type".format(
@@ -237,7 +238,8 @@ def _(tolerance: dict, value: Any, secrets: Secrets = None) -> bool:
     elif tolerance_type == "jsonpath":
         target = tolerance.get("target")
         path = tolerance.get("path")
-        px = jparse(path)
+        count_value = tolerance.get("count", None)
+        px = jparse.parse(path)
 
         if target:
             # if no target was provided, we use the tested value as-is
@@ -253,15 +255,11 @@ def _(tolerance: dict, value: Any, secrets: Secrets = None) -> bool:
                 pass
 
         items = px.find(value)
-        if not items:
+
+        if count_value is not None:
+            if len(items) != count_value:
+                return False
+        elif not items:
             return False
 
-        expected_value = tolerance.get("expect")
-        if expected_value is None:
-            return True
-
-        for item in items:
-            if item.value != expected_value:
-                return False
-        else:
-            return True
+        return True
