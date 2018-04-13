@@ -154,7 +154,8 @@ def get_background_pools(experiment: Experiment) -> ThreadPoolExecutor:
 
 
 @with_cache
-def run_experiment(experiment: Experiment, settings: Settings=None) -> Journal:
+def run_experiment(experiment: Experiment,
+                   settings: Settings = None) -> Journal:
     """
     Run the given `experiment` method step by step, in the following sequence:
     steady probe, action, close probe.

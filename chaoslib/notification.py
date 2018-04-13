@@ -42,8 +42,8 @@ class ValidateFlowEvent(FlowEvent):
     ValidateCompleted = "validate-completed"
 
 
-def notify(settings: Settings, event: FlowEvent, payload: Any=None,
-           error: Any=None):
+def notify(settings: Settings, event: FlowEvent, payload: Any = None,
+           error: Any = None):
     """
     Go through all the notification channels declared in the settings and
     call them one by one. Only call those matching the current event.

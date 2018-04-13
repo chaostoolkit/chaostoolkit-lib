@@ -12,7 +12,7 @@ CHAOSTOOLKIT_CONFIG_PATH = os.path.abspath(
     os.path.expanduser("~/.chaostoolkit/settings.yaml"))
 
 
-def load_settings(settings_path: str=CHAOSTOOLKIT_CONFIG_PATH) -> Settings:
+def load_settings(settings_path: str = CHAOSTOOLKIT_CONFIG_PATH) -> Settings:
     """
     Load chaostoolkit settings as a mapping of key/values or return `None`
     when the file could not be found.
