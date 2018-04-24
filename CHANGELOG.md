@@ -4,6 +4,16 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.16.0...HEAD
 
+## [0.17.0][] - 2018-04-24
+
+[0.17.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.16.0...0.17.0
+
+### Added
+
+-   Experiments can now be loaded from YAML as well [#54][54]
+
+https://github.com/chaostoolkit/chaostoolkit/issues/54
+
 ## [0.16.0][] - 2018-04-13
 
 [0.16.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.15.1...0.16.0
