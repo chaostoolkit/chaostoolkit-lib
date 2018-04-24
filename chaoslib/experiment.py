@@ -40,7 +40,7 @@ def load_experiment(path: str) -> Experiment:
             return yaml.load(f)
         elif ext == ".json":
             return json.load(f)
-    
+
     raise InvalidExperiment(
         "only files with json, yaml or yml extensions are supported")
 
