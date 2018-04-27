@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from collections import ChainMap
+from functools import wraps
 from string import Template
 from typing import Any, Dict, List, Mapping, Union
 
 from chaoslib.types import Configuration, Secrets
 
 __all__ = ["__version__", "substitute"]
-__version__ = '0.16.0'
+__version__ = '0.17.0'
 
 
 def substitute(data: Union[None, str, Dict[str, Any], List],
