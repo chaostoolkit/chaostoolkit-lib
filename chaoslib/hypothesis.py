@@ -256,10 +256,17 @@ def _(tolerance: dict, value: Any, secrets: Secrets = None) -> bool:
 
         items = px.find(value)
 
-        if count_value is not None:
-            if len(items) != count_value:
-                return False
-        elif not items:
-            return False
+        result = len(items) > 0
 
-        return True
+        if count_value is not None:
+            result = len(items) == count_value
+
+        if "expect" in tolerance:
+            expect = tolerance["expect"]
+            values = [item.value for item in items]
+            if len(values) == 1:
+                result = expect in [values[0], values]
+            else:
+                result = values == expect
+
+        return result

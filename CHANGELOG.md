@@ -4,6 +4,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.17.0...HEAD
 
+### Added
+
+- jsonpath tolerance can now take an ̀`expect` property to compare the returned
+  results with a given value (which is not really well supported in jsonpath
+  when not dealing with arrays)
+
 ## [0.17.0][] - 2018-04-27
 
 [0.17.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.16.0...0.17.0

@@ -7,7 +7,7 @@ from typing import Any, Dict, List, Mapping, Union
 from chaoslib.types import Configuration, Secrets
 
 __all__ = ["__version__", "substitute"]
-__version__ = '0.17.0'
+__version__ = '0.18.0'
 
 
 def substitute(data: Union[None, str, Dict[str, Any], List],
