@@ -152,8 +152,18 @@ def run_steady_state_hypothesis(experiment: Experiment,
     for activity in probes:
         run = execute_activity(
             activity, configuration=configuration, secrets=secrets, dry=dry)
-        run["tolerance_met"] = True
+
         state["probes"].append(run)
+
+        if run["status"] == "failed":
+            run["tolerance_met"] = False
+            state["steady_state_met"] = False
+            logger.warn("Probe terminated unexpectedly, "
+                        "so its tolerance could not be validated")
+            return state
+
+        run["tolerance_met"] = True
+
         if dry:
             # do not check for tolerance when dry mode is on
             continue

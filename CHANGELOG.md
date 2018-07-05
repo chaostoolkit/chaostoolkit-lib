@@ -11,6 +11,12 @@
   when not dealing with arrays)
 - Ability to save settings as well as load them.
 
+### Changed
+
+- when the probe of the steady state hypothesis fails with a `FailedActivity`
+  exception, we now say that the steady state hypothesis was not met. Before,
+  it would simply bail the whole experiment very sadly
+
 ## [0.17.0][] - 2018-04-27
 
 [0.17.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.16.0...0.17.0
