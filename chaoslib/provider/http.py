@@ -65,6 +65,16 @@ def run_http_activity(activity: Activity, configuration: Configuration,
         else:
             body = r.text
 
+        # kind warning to the user that this HTTP call may be invalid
+        # but not during the hypothesis check because that could also be
+        # exactly what the user want. This warning is helpful during the
+        # method and rollbacks
+        if "tolerance" not in activity and r.status_code > 399:
+            logger.warning(
+                "This HTTP call returned a response with a HTTP status code "
+                "above 400. This may indicate some error and not "
+                "what you expected. Please have a look at the logs.")
+
         return {
             "status": r.status_code,
             "headers": dict(**r.headers),

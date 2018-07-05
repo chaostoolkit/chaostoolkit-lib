@@ -10,6 +10,13 @@
   results with a given value (which is not really well supported in jsonpath
   when not dealing with arrays)
 - Ability to save settings as well as load them.
+- Display a warning to the user when a HTTP call (using the HTTP provider)
+  returned a status code above 399. This makes it easier to track, during the
+  experimental method or rollbacks, when the endpoint responded something
+  we may not expected. During the steady state hypothesis checks, this warning
+  is not displayed as this may be expected [#46][46]
+
+[46]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/46
 
 ### Changed
 
@@ -25,7 +32,7 @@
 
 -   Experiments can now be loaded from YAML as well [#54][54]
 
-https://github.com/chaostoolkit/chaostoolkit/issues/54
+[54]: https://github.com/chaostoolkit/chaostoolkit/issues/54
 
 ## [0.16.0][] - 2018-04-13
 
