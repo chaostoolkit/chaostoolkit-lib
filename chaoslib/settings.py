@@ -7,7 +7,7 @@ import yaml
 
 from chaoslib.types import Settings
 
-__all__ = ["load_settings"]
+__all__ = ["load_settings", "save_settings"]
 CHAOSTOOLKIT_CONFIG_PATH = os.path.abspath(
     os.path.expanduser("~/.chaostoolkit/settings.yaml"))
 
@@ -24,3 +24,13 @@ def load_settings(settings_path: str = CHAOSTOOLKIT_CONFIG_PATH) -> Settings:
 
     with open(settings_path) as f:
         return yaml.load(f.read())
+
+
+def save_settings(settings: Settings,
+                  settings_path: str = CHAOSTOOLKIT_CONFIG_PATH):
+    """
+    Save chaostoolkit settings as a mapping of key/values, overwriting any file
+    that may already be present.
+    """
+    with open(settings_path, 'w') as outfile:
+        yaml.dump(settings, outfile, default_flow_style=False)

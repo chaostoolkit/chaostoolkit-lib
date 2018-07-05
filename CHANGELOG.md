@@ -9,6 +9,7 @@
 - jsonpath tolerance can now take an ̀`expect` property to compare the returned
   results with a given value (which is not really well supported in jsonpath
   when not dealing with arrays)
+- Ability to save settings as well as load them.
 
 ## [0.17.0][] - 2018-04-27
 
