@@ -2,7 +2,6 @@
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 import io
-import json
 import os.path
 import platform
 import time
@@ -10,7 +9,6 @@ import traceback
 from typing import Any, Callable, Dict, Iterator, List
 
 from logzero import logger
-import yaml
 
 from chaoslib import __version__
 from chaoslib.activity import ensure_activity_is_valid, run_activities
@@ -21,6 +19,7 @@ from chaoslib.exceptions import FailedActivity, InvalidActivity, \
 from chaoslib.configuration import load_configuration
 from chaoslib.hypothesis import ensure_hypothesis_is_valid, \
     run_steady_state_hypothesis
+from chaoslib.loader import load_experiment
 from chaoslib.rollback import run_rollbacks
 from chaoslib.secret import load_secrets
 from chaoslib.types import Action, Activity, Configuration, Experiment, \
@@ -28,21 +27,6 @@ from chaoslib.types import Action, Activity, Configuration, Experiment, \
 
 
 __all__ = ["ensure_experiment_is_valid", "run_experiment"]
-
-
-def load_experiment(path: str) -> Experiment:
-    """
-    Parse the given experiment from `path` and return it.
-    """
-    with io.open(path) as f:
-        p, ext = os.path.splitext(path)
-        if ext in (".yaml", ".yml"):
-            return yaml.load(f)
-        elif ext == ".json":
-            return json.load(f)
-
-    raise InvalidExperiment(
-        "only files with json, yaml or yml extensions are supported")
 
 
 @with_cache
