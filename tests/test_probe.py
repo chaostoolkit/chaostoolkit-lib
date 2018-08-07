@@ -6,7 +6,7 @@ import warnings
 import pytest
 import requests_mock
 
-from chaoslib.exceptions import FailedActivity, InvalidActivity
+from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.activity import ensure_activity_is_valid, run_activity
 from chaoslib.provider import process as chaoslib_process
 from chaoslib.types import Probe
@@ -131,7 +131,7 @@ def test_run_process_probe_can_timeout():
     probe = probes.ProcProbe
     probe["provider"]["timeout"] = 0.0001
 
-    with pytest.raises(FailedActivity) as exc:
+    with pytest.raises(ActivityFailed) as exc:
         run_activity(
             probes.ProcProbe, config.EmptyConfig, 
             experiments.Secrets).decode("utf-8")
@@ -177,5 +177,5 @@ def test_run_http_probe_can_expect_failure():
 
         try:
             run_activity(probe, config.EmptyConfig, experiments.Secrets)
-        except FailedActivity:
+        except ActivityFailed:
             pytest.fail("activity should not have failed")
