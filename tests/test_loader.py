@@ -15,6 +15,12 @@ def test_load_from_file(generic_experiment: str):
         pytest.fail(str(x))
 
 
+def test_load_invalid_filepath(generic_experiment: str):
+    with pytest.raises(InvalidSource) as x:
+        load_experiment("/tmp/xyuzye.txt")
+    assert 'Path "/tmp/xyuzye.txt" does not exist.' in str(x)
+
+
 def test_load_from_http_without_auth(generic_experiment: str):
     with requests_mock.mock() as m:
         m.get(

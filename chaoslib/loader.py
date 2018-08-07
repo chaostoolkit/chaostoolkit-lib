@@ -76,6 +76,9 @@ def load_experiment(experiment_source: str,
         return parse_experiment_from_file(experiment_source)
 
     p = urlparse(experiment_source)
+    if not p.scheme and not os.path.exists(p.path):
+        raise InvalidSource('Path "{}" does not exist.'.format(p.path))
+
     if p.scheme not in ("http", "https"):
         raise InvalidSource(
             "'{}' is not a supported source scheme.".format(p.scheme))
