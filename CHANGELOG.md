@@ -4,6 +4,34 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.19.0...HEAD
 
+## Added
+
+- support for loading experiments from a remote endpoint using the HTTP protocol
+  is now supported [#53][53]. Note that we do not perform any validation that
+  the endpoint is safe, it's up to the user to be careful here (for instance
+  by downloading the experiment using curl and reviewing it). We also do not
+  tolerate self-signed endpoints for now.
+- added an `auths` entry to the settings file so that it can be used when
+  loading from a remote endpoint that requires credentials. For now, the
+  credentials should be manually added but this may be addressed when [#65][65]
+  is tackled, below is an example of such an entry:
+
+    ```yaml
+    auths:
+      mydomain.com:
+        type: basic
+        value: XYZ
+      otherdomain.com:
+        type: bearer
+        value: UIY
+      localhost:8081:
+        type: digest
+        value: UIY
+    ```
+
+[53]: https://github.com/chaostoolkit/chaostoolkit/issues/53
+[65]: https://github.com/chaostoolkit/chaostoolkit/issues/65
+
 ## [0.19.0][] - 2018-07-05
 
 [0.17.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.17.0...0.19.0
