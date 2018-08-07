@@ -10,7 +10,7 @@ from typing import Any
 from logzero import logger
 
 from chaoslib import substitute
-from chaoslib.exceptions import FailedActivity, InvalidActivity
+from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.types import Activity, Configuration, Secrets
 
 
@@ -25,7 +25,7 @@ def run_process_activity(activity: Activity, configuration: Configuration,
     A process activity is an executable the current user is allowed to apply.
     The raw result of that command is returned as bytes of this activity.
 
-    Raises :exc:`FailedActivity` when a the process takes longer than the
+    Raises :exc:`ActivityFailed` when a the process takes longer than the
     timeout defined in the activity. There is no timeout by default so be
     careful when you do not explicitely provide one.
 
@@ -56,7 +56,7 @@ def run_process_activity(activity: Activity, configuration: Configuration,
             arguments, timeout=timeout, stdout=subprocess.PIPE,
             stderr=subprocess.PIPE, env=os.environ, shell=shell)
     except subprocess.TimeoutExpired:
-        raise FailedActivity("process activity took too long to complete")
+        raise ActivityFailed("process activity took too long to complete")
 
     return {
         "status": proc.returncode,

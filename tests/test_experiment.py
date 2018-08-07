@@ -10,7 +10,7 @@ import pytest
 import requests_mock
 import yaml
 
-from chaoslib.exceptions import FailedActivity, InvalidActivity, \
+from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
     InvalidExperiment
 from chaoslib.experiment import ensure_experiment_is_valid, load_experiment, \
     run_experiment, run_activities

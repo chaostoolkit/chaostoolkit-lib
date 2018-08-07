@@ -13,7 +13,7 @@ from typing import Any, Iterator, List
 from logzero import logger
 
 from chaoslib.caching import lookup_activity
-from chaoslib.exceptions import FailedActivity, InvalidActivity, \
+from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
     InvalidExperiment
 from chaoslib.provider.http import run_http_activity, validate_http_activity
 from chaoslib.provider.python import run_python_activity, \
@@ -140,7 +140,7 @@ def execute_activity(activity: Activity, configuration: Configuration,
     if ref:
         activity = lookup_activity(ref)
         if not activity:
-            raise FailedActivity(
+            raise ActivityFailed(
                 "could not find referenced activity '{r}'".format(r=ref))
 
     pauses = activity.get("pauses", {})
@@ -175,7 +175,7 @@ def execute_activity(activity: Activity, configuration: Configuration,
             logger.debug("  => succeeded with '{r}'".format(r=result))
         else:
             logger.debug("  => succeeded without any result value")
-    except FailedActivity as x:
+    except ActivityFailed as x:
         error_msg = str(x)
         run["status"] = "failed"
         run["output"] = result
@@ -201,7 +201,7 @@ def run_activity(activity: Activity, configuration: Configuration,
                  secrets: Secrets) -> Any:
     """
     Run the given activity and return its result. If the activity defines a
-    `timeout` this function raises :exc:`FailedActivity`.
+    `timeout` this function raises :exc:`ActivityFailed`.
 
     This function assumes the activity is valid as per
     `ensure_layer_activity_is_valid`. Please be careful not to call this

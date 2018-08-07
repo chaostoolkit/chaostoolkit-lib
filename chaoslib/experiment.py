@@ -14,7 +14,7 @@ from chaoslib import __version__
 from chaoslib.activity import ensure_activity_is_valid, run_activities
 from chaoslib.caching import with_cache, lookup_activity
 from chaoslib.deprecation import warn_about_deprecated_features
-from chaoslib.exceptions import FailedActivity, InvalidActivity, \
+from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
     InvalidExperiment
 from chaoslib.configuration import load_configuration
 from chaoslib.hypothesis import ensure_hypothesis_is_valid, \
@@ -191,11 +191,11 @@ def run_experiment(experiment: Experiment,
             journal["steady_states"]["before"] = state
             if state is not None and not state["steady_state_met"]:
                 p = state["probes"][-1]
-                raise FailedActivity(
+                raise ActivityFailed(
                     "Steady state probe '{p}' is not in the given tolerance "
                     "so failing this experiment".format(
                         p=p["activity"]["name"]))
-        except FailedActivity as a:
+        except ActivityFailed as a:
             journal["steady_states"]["before"] = state
             journal["status"] = "failed"
             logger.fatal(str(a))
@@ -215,11 +215,11 @@ def run_experiment(experiment: Experiment,
                     journal["steady_states"]["after"] = state
                     if state is not None and not state["steady_state_met"]:
                         p = state["probes"][-1]
-                        raise FailedActivity(
+                        raise ActivityFailed(
                             "Steady state probe '{p}' is not in the given "
                             "tolerance so failing this experiment".format(
                                 p=p["activity"]["name"]))
-                except FailedActivity as a:
+                except ActivityFailed as a:
                     journal["status"] = "failed"
                     logger.fatal(str(a))
     except (KeyboardInterrupt, SystemExit):

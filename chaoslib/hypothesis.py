@@ -16,7 +16,7 @@ from logzero import logger
 
 from chaoslib.activity import ensure_activity_is_valid, execute_activity, \
     run_activity
-from chaoslib.exceptions import FailedActivity, InvalidActivity, \
+from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
     InvalidExperiment
 from chaoslib.types import Configuration, Experiment, Run, Secrets, Tolerance
 

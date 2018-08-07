@@ -9,7 +9,7 @@ from logzero import logger
 import requests
 
 from chaoslib import substitute
-from chaoslib.exceptions import FailedActivity, InvalidActivity
+from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.types import Activity, Configuration, Secrets
 
 
@@ -25,7 +25,7 @@ def run_http_activity(activity: Activity, configuration: Configuration,
     A HTTP activity is a call to a HTTP endpoint and its result is returned as
     the raw result of this activity.
 
-    Raises :exc:`FailedActivity` when a timeout occurs for the request or when
+    Raises :exc:`ActivityFailed` when a timeout occurs for the request or when
     the endpoint returns a status in the 400 or 500 ranges.
 
     This should be considered as a private function.
@@ -81,10 +81,10 @@ def run_http_activity(activity: Activity, configuration: Configuration,
             "body": body
         }
     except requests.exceptions.ConnectionError as cex:
-        raise FailedActivity("failed to connect to {u}: {x}".format(
+        raise ActivityFailed("failed to connect to {u}: {x}".format(
             u=url, x=str(cex)))
     except requests.exceptions.Timeout:
-        raise FailedActivity("activity took too long to complete")
+        raise ActivityFailed("activity took too long to complete")
 
 
 def validate_http_activity(activity: Activity):

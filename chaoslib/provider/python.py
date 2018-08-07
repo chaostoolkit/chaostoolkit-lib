@@ -10,7 +10,7 @@ from typing import Any
 from logzero import logger
 
 from chaoslib import substitute
-from chaoslib.exceptions import FailedActivity, InvalidActivity
+from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.types import Activity, Configuration, Secrets
 
 
@@ -49,7 +49,7 @@ def run_python_activity(activity: Activity, configuration: Configuration,
     try:
         return func(**arguments)
     except Exception as x:
-        raise FailedActivity(
+        raise ActivityFailed(
             traceback.format_exception_only(
                 type(x), x)[0].strip()).with_traceback(
                     sys.exc_info()[2])

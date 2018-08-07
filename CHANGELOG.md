@@ -4,6 +4,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.19.0...HEAD
 
+## Changed
+
+- renamed `FailedActivity` to a more active style: `ActivityFailed` [#17][17]
+
+[17]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/17
+
 ## Added
 
 - support for loading experiments from a remote endpoint using the HTTP protocol
