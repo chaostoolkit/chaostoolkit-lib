@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 __all__ = ["ChaosException", "InvalidExperiment", "InvalidActivity",
-           "FailedActivity", "DiscoveryFailed"]
+           "FailedActivity", "DiscoveryFailed", "InvalidSource"]
 
 
 class ChaosException(Exception):
@@ -21,4 +21,8 @@ class FailedActivity(ChaosException):
 
 
 class DiscoveryFailed(ChaosException):
+    pass
+
+
+class InvalidSource(ChaosException):
     pass
