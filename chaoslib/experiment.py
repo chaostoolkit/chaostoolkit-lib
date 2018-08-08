@@ -16,6 +16,7 @@ from chaoslib.caching import with_cache, lookup_activity
 from chaoslib.deprecation import warn_about_deprecated_features
 from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
     InvalidExperiment
+from chaoslib.extension import validate_extensions
 from chaoslib.configuration import load_configuration
 from chaoslib.hypothesis import ensure_hypothesis_is_valid, \
     run_steady_state_hypothesis
@@ -65,6 +66,8 @@ def ensure_experiment_is_valid(experiment: Experiment):
         if list(filter(lambda t: t == '' or not isinstance(t, str), tags)):
             raise InvalidExperiment(
                 "experiment tags must be a non-empty string")
+
+    validate_extensions(experiment)
 
     config = load_configuration(experiment.get("configuration", {}))
     secrets = load_secrets(experiment.get("secrets", {}), config)

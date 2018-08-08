@@ -12,6 +12,9 @@
 
 ## Added
 
+- support for the `extensions` block. A sequence of extension objects which are
+  free to contain any piece of data they need. Their only mandatory property
+  is a `name` [#60][60]
 - support for loading experiments from a remote endpoint using the HTTP protocol
   is now supported [#53][53]. Note that we do not perform any validation that
   the endpoint is safe, it's up to the user to be careful here (for instance
@@ -36,6 +39,7 @@
     ```
 
 [53]: https://github.com/chaostoolkit/chaostoolkit/issues/53
+[60]: https://github.com/chaostoolkit/chaostoolkit/issues/60
 [65]: https://github.com/chaostoolkit/chaostoolkit/issues/65
 
 ## [0.19.0][] - 2018-07-05
