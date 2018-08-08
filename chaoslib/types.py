@@ -3,7 +3,7 @@ from typing import Any, Dict, Generator, List, Tuple, Union
 
 __all__ = ["MicroservicesStatus", "Probe", "Action", "Experiment", "Layer",
            "TargetLayers", "Activity", "Journal", "Run", "Secrets", "Step",
-           "Configuration", "Discovery", "DiscoveredActivities",
+           "Configuration", "Discovery", "DiscoveredActivities", "Extension",
            "DiscoveredSystemInfo", "Settings", "EventPayload", "Tolerance"]
 
 
@@ -32,3 +32,5 @@ Settings = Dict[str, Any]
 EventPayload = Dict[str, Any]
 
 Tolerance = Union[int, str, bool, list, Dict[str, Any]]
+
+Extension = Dict[str, Any]
