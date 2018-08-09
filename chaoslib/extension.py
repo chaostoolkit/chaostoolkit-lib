@@ -18,7 +18,7 @@ def validate_extensions(experiment: Experiment):
 
     for ext in extensions:
         ext_name = ext.get('name')
-        if not ext_name or ext_name.strip():
+        if not ext_name or not ext_name.strip():
             raise InvalidExperiment("All extensions require a non-empty name")
 
 
