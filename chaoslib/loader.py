@@ -5,6 +5,7 @@ from typing import Dict
 from urllib.parse import urlparse
 
 from chaoslib.exceptions import InvalidSource
+from logzero import logger
 import requests
 import yaml
 try:
@@ -83,7 +84,9 @@ def load_experiment(experiment_source: str,
         raise InvalidSource(
             "'{}' is not a supported source scheme.".format(p.scheme))
 
-    headers = {}
+    headers = {
+        "Accept": "application/json, application/x-yaml"
+    }
     if settings:
         auths = settings.get("auths", [])
         for domain in auths:
@@ -98,4 +101,5 @@ def load_experiment(experiment_source: str,
         raise InvalidSource(
             "Failed to fetch the experiment: {}".format(r.text))
 
+    logger.debug("Fetched experiment: \n{}".format(r.text))
     return parse_experiment_from_http(r)

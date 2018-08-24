@@ -51,7 +51,10 @@ def test_load_from_http_with_auth(settings: Settings, generic_experiment: str):
         }
         m.get(
             'http://example.com/experiment.json', status_code=200,
-            request_headers={"Authorization": "bearer XYZ"},
+            request_headers={
+                "Authorization": "bearer XYZ",
+                "Accept": "application/json, application/x-yaml"
+            },
             headers={"Content-Type": "application/json"},
             json=json.dumps(generic_experiment))
         try:

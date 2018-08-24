@@ -2,9 +2,18 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.20.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.20.1...HEAD
 
-## [0.20.0][] - 2018-09-09
+## [0.20.1][] - 2018-08-24
+
+[0.20.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.20.0...0.20.1
+
+## Changed
+
+- Pass an `Accept: application/json, application/x+yaml` header when fetching
+  the experiment over HTTP
+
+## [0.20.0][] - 2018-08-09
 
 [0.20.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.19.0...0.20.0
 
