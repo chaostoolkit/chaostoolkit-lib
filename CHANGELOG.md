@@ -4,6 +4,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.20.1...HEAD
 
+### Added
+
+-  add [codecov][] integration
+
+[codecov]: https://codecov.io/gh/chaostoolkit/chaostoolkit-lib
+
 ## [0.20.1][] - 2018-08-24
 
 [0.20.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.20.0...0.20.1
