@@ -34,6 +34,7 @@ class RunFlowEvent(FlowEvent):
     RunStarted = "run-started"
     RunFailed = "run-failed"
     RunCompleted = "run-completed"
+    RunDeviated = "run-deviated"
 
 
 class ValidateFlowEvent(FlowEvent):

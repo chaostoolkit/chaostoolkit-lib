@@ -105,6 +105,7 @@ def initialize_run_journal(experiment: Experiment) -> Journal:
         "experiment": experiment.copy(),
         "start": datetime.utcnow().isoformat(),
         "status": None,
+        "deviated": False,
         "steady_states": {
             "before": None,
             "after": None
@@ -217,6 +218,7 @@ def run_experiment(experiment: Experiment,
                         experiment, config, secrets, dry)
                     journal["steady_states"]["after"] = state
                     if state is not None and not state["steady_state_met"]:
+                        journal["deviated"] = True
                         p = state["probes"][-1]
                         raise ActivityFailed(
                             "Steady state probe '{p}' is not in the given "
@@ -237,8 +239,16 @@ def run_experiment(experiment: Experiment,
     journal["end"] = datetime.utcnow().isoformat()
     journal["duration"] = time.time() - started_at
 
+    has_deviated = journal["deviated"]
+    status = "deviated" if has_deviated else journal["status"]
+
     logger.info(
-        "Experiment ended with status: {s}".format(s=journal["status"]))
+        "Experiment ended with status: {s}".format(s=status))
+
+    if has_deviated:
+        logger.info(
+            "The steady-state has deviated, a weakness may have been "
+            "discovered")
 
     return journal
 
