@@ -7,8 +7,21 @@
 ### Added
 
 -  add [codecov][] integration
+-  add a new `"deviated"` flag to the journal to signal when the experiment ran
+   fully but the steady state deviated after the experimental method was
+   executed
+-  add a new `RunFlowEvent.RunDeviated` declaration which can be used to
+   signal when the experiment deviated. This can be sent in addition to the
+   other events. This would allow subscribers to be notified when an experiment
+   failed because the system deviated, while not being notified for any other
+   failures that aborted the experiment run altogether [#56][56]
 
 [codecov]: https://codecov.io/gh/chaostoolkit/chaostoolkit-lib
+[#56]: https://github.com/chaostoolkit/chaostoolkit/issues/56
+
+### Changed
+
+-  wording of the messages when the experiment deviated [#56][56]
 
 ## [0.20.1][] - 2018-08-24
 
