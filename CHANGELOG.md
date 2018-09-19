@@ -15,9 +15,15 @@
    other events. This would allow subscribers to be notified when an experiment
    failed because the system deviated, while not being notified for any other
    failures that aborted the experiment run altogether [#56][56]
+-  attempt to detect the encoding of the stdout/stderr streams of the process
+   activities. This is only the case when either the [chardet][] or [cchardet][]
+   packages are installed. When decoding does fail, raise an `ActivityFailed`
+   exception
 
 [codecov]: https://codecov.io/gh/chaostoolkit/chaostoolkit-lib
 [#56]: https://github.com/chaostoolkit/chaostoolkit/issues/56
+[chardet]: https://chardet.readthedocs.io/en/latest/
+[cchardet]: https://github.com/PyYoshi/cChardet
 
 ### Changed
 
