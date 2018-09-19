@@ -33,7 +33,7 @@
 
 [0.20.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.20.0...0.20.1
 
-## Changed
+### Changed
 
 - Pass an `Accept: application/json, application/x+yaml` header when fetching
   the experiment over HTTP
@@ -42,13 +42,13 @@
 
 [0.20.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.19.0...0.20.0
 
-## Changed
+### Changed
 
 - renamed `FailedActivity` to a more active style: `ActivityFailed` [#17][17]
 
 [17]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/17
 
-## Added
+### Added
 
 - support for the `extensions` block. A sequence of extension objects which are
   free to contain any piece of data they need. Their only mandatory property
