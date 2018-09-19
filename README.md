@@ -102,6 +102,19 @@ also run the following command:
 $ pip install -U chaostoolkit-lib[jsonpath]
 ```
 
+When using a process activity, the standard output end error streams are logged
+into the `chaostoolkit.log` file. The default encoding used is `utf-8` to decode
+those streams. Sometimes, this is not the right encoding, so you can install
+the [chardet][] or [cchardet][] packages to attempt the detection of the right
+encoding.
+
+[chardet]: https://chardet.readthedocs.io/en/latest/
+[cchardet]: https://github.com/PyYoshi/cChardet
+
+```
+$ pip install -U chaostoolkit-lib[decoders]
+```
+
 ## Contribute
 
 Contributors to this project are welcome as this is an open-source effort that

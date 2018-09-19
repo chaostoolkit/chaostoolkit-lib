@@ -9,7 +9,7 @@ from typing import Any
 
 from logzero import logger
 
-from chaoslib import substitute
+from chaoslib import decode_bytes, substitute
 from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.types import Activity, Configuration, Secrets
 
@@ -58,10 +58,13 @@ def run_process_activity(activity: Activity, configuration: Configuration,
     except subprocess.TimeoutExpired:
         raise ActivityFailed("process activity took too long to complete")
 
+    stdout = decode_bytes(proc.stdout)
+    stderr = decode_bytes(proc.stderr)
+
     return {
         "status": proc.returncode,
-        "stdout": proc.stdout.decode('utf-8'),
-        "stderr": proc.stderr.decode('utf-8')
+        "stdout": stdout,
+        "stderr": stderr
     }
 
 

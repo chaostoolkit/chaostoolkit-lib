@@ -4,9 +4,19 @@ from functools import wraps
 from string import Template
 from typing import Any, Dict, List, Mapping, Union
 
+HAS_CHARDET = True
+try:
+    import cchardet as chardet
+except ImportError:
+    try:
+        import chardet
+    except ImportError:
+        HAS_CHARDET = False
+from logzero import logger
+
 from chaoslib.types import Configuration, Secrets
 
-__all__ = ["__version__", "substitute"]
+__all__ = ["__version__", "decode_bytes", "substitute"]
 __version__ = '0.20.1'
 
 
@@ -83,3 +93,29 @@ def substitute_in_sequence(data: List[Any],
         else:
             new_value.append(v)
     return new_value
+
+
+def decode_bytes(data: bytes, default_encoding: str = 'utf-8') -> str:
+    """
+    Decode the given bytes and return the decoded unicode string or raises
+    `ActivityFailed`.
+
+    When the chardet, or cchardet, packages are installed, we try to detect
+    the encoding and use that instead of the default one (when the confidence
+    is greater or equal than 50%).
+    """
+    encoding = default_encoding
+    if HAS_CHARDET:
+        detected = chardet.detect(data) or {}
+        confidence = detected.get('confidence') or 0
+        if confidence >= 0.5:
+            encoding = detected['encoding']
+            logger.debug(
+                "Data encoding detected as '{}' "
+                "with a confidence of {}".format(encoding, confidence))
+
+    try:
+        return data.decode(encoding)
+    except UnicodeDecodeError as x:
+        raise ActivityFailed(
+            "Failed to decode bytes using encoding '{}'".format(encoding))
