@@ -62,8 +62,8 @@ def get_discover_function(package: object):
             return value
 
     raise DiscoveryFailed(
-            "package '{name}' does not export a `discover` function".format(
-                name=package.__name__))
+        "package '{name}' does not export a `discover` function".format(
+            name=package.__name__))
 
 
 ###############################################################################
