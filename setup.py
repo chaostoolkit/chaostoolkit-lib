@@ -58,6 +58,9 @@ extras_require = {
     ],
     "jsonpath": [
         "jsonpath-ng"
+    ],
+    "decoders": [
+        "cchardet", "chardet"
     ]
 }
 
