@@ -2,6 +2,7 @@
 
 [![Version](https://img.shields.io/pypi/v/chaostoolkit-lib.svg)](https://img.shields.io/pypi/v/chaostoolkit-lib.svg)
 [![License](https://img.shields.io/pypi/l/chaostoolkit-lib.svg)](https://img.shields.io/pypi/l/chaostoolkit-lib.svg)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fchaostoolkit%2Fchaostoolkit-lib.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fchaostoolkit%2Fchaostoolkit-lib?ref=badge_shield)
 
 [![Build Status](https://travis-ci.org/chaostoolkit/chaostoolkit-lib.svg?branch=master)](https://travis-ci.org/chaostoolkit/chaostoolkit-lib)
 [![codecov](https://codecov.io/gh/chaostoolkit/chaostoolkit-lib/branch/master/graph/badge.svg)](https://codecov.io/gh/chaostoolkit/chaostoolkit-lib)
@@ -136,3 +137,6 @@ into the master branch of the repository. Please, make sure you can abide by
 the rules of the DCO before submitting a PR.
 
 [dco]: https://github.com/probot/dco#how-it-works
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fchaostoolkit%2Fchaostoolkit-lib.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fchaostoolkit%2Fchaostoolkit-lib?ref=badge_large)
