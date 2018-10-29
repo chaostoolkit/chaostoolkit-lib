@@ -4,6 +4,45 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.21.0...HEAD
 
+### Added
+
+-  add controls to provide entry points into the execution flow to perform
+   out of band tasks such as tracing, monitoring or run's control [#84][84]
+   Simply add a block such as:
+    ```
+    "controls": [
+       {
+            "name": "tracing",
+            "scope": ["pre", "post"],
+            "provider": {
+                "type": "python",
+                "module": "chaostracing.control"
+            }
+        }
+    ]
+    ```
+    At the experiment, steady-state and/or activity level. This would apply
+    the `tracing` control before and after the element it is enclosed in.
+
+    By default, a control defined at the experiment level will be applied at
+    all sub-levels. You can change that behavior like this:
+
+    ```
+    "controls": [
+       {
+            "name": "tracing",
+            "scope": ["pre", "post"],
+            "automatic": false,
+            "provider": {
+                "type": "python",
+                "module": "chaostracing.control"
+            }
+        }
+    ]
+    ```
+
+[84]: https://github.com/chaostoolkit/chaostoolkit/issues/84
+
 ## [0.21.0][] - 2018-09-19
 
 [0.21.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.20.1...0.21.0

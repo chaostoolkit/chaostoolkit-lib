@@ -16,9 +16,11 @@ from logzero import logger
 
 from chaoslib.activity import ensure_activity_is_valid, execute_activity, \
     run_activity
+from chaoslib.control import controls
 from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
     InvalidExperiment
-from chaoslib.types import Configuration, Experiment, Run, Secrets, Tolerance
+from chaoslib.types import Configuration, Experiment, Run, \
+    Secrets, Tolerance
 
 
 __all__ = ["ensure_hypothesis_is_valid", "run_steady_state_hypothesis"]
@@ -148,35 +150,40 @@ def run_steady_state_hypothesis(experiment: Experiment,
 
     logger.info("Steady state hypothesis: {h}".format(h=hypo.get("title")))
 
-    probes = hypo.get("probes", [])
-    for activity in probes:
-        run = execute_activity(
-            activity, configuration=configuration, secrets=secrets, dry=dry)
+    with controls(level="hypothesis", experiment=experiment, context=hypo,
+                  configuration=configuration, secrets=secrets) as control:
+        probes = hypo.get("probes", [])
+        for activity in probes:
+            run = execute_activity(
+                experiment=experiment, activity=activity,
+                configuration=configuration, secrets=secrets, dry=dry)
 
-        state["probes"].append(run)
+            state["probes"].append(run)
 
-        if run["status"] == "failed":
-            run["tolerance_met"] = False
-            state["steady_state_met"] = False
-            logger.warn("Probe terminated unexpectedly, "
-                        "so its tolerance could not be validated")
-            return state
+            if run["status"] == "failed":
+                run["tolerance_met"] = False
+                state["steady_state_met"] = False
+                logger.warn("Probe terminated unexpectedly, "
+                            "so its tolerance could not be validated")
+                return state
 
-        run["tolerance_met"] = True
+            run["tolerance_met"] = True
 
-        if dry:
-            # do not check for tolerance when dry mode is on
-            continue
+            if dry:
+                # do not check for tolerance when dry mode is on
+                continue
 
-        tolerance = activity.get("tolerance")
-        logger.debug("allowed tolerance is {t}".format(t=str(tolerance)))
-        if not within_tolerance(tolerance, run["output"]):
-            run["tolerance_met"] = False
-            state["steady_state_met"] = False
-            return state
+            tolerance = activity.get("tolerance")
+            logger.debug("allowed tolerance is {t}".format(t=str(tolerance)))
+            if not within_tolerance(tolerance, run["output"]):
+                run["tolerance_met"] = False
+                state["steady_state_met"] = False
+                return state
 
-    state["steady_state_met"] = True
-    logger.info("Steady state hypothesis is met!")
+        state["steady_state_met"] = True
+        logger.info("Steady state hypothesis is met!")
+
+        control.with_state(state)
 
     return state
 

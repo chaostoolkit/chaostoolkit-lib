@@ -13,9 +13,11 @@ from logzero import logger
 from chaoslib import __version__
 from chaoslib.activity import ensure_activity_is_valid, run_activities
 from chaoslib.caching import with_cache, lookup_activity
+from chaoslib.control import initialize_controls, controls, cleanup_controls, \
+    validate_controls, Control
 from chaoslib.deprecation import warn_about_deprecated_features
-from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
-    InvalidExperiment
+from chaoslib.exceptions import ActivityFailed, ChaosException, \
+    InterruptExecution, InvalidActivity, InvalidExperiment
 from chaoslib.extension import validate_extensions
 from chaoslib.configuration import load_configuration
 from chaoslib.hypothesis import ensure_hypothesis_is_valid, \
@@ -94,6 +96,8 @@ def ensure_experiment_is_valid(experiment: Experiment):
 
     warn_about_deprecated_features(experiment)
 
+    validate_controls(experiment)
+
     logger.info("Experiment looks valid")
 
 
@@ -151,8 +155,7 @@ def get_background_pools(experiment: Experiment) -> ThreadPoolExecutor:
 
 
 @with_cache
-def run_experiment(experiment: Experiment,
-                   settings: Settings = None) -> Journal:
+def run_experiment(experiment: Experiment) -> Journal:
     """
     Run the given `experiment` method step by step, in the following sequence:
     steady probe, action, close probe.
@@ -182,22 +185,25 @@ def run_experiment(experiment: Experiment,
     started_at = time.time()
     config = load_configuration(experiment.get("configuration", {}))
     secrets = load_secrets(experiment.get("secrets", {}), config)
+    initialize_controls(experiment, config, secrets)
     activity_pool, rollback_pool = get_background_pools(experiment)
 
+    control = Control()
     journal = initialize_run_journal(experiment)
 
     try:
-        # this may fail the entire experiment right there if any of the probes
-        # fail or fall out of their tolerance zone
+        control.begin("experiment", experiment, experiment, config, secrets)
+        # this may fail the entire experiment right there if any of the
+        # probes fail or fall out of their tolerance zone
         try:
             state = run_steady_state_hypothesis(
-                experiment, config, secrets, dry)
+                experiment, config, secrets, dry=dry)
             journal["steady_states"]["before"] = state
             if state is not None and not state["steady_state_met"]:
                 p = state["probes"][-1]
                 raise ActivityFailed(
-                    "Steady state probe '{p}' is not in the given tolerance "
-                    "so failing this experiment".format(
+                    "Steady state probe '{p}' is not in the given "
+                    "tolerance so failing this experiment".format(
                         p=p["activity"]["name"]))
         except ActivityFailed as a:
             journal["steady_states"]["before"] = state
@@ -215,7 +221,7 @@ def run_experiment(experiment: Experiment,
             else:
                 try:
                     state = run_steady_state_hypothesis(
-                        experiment, config, secrets, dry)
+                        experiment, config, secrets, dry=dry)
                     journal["steady_states"]["after"] = state
                     if state is not None and not state["steady_state_met"]:
                         journal["deviated"] = True
@@ -227,6 +233,9 @@ def run_experiment(experiment: Experiment,
                 except ActivityFailed as a:
                     journal["status"] = "failed"
                     logger.fatal(str(a))
+    except InterruptExecution as i:
+        journal["status"] = "interrupted"
+        logger.fatal(str(i))
     except (KeyboardInterrupt, SystemExit):
         journal["status"] = "interrupted"
         logger.warn("Received an exit signal, "
@@ -250,26 +259,40 @@ def run_experiment(experiment: Experiment,
             "The steady-state has deviated, a weakness may have been "
             "discovered")
 
+    control.with_state(journal)
+
+    try:
+        control.end("experiment", experiment, experiment, config, secrets)
+    except ChaosException as x:
+        pass
+
+    cleanup_controls(experiment)
+
     return journal
 
 
 def apply_activities(experiment: Experiment, configuration: Configuration,
                      secrets: Secrets, pool: ThreadPoolExecutor,
                      dry: bool = False) -> List[Run]:
-    runs = list(run_activities(experiment, configuration, secrets, pool, dry))
+    with controls(level="method", experiment=experiment, context=experiment,
+                  configuration=configuration, secrets=secrets) as control:
+        runs = list(
+            run_activities(experiment, configuration, secrets, pool, dry))
 
-    if pool:
-        logger.debug("Waiting for background activities to complete...")
-        pool.shutdown(wait=True)
+        if pool:
+            logger.debug("Waiting for background activities to complete...")
+            pool.shutdown(wait=True)
 
-    result = []
-    for run in runs:
-        if not run:
-            continue
-        if isinstance(run, dict):
-            result.append(run)
-        else:
-            result.append(run.result())
+        result = []
+        for run in runs:
+            if not run:
+                continue
+            if isinstance(run, dict):
+                result.append(run)
+            else:
+                result.append(run.result())
+
+        control.with_state(result)
 
     return result
 
@@ -278,20 +301,24 @@ def apply_rollbacks(experiment: Experiment, configuration: Configuration,
                     secrets: Secrets, pool: ThreadPoolExecutor,
                     dry: bool = False) -> List[Run]:
     logger.info("Let's rollback...")
-    rollbacks = list(
-        run_rollbacks(experiment, configuration, secrets, pool, dry))
+    with controls(level="rollback", experiment=experiment, context=experiment,
+                  configuration=configuration, secrets=secrets) as control:
+        rollbacks = list(
+            run_rollbacks(experiment, configuration, secrets, pool, dry))
 
-    if pool:
-        logger.debug("Waiting for background rollbacks to complete...")
-        pool.shutdown(wait=True)
+        if pool:
+            logger.debug("Waiting for background rollbacks to complete...")
+            pool.shutdown(wait=True)
 
-    result = []
-    for rollback in rollbacks:
-        if not rollback:
-            continue
-        if isinstance(rollback, dict):
-            result.append(rollback)
-        else:
-            result.append(rollback.result())
+        result = []
+        for rollback in rollbacks:
+            if not rollback:
+                continue
+            if isinstance(rollback, dict):
+                result.append(rollback)
+            else:
+                result.append(rollback.result())
+
+        control.with_state(result)
 
     return result
