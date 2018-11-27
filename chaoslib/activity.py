@@ -13,8 +13,9 @@ from typing import Any, Iterator, List
 from logzero import logger
 
 from chaoslib.caching import lookup_activity
-from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
-    InvalidExperiment
+from chaoslib.control import controls
+from chaoslib.exceptions import ActivityFailed, \
+    InvalidActivity, InvalidExperiment
 from chaoslib.provider.http import run_http_activity, validate_http_activity
 from chaoslib.provider.python import run_python_activity, \
     validate_python_activity
@@ -116,83 +117,88 @@ def run_activities(experiment: Experiment, configuration: Configuration,
     for activity in method:
         if activity.get("background"):
             logger.debug("activity will run in the background")
-            yield pool.submit(execute_activity, activity=activity,
-                              configuration=configuration, secrets=secrets,
-                              dry=dry)
+            yield pool.submit(
+                execute_activity, experiment=experiment, activity=activity,
+                configuration=configuration, secrets=secrets, dry=dry)
         else:
-            yield execute_activity(activity, configuration=configuration,
-                                   secrets=secrets, dry=dry)
+            yield execute_activity(
+                experiment=experiment, activity=activity,
+                configuration=configuration, secrets=secrets, dry=dry)
 
 
 ###############################################################################
 # Internal functions
 ###############################################################################
-
-
-def execute_activity(activity: Activity, configuration: Configuration,
+def execute_activity(experiment: Experiment, activity: Activity,
+                     configuration: Configuration,
                      secrets: Secrets, dry: bool = False) -> Run:
     """
     Low-level wrapper around the actual activity provider call to collect
     some meta data (like duration, start/end time, exceptions...) during
     the run.
     """
-    ref = activity.get("ref")
-    if ref:
-        activity = lookup_activity(ref)
-        if not activity:
-            raise ActivityFailed(
-                "could not find referenced activity '{r}'".format(r=ref))
+    with controls(level="activity", experiment=experiment, context=activity,
+                  configuration=configuration, secrets=secrets) as control:
+        ref = activity.get("ref")
+        if ref:
+            activity = lookup_activity(ref)
+            if not activity:
+                raise ActivityFailed(
+                    "could not find referenced activity '{r}'".format(r=ref))
 
-    pauses = activity.get("pauses", {})
-    pause_before = pauses.get("before")
-    if pause_before:
-        logger.info("Pausing before next activity for {d}s...".format(
-            d=pause_before))
-        time.sleep(pause_before)
+        pauses = activity.get("pauses", {})
+        pause_before = pauses.get("before")
+        if pause_before:
+            logger.info("Pausing before next activity for {d}s...".format(
+                d=pause_before))
+            time.sleep(pause_before)
 
-    if activity.get("background"):
-        logger.info("{t}: {n} [in background]".format(
-            t=activity["type"].title(), n=activity.get("name")))
-    else:
-        logger.info("{t}: {n}".format(
-            t=activity["type"].title(), n=activity.get("name")))
-
-    start = datetime.utcnow()
-
-    run = {
-        "activity": activity.copy(),
-        "output": None
-    }
-
-    result = None
-    try:
-        # only run the activity itself when not in dry-mode
-        if not dry:
-            result = run_activity(activity, configuration, secrets)
-        run["output"] = result
-        run["status"] = "succeeded"
-        if result is not None:
-            logger.debug("  => succeeded with '{r}'".format(r=result))
+        if activity.get("background"):
+            logger.info("{t}: {n} [in background]".format(
+                t=activity["type"].title(), n=activity.get("name")))
         else:
-            logger.debug("  => succeeded without any result value")
-    except ActivityFailed as x:
-        error_msg = str(x)
-        run["status"] = "failed"
-        run["output"] = result
-        run["exception"] = traceback.format_exception(type(x), x, None)
-        logger.error("  => failed: {x}".format(x=error_msg))
-    finally:
-        # capture the end time before we pause
-        end = datetime.utcnow()
-        run["start"] = start.isoformat()
-        run["end"] = end.isoformat()
-        run["duration"] = (end - start).total_seconds()
+            logger.info("{t}: {n}".format(
+                t=activity["type"].title(), n=activity.get("name")))
 
-        pause_after = pauses.get("after")
-        if pause_after:
-            logger.info("Pausing after activity for {d}s...".format(
-                d=pause_after))
-            time.sleep(pause_after)
+        start = datetime.utcnow()
+
+        run = {
+            "activity": activity.copy(),
+            "output": None
+        }
+
+        result = None
+        interrupted = False
+        try:
+            # only run the activity itself when not in dry-mode
+            if not dry:
+                result = run_activity(activity, configuration, secrets)
+            run["output"] = result
+            run["status"] = "succeeded"
+            if result is not None:
+                logger.debug("  => succeeded with '{r}'".format(r=result))
+            else:
+                logger.debug("  => succeeded without any result value")
+        except ActivityFailed as x:
+            error_msg = str(x)
+            run["status"] = "failed"
+            run["output"] = result
+            run["exception"] = traceback.format_exception(type(x), x, None)
+            logger.error("  => failed: {x}".format(x=error_msg))
+        finally:
+            # capture the end time before we pause
+            end = datetime.utcnow()
+            run["start"] = start.isoformat()
+            run["end"] = end.isoformat()
+            run["duration"] = (end - start).total_seconds()
+
+            pause_after = pauses.get("after")
+            if pause_after and not interrupted:
+                logger.info("Pausing after activity for {d}s...".format(
+                    d=pause_after))
+                time.sleep(pause_after)
+
+        control.with_state(run)
 
     return run
 

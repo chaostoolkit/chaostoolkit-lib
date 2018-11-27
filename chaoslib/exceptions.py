@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
 __all__ = ["ChaosException", "InvalidExperiment", "InvalidActivity",
-           "ActivityFailed", "DiscoveryFailed", "InvalidSource"]
+           "ActivityFailed", "DiscoveryFailed", "InvalidSource",
+           "InterruptExecution", "ControlPythonFunctionLoadingError",
+           "InvalidControl"]
 
 
 class ChaosException(Exception):
@@ -29,4 +31,16 @@ class DiscoveryFailed(ChaosException):
 
 
 class InvalidSource(ChaosException):
+    pass
+
+
+class ControlPythonFunctionLoadingError(Exception):
+    pass
+
+
+class InterruptExecution(ChaosException):
+    pass
+
+
+class InvalidControl(ChaosException):
     pass

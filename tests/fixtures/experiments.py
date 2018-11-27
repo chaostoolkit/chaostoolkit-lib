@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from copy import deepcopy
+
 from fixtures.probes import BackgroundPythonModuleProbe, MissingFuncArgProbe, \
     PythonModuleProbe, PythonModuleProbeWithBoolTolerance, \
     PythonModuleProbeWithExternalTolerance, PythonModuleProbeWithLongPause, \
@@ -194,3 +196,63 @@ ExperimentWithVariousTolerances = {
     ],
     "rollbacks": []
 }
+
+
+
+ExperimentWithControls = {
+    "title": "do cats live in the Internet?",
+    "description": "an experiment of importance",
+    "controls": [
+        {
+            "name": "dummy",
+            "scope": ["pre", "post"],
+            "provider": {
+                "type": "python",
+                "module": "fixtures.controls.dummy"
+            }
+        }
+    ],
+    "steady-state-hypothesis": {
+        "title": "hello",
+        "probes": [
+        deepcopy(PythonModuleProbeWithBoolTolerance)
+        ]
+    },
+    "method": [
+        deepcopy(PythonModuleProbe)
+    ],
+    "rollbacks": [
+        deepcopy(PythonModuleProbeWithBoolTolerance)
+    ]
+}
+
+ExperimentCanBeInterruptedByControl = deepcopy(ExperimentWithControls)
+ExperimentCanBeInterruptedByControl["controls"] = [
+    {
+        "name": "aborter",
+        "scope": ["pre", "post"],
+        "provider": {
+            "type": "python",
+            "module": "fixtures.controls.interrupter"
+        }
+    }
+]
+
+
+ExperimentWithoutControls = {
+    "title": "do cats live in the Internet?",
+    "description": "an experiment of importance",
+    "steady-state-hypothesis": {
+        "title": "hello",
+        "probes": [
+        deepcopy(PythonModuleProbeWithBoolTolerance)
+        ]
+    },
+    "method": [
+        deepcopy(PythonModuleProbe)
+    ],
+    "rollbacks": [
+        deepcopy(PythonModuleProbeWithBoolTolerance)
+    ]
+}
+
