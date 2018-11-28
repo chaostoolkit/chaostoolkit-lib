@@ -6,6 +6,8 @@
 
 ### Added
 
+-  log (at DEBUG level) which Python file holds an activity or control provider
+   function [#59][59]
 -  add controls to provide entry points into the execution flow to perform
    out of band tasks such as tracing, monitoring or run's control [#84][84]
    Simply add a block such as:
@@ -41,6 +43,7 @@
     ]
     ```
 
+[59]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/59
 [84]: https://github.com/chaostoolkit/chaostoolkit/issues/84
 
 ## [0.21.0][] - 2018-09-19
