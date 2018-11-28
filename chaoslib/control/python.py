@@ -134,4 +134,12 @@ def load_func(control: Control, func_name: str) -> Callable:
                 mod_path, func_name
             ))
         return
+
+    try:
+        logger.debug(
+            "Control '{}' loaded from '{}'".format(
+                func_name, inspect.getfile(func)))
+    except TypeError:
+        pass
+
     return func

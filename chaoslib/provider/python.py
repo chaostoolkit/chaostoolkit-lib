@@ -32,6 +32,13 @@ def run_python_activity(activity: Activity, configuration: Configuration,
     func_name = provider["func"]
     mod = importlib.import_module(mod_path)
     func = getattr(mod, func_name)
+    try:
+        logger.debug(
+            "Activity '{}' loaded from '{}'".format(
+                activity.get("name"), inspect.getfile(func)))
+    except TypeError:
+        pass
+
     arguments = provider.get("arguments", {}).copy()
 
     if configuration or secrets:
