@@ -67,7 +67,7 @@ def validate_python_control(control: Control):
             "Control '{}' must have a `provider` property".format(name))
 
     provider = control["provider"]
-    mod_name = control.get("module")
+    mod_name = provider.get("module")
     if not mod_name:
         raise InvalidActivity(
             "Control '{}' must have a module path".format(name))
