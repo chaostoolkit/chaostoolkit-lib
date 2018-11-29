@@ -205,7 +205,6 @@ ExperimentWithControls = {
     "controls": [
         {
             "name": "dummy",
-            "scope": ["pre", "post"],
             "provider": {
                 "type": "python",
                 "module": "fixtures.controls.dummy"
@@ -230,7 +229,6 @@ ExperimentCanBeInterruptedByControl = deepcopy(ExperimentWithControls)
 ExperimentCanBeInterruptedByControl["controls"] = [
     {
         "name": "aborter",
-        "scope": ["pre", "post"],
         "provider": {
             "type": "python",
             "module": "fixtures.controls.interrupter"

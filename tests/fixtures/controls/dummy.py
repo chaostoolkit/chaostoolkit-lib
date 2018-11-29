@@ -18,47 +18,47 @@ def cleanup_control() -> NoReturn:
     value_from_config = None
 
 
-def pre_experiment_control(context: Experiment, **kwargs):
-    context["pre_experiment_control"] = True
+def before_experiment_control(context: Experiment, **kwargs):
+    context["before_experiment_control"] = True
 
 
-def post_experiment_control(context: Experiment, state: Journal, **kwargs):
-    context["post_experiment_control"] = True
-    state["post_experiment_control"] = True
+def after_experiment_control(context: Experiment, state: Journal, **kwargs):
+    context["after_experiment_control"] = True
+    state["after_experiment_control"] = True
 
 
-def pre_hypothesis_control(context: Hypothesis, **kwargs):
-    context["pre_hypothesis_control"] = True
+def before_hypothesis_control(context: Hypothesis, **kwargs):
+    context["before_hypothesis_control"] = True
 
 
-def post_hypothesis_control(context: Hypothesis,
+def after_hypothesis_control(context: Hypothesis,
                             state: Dict[str, Any], **kwargs):
-    context["post_hypothesis_control"] = True
-    state["post_hypothesis_control"] = True
+    context["after_hypothesis_control"] = True
+    state["after_hypothesis_control"] = True
 
 
-def pre_method_control(context: Experiment, **kwargs):
-    context["pre_method_control"] = True
+def before_method_control(context: Experiment, **kwargs):
+    context["before_method_control"] = True
 
 
-def post_method_control(context: Experiment, state: List[Run], **kwargs):
-    context["post_method_control"] = True
-    state.append("post_method_control")
+def after_method_control(context: Experiment, state: List[Run], **kwargs):
+    context["after_method_control"] = True
+    state.append("after_method_control")
 
 
-def pre_rollback_control(context: Experiment, **kwargs):
-    context["pre_rollback_control"] = True
+def before_rollback_control(context: Experiment, **kwargs):
+    context["before_rollback_control"] = True
 
 
-def post_rollback_control(context: Experiment, state: List[Run], **kwargs):
-    context["post_rollback_control"] = True
-    state.append("post_rollback_control")
+def after_rollback_control(context: Experiment, state: List[Run], **kwargs):
+    context["after_rollback_control"] = True
+    state.append("after_rollback_control")
 
 
-def pre_activity_control(context: Activity, **kwargs):
-    context["pre_activity_control"] = True
+def before_activity_control(context: Activity, **kwargs):
+    context["before_activity_control"] = True
 
 
-def post_activity_control(context: Activity, state: Run, **kwargs):
-    context["post_activity_control"] = True
-    state["post_activity_control"] = True
+def after_activity_control(context: Activity, state: Run, **kwargs):
+    context["after_activity_control"] = True
+    state["after_activity_control"] = True

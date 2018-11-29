@@ -15,7 +15,6 @@
     "controls": [
        {
             "name": "tracing",
-            "scope": ["pre", "post"],
             "provider": {
                 "type": "python",
                 "module": "chaostracing.control"
@@ -26,6 +25,23 @@
     At the experiment, steady-state and/or activity level. This would apply
     the `tracing` control before and after the element it is enclosed in.
 
+    By default, a control defined at the experiment level will be applied
+    before and after, if you want to limit to one or the other, use the
+    `scope` property:
+
+    ```
+    "controls": [
+       {
+            "name": "tracing",
+            "scope": "after",
+            "provider": {
+                "type": "python",
+                "module": "chaostracing.control"
+            }
+        }
+    ]
+    ```
+
     By default, a control defined at the experiment level will be applied at
     all sub-levels. You can change that behavior like this:
 
@@ -33,7 +49,6 @@
     "controls": [
        {
             "name": "tracing",
-            "scope": ["pre", "post"],
             "automatic": false,
             "provider": {
                 "type": "python",

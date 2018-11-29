@@ -20,16 +20,16 @@ from chaoslib.types import Activity, Configuration, Control, Experiment, \
 __all__ = ["apply_python_control", "cleanup_control", "initialize_control",
            "validate_python_control"]
 _level_mapping = {
-    "experiment-pre": "pre_experiment_control",
-    "experiment-post": "post_experiment_control",
-    "hypothesis-pre": "pre_hypothesis_control",
-    "hypothesis-post": "post_hypothesis_control",
-    "method-pre": "pre_method_control",
-    "method-post": "post_method_control",
-    "rollback-pre": "pre_rollback_control",
-    "rollback-post": "post_rollback_control",
-    "activity-pre": "pre_activity_control",
-    "activity-post": "post_activity_control",
+    "experiment-before": "before_experiment_control",
+    "experiment-after": "after_experiment_control",
+    "hypothesis-before": "before_hypothesis_control",
+    "hypothesis-after": "after_hypothesis_control",
+    "method-before": "before_method_control",
+    "method-after": "after_method_control",
+    "rollback-before": "before_rollback_control",
+    "rollback-after": "after_rollback_control",
+    "activity-before": "before_activity_control",
+    "activity-after": "after_activity_control",
 }
 
 

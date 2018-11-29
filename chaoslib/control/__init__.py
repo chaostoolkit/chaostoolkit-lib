@@ -103,7 +103,7 @@ class Control:
         self.state = None
         apply_controls(
             level=level, experiment=experiment, context=context,
-            scope="pre", configuration=configuration, secrets=secrets)
+            scope="before", configuration=configuration, secrets=secrets)
 
     def with_state(self, state):
         self.state = state
@@ -115,7 +115,7 @@ class Control:
         self.state = None
         apply_controls(
             level=level, experiment=experiment, context=context,
-            scope="post", state=state, configuration=configuration,
+            scope="after", state=state, configuration=configuration,
             secrets=secrets)
 
 
@@ -209,7 +209,7 @@ def apply_controls(level: str, experiment: Experiment,
     The ̀ level` parameter is one of `"experiment", "hypothesis", "method",
     "rollback", "activity"`. The `context` is usually an experiment except at
     the `"activity"` when it must be an activity. The `scope` is one of
-    `"pre", "post"` and the `state` is only set on `"post"` scope.
+    `"before", "after"` and the `state` is only set on `"after"` scope.
     """
     controls = get_context_controls(experiment, context)
     if not controls:
@@ -218,13 +218,8 @@ def apply_controls(level: str, experiment: Experiment,
     for control in controls:
         control_name = control.get("name")
         target_scope = control.get("scope")
-        if not target_scope:
-            continue
 
-        if not isinstance(target_scope, list):
-            target_scope = [target_scope]
-
-        if scope not in target_scope:
+        if target_scope and target_scope != scope:
             continue
 
         logger.debug(
