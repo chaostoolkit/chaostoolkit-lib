@@ -58,14 +58,6 @@ def validate_python_control(control: Control):
     """
     Verify that a control block matches the specification
     """
-    if "name" not in control:
-        raise InvalidControl("A control must have a `name` property")
-
-    name = control["name"]
-    if "provider" not in control:
-        raise InvalidControl(
-            "Control '{}' must have a `provider` property".format(name))
-
     provider = control["provider"]
     mod_name = provider.get("module")
     if not mod_name:

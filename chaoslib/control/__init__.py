@@ -81,19 +81,34 @@ def validate_controls(experiment: Experiment):
 
     Raises :exc:`chaoslib.exceptions.InvalidControl` when they are not valid.
     """
+    controls = get_controls(experiment)
     references = [
-        c["name"] for c in get_controls(experiment) if "ref" not in c
+        c["name"] for c in get_controls(experiment)
+        if "ref" not in c and "name" in c
     ]
-    for c in get_controls(experiment):
+    for c in controls:
         if "ref" in c:
             if c["ref"] not in references:
                 raise InvalidControl(
                     "Control reference '{}' declaration cannot be found")
 
-    for control in get_controls(experiment):
-        provider_type = control.get("provider", {}).get("type")
+        if "name" not in c:
+            raise InvalidControl("A control must have a `name` property")
+
+        name = c["name"]
+        if "provider" not in c:
+            raise InvalidControl(
+                "Control '{}' must have a `provider` property".format(name))
+
+        scope = c.get("scope")
+        if scope and scope not in ("before", "after"):
+            raise InvalidControl(
+                "Control '{}' scope property must be 'before' or "
+                "'after' only".format(name))
+
+        provider_type = c.get("provider", {}).get("type")
         if provider_type == "python":
-            validate_python_control(control)
+            validate_python_control(c)
 
 
 class Control:
