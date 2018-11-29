@@ -38,7 +38,8 @@ license = 'Apache License 2.0'
 packages = [
     'chaoslib',
     'chaoslib.discovery',
-    'chaoslib.provider'
+    'chaoslib.provider',
+    'chaoslib.control'
 ]
 
 needs_pytest = set(['pytest', 'test']).intersection(sys.argv)

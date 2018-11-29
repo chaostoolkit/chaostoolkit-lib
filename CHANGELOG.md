@@ -2,7 +2,15 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.22.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.22.1...HEAD
+
+## [0.22.1][] - 2018-11-29
+
+[0.22.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.22.0...0.22.1
+
+### Added
+
+* Bug fix release for missing exporting the chaoslib/control package
 
 ## [0.22.0][] - 2018-11-29
 
