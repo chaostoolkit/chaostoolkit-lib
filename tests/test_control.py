@@ -157,20 +157,20 @@ def test_no_controls_get_applied_when_none_defined():
 def test_automatic_goes_deep_down_the_tree():
     exp = deepcopy(experiments.ExperimentWithControls)
 
-    controls = get_context_controls(exp, exp)
+    controls = get_context_controls("experiment", exp, exp)
     assert len(controls) == 1
 
     exp = deepcopy(experiments.ExperimentWithControls)
     hypo = exp["steady-state-hypothesis"]
     assert "controls" not in hypo
-    controls = get_context_controls(exp, hypo)
+    controls = get_context_controls("hypothesis", exp, hypo)
     assert len(controls) == 1
 
     exp = deepcopy(experiments.ExperimentWithControls)
     activities = get_all_activities(exp)
     for activity in activities:
         assert "controls" not in activity
-        controls = get_context_controls(exp, activity)
+        controls = get_context_controls("activity", exp, activity)
         assert len(controls) == 1
 
 
@@ -178,14 +178,24 @@ def test_not_automatic_does_not_go_deep_down_the_tree():
     exp = deepcopy(experiments.ExperimentWithControls)
     exp["controls"][0]["automatic"] = False
 
-    controls = get_context_controls(exp, exp)
+    controls = get_context_controls("experiment", exp, exp)
     assert len(controls) == 1
 
     exp = deepcopy(experiments.ExperimentWithControls)
     exp["controls"][0]["automatic"] = False
     hypo = exp["steady-state-hypothesis"]
     assert "controls" not in hypo
-    controls = get_context_controls(exp, hypo)
+    controls = get_context_controls("hypothesis", exp, hypo)
+    assert len(controls) == 0
+
+    exp = deepcopy(experiments.ExperimentWithControls)
+    exp["controls"][0]["automatic"] = False
+    controls = get_context_controls("method", exp, exp)
+    assert len(controls) == 0
+
+    exp = deepcopy(experiments.ExperimentWithControls)
+    exp["controls"][0]["automatic"] = False
+    controls = get_context_controls("rollback", exp, exp)
     assert len(controls) == 0
 
     exp = deepcopy(experiments.ExperimentWithControls)
@@ -193,5 +203,5 @@ def test_not_automatic_does_not_go_deep_down_the_tree():
     activities = get_all_activities(exp)
     for activity in activities:
         assert "controls" not in activity
-        controls = get_context_controls(exp, activity)
+        controls = get_context_controls("activity", exp, activity)
         assert len(controls) == 0

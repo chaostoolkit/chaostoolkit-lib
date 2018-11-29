@@ -159,7 +159,7 @@ def get_controls(experiment: Experiment) -> List[Control]:
     return controls
 
 
-def get_context_controls(experiment: Experiment,
+def get_context_controls(level: str, experiment: Experiment,
                          context: Union[Activity, Experiment]) \
                          -> List[Control]:
     """
@@ -172,9 +172,17 @@ def get_context_controls(experiment: Experiment,
     top_level_controls = experiment.get("controls", [])
 
     controls = context.get("controls", [])
-    if not controls and not top_level_controls:
-        return []
-    elif not controls and top_level_controls:
+    if not controls:
+        if not top_level_controls:
+            return []
+        else:
+            return [
+                deepcopy(c)
+                for c in top_level_controls
+                if c.get("automatic", True)
+            ]
+
+    if level in ["method", "rollback"]:
         return [
             deepcopy(c)
             for c in top_level_controls
@@ -211,7 +219,7 @@ def apply_controls(level: str, experiment: Experiment,
     the `"activity"` when it must be an activity. The `scope` is one of
     `"before", "after"` and the `state` is only set on `"after"` scope.
     """
-    controls = get_context_controls(experiment, context)
+    controls = get_context_controls(level, experiment, context)
     if not controls:
         return
 
