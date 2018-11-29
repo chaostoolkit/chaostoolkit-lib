@@ -11,6 +11,7 @@
 ### Added
 
 * Bug fix release for missing exporting the chaoslib/control package
+* Exposing readme as markdown in https://pypi.org/
 
 ## [0.22.0][] - 2018-11-29
 
