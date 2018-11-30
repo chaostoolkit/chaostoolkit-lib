@@ -17,7 +17,7 @@ from logzero import logger
 from chaoslib.types import Configuration, Secrets
 
 __all__ = ["__version__", "decode_bytes", "substitute"]
-__version__ = '0.22.1'
+__version__ = '0.22.2'
 
 
 def substitute(data: Union[None, str, Dict[str, Any], List],
