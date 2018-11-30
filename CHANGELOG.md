@@ -4,6 +4,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.0.0rc1...HEAD
 
+### Changed
+
+- Ensure Python control can be found [#63][63]
+
+[63]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/63
+
 ## [1.0.0rc1][] - 2018-11-30
 
 [1.0.0rc1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.22.2...1.0.0rc1

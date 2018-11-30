@@ -253,9 +253,9 @@ def apply_controls(level: str, experiment: Experiment,
 
         try:
             if provider_type == "python":
-                level = "{}-{}".format(level, scope)
                 apply_python_control(
-                    level=level, control=control, context=context, state=state,
+                    level="{}-{}".format(level, scope), control=control,
+                    context=context, state=state,
                     configuration=configuration, secrets=secrets)
         except InterruptExecution as c:
             logger.debug(
