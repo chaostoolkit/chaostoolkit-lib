@@ -56,13 +56,14 @@ extras_require = {
     "vault": [
         "ply==3.4",
         "pyhcl>=0.2.1,<0.3.0",
-        "hvac"
+        "hvac==0.7.0"
     ],
     "jsonpath": [
-        "jsonpath-ng"
+        "jsonpath-ng==1.4.3"
     ],
     "decoders": [
-        "cchardet", "chardet"
+        "cchardet==2.1.4",
+        "chardet==3.0.4"
     ]
 }
 

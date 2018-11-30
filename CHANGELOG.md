@@ -2,7 +2,16 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.22.2...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.0.0rc1...HEAD
+
+## [1.0.0rc1][] - 2018-11-30
+
+[1.0.0rc1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.22.2...1.0.0rc1
+
+### Changed
+
+- Let's get ready to roll 1.0.0
+- Pinned dependency versions
 
 ## [0.22.2][] - 2018-11-30
 
