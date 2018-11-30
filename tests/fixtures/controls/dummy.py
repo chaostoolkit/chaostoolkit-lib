@@ -1,5 +1,5 @@
 import os
-from typing import Any, Callable, Dict, List, NoReturn, Union
+from typing import Any, Callable, Dict, List, Union
 
 from chaoslib.types import Activity, Configuration, \
     Experiment, Hypothesis, Journal, Run, Secrets, Settings
@@ -7,13 +7,13 @@ from chaoslib.types import Activity, Configuration, \
 value_from_config = None
 
 
-def configure_control(config: Configuration, secrets = Secrets) -> NoReturn:
+def configure_control(config: Configuration, secrets = Secrets):
     global value_from_config
     print(config)
     value_from_config = config.get("dummy-key", "default")
 
 
-def cleanup_control() -> NoReturn:
+def cleanup_control():
     global value_from_config
     value_from_config = None
 

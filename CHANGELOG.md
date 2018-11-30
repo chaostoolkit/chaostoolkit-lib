@@ -4,6 +4,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.22.1...HEAD
 
+### Changed
+
+* Remove `NoReturn` import as it is not available prior Python 3.6.5 [#90][90]
+
+[90]: https://github.com/chaostoolkit/chaostoolkit/issues/90
+
 ## [0.22.1][] - 2018-11-29
 
 [0.22.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.22.0...0.22.1

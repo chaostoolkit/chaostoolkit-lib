@@ -5,7 +5,7 @@ from functools import wraps
 import importlib
 import inspect
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Callable, Dict, Generator, List, NoReturn, Union
+from typing import Any, Callable, Dict, Generator, List, Union
 
 from logzero import logger
 
