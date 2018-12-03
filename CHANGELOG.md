@@ -8,9 +8,11 @@
 
 - Ensure Python control can be found [#63][63]
 - Ensure activity is looked up before control is applied [#64][64]
+- Ensure controls are applied only once before/after [#65][65]
 
 [63]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/63
 [64]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/64
+[65]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/65
 
 ## [1.0.0rc1][] - 2018-11-30
 

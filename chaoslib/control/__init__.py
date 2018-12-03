@@ -214,7 +214,7 @@ def get_context_controls(level: str, experiment: Experiment,
             for tc in top_level_controls:
                 if c.get("name") == tc.get("name"):
                     break
-
+            else:
                 if tc.get("automatic", True):
                     controls.append(deepcopy(tc))
 
