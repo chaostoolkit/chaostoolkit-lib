@@ -137,15 +137,15 @@ def execute_activity(experiment: Experiment, activity: Activity,
     some meta data (like duration, start/end time, exceptions...) during
     the run.
     """
+    ref = activity.get("ref")
+    if ref:
+        activity = lookup_activity(ref)
+        if not activity:
+            raise ActivityFailed(
+                "could not find referenced activity '{r}'".format(r=ref))
+
     with controls(level="activity", experiment=experiment, context=activity,
                   configuration=configuration, secrets=secrets) as control:
-        ref = activity.get("ref")
-        if ref:
-            activity = lookup_activity(ref)
-            if not activity:
-                raise ActivityFailed(
-                    "could not find referenced activity '{r}'".format(r=ref))
-
         pauses = activity.get("pauses", {})
         pause_before = pauses.get("before")
         if pause_before:
