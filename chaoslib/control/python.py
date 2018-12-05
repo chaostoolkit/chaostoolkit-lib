@@ -67,7 +67,7 @@ def validate_python_control(control: Control):
 
     try:
         importlib.import_module(mod_name)
-    except ModuleNotFoundError:
+    except ImportError:
         raise InvalidActivity("could not find Python module '{mod}' "
                               "in control '{name}'".format(
                                   mod=mod_name, name=name))
@@ -115,7 +115,7 @@ def load_func(control: Control, func_name: str) -> Callable:
     mod_path = provider["module"]
     try:
         mod = importlib.import_module(mod_path)
-    except ModuleNotFoundError as x:
+    except ImportError as x:
         logger.debug(
             "Control module '{}' could not be loaded. "
             "Have you installed it?".format(mod_path))

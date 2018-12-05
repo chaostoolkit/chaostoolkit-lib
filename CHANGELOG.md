@@ -11,11 +11,14 @@
 - Ensure controls are applied only once before/after [#65][65]
 - Declare the name property in the catch block of the python control
   validator [#66][66]
+- Use `ImportError` exception instead of `ModuleNotFoundError` which is not
+  declared in Python 3.5
 
 [63]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/63
 [64]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/64
 [65]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/65
 [66]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/66
+[67]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/67
 
 ## [1.0.0rc1][] - 2018-11-30
 
