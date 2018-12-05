@@ -12,13 +12,15 @@
 - Declare the name property in the catch block of the python control
   validator [#66][66]
 - Use `ImportError` exception instead of `ModuleNotFoundError` which is not
-  declared in Python 3.5
+  declared in Python 3.5 [#67][67]
+- Disallow empty JSON path [#68][68]
 
 [63]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/63
 [64]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/64
 [65]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/65
 [66]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/66
 [67]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/67
+[68]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/68
 
 ## [1.0.0rc1][] - 2018-11-30
 

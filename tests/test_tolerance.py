@@ -209,6 +209,16 @@ def test_tolerance_jsonpath_from_bytes():
         t, value=b'{"foo": [{"baz": 1}, {"baz": 2}]}') is True
 
 
+def test_tolerance_jsonpath_cannot_be_empty():
+    t = {
+        "type": "jsonpath",
+        "path": ""
+    }
+
+    with pytest.raises(InvalidActivity) as e:
+        ensure_hypothesis_tolerance_is_valid(t)
+
+
 def test_tolerance_regex_stdout_process():
     t = {
         "type": "regex",

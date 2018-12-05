@@ -119,12 +119,19 @@ def check_json_path(tolerance: Tolerance):
             "hypothesis jsonpath probe tolerance must have a `path` key")
 
     try:
-        path = tolerance.get("path")
+        path = tolerance.get("path", "").strip()
+        if not path:
+            raise InvalidActivity(
+                "hypothesis probe tolerance JSON path cannot be empty")
         jparse.parse(path)
+    except AttributeError as a:
+        raise InvalidActivity(
+            "hypothesis probe tolerance JSON path {} is invalid".format(
+                path))
     except TypeError as t:
         raise InvalidActivity(
-            "hypothesis probe tolerance path {} has an invalid type".format(
-                path))
+            "hypothesis probe tolerance JSON path {} has an invalid "
+            "type".format(path))
     except JsonPathLexerError as e:
         raise InvalidActivity(
             "hypothesis probe tolerance JSON path '{}' is invalid: {}".format(
