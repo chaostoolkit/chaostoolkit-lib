@@ -14,4 +14,6 @@ def test_process_not_utf8_cannot_fail():
         }
     }, None, None)
 
+    assert result['status'] == 0
+    assert result['stderr'] == u''
     assert result['stdout'] == u'é'
