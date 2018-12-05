@@ -10,7 +10,8 @@ import pytest
 from chaoslib.activity import execute_activity
 from chaoslib.control import initialize_controls, cleanup_controls, \
     validate_controls, controls, get_all_activities, get_context_controls
-from chaoslib.exceptions import InterruptExecution
+from chaoslib.control.python import validate_python_control
+from chaoslib.exceptions import InterruptExecution, InvalidActivity
 from chaoslib.experiment import run_experiment
 from chaoslib.types import Activity, Configuration, Control, \
     Experiment, Hypothesis, Journal, Run, Secrets,  Settings
@@ -205,3 +206,24 @@ def test_not_automatic_does_not_go_deep_down_the_tree():
         assert "controls" not in activity
         controls = get_context_controls("activity", exp, activity)
         assert len(controls) == 0
+
+
+def test_validate_python_control_must_be_loadable():
+    with pytest.raises(InvalidActivity):
+        validate_python_control({
+            "name": "a-python-control",
+            "provider": {
+                "type": "python",
+                "module": "blah.blah"
+            }
+        })
+
+
+def test_validate_python_control_needs_a_module():
+    with pytest.raises(InvalidActivity):
+        validate_python_control({
+            "name": "a-python-control",
+            "provider": {
+                "type": "python"
+            }
+        })

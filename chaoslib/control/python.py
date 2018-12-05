@@ -58,6 +58,7 @@ def validate_python_control(control: Control):
     """
     Verify that a control block matches the specification
     """
+    name = control["name"]
     provider = control["provider"]
     mod_name = provider.get("module")
     if not mod_name:
