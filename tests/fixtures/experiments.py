@@ -225,6 +225,10 @@ ExperimentWithControls = {
     ]
 }
 
+
+ExperimentWithControlAccessingExperiment = deepcopy(ExperimentWithControls)
+ExperimentWithControlAccessingExperiment["controls"][0]["provider"]["module"] = "fixtures.controls.dummy_with_experiment"
+
 ExperimentCanBeInterruptedByControl = deepcopy(ExperimentWithControls)
 ExperimentCanBeInterruptedByControl["controls"] = [
     {
