@@ -227,3 +227,18 @@ def test_validate_python_control_needs_a_module():
                 "type": "python"
             }
         })
+
+
+def test_controls_can_access_experiment():
+    exp = deepcopy(experiments.ExperimentWithControlAccessingExperiment)
+    exp["dry"] = True
+
+    hypo = exp.get("steady-state-hypothesis")
+    run_experiment(exp)
+    assert hypo["has_experiment_before"] is True
+    assert hypo["has_experiment_after"] is True
+
+    activities = get_all_activities(exp)
+    for activity in activities:
+        assert activity["has_experiment_before"] is True
+        assert activity["has_experiment_after"] is True

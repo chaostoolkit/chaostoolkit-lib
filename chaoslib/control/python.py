@@ -73,7 +73,7 @@ def validate_python_control(control: Control):
                                   mod=mod_name, name=name))
 
 
-def apply_python_control(level: str, control: Control,
+def apply_python_control(level: str, control: Control, experiment: Experiment,
                          context: Union[Activity, Experiment],
                          state: Union[Journal, Run, List[Run]] = None,
                          configuration: Configuration = None,
@@ -103,6 +103,9 @@ def apply_python_control(level: str, control: Control,
 
     if "state" in sig.parameters:
         arguments["state"] = state
+
+    if "experiment" in sig.parameters:
+        arguments["experiment"] = experiment
 
     func(context=context, **arguments)
 
