@@ -142,11 +142,17 @@ def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],
     secrets = {}
 
     url = configuration.get("vault_addr")
-    token = configuration.get("vault_token")
-
     client = None
-    if HAS_HVAC:
-        client = hvac.Client(url=url, token=token)
+    if "vault_token" in configuration.keys():
+        token = configuration.get("vault_token")
+        if HAS_HVAC:
+            client = hvac.Client(url=url, token=token)
+    elif "vault_role_id" in configuration.keys() and "vault_role_secret" in configuration.keys():
+        role_id = configuration.get("vault_role_id")
+        role_secret = configuration.get("vault_role_secret")
+        if HAS_HVAC:
+            client = hvac.Client(url=url)
+            client.token = client.auth_approle(role_id, role_secret)['auth']['client_token']
 
     for (target, keys) in secrets_info.items():
         secrets[target] = {}
