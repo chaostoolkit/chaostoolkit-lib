@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 import os
-import requests
 from typing import Dict
-
 from logzero import logger
+
 try:
-    import hvac
+    import hvac as hvac
     HAS_HVAC = True
 except ImportError:
     HAS_HVAC = False
@@ -137,22 +136,27 @@ def load_secrets_from_env(secrets_info: Dict[str, Dict[str, str]],
     return secrets
 
 
+def create_vault_client(configuration: Configuration = None):
+    client = None
+    if HAS_HVAC:
+        url = configuration.get("vault_addr")
+        client = hvac.Client(url=url)
+        if "vault_token" in configuration.keys():
+            client.token = configuration.get("vault_token")
+        elif "vault_role_id" in configuration.keys() and \
+             "vault_role_secret" in configuration.keys():
+            role_id = configuration.get("vault_role_id")
+            role_secret = configuration.get("vault_role_secret")
+            client.token = client.auth_approle(role_id, role_secret)[
+                                               'auth']['client_token']
+    return client
+
+
 def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],
                             configuration: Configuration = None) -> Secrets:
     secrets = {}
 
-    url = configuration.get("vault_addr")
-    client = None
-    if "vault_token" in configuration.keys():
-        token = configuration.get("vault_token")
-        if HAS_HVAC:
-            client = hvac.Client(url=url, token=token)
-    elif "vault_role_id" in configuration.keys() and "vault_role_secret" in configuration.keys():
-        role_id = configuration.get("vault_role_id")
-        role_secret = configuration.get("vault_role_secret")
-        if HAS_HVAC:
-            client = hvac.Client(url=url)
-            client.token = client.auth_approle(role_id, role_secret)['auth']['client_token']
+    client = create_vault_client(configuration)
 
     for (target, keys) in secrets_info.items():
         secrets[target] = {}
