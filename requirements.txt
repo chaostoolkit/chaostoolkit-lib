@@ -1,4 +1,4 @@
 logzero==1.5.0
-requests==2.20.1
+requests==2.21.0
 pyyaml==3.13
 setuptools==40.6.2
