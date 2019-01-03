@@ -162,10 +162,12 @@ def notify_with_http(channel: Dict[str, str], payload: EventPayload):
     if url:
         try:
             if forward_event_payload:
+                logger.debug("Notifying '{}' with payload".format(url))
                 r = requests.post(
                     url, headers=headers, verify=verify_tls, timeout=(2, 5),
                     json=payload)
             else:
+                logger.debug("Notifying '{}' without payload".format(url))
                 r = requests.get(
                     url, headers=headers, verify=verify_tls, timeout=(2, 5))
 
@@ -173,6 +175,8 @@ def notify_with_http(channel: Dict[str, str], payload: EventPayload):
                 logger.debug(
                     "Notification sent to '{u}' failed with '{t}'".format(
                         u=url, t=r.text))
+            else:
+                logger.debug("Notification's response: {}".format(r.text))
         except requests.exceptions.RequestException as err:
             logger.debug(
                 "failed calling notification endpoint", exc_info=err)
