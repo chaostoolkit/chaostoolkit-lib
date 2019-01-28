@@ -85,6 +85,8 @@ In addition to essential dependencies, the package can install a couple of
 other extra dependencies for specific use-cases. They are not mandatory and
 the library will warn you if you try to use a feature that requires them.
 
+### Vault
+
 If you need [Vault][vault] support to read secrets from, run the following
 command:
 
@@ -92,6 +94,14 @@ command:
 ```
 $ pip install -U chaostoolkit-lib[vault]
 ```
+
+To authenticate with Vault, you either use a token through the `vault_token`
+configuration key or via an [AppRole][approle] via the `vault_role_id`,
+`vault_secret_id` pair of configuration keys.
+
+[approle]: https://www.vaultproject.io/docs/auth/approle.html
+
+### JSON Path
 
 If you need [JSON Path support][jpath] for tolerance probes in the hypothesis,
 also run the following command:

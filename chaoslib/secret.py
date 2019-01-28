@@ -162,15 +162,18 @@ def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],
 
 
 def create_vault_client(configuration: Configuration = None):
+    """
+    Initialize a Vault client from either a token or an approle.
+    """
     client = None
     if HAS_HVAC:
         url = configuration.get("vault_addr")
         client = hvac.Client(url=url)
 
-        if "vault_token" in configuration.keys():
+        if "vault_token" in configuration:
             client.token = configuration.get("vault_token")
-        elif "vault_role_id" in configuration.keys() and \
-             "vault_role_secret" in configuration.keys():
+        elif "vault_role_id" in configuration and \
+             "vault_role_secret" in configuration:
             role_id = configuration.get("vault_role_id")
             role_secret = configuration.get("vault_role_secret")
 
