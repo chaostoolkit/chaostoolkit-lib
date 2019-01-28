@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import requests
-from typing import Dict
+from typing import Any, Dict
 
 from logzero import logger
 try:
@@ -139,6 +139,51 @@ def load_secrets_from_env(secrets_info: Dict[str, Dict[str, str]],
 
 def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],
                             configuration: Configuration = None) -> Secrets:
+    """
+    Load secrets from Vault KV secrets store
+
+    In your experiment:
+
+    ```
+    {
+        "k8s": {
+            "mykey": {
+                "type": "vault",
+                "path": "foo/bar"
+            }
+        }
+    }
+    ```
+
+    This will read the Vault secret at path `secret/foo/bar`
+    (or `secret/data/foo/bar` if you use Vault KV version 2) and store its
+    entirely payload into Chaos Toolkit `mykey`. This means, that all kays
+    under that path will be available as-is. For instance, this could be:
+
+    ```
+    {
+        "mypassword": "shhh",
+        "mylogin": "jane
+    }
+    ```
+
+    You may be more specific as follows:
+
+    ```
+    {
+        "k8s": {
+            "mykey": {
+                "type": "vault",
+                "path": "foo/bar",
+                "key": "mypassword"
+            }
+        }
+    }
+    ```
+
+    In that case, `mykey` will be set to the value at `secret/foo/bar` under
+    the Vault secret key `mypassword`.
+    """
     secrets = {}
 
     client = create_vault_client(configuration)
@@ -153,7 +198,20 @@ def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],
                         "Install the `hvac` package to fetch secrets "
                         "from Vault: `pip install chaostoolkit-lib[vault]`.")
                     return {}
-                secrets[target][key] = client.read(value["key"])
+
+                path = value.get("path")
+                vault_payload = client.secrets.kv.read_secret(path=path)
+                if not vault_payload:
+                    logger.debug(
+                        "No Vault secret found at path: {}".format(path))
+                    continue
+
+                data = vault_payload.get("data")
+
+                if "key" in value:
+                    secrets[target][key] = data.get(value["key"])
+                else:
+                    secrets[target][key] = data
 
         if not secrets[target]:
             secrets.pop(target)
@@ -161,6 +219,9 @@ def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],
     return secrets
 
 
+###############################################################################
+# Internals
+###############################################################################
 def create_vault_client(configuration: Configuration = None):
     """
     Initialize a Vault client from either a token or an approle.
@@ -169,6 +230,12 @@ def create_vault_client(configuration: Configuration = None):
     if HAS_HVAC:
         url = configuration.get("vault_addr")
         client = hvac.Client(url=url)
+
+        client.secrets.kv.default_kv_version = str(configuration.get(
+            "vault_kv_version", "2"))
+        logger.debug(
+            "Using Vault secrets KV version {}".format(
+                client.secrets.kv.default_kv_version))
 
         if "vault_token" in configuration:
             client.token = configuration.get("vault_token")

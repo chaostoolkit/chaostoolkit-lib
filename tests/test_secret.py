@@ -2,9 +2,11 @@
 import os
 
 import pytest
-from chaoslib.secret import load_secrets, create_vault_client
+from chaoslib.secret import load_secrets, load_secrets_from_vault, \
+    create_vault_client
 from fixtures import config
 from unittest.mock import ANY, MagicMock, patch
+
 
 def test_should_load_environment():
     os.environ["KUBE_API_URL"] = "http://1.2.3.4"
@@ -83,3 +85,55 @@ def test_should_auth_with_token(hvac):
 
     assert vault_client.token == config['vault_token']
     fake_client.auth_approle.assert_not_called()
+
+
+@patch('chaoslib.secret.hvac')
+def test_read_secrets_from_vault(hvac):
+    config = {
+        'vault_addr': 'http://someaddr.com',
+        'vault_token': 'not_awesome_token',
+    }
+
+    secrets_info = {
+        "k8s": {
+            "a-secret": {
+                "type": "vault",
+                "path": "foo/stuff"
+            }
+        }
+    }
+
+    # secret at secret/foo
+    vault_secret_payload = {
+        "auth": None,
+        "data": {
+            "my-important-secret": "bar",
+            "my-less-important-secret": "baz"
+        },
+        "lease_duration": 2764800,
+        "lease_id": "",
+        "renewable": False
+    }
+
+    fake_client = MagicMock()
+    hvac.Client.return_value = fake_client
+    fake_client.secrets.kv.read_secret.return_value = vault_secret_payload
+
+    secrets = load_secrets_from_vault(secrets_info, config)
+    assert secrets["k8s"]["a-secret"] == {
+        "my-important-secret": "bar",
+        "my-less-important-secret": "baz"
+    }
+
+    secrets_info = {
+        "k8s": {
+            "a-secret": {
+                "type": "vault",
+                "path": "foo/stuff",
+                "key": "my-important-secret"
+            }
+        }
+    }
+
+    secrets = load_secrets_from_vault(secrets_info, config)
+    assert secrets["k8s"]["a-secret"] == "bar"

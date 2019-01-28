@@ -146,6 +146,21 @@ ExperimentWithDeprecatedProcArgsProbe = {
     ]
 }
 
+ExperimentWithDeprecatedVaultPayload = {
+    "title": "vault is missing a path",
+    "description": "an experiment of importance",
+    "secrets": {
+        "k8s": {
+            "some-key": {
+                "type": "vault",
+                "key": "foo"
+            }
+        }
+    },
+    "method": []
+}
+
+
 Experiment = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",

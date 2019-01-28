@@ -16,6 +16,39 @@
 - Disallow empty JSON path [#68][68]
 - Pass the experiment to each control when requested via the `experiment`
   parameter of the Python function [#69][69]
+- Specify the [Vault KV secret][kvversion] default version to be used via the
+  `"vault_kv_version"` configuration property, defaulting to v2
+- Support now [AppRole][approle] Vault authentication to access Vault secrets
+  thanks to @AlexShemeshWix [#74][74]
+- [BREAKING] Vault secrets are now accessed via the `path` property [#77][77]
+  instead of the `key` property as before. A warning message will be displayed.
+
+    ```json
+        {
+            "k8s": {
+                "mykey": {
+                    "type": "vault",
+                    "path": "foo/bar"
+                }
+            }
+        }
+    ```
+
+  In that case, you get the whole secrets payload from Vault set to the `mykey`
+  property. If you want a specific value from that payload, specify its key
+  as follows:
+
+    ```json
+    {
+        "k8s": {
+            "mykey": {
+                "type": "vault",
+                "path": "foo/bar",
+                "key": "mypassword"
+            }
+        }
+    }
+    ```
 
 [63]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/63
 [64]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/64
@@ -24,6 +57,11 @@
 [67]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/67
 [68]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/68
 [69]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/69
+[74]: https://github.com/chaostoolkit/chaostoolkit-lib/pull/74
+[77]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/77
+
+[kvversion]: https://www.vaultproject.io/api/secret/kv/index.html
+[approle]: https://www.vaultproject.io/api/auth/approle/index.html
 
 ## [1.0.0rc1][] - 2018-11-30
 
