@@ -8,7 +8,11 @@
 [![Python versions](https://img.shields.io/pypi/pyversions/chaostoolkit-lib.svg)](https://www.python.org/)
 [![Requirements Status](https://requires.io/github/chaostoolkit/chaostoolkit-lib/requirements.svg?branch=master)](https://requires.io/github/chaostoolkit/chaostoolkit-lib/requirements/?branch=master)
 
-The Chaos Toolkit core library.
+The Chaos Toolkit core library implementing the [Open Chaos Initiative][oci].
+
+[oci]: https://openchaos.io/
+
+[![Chaos Toolkit](https://avatars1.githubusercontent.com/u/32068152?s=200&v=4)](https://chaostoolkit.org/)
 
 ## Purpose
 
