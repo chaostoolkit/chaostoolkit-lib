@@ -273,3 +273,7 @@ ExperimentWithoutControls = {
     ]
 }
 
+# we should be conservative about reading experiments
+UnsafeYamlExperiment = """
+!!python/object/apply:os.system\nargs: ['Hello shell!']
+"""

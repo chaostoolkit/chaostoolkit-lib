@@ -49,6 +49,8 @@
         }
     }
     ```
+- Switch to `yaml.safe_load()` vs the unsafe `yaml.load()` to load YAML
+  experiments [#78][78]
 
 [63]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/63
 [64]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/64
@@ -59,6 +61,7 @@
 [69]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/69
 [74]: https://github.com/chaostoolkit/chaostoolkit-lib/pull/74
 [77]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/77
+[78]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/78
 
 [kvversion]: https://www.vaultproject.io/api/secret/kv/index.html
 [approle]: https://www.vaultproject.io/api/auth/approle/index.html

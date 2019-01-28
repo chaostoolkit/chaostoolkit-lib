@@ -27,7 +27,11 @@ def parse_experiment_from_file(path: str) -> Experiment:
     with io.open(path) as f:
         p, ext = os.path.splitext(path)
         if ext in (".yaml", ".yml"):
-            return yaml.load(f)
+            try:
+                return yaml.safe_load(f)
+            except yaml.YAMLError as ye:
+                raise InvalidSource(
+                    "Failed parsing YAML experiment: {}".format(str(ye)))
         elif ext == ".json":
             return json.load(f)
 
@@ -45,7 +49,11 @@ def parse_experiment_from_http(response: requests.Response) -> Experiment:
     if 'application/json' in content_type:
         return response.json()
     elif 'application/x-yaml' in content_type or 'text/yaml' in content_type:
-        return yaml.load(response.text)
+        try:
+            return yaml.safe_load(response.text)
+        except yaml.YAMLError as ye:
+            raise InvalidSource(
+                "Failed parsing YAML experiment: {}".format(str(ye)))
 
     raise InvalidExperiment(
         "only files with json, yaml or yml extensions are supported")
