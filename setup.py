@@ -54,16 +54,14 @@ with io.open('requirements.txt') as f:
 
 extras_require = {
     "vault": [
-        "ply==3.4",
-        "pyhcl>=0.2.1,<0.3.0",
-        "hvac==0.7.0"
+        "hvac>=0.7.2"
     ],
     "jsonpath": [
-        "jsonpath-ng==1.4.3"
+        "jsonpath-ng>=1.4.3"
     ],
     "decoders": [
-        "cchardet==2.1.4",
-        "chardet==3.0.4"
+        "cchardet>=2.1.4",
+        "chardet>=3.0.4"
     ]
 }
 
