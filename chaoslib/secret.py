@@ -13,7 +13,7 @@ except ImportError:
 from chaoslib.exceptions import InvalidExperiment
 from chaoslib.types import Configuration, Secrets
 
-__all__ = ["load_secrets"]
+__all__ = ["load_secrets", "create_vault_client"]
 
 
 def load_secrets(secrets_info: Dict[str, Dict[str, str]],
@@ -141,12 +141,7 @@ def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],
                             configuration: Configuration = None) -> Secrets:
     secrets = {}
 
-    url = configuration.get("vault_addr")
-    token = configuration.get("vault_token")
-
-    client = None
-    if HAS_HVAC:
-        client = hvac.Client(url=url, token=token)
+    client = create_vault_client(configuration)
 
     for (target, keys) in secrets_info.items():
         secrets[target] = {}
@@ -164,3 +159,21 @@ def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],
             secrets.pop(target)
 
     return secrets
+
+
+def create_vault_client(configuration: Configuration = None):
+    client = None
+    if HAS_HVAC:
+        url = configuration.get("vault_addr")
+        client = hvac.Client(url=url)
+
+        if "vault_token" in configuration.keys():
+            client.token = configuration.get("vault_token")
+        elif "vault_role_id" in configuration.keys() and \
+             "vault_role_secret" in configuration.keys():
+            role_id = configuration.get("vault_role_id")
+            role_secret = configuration.get("vault_role_secret")
+
+            app_role = client.auth_approle(role_id, role_secret)
+            client.token = app_role['auth']['client_token']
+    return client
