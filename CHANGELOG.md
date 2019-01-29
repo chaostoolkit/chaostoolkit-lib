@@ -7,8 +7,10 @@
 ### Changed
 
 - Fix differences of API between Vault KV secret v1 and v2 [#80][80]
+- Catch Vault AppRole client error [#81][81]
 
 [80]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/80
+[81]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/81
 
 ## [1.0.0rc2][] - 2019-01-28
 

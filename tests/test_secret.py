@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import os
 
+from hvac.exceptions import InvalidRequest
 import pytest
+from chaoslib.exceptions import InvalidExperiment
 from chaoslib.secret import load_secrets, load_secrets_from_vault, \
     create_vault_client
 from fixtures import config
@@ -69,6 +71,22 @@ def test_should_auth_with_approle(hvac):
 
     assert vault_client.token == fake_auth_object['auth']['client_token']
     fake_client.auth_approle.assert_called_with(config['vault_role_id'], config['vault_role_secret'])
+
+
+@patch('chaoslib.secret.hvac')
+def test_should_catch_approle_invalid_secret_id_abort_the_run(hvac):
+    config = {
+        'vault_addr' : 'http://someaddr.com',
+        'vault_role_id' : 'mighty_id',
+        'vault_role_secret' : 'expired'
+    }
+
+    fake_client = MagicMock()
+    fake_client.auth_approle.side_effect = InvalidRequest()
+    hvac.Client.return_value = fake_client
+
+    with pytest.raises(InvalidExperiment):
+        create_vault_client(config)
 
 
 @patch('chaoslib.secret.hvac')

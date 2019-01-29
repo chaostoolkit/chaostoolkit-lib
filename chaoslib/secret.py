@@ -266,6 +266,12 @@ def create_vault_client(configuration: Configuration = None):
             role_id = configuration.get("vault_role_id")
             role_secret = configuration.get("vault_role_secret")
 
-            app_role = client.auth_approle(role_id, role_secret)
+            try:
+                app_role = client.auth_approle(role_id, role_secret)
+            except Exception as ve:
+                raise InvalidExperiment(
+                    "Failed to connect to Vault with the AppRole: {}".format(
+                        str(ve)))
+
             client.token = app_role['auth']['client_token']
     return client
