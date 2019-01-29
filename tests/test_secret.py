@@ -76,6 +76,7 @@ def test_should_auth_with_token(hvac):
     config = {
         'vault_addr': 'http://someaddr.com',
         'vault_token': 'not_awesome_token',
+        'vault_kv_version': '1'
     }
 
     fake_client = MagicMock()
@@ -88,10 +89,11 @@ def test_should_auth_with_token(hvac):
 
 
 @patch('chaoslib.secret.hvac')
-def test_read_secrets_from_vault(hvac):
+def test_read_secrets_from_vault_with_kv_version_1(hvac):
     config = {
         'vault_addr': 'http://someaddr.com',
         'vault_token': 'not_awesome_token',
+        'vault_kv_version': '1'
     }
 
     secrets_info = {
@@ -117,7 +119,64 @@ def test_read_secrets_from_vault(hvac):
 
     fake_client = MagicMock()
     hvac.Client.return_value = fake_client
-    fake_client.secrets.kv.read_secret.return_value = vault_secret_payload
+    fake_client.secrets.kv.v1.read_secret.return_value = vault_secret_payload
+
+    secrets = load_secrets_from_vault(secrets_info, config)
+    assert secrets["k8s"]["a-secret"] == {
+        "my-important-secret": "bar",
+        "my-less-important-secret": "baz"
+    }
+
+    secrets_info = {
+        "k8s": {
+            "a-secret": {
+                "type": "vault",
+                "path": "foo/stuff",
+                "key": "my-important-secret"
+            }
+        }
+    }
+
+    secrets = load_secrets_from_vault(secrets_info, config)
+    assert secrets["k8s"]["a-secret"] == "bar"
+
+
+@patch('chaoslib.secret.hvac')
+def test_read_secrets_from_vault_with_kv_version_2(hvac):
+    config = {
+        'vault_addr': 'http://someaddr.com',
+        'vault_token': 'not_awesome_token',
+        'vault_kv_version': '2'
+    }
+
+    secrets_info = {
+        "k8s": {
+            "a-secret": {
+                "type": "vault",
+                "path": "foo/stuff"
+            }
+        }
+    }
+
+    # secret at secret/foo
+    vault_secret_payload = {
+        "data": {
+            "data": {
+                "my-important-secret": "bar",
+                "my-less-important-secret": "baz"
+            },
+            "metadata": {
+                "auth": None,
+                "lease_duration": 2764800,
+                "lease_id": "",
+                "renewable": False
+            }
+        }
+    }
+
+    fake_client = MagicMock()
+    hvac.Client.return_value = fake_client
+    fake_client.secrets.kv.v2.read_secret_version.return_value = vault_secret_payload
 
     secrets = load_secrets_from_vault(secrets_info, config)
     assert secrets["k8s"]["a-secret"] == {

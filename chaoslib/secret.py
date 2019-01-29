@@ -200,16 +200,38 @@ def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],
                     return {}
 
                 path = value.get("path")
-                vault_payload = client.secrets.kv.read_secret(path=path)
+                if path is None:
+                    logger.warning(
+                        "Missing Vault secret path for '{}'".format(key))
+                    continue
+
+                # see https://github.com/chaostoolkit/chaostoolkit/issues/98
+                kv = client.secrets.kv
+                is_kv1 = kv.default_kv_version == "1"
+                if is_kv1:
+                    vault_payload = kv.v1.read_secret(path=path)
+                else:
+                    vault_payload = kv.v2.read_secret_version(path=path)
+
                 if not vault_payload:
-                    logger.debug(
+                    logger.warning(
                         "No Vault secret found at path: {}".format(path))
                     continue
 
-                data = vault_payload.get("data")
+                if is_kv1:
+                    data = vault_payload.get("data")
+                else:
+                    data = vault_payload.get("data", {}).get("data")
 
                 if "key" in value:
-                    secrets[target][key] = data.get(value["key"])
+                    vault_key = value["key"]
+                    if vault_key not in data:
+                        logger.warning(
+                            "No Vault key '{}' at secret path '{}'".format(
+                                vault_key, path))
+                        continue
+
+                    secrets[target][key] = data.get(vault_key)
                 else:
                     secrets[target][key] = data
 
