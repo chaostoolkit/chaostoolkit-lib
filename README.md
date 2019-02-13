@@ -99,11 +99,18 @@ command:
 $ pip install -U chaostoolkit-lib[vault]
 ```
 
-To authenticate with Vault, you either use a token through the `vault_token`
-configuration key or via an [AppRole][approle] via the `vault_role_id`,
-`vault_secret_id` pair of configuration keys.
+To authenticate with Vault, you can either:
+* Use a token through the `vault_token` configuration key
+* Use an [AppRole][approle] via the `vault_role_id`, `vault_secret_id` pair of configuration keys
+* Use a [service account][serviceaccount] configured with an appropriate [role][role] via the `vault_sa_role` configuration key. The `vault_sa_token_path`, `vault_k8s_mount_point`, and `vault_secrets_mount_point` configuration keys can optionally be specified to point to a location containing a service account [token][sa-token], a different Kubernetes authentication method [mount point][k8s-mount], or a different secrets [mount point][secrets-mount], respectively.
 
 [approle]: https://www.vaultproject.io/docs/auth/approle.html
+[serviceaccount]: https://www.vaultproject.io/api/auth/kubernetes/index.html
+[role]: https://www.vaultproject.io/api/auth/kubernetes/index.html#create-role
+[sa-token]: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#service-account-token-volume-projection
+[k8s-mount]: https://www.vaultproject.io/docs/auth/kubernetes.html
+[secrets-mount]: https://www.vaultproject.io/api/secret/kv/kv-v1.htm
+
 
 ### JSON Path
 

@@ -7,7 +7,7 @@ from chaoslib.exceptions import InvalidExperiment
 from chaoslib.secret import load_secrets, load_secrets_from_vault, \
     create_vault_client
 from fixtures import config
-from unittest.mock import ANY, MagicMock, patch
+from unittest.mock import ANY, MagicMock, patch, mock_open
 
 
 def test_should_load_environment():
@@ -104,6 +104,43 @@ def test_should_auth_with_token(hvac):
 
     assert vault_client.token == config['vault_token']
     fake_client.auth_approle.assert_not_called()
+
+
+@patch('chaoslib.secret.hvac', autospec=True)
+def test_should_auth_with_service_account(hvac):
+    config = {
+        'vault_addr': 'http://someaddr.com',
+        'vault_sa_role': 'some_role',
+        'vault_k8s_mount_point': 'not_kubernetes',
+        'vault_kv_version': '1'
+    }
+
+    fake_client = MagicMock()
+    hvac.Client.return_value = fake_client
+
+
+    with patch('chaoslib.secret.open', mock_open(read_data="fake_sa_token")):
+        vault_client = create_vault_client(config)
+        vault_client.auth_approle.assert_not_called()
+        vault_client.auth_kubernetes.assert_called_with(
+            role=config['vault_sa_role'], jwt='fake_sa_token', use_token=True,
+            mount_point=config['vault_k8s_mount_point'])
+
+
+@patch('chaoslib.secret.hvac')
+def test_should_catch_service_account_invalid_abort_the_run(hvac):
+    config = {
+        'vault_addr': 'http://someaddr.com',
+        'vault_sa_role': 'invalid',
+        'vault_kv_version': '1'
+    }
+
+    fake_client = MagicMock()
+    fake_client.auth_kubernetes.side_effect = InvalidRequest()
+    hvac.Client.return_value = fake_client
+
+    with pytest.raises(InvalidExperiment):
+        create_vault_client(config)
 
 
 @patch('chaoslib.secret.hvac')
