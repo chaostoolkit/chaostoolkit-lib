@@ -209,9 +209,15 @@ def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],
                 kv = client.secrets.kv
                 is_kv1 = kv.default_kv_version == "1"
                 if is_kv1:
-                    vault_payload = kv.v1.read_secret(path=path)
+                    vault_payload = kv.v1.read_secret(
+                        path=path,
+                        mount_point=configuration.get(
+                            "vault_secrets_mount_point", "secret"))
                 else:
-                    vault_payload = kv.v2.read_secret_version(path=path)
+                    vault_payload = kv.v2.read_secret_version(
+                        path=path,
+                        mount_point=configuration.get(
+                            "vault_secrets_mount_point", "secret"))
 
                 if not vault_payload:
                     logger.warning(
@@ -232,6 +238,7 @@ def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],
                         continue
 
                     secrets[target][key] = data.get(vault_key)
+
                 else:
                     secrets[target][key] = data
 
@@ -274,4 +281,29 @@ def create_vault_client(configuration: Configuration = None):
                         str(ve)))
 
             client.token = app_role['auth']['client_token']
+        elif "vault_sa_role" in configuration:
+            sa_token_path = configuration.get(
+                "vault_sa_token_path", "") or \
+                "/var/run/secrets/kubernetes.io/serviceaccount/token"
+
+            mount_point = configuration.get(
+                "vault_k8s_mount_point", "kubernetes")
+
+            try:
+                with open(sa_token_path) as sa_token:
+                    jwt = sa_token.read()
+                    role = configuration.get("vault_sa_role")
+                    client.auth_kubernetes(role=role,
+                                           jwt=jwt,
+                                           use_token=True,
+                                           mount_point=mount_point)
+            except IOError:
+                raise InvalidExperiment(
+                    "Failed to get service account token at: {path}".format(
+                        path=sa_token_path))
+            except Exception as e:
+                raise InvalidExperiment(
+                    "Failed to connect to Vault using service account with "
+                    "errors: '{errors}'".format(errors=str(e)))
+
     return client

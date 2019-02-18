@@ -12,9 +12,11 @@
 
 - Fix differences of API between Vault KV secret v1 and v2 [#80][80]
 - Catch Vault AppRole client error [#81][81]
+- Support now [Service Account][serviceaccount] Vault authentication to access Vault secrets [#82][82]
 
 [80]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/80
 [81]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/81
+[82]: https://github.com/chaostoolkit/chaostoolkit-lib/pull/82
 
 ## [1.0.0rc2][] - 2019-01-28
 
@@ -81,6 +83,7 @@
 
 [kvversion]: https://www.vaultproject.io/api/secret/kv/index.html
 [approle]: https://www.vaultproject.io/api/auth/approle/index.html
+[serviceaccount]: https://www.vaultproject.io/api/auth/kubernetes/index.html
 
 ## [1.0.0rc1][] - 2018-11-30
 
