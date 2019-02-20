@@ -5,6 +5,7 @@
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.0.0rc3...HEAD
 
 - Delint to clean things up before 1.0
+- Do not pin too strictly or this causes havoc when updating chaoslib
 
 ## [1.0.0rc3][] - 2019-01-29
 
