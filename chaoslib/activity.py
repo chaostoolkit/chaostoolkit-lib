@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-import logging
 import numbers
-import os
-import os.path
-import sys
 import time
 import traceback
 from typing import Any, Iterator, List
@@ -14,8 +10,7 @@ from logzero import logger
 
 from chaoslib.caching import lookup_activity
 from chaoslib.control import controls
-from chaoslib.exceptions import ActivityFailed, \
-    InvalidActivity, InvalidExperiment
+from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.provider.http import run_http_activity, validate_http_activity
 from chaoslib.provider.python import run_python_activity, \
     validate_python_activity

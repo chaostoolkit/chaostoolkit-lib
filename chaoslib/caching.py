@@ -6,7 +6,6 @@ from typing import List, Union
 
 from logzero import logger
 
-from chaoslib.exceptions import InvalidExperiment
 from chaoslib.types import Activity, Experiment
 
 

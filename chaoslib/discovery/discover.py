@@ -3,7 +3,7 @@ from datetime import datetime
 import importlib
 import inspect
 import platform
-from typing import Any, Dict, List, Set
+from typing import Any
 import uuid
 
 from logzero import logger
@@ -97,7 +97,7 @@ def discover_activities(extension_mod_name: str,
     activities = []
     try:
         exported = getattr(mod, "__all__")
-    except AttributeError as e:
+    except AttributeError:
         logger.warn("'{m}' does not expose the __all__ attribute. "
                     "It is required to determine what functions are actually "
                     "exported as activities.".format(m=extension_mod_name))

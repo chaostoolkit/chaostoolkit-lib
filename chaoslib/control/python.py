@@ -2,17 +2,12 @@
 from copy import deepcopy
 import importlib
 import inspect
-import os
-import os.path
-import sys
-import traceback
-from typing import Any, Callable, Dict, List, Union
+from typing import Callable, List, Union
 
 from logzero import logger
 
 from chaoslib import substitute
-from chaoslib.exceptions import ActivityFailed, ChaosException, \
-    InvalidActivity, InvalidControl
+from chaoslib.exceptions import InvalidActivity
 from chaoslib.types import Activity, Configuration, Control, Experiment, \
     Journal, Run, Secrets
 
@@ -118,7 +113,7 @@ def load_func(control: Control, func_name: str) -> Callable:
     mod_path = provider["module"]
     try:
         mod = importlib.import_module(mod_path)
-    except ImportError as x:
+    except ImportError:
         logger.debug(
             "Control module '{}' could not be loaded. "
             "Have you installed it?".format(mod_path))

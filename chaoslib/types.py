@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from typing import Any, Dict, Generator, List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 __all__ = ["MicroservicesStatus", "Probe", "Action", "Experiment", "Layer",
            "TargetLayers", "Activity", "Journal", "Run", "Secrets", "Step",

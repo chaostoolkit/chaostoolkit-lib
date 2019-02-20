@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from collections import ChainMap
-from functools import wraps
 from string import Template
 from typing import Any, Dict, List, Mapping, Union
 
@@ -14,6 +13,7 @@ except ImportError:
         HAS_CHARDET = False
 from logzero import logger
 
+from chaoslib.exceptions import ActivityFailed
 from chaoslib.types import Configuration, Secrets
 
 __all__ = ["__version__", "decode_bytes", "substitute"]
@@ -116,6 +116,6 @@ def decode_bytes(data: bytes, default_encoding: str = 'utf-8') -> str:
 
     try:
         return data.decode(encoding)
-    except UnicodeDecodeError as x:
+    except UnicodeDecodeError:
         raise ActivityFailed(
             "Failed to decode bytes using encoding '{}'".format(encoding))

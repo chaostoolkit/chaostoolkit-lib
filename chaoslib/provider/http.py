@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-import itertools
-import os
-import os.path
 from typing import Any
 import urllib3
 

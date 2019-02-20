@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import importlib
 import inspect
-import os
-import os.path
 import sys
 import traceback
 from typing import Any

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import io
 import os.path
-from typing import Dict
 from urllib.parse import urlparse
 
 from chaoslib.exceptions import InvalidSource
@@ -43,7 +42,6 @@ def parse_experiment_from_http(response: requests.Response) -> Experiment:
     """
     Parse the given experiment from the request's `response`.
     """
-    headers = response.headers
     content_type = response.headers.get("Content-Type")
 
     if 'application/json' in content_type:

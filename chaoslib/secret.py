@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-import requests
-from typing import Any, Dict
+from typing import Dict
 
 from logzero import logger
 try:

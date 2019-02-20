@@ -2,7 +2,7 @@
 from functools import singledispatch
 import json
 import re
-from typing import Any, Dict
+from typing import Any
 
 try:
     from jsonpath_ng import jsonpath
@@ -17,9 +17,8 @@ from logzero import logger
 from chaoslib.activity import ensure_activity_is_valid, execute_activity, \
     run_activity
 from chaoslib.control import controls
-from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
-    InvalidExperiment
-from chaoslib.types import Configuration, Experiment, Run, \
+from chaoslib.exceptions import InvalidActivity, InvalidExperiment
+from chaoslib.types import Configuration, Experiment, \
     Secrets, Tolerance
 
 
@@ -92,7 +91,7 @@ def check_regex_pattern(tolerance: Tolerance):
     pattern = tolerance["pattern"]
     try:
         re.compile(pattern)
-    except TypeError as t:
+    except TypeError:
         raise InvalidActivity(
             "hypothesis probe tolerance pattern {} has an invalid type".format(
                 pattern))
@@ -124,11 +123,11 @@ def check_json_path(tolerance: Tolerance):
             raise InvalidActivity(
                 "hypothesis probe tolerance JSON path cannot be empty")
         jparse.parse(path)
-    except AttributeError as a:
+    except AttributeError:
         raise InvalidActivity(
             "hypothesis probe tolerance JSON path {} is invalid".format(
                 path))
-    except TypeError as t:
+    except TypeError:
         raise InvalidActivity(
             "hypothesis probe tolerance JSON path {} has an invalid "
             "type".format(path))

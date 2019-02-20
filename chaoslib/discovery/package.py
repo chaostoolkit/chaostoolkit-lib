@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import importlib
 import inspect
-import operator
 import subprocess
 
 from logzero import logger
@@ -83,7 +82,7 @@ def get_importname_from_package(package_name: str) -> str:
     dist = pkg_resources.get_distribution(req)
     try:
         name = dist.get_metadata('top_level.txt').split("\n)", 1)[0]
-    except FileNotFoundError as err:
+    except FileNotFoundError:
         raise DiscoveryFailed(
             "failed to load package '{p}' metadata. "
             "Was the package installed properly?".format(p=package_name))

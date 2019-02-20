@@ -10,8 +10,8 @@ import requests
 
 from chaoslib.types import EventPayload, Settings
 
-__all__ = ["ActivityEvent", "DiscoverFlowEvent", "InitFlowEvent",
-           "RunFlowEvent", "ValidateFlowEvent", "notify"]
+__all__ = ["DiscoverFlowEvent", "InitFlowEvent", "RunFlowEvent",
+           "ValidateFlowEvent", "notify"]
 
 
 class FlowEvent(Enum):

@@ -1,6 +1,6 @@
 from collections import namedtuple
 from email import message_from_string
-from typing import Any, Dict, List
+from typing import List
 
 from pkg_resources import Environment
 

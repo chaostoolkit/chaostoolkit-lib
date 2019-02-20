@@ -1,21 +1,15 @@
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
 from copy import deepcopy
-from functools import wraps
-import importlib
-import inspect
-from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Callable, Dict, Generator, List, Union
+from typing import List, Union
 
 from logzero import logger
 
 from chaoslib.control.python import apply_python_control, cleanup_control, \
     initialize_control, validate_python_control
-from chaoslib.exceptions import ActivityFailed, InterruptExecution, \
-    InvalidExperiment, InvalidActivity, ControlPythonFunctionLoadingError, \
-    InvalidControl
-from chaoslib.types import Activity, Configuration, Control, \
-    Experiment, Hypothesis, Journal, Run, Secrets, Settings
+from chaoslib.exceptions import InterruptExecution, InvalidControl
+from chaoslib.types import Activity, Configuration, \
+    Experiment, Hypothesis, Journal, Run, Secrets
 
 __all__ = ["controls", "initialize_controls", "cleanup_controls",
            "validate_controls", "Control"]
@@ -257,12 +251,12 @@ def apply_controls(level: str, experiment: Experiment,
                     level="{}-{}".format(level, scope), control=control,
                     context=context, state=state, experiment=experiment,
                     configuration=configuration, secrets=secrets)
-        except InterruptExecution as c:
+        except InterruptExecution:
             logger.debug(
                 "{}-control '{}' interrupted the execution".format(
                     scope.title(), control_name), exc_info=True)
             raise
-        except Exception as x:
+        except Exception:
             logger.debug(
                 "{}-control '{}' failed".format(
                     scope.title(), control_name), exc_info=True)

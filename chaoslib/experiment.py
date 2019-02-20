@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-import io
-import os.path
 import platform
 import time
-import traceback
-from typing import Any, Callable, Dict, Iterator, List
+from typing import List
 
 from logzero import logger
 
@@ -25,11 +22,10 @@ from chaoslib.hypothesis import ensure_hypothesis_is_valid, \
 from chaoslib.loader import load_experiment
 from chaoslib.rollback import run_rollbacks
 from chaoslib.secret import load_secrets
-from chaoslib.types import Action, Activity, Configuration, Experiment, \
-    Journal, Probe, Run, Secrets, Settings, Step
+from chaoslib.types import Configuration, Experiment, Journal, Run, Secrets
 
 
-__all__ = ["ensure_experiment_is_valid", "run_experiment"]
+__all__ = ["ensure_experiment_is_valid", "run_experiment", "load_experiment"]
 
 
 @with_cache
@@ -72,7 +68,7 @@ def ensure_experiment_is_valid(experiment: Experiment):
     validate_extensions(experiment)
 
     config = load_configuration(experiment.get("configuration", {}))
-    secrets = load_secrets(experiment.get("secrets", {}), config)
+    load_secrets(experiment.get("secrets", {}), config)
 
     ensure_hypothesis_is_valid(experiment)
 
@@ -213,7 +209,7 @@ def run_experiment(experiment: Experiment) -> Journal:
             try:
                 journal["run"] = apply_activities(
                     experiment, config, secrets, activity_pool, dry)
-            except Exception as x:
+            except Exception:
                 journal["status"] = "aborted"
                 logger.fatal(
                     "Experiment ran into an un expected fatal error, "
@@ -263,7 +259,7 @@ def run_experiment(experiment: Experiment) -> Journal:
 
     try:
         control.end("experiment", experiment, experiment, config, secrets)
-    except ChaosException as x:
+    except ChaosException:
         pass
 
     cleanup_controls(experiment)
