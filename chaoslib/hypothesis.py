@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+from decimal import Decimal, InvalidOperation
 from functools import singledispatch
 import json
+from numbers import Number
 import re
 from typing import Any
 
@@ -72,6 +74,8 @@ def ensure_hypothesis_tolerance_is_valid(tolerance: Tolerance):
             check_regex_pattern(tolerance)
         elif tolerance_type == "jsonpath":
             check_json_path(tolerance)
+        elif tolerance_type == "range":
+            check_range(tolerance)
         else:
             raise InvalidActivity(
                 "hypothesis probe tolerance type '{}' is unsupported".format(
@@ -135,6 +139,33 @@ def check_json_path(tolerance: Tolerance):
         raise InvalidActivity(
             "hypothesis probe tolerance JSON path '{}' is invalid: {}".format(
                 str(e)))
+
+
+def check_range(tolerance: Tolerance):
+    """
+    Check a value is within a given range. That range may be set to a min and
+    max value or a sequence.
+    """
+    if "range" not in tolerance:
+        raise InvalidActivity(
+            "hypothesis range probe tolerance must have a `range` key")
+
+    the_range = tolerance["range"]
+    if not isinstance(the_range, list):
+        raise InvalidActivity(
+            "hypothesis range must be a sequence")
+
+    if len(the_range) != 2:
+        raise InvalidActivity(
+            "hypothesis range sequence must be made of two values")
+
+    if not isinstance(the_range[0], Number):
+        raise InvalidActivity(
+            "hypothesis range lower boundary must be a number")
+
+    if not isinstance(the_range[1], Number):
+        raise InvalidActivity(
+            "hypothesis range upper boundary must be a number")
 
 
 def run_steady_state_hypothesis(experiment: Experiment,
@@ -293,3 +324,18 @@ def _(tolerance: dict, value: Any, secrets: Secrets = None) -> bool:
                 result = values == expect
 
         return result
+    elif tolerance_type == "range":
+        target = tolerance.get("target")
+        if target:
+            value = value.get(target, value)
+
+        try:
+            value = Decimal(value)
+        except InvalidOperation:
+            logger.debug("range check expects a number value")
+            return False
+
+        the_range = tolerance.get("range")
+        min_value = the_range[0]
+        max_value = the_range[1]
+        return Decimal(min_value) <= value <= Decimal(max_value)
