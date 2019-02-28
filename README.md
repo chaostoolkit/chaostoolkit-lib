@@ -22,7 +22,7 @@ The purpose of this library is to provide the core of the Chaos Toolkit
 Unless you wish to create your own toolkit, you will likely not use directly
 this library.
 
-[concepts]: http://chaostoolkit.org/overview/concepts/
+[concepts]: https://docs.chaostoolkit.org/reference/concepts/
 
 ## Features
 
