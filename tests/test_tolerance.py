@@ -368,3 +368,129 @@ def test_tolerance_unsupported_type():
         })
     hypothesis.HAS_JSONPATH = True
     assert "Install the `jsonpath_ng` package to use a JSON path" in str(e)
+
+
+def test_tolerance_range_integer():
+    t = {
+        "type": "range",
+        "target": "body",
+        "range": [10, 800]
+    }
+    ensure_hypothesis_tolerance_is_valid(t)
+    assert within_tolerance(t, value={
+        "status": 200,
+        "headers": {
+            "Content-Type": "text/plain"
+        },
+        "body": "580"
+    }) is True
+
+    t = {
+        "type": "range",
+        "target": "body",
+        "range": [10, 800]
+    }
+    ensure_hypothesis_tolerance_is_valid(t)
+    assert within_tolerance(t, value={
+        "status": 200,
+        "headers": {
+            "Content-Type": "text/plain"
+        },
+        "body": "1230"
+    }) is False
+
+
+def test_tolerance_range_float():
+    t = {
+        "type": "range",
+        "target": "body",
+        "range": [10.5, 800.89]
+    }
+    ensure_hypothesis_tolerance_is_valid(t)
+    assert within_tolerance(t, value={
+        "status": 200,
+        "headers": {
+            "Content-Type": "text/plain"
+        },
+        "body": "580.5"
+    }) is True
+
+    t = {
+        "type": "range",
+        "target": "body",
+        "range": [10.5, 800.89]
+    }
+    ensure_hypothesis_tolerance_is_valid(t)
+    assert within_tolerance(t, value={
+        "status": 200,
+        "headers": {
+            "Content-Type": "text/plain"
+        },
+        "body": "1230.7"
+    }) is False
+
+
+def test_tolerance_range_mix_integer_and_float():
+    t = {
+        "type": "range",
+        "target": "body",
+        "range": [10, 800.8]
+    }
+    ensure_hypothesis_tolerance_is_valid(t)
+    assert within_tolerance(t, value={
+        "status": 200,
+        "headers": {
+            "Content-Type": "text/plain"
+        },
+        "body": "580.4"
+    }) is True
+
+    t = {
+        "type": "range",
+        "target": "body",
+        "range": [10.5, 800]
+    }
+    ensure_hypothesis_tolerance_is_valid(t)
+    assert within_tolerance(t, value={
+        "status": 200,
+        "headers": {
+            "Content-Type": "text/plain"
+        },
+        "body": "1230"
+    }) is False
+
+
+def test_tolerance_range_lower_boundary_must_be_a_number():
+    t = {
+        "type": "range",
+        "target": "body",
+        "range": ["a", 6]
+    }
+    with pytest.raises(InvalidActivity):
+        ensure_hypothesis_tolerance_is_valid(t)
+
+
+def test_tolerance_range_upper_boundary_must_be_a_number():
+    t = {
+        "type": "range",
+        "target": "body",
+        "range": [6, "b"]
+    }
+    with pytest.raises(InvalidActivity):
+        ensure_hypothesis_tolerance_is_valid(t)
+
+
+def test_tolerance_range_checked_value_must_be_a_number():
+    t = {
+        "type": "range",
+        "target": "body",
+        "range": [6, 8]
+    }
+    ensure_hypothesis_tolerance_is_valid(t)
+    assert within_tolerance(t, value={
+        "status": 200,
+        "headers": {
+            "Content-Type": "text/plain"
+        },
+        "body": "bad"
+    }) is False

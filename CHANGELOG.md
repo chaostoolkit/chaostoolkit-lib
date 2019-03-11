@@ -4,6 +4,31 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.0.0...HEAD
 
+#### Added
+
+- a new tolerance type called `range` to support scenarios such as:
+  
+  value type is:
+  ```
+  {
+      "status": 200,
+      "headers": {"content-type": "text/plain"},
+      "body": "1234.8"
+  }
+  ```
+
+  tolerance is as follows:
+  ```
+  {
+      "type": "range",
+      "range": [1000.0, 2000.0]
+      }
+  }
+  ```
+
+  lower and upper bounds may be integers or floats.
+
+
 ## [1.0.0][] - 2019-02-21
 
 [1.0.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.0.0rc3...1.0.0
