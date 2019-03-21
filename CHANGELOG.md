@@ -4,6 +4,14 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.1.0...HEAD
 
+### Changed
+
+- Fix a failure when no top-level controls were provided but an activity
+  control was declared [#88][88]
+
+[88]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/88
+
+
 ## [1.1.0][] - 2019-03-11
 
 [1.1.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.0.0...1.1.0

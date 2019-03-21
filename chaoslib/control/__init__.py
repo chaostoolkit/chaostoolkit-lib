@@ -179,17 +179,18 @@ def get_context_controls(level: str, experiment: Experiment,
     top-level ine.
     """
     top_level_controls = experiment.get("controls", [])
-
     controls = context.get("controls", [])
+
+    # do we even have something at the top level to be merged?
+    if not top_level_controls:
+        return controls
+
     if not controls:
-        if not top_level_controls:
-            return []
-        else:
-            return [
-                deepcopy(c)
-                for c in top_level_controls
-                if c.get("automatic", True)
-            ]
+        return [
+            deepcopy(c)
+            for c in top_level_controls
+            if c.get("automatic", True)
+        ]
 
     if level in ["method", "rollback"]:
         return [

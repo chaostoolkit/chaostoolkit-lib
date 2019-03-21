@@ -242,3 +242,28 @@ def test_controls_can_access_experiment():
     for activity in activities:
         assert activity["has_experiment_before"] is True
         assert activity["has_experiment_after"] is True
+
+
+def test_controls_are_applied_at_various_levels():
+    exp = deepcopy(experiments.ExperimentWithControlsAtVariousLevels)
+    exp["dry"] = True
+
+    run_experiment(exp)
+    activities = get_all_activities(exp)
+    for activity in activities:
+        print(activity)
+        if "controls" in activity:
+            assert activity["before_activity_control"] is True
+            assert activity["after_activity_control"] is True
+
+
+def test_controls_are_applied_when_they_are_not_top_level():
+    exp = deepcopy(experiments.ExperimentWithControlNotAtTopLevel)
+    exp["dry"] = True
+
+    run_experiment(exp)
+    activities = get_all_activities(exp)
+    for activity in activities:
+        if "controls" in activity:
+            assert activity["before_activity_control"] is True
+            assert activity["after_activity_control"] is True
