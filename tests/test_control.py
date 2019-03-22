@@ -2,9 +2,12 @@
 from copy import deepcopy
 from concurrent.futures import ThreadPoolExecutor
 import os
+import tempfile
 from typing import Any, Dict, List
+from unittest.mock import patch
 
 from pkg_resources import Distribution, EntryPoint, working_set
+import logzero
 import pytest
 
 from chaoslib.activity import execute_activity
@@ -208,15 +211,19 @@ def test_not_automatic_does_not_go_deep_down_the_tree():
         assert len(controls) == 0
 
 
-def test_validate_python_control_must_be_loadable():
-    with pytest.raises(InvalidActivity):
-        validate_python_control({
-            "name": "a-python-control",
-            "provider": {
-                "type": "python",
-                "module": "blah.blah"
-            }
-        })
+@patch('chaoslib.control.python.logger', autospec=True)
+def test_validate_python_control_must_be_loadable(logger):
+    validate_python_control({
+        "name": "a-python-control",
+        "provider": {
+            "type": "python",
+            "module": "blah.blah"
+        }
+    })
+    args = logger.warning.call_args
+    msg = "Could not find Python module 'blah.blah' in control " \
+        "'a-python-control'. Did you install the Python module?"
+    assert msg in args[0][0]
 
 
 def test_validate_python_control_needs_a_module():

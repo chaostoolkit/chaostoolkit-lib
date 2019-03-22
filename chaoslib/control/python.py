@@ -63,9 +63,10 @@ def validate_python_control(control: Control):
     try:
         importlib.import_module(mod_name)
     except ImportError:
-        raise InvalidActivity("could not find Python module '{mod}' "
-                              "in control '{name}'".format(
-                                  mod=mod_name, name=name))
+        logger.warning("Could not find Python module '{mod}' "
+                       "in control '{name}'. Did you install the Python "
+                       "module? The experiment will carry on running "
+                       "nonetheless.".format(mod=mod_name, name=name))
 
 
 def apply_python_control(level: str, control: Control, experiment: Experiment,
