@@ -26,3 +26,9 @@ def test_save_settings():
     saved_settings = load_settings(new_settings_location)
     assert "notifications" in saved_settings
     os.remove(new_settings_location)
+
+
+def test_load_unsafe_settings():
+    settings = load_settings(
+        os.path.join(settings_dir, "unsafe-settings.yaml"))
+    assert settings is None
