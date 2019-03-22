@@ -241,6 +241,31 @@ ExperimentWithControls = {
 }
 
 
+ExperimentWithControlsAtVariousLevels = deepcopy(ExperimentWithControls)
+ExperimentWithControlsAtVariousLevels["method"][0]["controls"] = [
+        {
+            "name": "dummy-two",
+            "provider": {
+                "type": "python",
+                "module": "fixtures.controls.dummy"
+            }
+        }
+    ]
+
+
+ExperimentWithControlNotAtTopLevel = deepcopy(ExperimentWithControls)
+ExperimentWithControlNotAtTopLevel.pop("controls")
+ExperimentWithControlNotAtTopLevel["method"][0]["controls"] = [
+        {
+            "name": "dummy",
+            "provider": {
+                "type": "python",
+                "module": "fixtures.controls.dummy"
+            }
+        }
+    ]
+
+
 ExperimentWithControlAccessingExperiment = deepcopy(ExperimentWithControls)
 ExperimentWithControlAccessingExperiment["controls"][0]["provider"]["module"] = "fixtures.controls.dummy_with_experiment"
 
