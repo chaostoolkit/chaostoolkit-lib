@@ -4,6 +4,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.1.1...HEAD
 
+### Changed
+
+- Use a YAML safe loader for settings [#92][92]
+
+[92]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/92
+
 ## [1.1.1][] - 2019-03-22
 
 [1.1.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.1.0...1.1.1

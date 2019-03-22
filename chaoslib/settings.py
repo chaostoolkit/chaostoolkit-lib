@@ -23,7 +23,10 @@ def load_settings(settings_path: str = CHAOSTOOLKIT_CONFIG_PATH) -> Settings:
         return
 
     with open(settings_path) as f:
-        return yaml.load(f.read())
+        try:
+            return yaml.safe_load(f.read())
+        except yaml.YAMLError as ye:
+            logger.error("Failed parsing YAML settings: {}".format(str(ye)))
 
 
 def save_settings(settings: Settings,
