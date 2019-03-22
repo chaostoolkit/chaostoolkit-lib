@@ -8,8 +8,11 @@
 
 - Fix a failure when no top-level controls were provided but an activity
   control was declared [#88][88]
+- Warn when control Python package is not installed but do not fail experiment
+  during validation [#90][90]. Controls should remain optional.
 
 [88]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/88
+[90]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/90
 
 
 ## [1.1.0][] - 2019-03-11
