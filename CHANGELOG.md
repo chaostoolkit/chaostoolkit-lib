@@ -4,6 +4,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.1.2...HEAD
 
+### Changed
+
+- Create settings directory when it doesn't already exist [#97][97]
+
+[97]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/97
+
 ## [1.1.2][] - 2019-03-22
 
 [1.1.2]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.1.1...1.1.2

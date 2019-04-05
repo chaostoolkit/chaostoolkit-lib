@@ -32,3 +32,16 @@ def test_load_unsafe_settings():
     settings = load_settings(
         os.path.join(settings_dir, "unsafe-settings.yaml"))
     assert settings is None
+
+
+def test_create_settings_file_on_save():
+    ghost = os.path.abspath(os.path.join(settings_dir, "bah", "ghost.yaml"))
+    assert not os.path.exists(ghost)
+    try:
+        save_settings({}, ghost)
+        assert os.path.exists(ghost)
+    finally:
+        try:
+            os.remove(ghost)
+        except OSError:
+            pass

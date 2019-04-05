@@ -35,5 +35,9 @@ def save_settings(settings: Settings,
     Save chaostoolkit settings as a mapping of key/values, overwriting any file
     that may already be present.
     """
+    settings_dir = os.path.dirname(settings_path)
+    if not os.path.isdir(settings_dir):
+        os.mkdir(settings_dir)
+
     with open(settings_path, 'w') as outfile:
         yaml.dump(settings, outfile, default_flow_style=False)
