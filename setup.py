@@ -52,6 +52,10 @@ install_require = []
 with io.open('requirements.txt') as f:
     install_require = [l.strip() for l in f if not l.startswith('#')]
 
+install_require.append(
+    'contextvars;python_version<"3.7"'
+)
+
 extras_require = {
     "vault": [
         "hvac>=0.7.2"

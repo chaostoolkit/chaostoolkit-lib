@@ -8,11 +8,16 @@ from logzero import logger
 from chaoslib.control.python import apply_python_control, cleanup_control, \
     initialize_control, validate_python_control
 from chaoslib.exceptions import InterruptExecution, InvalidControl
+from chaoslib.types import Settings
 from chaoslib.types import Activity, Configuration, \
     Experiment, Hypothesis, Journal, Run, Secrets
+import contextvars
 
 __all__ = ["controls", "initialize_controls", "cleanup_controls",
-           "validate_controls", "Control"]
+           "validate_controls", "Control", "initialize_global_controls",
+           "cleanup_global_controls"]
+
+global_controls = contextvars.ContextVar('global_controls', default=[])
 
 
 def initialize_controls(experiment: Experiment,
@@ -105,6 +110,43 @@ def validate_controls(experiment: Experiment):
             validate_python_control(c)
 
 
+def initialize_global_controls(settings: Settings):
+    """
+    Load and initialize controls declared in the settings
+    """
+    auths = settings.get('auths', [])
+    controls = []
+    for name, control in settings.get("controls", {}).items():
+        control['name'] = name
+        logger.debug("Initializing global control '{}'".format(name))
+
+        auth_secrets = {
+            auth: deepcopy(auths[auth])
+            for auth in control.get(
+                "secrets", {}).get('auths', []) if auth in auths
+        }
+        provider = control.get("provider")
+        if provider and provider["type"] == "python":
+            initialize_control(
+                control, configuration=None, secrets=auth_secrets)
+        controls.append(control)
+    global_controls.set(controls)
+
+
+def cleanup_global_controls():
+    """
+    Unload and cleanup global controls
+    """
+    controls = global_controls.get()
+    for control in controls:
+        name = control['name']
+        logger.debug("Cleaning up global control '{}'".format(name))
+
+        provider = control.get("provider")
+        if provider and provider["type"] == "python":
+            cleanup_control(control)
+
+
 class Control:
     def begin(self, level: str, experiment: Experiment,
               context: Union[Activity, Hypothesis, Experiment],
@@ -178,8 +220,10 @@ def get_context_controls(level: str, experiment: Experiment,
     If a control is declared at the current level, do override it with an
     top-level ine.
     """
+    glbl_controls = global_controls.get()[:]
     top_level_controls = experiment.get("controls", [])
     controls = context.get("controls", [])
+    controls.extend(glbl_controls)
 
     # do we even have something at the top level to be merged?
     if not top_level_controls:
