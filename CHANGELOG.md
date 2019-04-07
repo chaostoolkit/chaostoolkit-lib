@@ -9,6 +9,7 @@
 - Create settings directory when it doesn't already exist [#97][97]
 - Pass configuration to tolerance checks so that probe tolerance can access it
   [#98][98]
+- Fix using a probe as a tolerance validator [#98][98]
 
 [97]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/97
 [98]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/98

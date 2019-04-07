@@ -19,7 +19,8 @@ from logzero import logger
 from chaoslib.activity import ensure_activity_is_valid, execute_activity, \
     run_activity
 from chaoslib.control import controls
-from chaoslib.exceptions import InvalidActivity, InvalidExperiment
+from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
+    InvalidExperiment
 from chaoslib.types import Configuration, Experiment, \
     Secrets, Tolerance
 
@@ -288,9 +289,12 @@ def _(tolerance: dict, value: Any, configuration: Configuration = None,
     tolerance_type = tolerance.get("type")
 
     if tolerance_type == "probe":
-        tolerance["arguments"]["value"] = value
-        run = run_activity(tolerance, configuration, secrets)
-        return run["status"] == "succeeded"
+        tolerance["provider"]["arguments"]["value"] = value
+        try:
+            run_activity(tolerance, configuration, secrets)
+            return True
+        except ActivityFailed:
+            return False
     elif tolerance_type == "regex":
         target = tolerance.get("target")
         pattern = tolerance.get("pattern")

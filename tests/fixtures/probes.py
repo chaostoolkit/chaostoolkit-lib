@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 import os.path
 import sys
+from typing import Any
+
+from chaoslib.exceptions import ActivityFailed
 
 
 EmptyProbe = {}
@@ -335,3 +338,8 @@ BackgroundPythonModuleProbe = {
         }
     }
 }
+
+
+def must_be_in_range(a: int, b: int, value: Any = None) -> bool:
+    if not (a < int(value.get("body")) < b):
+        raise ActivityFailed("body is not in expected range")
