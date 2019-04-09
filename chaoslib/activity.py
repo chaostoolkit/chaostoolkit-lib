@@ -32,7 +32,7 @@ def ensure_activity_is_valid(activity: Activity):
 
     * `"type"` the kind of activity, one of `"python"`, `"process"` or `"http"`
 
-    Dependending on the type, an activity requires a variety of other keys.
+    Depending on the type, an activity requires a variety of other keys.
 
     In all failing cases, raises :exc:`InvalidActivity`.
     """
