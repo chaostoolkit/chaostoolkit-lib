@@ -234,8 +234,8 @@ def run_experiment(experiment: Experiment) -> Journal:
         logger.fatal(str(i))
     except (KeyboardInterrupt, SystemExit):
         journal["status"] = "interrupted"
-        logger.warn("Received an exit signal, "
-                    "leaving without applying rollbacks.")
+        logger.warning("Received an exit signal, "
+                       "leaving without applying rollbacks.")
     else:
         journal["status"] = journal["status"] or "completed"
         journal["rollbacks"] = apply_rollbacks(

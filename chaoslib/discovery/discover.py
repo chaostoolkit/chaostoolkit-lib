@@ -98,9 +98,10 @@ def discover_activities(extension_mod_name: str,
     try:
         exported = getattr(mod, "__all__")
     except AttributeError:
-        logger.warn("'{m}' does not expose the __all__ attribute. "
-                    "It is required to determine what functions are actually "
-                    "exported as activities.".format(m=extension_mod_name))
+        logger.warning("'{m}' does not expose the __all__ attribute. "
+                       "It is required to determine what functions are "
+                       "actually exported as activities."
+                       .format(m=extension_mod_name))
         return activities
 
     funcs = inspect.getmembers(mod, inspect.isfunction)
