@@ -19,7 +19,8 @@ from logzero import logger
 from chaoslib.activity import ensure_activity_is_valid, execute_activity, \
     run_activity
 from chaoslib.control import controls
-from chaoslib.exceptions import InvalidActivity, InvalidExperiment
+from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
+    InvalidExperiment
 from chaoslib.types import Configuration, Experiment, \
     Secrets, Tolerance
 
@@ -212,7 +213,10 @@ def run_steady_state_hypothesis(experiment: Experiment,
 
             tolerance = activity.get("tolerance")
             logger.debug("allowed tolerance is {t}".format(t=str(tolerance)))
-            if not within_tolerance(tolerance, run["output"]):
+            checked = within_tolerance(
+                tolerance, run["output"], configuration=configuration,
+                secrets=secrets)
+            if not checked:
                 run["tolerance_met"] = False
                 state["steady_state_met"] = False
                 return state
@@ -227,6 +231,7 @@ def run_steady_state_hypothesis(experiment: Experiment,
 
 @singledispatch
 def within_tolerance(tolerance: Any, value: Any,
+                     configuration: Configuration = None,
                      secrets: Secrets = None) -> bool:
     """
     Performs a quick validation of the probe's result `value` against the
@@ -244,17 +249,20 @@ def within_tolerance(tolerance: Any, value: Any,
 
 
 @within_tolerance.register(bool)
-def _(tolerance: bool, value: bool, secrets: Secrets = None) -> bool:
+def _(tolerance: bool, value: bool, configuration: Configuration = None,
+      secrets: Secrets = None) -> bool:
     return value == tolerance
 
 
 @within_tolerance.register(str)
-def _(tolerance: str, value: str, secrets: Secrets = None) -> bool:
+def _(tolerance: str, value: str, configuration: Configuration = None,
+      secrets: Secrets = None) -> bool:
     return value == tolerance
 
 
 @within_tolerance.register(int)
-def _(tolerance: int, value: int, secrets: Secrets = None) -> bool:
+def _(tolerance: int, value: int, configuration: Configuration = None,
+      secrets: Secrets = None) -> bool:
     if isinstance(value, dict):
         if "status" in value:
             return value["status"] == tolerance
@@ -263,7 +271,8 @@ def _(tolerance: int, value: int, secrets: Secrets = None) -> bool:
 
 
 @within_tolerance.register(list)
-def _(tolerance: list, value: Any, secrets: Secrets = None) -> bool:
+def _(tolerance: list, value: Any, configuration: Configuration = None,
+      secrets: Secrets = None) -> bool:
     if isinstance(value, dict):
         if "status" in value:
             return value["status"] in tolerance
@@ -275,13 +284,17 @@ def _(tolerance: list, value: Any, secrets: Secrets = None) -> bool:
 
 
 @within_tolerance.register(dict)
-def _(tolerance: dict, value: Any, secrets: Secrets = None) -> bool:
+def _(tolerance: dict, value: Any, configuration: Configuration = None,
+      secrets: Secrets = None) -> bool:
     tolerance_type = tolerance.get("type")
 
     if tolerance_type == "probe":
-        tolerance["arguments"]["value"] = value
-        run = run_activity(tolerance, secrets)
-        return run["status"] == "succeeded"
+        tolerance["provider"]["arguments"]["value"] = value
+        try:
+            run_activity(tolerance, configuration, secrets)
+            return True
+        except ActivityFailed:
+            return False
     elif tolerance_type == "regex":
         target = tolerance.get("target")
         pattern = tolerance.get("pattern")
