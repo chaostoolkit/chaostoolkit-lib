@@ -10,10 +10,12 @@
 - Pass configuration to tolerance checks so that probe tolerance can access it
   [#98][98]
 - Fix using a probe as a tolerance validator [#98][98]
-- Make settings globally available during the run
+- Make settings globally available during the run [#99][99]
+- Load controls from settings too now [#99][99]
 
 [97]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/97
 [98]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/98
+[99]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/99
 
 ## [1.1.2][] - 2019-03-22
 
