@@ -3,15 +3,17 @@ from contextlib import contextmanager
 from copy import deepcopy
 from typing import List, Union
 
+import contextvars
 from logzero import logger
 
 from chaoslib.control.python import apply_python_control, cleanup_control, \
     initialize_control, validate_python_control
 from chaoslib.exceptions import InterruptExecution, InvalidControl
+from chaoslib.settings import get_loaded_settings
 from chaoslib.types import Settings
-from chaoslib.types import Activity, Configuration, \
+from chaoslib.types import Activity, Configuration, Control as ControlType, \
     Experiment, Hypothesis, Journal, Run, Secrets
-import contextvars
+
 
 __all__ = ["controls", "initialize_controls", "cleanup_controls",
            "validate_controls", "Control", "initialize_global_controls",
@@ -114,21 +116,16 @@ def initialize_global_controls(settings: Settings):
     """
     Load and initialize controls declared in the settings
     """
-    auths = settings.get('auths', [])
     controls = []
     for name, control in settings.get("controls", {}).items():
         control['name'] = name
         logger.debug("Initializing global control '{}'".format(name))
 
-        auth_secrets = {
-            auth: deepcopy(auths[auth])
-            for auth in control.get(
-                "secrets", {}).get('auths', []) if auth in auths
-        }
         provider = control.get("provider")
         if provider and provider["type"] == "python":
             initialize_control(
-                control, configuration=None, secrets=auth_secrets)
+                control, configuration=None, secrets=None,
+                settings=settings)
         controls.append(control)
     global_controls.set(controls)
 
@@ -138,6 +135,8 @@ def cleanup_global_controls():
     Unload and cleanup global controls
     """
     controls = global_controls.get()
+    global_controls.set([])
+
     for control in controls:
         name = control['name']
         logger.debug("Cleaning up global control '{}'".format(name))
@@ -145,6 +144,13 @@ def cleanup_global_controls():
         provider = control.get("provider")
         if provider and provider["type"] == "python":
             cleanup_control(control)
+
+
+def get_global_controls() -> List[ControlType]:
+    """
+    All the controls loaded from the settings.
+    """
+    return global_controls.get()
 
 
 class Control:
@@ -273,6 +279,7 @@ def apply_controls(level: str, experiment: Experiment,
     the `"activity"` when it must be an activity. The `scope` is one of
     `"before", "after"` and the `state` is only set on `"after"` scope.
     """
+    settings = get_loaded_settings() or None
     controls = get_context_controls(level, experiment, context)
     if not controls:
         return
@@ -295,7 +302,8 @@ def apply_controls(level: str, experiment: Experiment,
                 apply_python_control(
                     level="{}-{}".format(level, scope), control=control,
                     context=context, state=state, experiment=experiment,
-                    configuration=configuration, secrets=secrets)
+                    configuration=configuration, secrets=secrets,
+                    settings=settings)
         except InterruptExecution:
             logger.debug(
                 "{}-control '{}' interrupted the execution".format(

@@ -7,10 +7,13 @@ from chaoslib.types import Activity, Configuration, \
 value_from_config = None
 
 
-def configure_control(config: Configuration, secrets = Secrets):
+def configure_control(config: Configuration, secrets: Secrets,
+                      settings: Settings):
     global value_from_config
-    print(config)
-    value_from_config = config.get("dummy-key", "default")
+    if config:
+        value_from_config = config.get("dummy-key", "default")
+    elif settings:
+        value_from_config = settings.get("dummy-key", "default")
 
 
 def cleanup_control():
@@ -32,7 +35,7 @@ def before_hypothesis_control(context: Hypothesis, **kwargs):
 
 
 def after_hypothesis_control(context: Hypothesis,
-                            state: Dict[str, Any], **kwargs):
+                             state: Dict[str, Any], **kwargs):
     context["after_hypothesis_control"] = True
     state["after_hypothesis_control"] = True
 

@@ -12,7 +12,8 @@ import pytest
 
 from chaoslib.activity import execute_activity
 from chaoslib.control import initialize_controls, cleanup_controls, \
-    validate_controls, controls, get_all_activities, get_context_controls
+    validate_controls, controls, get_all_activities, get_context_controls, \
+    initialize_global_controls, cleanup_global_controls, get_global_controls
 from chaoslib.control.python import validate_python_control
 from chaoslib.exceptions import InterruptExecution, InvalidActivity
 from chaoslib.experiment import run_experiment
@@ -258,7 +259,6 @@ def test_controls_are_applied_at_various_levels():
     run_experiment(exp)
     activities = get_all_activities(exp)
     for activity in activities:
-        print(activity)
         if "controls" in activity:
             assert activity["before_activity_control"] is True
             assert activity["after_activity_control"] is True
@@ -274,3 +274,64 @@ def test_controls_are_applied_when_they_are_not_top_level():
         if "controls" in activity:
             assert activity["before_activity_control"] is True
             assert activity["after_activity_control"] is True
+
+
+def test_load_global_controls_from_settings():
+    exp = deepcopy(experiments.ExperimentWithControls)
+
+    try:
+        run_experiment(exp)
+        activities = get_all_activities(exp)
+        for activity in activities:
+            if "controls" in activity:
+                assert "before_activity_control" not in activity
+                assert "after_activity_control" not in activity
+    finally:
+        cleanup_global_controls()
+
+    initialize_global_controls({
+        "dummy-key": "blah",
+        "controls": {
+            "dummy": {
+                "provider": {
+                    "type": "python",
+                    "module": "fixtures.controls.dummy"
+                }
+            }
+        }
+    })
+
+    try:
+        run_experiment(exp)
+        activities = get_all_activities(exp)
+        for activity in activities:
+            if "controls" in activity:
+                assert activity["before_activity_control"] is True
+                assert activity["after_activity_control"] is True
+    finally:
+        cleanup_global_controls()
+
+
+def test_get_globally_loaded_controls_from_settings():
+    assert get_global_controls() == []
+
+    initialize_global_controls({
+        "controls": {
+            "dummy": {
+                "provider": {
+                    "type": "python",
+                    "module": "fixtures.controls.dummy"
+                }
+            }
+        }
+    })
+
+    try:
+        ctrls = get_global_controls()
+        assert len(ctrls) == 1
+        assert ctrls[0]["name"] == "dummy"
+        assert ctrls[0]["provider"]["type"] == "python"
+        assert ctrls[0]["provider"]["module"] == "fixtures.controls.dummy"
+    finally:
+        cleanup_global_controls()
+        assert get_global_controls() == []
