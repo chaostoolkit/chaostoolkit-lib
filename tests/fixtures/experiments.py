@@ -229,7 +229,7 @@ ExperimentWithControls = {
     "steady-state-hypothesis": {
         "title": "hello",
         "probes": [
-        deepcopy(PythonModuleProbeWithBoolTolerance)
+            deepcopy(PythonModuleProbeWithBoolTolerance)
         ]
     },
     "method": [

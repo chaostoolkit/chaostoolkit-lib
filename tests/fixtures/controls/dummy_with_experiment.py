@@ -7,9 +7,8 @@ from chaoslib.types import Activity, Configuration, \
 value_from_config = None
 
 
-def configure_control(config: Configuration, secrets = Secrets):
+def configure_control(config: Configuration, secrets: Secrets):
     global value_from_config
-    print(config)
     value_from_config = config.get("dummy-key", "default")
 
 

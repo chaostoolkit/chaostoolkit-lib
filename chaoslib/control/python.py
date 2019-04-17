@@ -9,7 +9,7 @@ from logzero import logger
 from chaoslib import substitute
 from chaoslib.exceptions import InvalidActivity
 from chaoslib.types import Activity, Configuration, Control, Experiment, \
-    Journal, Run, Secrets
+    Journal, Run, Secrets, Settings
 
 
 __all__ = ["apply_python_control", "cleanup_control", "initialize_control",
@@ -29,14 +29,27 @@ _level_mapping = {
 
 
 def initialize_control(control: Control, configuration: Configuration,
-                       secrets: Secrets):
+                       secrets: Secrets, settings: Settings = None):
     """
     Initialize a control by calling its `configure_control` function.
     """
     func = load_func(control, "configure_control")
     if not func:
         return
-    func(configuration, secrets)
+
+    arguments = {}
+    sig = inspect.signature(func)
+
+    if "secrets" in sig.parameters:
+        arguments["secrets"] = secrets
+
+    if "config" in sig.parameters:
+        arguments["config"] = configuration
+
+    if "settings" in sig.parameters:
+        arguments["settings"] = settings
+
+    func(**arguments)
 
 
 def cleanup_control(control: Control):
@@ -73,7 +86,7 @@ def apply_python_control(level: str, control: Control, experiment: Experiment,
                          context: Union[Activity, Experiment],
                          state: Union[Journal, Run, List[Run]] = None,
                          configuration: Configuration = None,
-                         secrets: Secrets = None):
+                         secrets: Secrets = None, settings: Settings = None):
     """
     Apply a control by calling a function matching the given level.
     """
@@ -102,6 +115,12 @@ def apply_python_control(level: str, control: Control, experiment: Experiment,
 
     if "experiment" in sig.parameters:
         arguments["experiment"] = experiment
+
+    if "extensions" in sig.parameters:
+        arguments["extensions"] = experiment.get("extensions")
+
+    if "settings" in sig.parameters:
+        arguments["settings"] = settings
 
     func(context=context, **arguments)
 
