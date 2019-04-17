@@ -13,6 +13,7 @@
 - Make settings globally available during the run [#99][99]
 - Load controls from settings too now [#99][99]
 - Do not build on MacOSX platform [#110][110]
+- Run stable Python 3.7 build
 
 [97]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/97
 [98]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/98
