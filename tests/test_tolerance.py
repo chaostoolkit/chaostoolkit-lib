@@ -494,3 +494,35 @@ def test_tolerance_range_checked_value_must_be_a_number():
         },
         "body": "bad"
     }) is False
+
+
+def test_tolerance_with_a_probe():
+    t = {
+        "type": "probe",
+        "name": "must-be-in-range",
+        "provider": {
+            "type": "python",
+            "module": "fixtures.probes",
+            "func": "must_be_in_range",
+            "arguments": {
+                "a": 6,
+                "b": 8
+            }
+        }
+    }
+    ensure_hypothesis_tolerance_is_valid(t)
+    assert within_tolerance(t, value={
+        "status": 200,
+        "headers": {
+            "Content-Type": "text/plain"
+        },
+        "body": "9"
+    }) is False
+
+    assert within_tolerance(t, value={
+        "status": 200,
+        "headers": {
+            "Content-Type": "text/plain"
+        },
+        "body": "7"
+    }) is True

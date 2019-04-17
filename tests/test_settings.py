@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os.path
-from chaoslib.settings import load_settings, save_settings
+from chaoslib.settings import get_loaded_settings, load_settings, save_settings
+
 
 settings_dir = os.path.join(os.path.dirname(__file__), "fixtures")
 
@@ -45,3 +46,8 @@ def test_create_settings_file_on_save():
             os.remove(ghost)
         except OSError:
             pass
+
+
+def test_get_loaded_settings():
+    settings = load_settings(os.path.join(settings_dir, "settings.yaml"))
+    assert get_loaded_settings() is settings
