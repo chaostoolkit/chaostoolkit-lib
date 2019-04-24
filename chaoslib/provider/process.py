@@ -26,7 +26,7 @@ def run_process_activity(activity: Activity, configuration: Configuration,
 
     Raises :exc:`ActivityFailed` when a the process takes longer than the
     timeout defined in the activity. There is no timeout by default so be
-    careful when you do not explicitely provide one.
+    careful when you do not explicitly provide one.
 
     This should be considered as a private function.
     """
