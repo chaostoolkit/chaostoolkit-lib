@@ -43,8 +43,8 @@ def initialize_control(control: Control, configuration: Configuration,
     if "secrets" in sig.parameters:
         arguments["secrets"] = secrets
 
-    if "config" in sig.parameters:
-        arguments["config"] = configuration
+    if "configuration" in sig.parameters:
+        arguments["configuration"] = configuration
 
     if "settings" in sig.parameters:
         arguments["settings"] = settings
