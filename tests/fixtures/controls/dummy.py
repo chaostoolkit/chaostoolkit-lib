@@ -7,11 +7,11 @@ from chaoslib.types import Activity, Configuration, \
 value_from_config = None
 
 
-def configure_control(config: Configuration, secrets: Secrets,
+def configure_control(configuration: Configuration, secrets: Secrets,
                       settings: Settings):
     global value_from_config
-    if config:
-        value_from_config = config.get("dummy-key", "default")
+    if configuration:
+        value_from_config = configuration.get("dummy-key", "default")
     elif settings:
         value_from_config = settings.get("dummy-key", "default")
 

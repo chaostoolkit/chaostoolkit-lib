@@ -4,6 +4,11 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.2.0...HEAD
 
+### Changed
+
+- Fix to ensure a control's `configuration` parameter is populated when it the 
+  control is being `configured` [#114][114]
+
 ## [1.2.0][] - 2019-04-17
 
 [1.2.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.1.2...1.2.0
