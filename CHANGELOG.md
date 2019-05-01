@@ -8,6 +8,18 @@
 
 - Fix to ensure a control's `configuration` parameter is populated when it the 
   control is being `configured` [#114][114]
+- Load and apply global controls, those declared in the settings, from the
+  `run_experiment` function rather than out of band [#116][116]
+
+  This means that global controls will not be applied before the experiment
+  is validated but only when it's executed.
+
+  It also means the global controls will be provided with the experiment, its
+  configuration and secrets in case global controls must access these.
+
+[114]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/114
+[116]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/116
+
 
 ## [1.2.0][] - 2019-04-17
 

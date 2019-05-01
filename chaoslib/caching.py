@@ -2,11 +2,12 @@
 # Builds an in-memory cache of all declared activities so they can be
 # referenced from other places in the experiment
 from functools import wraps
+import inspect
 from typing import List, Union
 
 from logzero import logger
 
-from chaoslib.types import Activity, Experiment
+from chaoslib.types import Activity, Experiment, Settings
 
 
 __all__ = ["cache_activities", "clear_cache", "lookup_activity", "with_cache"]
@@ -48,11 +49,18 @@ def with_cache(f):
     function.
     """
     @wraps(f)
-    def wrapped(experiment: Experiment):
+    def wrapped(experiment: Experiment, settings: Settings = None):
         try:
             if experiment:
                 cache_activities(experiment)
-            return f(experiment)
+
+            sig = inspect.signature(f)
+            arguments = {
+                "experiment": experiment
+            }
+            if "settings" in sig.parameters:
+                arguments["settings"] = settings
+            return f(**arguments)
         finally:
             clear_cache()
     return wrapped

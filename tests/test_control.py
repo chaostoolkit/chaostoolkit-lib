@@ -25,22 +25,23 @@ from fixtures.controls import dummy as DummyControl
 
 
 def test_initialize_controls_will_configure_a_control():
+    exp = deepcopy(experiments.ExperimentWithControls)
     initialize_controls(
-        experiments.ExperimentWithControls, configuration={
+        exp, configuration={
             "dummy-key": "dummy-value"
         })
-    assert DummyControl.value_from_config == "dummy-value"
-    cleanup_controls(experiments.ExperimentWithControls)
+    assert exp["control-value"] == "dummy-value"
+    cleanup_controls(exp)
 
 
 def test_initialize_controls_will_cleanup_a_control():
-    cleanup_controls(experiments.ExperimentWithControls)
-    assert DummyControl.value_from_config == None
+    exp = deepcopy(experiments.ExperimentWithControls)
+    cleanup_controls(exp)
 
 
 def test_controls_are_applied_before_and_after_experiment():
     exp = deepcopy(experiments.ExperimentWithControls)
-    with controls("experiment", exp, context=exp) as c:
+    with controls("experiment", exp, context=exp):
         assert "before_experiment_control" in exp
         assert exp["before_experiment_control"] is True
 
@@ -55,12 +56,12 @@ def test_controls_are_applied_before_and_after_experiment():
 def test_controls_are_applied_before_and_but_not_after_experiment():
     exp = deepcopy(experiments.ExperimentWithControls)
     exp["controls"][0]["scope"] = "before"
-    with controls("experiment", exp, context=exp) as c:
+    with controls("experiment", exp, context=exp):
         assert "before_experiment_control" in exp
         assert exp["before_experiment_control"] is True
 
         exp["dry"] = True
-        journal = run_experiment(exp)
+        run_experiment(exp)
 
     assert "after_experiment_control" not in exp
 
@@ -68,7 +69,7 @@ def test_controls_are_applied_before_and_but_not_after_experiment():
 def test_controls_are_applied_not_before_and_but_after_experiment():
     exp = deepcopy(experiments.ExperimentWithControls)
     exp["controls"][0]["scope"] = "after"
-    with controls("experiment", exp, context=exp) as c:
+    with controls("experiment", exp, context=exp):
         assert "before_experiment_control" not in exp
 
         exp["dry"] = True
@@ -81,7 +82,7 @@ def test_controls_are_applied_not_before_and_but_after_experiment():
 
 def test_controls_may_interrupt_experiment():
     exp = deepcopy(experiments.ExperimentCanBeInterruptedByControl)
-    with controls("experiment", exp, context=exp) as c:
+    with controls("experiment", exp, context=exp):
         exp["dry"] = True
         journal = run_experiment(exp)
         assert journal["status"] == "interrupted"
@@ -90,7 +91,7 @@ def test_controls_may_interrupt_experiment():
 def test_controls_are_applied_before_and_after_hypothesis():
     exp = deepcopy(experiments.ExperimentWithControls)
     hypo = exp["steady-state-hypothesis"]
-    with controls("hypothesis", exp, context=hypo) as c:
+    with controls("hypothesis", exp, context=hypo):
         assert "before_hypothesis_control" in hypo
         assert hypo["before_hypothesis_control"] is True
 
@@ -104,7 +105,7 @@ def test_controls_are_applied_before_and_after_hypothesis():
 
 def test_controls_are_applied_before_and_after_method():
     exp = deepcopy(experiments.ExperimentWithControls)
-    with controls("method", exp, context=exp) as c:
+    with controls("method", exp, context=exp):
         assert "before_method_control" in exp
         assert exp["before_method_control"] is True
 
@@ -118,7 +119,7 @@ def test_controls_are_applied_before_and_after_method():
 
 def test_controls_are_applied_before_and_after_rollbacks():
     exp = deepcopy(experiments.ExperimentWithControls)
-    with controls("rollback", exp, context=exp) as c:
+    with controls("rollback", exp, context=exp):
         assert "before_rollback_control" in exp
         assert exp["before_rollback_control"] is True
 
@@ -136,7 +137,7 @@ def test_controls_are_applied_before_and_after_activities():
 
     activities = get_all_activities(exp)
     for activity in activities:
-        with controls("activity", exp, context=activity) as c:
+        with controls("activity", exp, context=activity):
             assert activity["before_activity_control"] is True
 
             run = execute_activity(exp, activity, None, None, dry=False)
@@ -150,11 +151,11 @@ def test_no_controls_get_applied_when_none_defined():
     exp = deepcopy(experiments.ExperimentWithoutControls)
     exp["dry"] = True
 
-    with controls("experiment", exp, context=exp) as c:
+    with controls("experiment", exp, context=exp):
         assert "before_experiment_control" not in exp
 
         exp["dry"] = True
-        journal = run_experiment(exp)
+        run_experiment(exp)
 
     assert "after_experiment_control" not in exp
 
@@ -277,20 +278,16 @@ def test_controls_are_applied_when_they_are_not_top_level():
 
 
 def test_load_global_controls_from_settings():
-    exp = deepcopy(experiments.ExperimentWithControls)
+    exp = deepcopy(experiments.ExperimentNoControls)
+    activities = get_all_activities(exp)
 
-    try:
-        run_experiment(exp)
-        activities = get_all_activities(exp)
-        for activity in activities:
-            if "controls" in activity:
-                assert "before_activity_control" not in activity
-                assert "after_activity_control" not in activity
-    finally:
-        cleanup_global_controls()
+    for activity in activities:
+        assert "before_activity_control" not in activity
+        assert "after_activity_control" not in activity
 
-    initialize_global_controls({
-        "dummy-key": "blah",
+    assert get_global_controls() == []
+    run_experiment(exp, settings={
+        "dummy-key": "hello there",
         "controls": {
             "dummy": {
                 "provider": {
@@ -300,22 +297,20 @@ def test_load_global_controls_from_settings():
             }
         }
     })
+    assert get_global_controls() == []
+    assert exp["control-value"] == "hello there"
 
-    try:
-        run_experiment(exp)
-        activities = get_all_activities(exp)
-        for activity in activities:
-            if "controls" in activity:
-                assert activity["before_activity_control"] is True
-                assert activity["after_activity_control"] is True
-    finally:
-        cleanup_global_controls()
+    for activity in activities:
+        assert "before_activity_control" in activity
+        assert "after_activity_control" in activity
+        assert activity["before_activity_control"] is True
+        assert activity["after_activity_control"] is True
 
 
 def test_get_globally_loaded_controls_from_settings():
     assert get_global_controls() == []
 
-    initialize_global_controls({
+    initialize_global_controls({}, {}, {}, {
         "controls": {
             "dummy": {
                 "provider": {
@@ -335,3 +330,132 @@ def test_get_globally_loaded_controls_from_settings():
     finally:
         cleanup_global_controls()
         assert get_global_controls() == []
+
+
+def test_load_global_controls_from_settings_configured_via_exp_config():
+    exp = deepcopy(experiments.ExperimentUsingConfigToConfigureControls)
+    activities = get_all_activities(exp)
+
+    for activity in activities:
+        assert "before_activity_control" not in activity
+        assert "after_activity_control" not in activity
+
+    assert get_global_controls() == []
+    run_experiment(exp, settings={
+        "controls": {
+            "dummy": {
+                "provider": {
+                    "type": "python",
+                    "module": "fixtures.controls.dummy"
+                }
+            }
+        }
+    })
+    assert get_global_controls() == []
+    assert exp["control-value"] == "blah blah"
+
+    for activity in activities:
+        assert "before_activity_control" in activity
+        assert "after_activity_control" in activity
+        assert activity["before_activity_control"] is True
+        assert activity["after_activity_control"] is True
+
+
+def test_apply_controls_even_on_background_activity():
+    exp = deepcopy(experiments.ExperimentNoControls)
+    exp["method"][0]["background"] = True
+    exp["method"][0]["pauses"] = {
+        "after": 1
+    }
+    activities = get_all_activities(exp)
+
+    for activity in activities:
+        assert "before_activity_control" not in activity
+        assert "after_activity_control" not in activity
+
+    assert get_global_controls() == []
+    run_experiment(exp, settings={
+        "dummy-key": "hello there",
+        "controls": {
+            "dummy": {
+                "provider": {
+                    "type": "python",
+                    "module": "fixtures.controls.dummy"
+                }
+            }
+        }
+    })
+    assert get_global_controls() == []
+    assert exp["control-value"] == "hello there"
+
+    for activity in activities:
+        assert "before_activity_control" in activity
+        assert "after_activity_control" in activity
+        assert activity["before_activity_control"] is True
+        assert activity["after_activity_control"] is True
+
+
+def test_control_cleanup_cannot_fail_the_experiment():
+    exp = deepcopy(experiments.ExperimentNoControls)
+    try:
+        run_experiment(exp, settings={
+            "dummy-key": "hello there",
+            "controls": {
+                "dummy": {
+                    "provider": {
+                        "type": "python",
+                        "module": "fixtures.controls.dummy_with_failing_cleanup"
+                    }
+                }
+            }
+        })
+    except:
+        pytest.fail("Failed to run experiment with a broken cleanup control")
+
+
+def test_control_initialization_cannot_fail_the_experiment():
+    exp = deepcopy(experiments.ExperimentNoControls)
+    try:
+        run_experiment(exp, settings={
+            "dummy-key": "hello there",
+            "controls": {
+                "dummy": {
+                    "provider": {
+                        "type": "python",
+                        "module": "fixtures.controls.dummy_with_failing_init"
+                    }
+                }
+            }
+        })
+    except:
+        pytest.fail("Failed to run experiment with a broken init control")
+
+
+def test_control_failing_its_initialization_must_not_be_registered():
+    exp = deepcopy(experiments.ExperimentNoControls)
+    run_experiment(exp, settings={
+        "dummy-key": "hello there",
+        "controls": {
+            "dummy-failed": {
+                "provider": {
+                    "type": "python",
+                    "module": "fixtures.controls.dummy_with_failing_init"
+                }
+            },
+            "dummy": {
+                "provider": {
+                    "type": "python",
+                    "module": "fixtures.controls.dummy"
+                }
+            }
+        }
+    })
+
+    assert "should_never_been_called" not in exp
+
+    activities = get_all_activities(exp)
+    for activity in activities:
+        assert "before_activity_control" in activity
+        assert "after_activity_control" in activity
+        assert activity["before_activity_control"] is True
+        assert activity["after_activity_control"] is True

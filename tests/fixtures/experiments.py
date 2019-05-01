@@ -213,19 +213,9 @@ ExperimentWithVariousTolerances = {
 }
 
 
-
-ExperimentWithControls = {
+ExperimentNoControls = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",
-    "controls": [
-        {
-            "name": "dummy",
-            "provider": {
-                "type": "python",
-                "module": "fixtures.controls.dummy"
-            }
-        }
-    ],
     "steady-state-hypothesis": {
         "title": "hello",
         "probes": [
@@ -238,6 +228,23 @@ ExperimentWithControls = {
     "rollbacks": [
         deepcopy(PythonModuleProbeWithBoolTolerance)
     ]
+}
+
+
+ExperimentWithControls = deepcopy(ExperimentNoControls)
+ExperimentWithControls["controls"] = [
+    {
+        "name": "dummy",
+        "provider": {
+            "type": "python",
+            "module": "fixtures.controls.dummy"
+        }
+    }
+]
+
+ExperimentUsingConfigToConfigureControls = deepcopy(ExperimentNoControls)
+ExperimentUsingConfigToConfigureControls["configuration"] = {
+    "dummy-key": "blah blah"
 }
 
 

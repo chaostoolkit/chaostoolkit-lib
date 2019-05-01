@@ -28,7 +28,8 @@ _level_mapping = {
 }
 
 
-def initialize_control(control: Control, configuration: Configuration,
+def initialize_control(control: Control, experiment: Experiment,
+                       configuration: Configuration,
                        secrets: Secrets, settings: Settings = None):
     """
     Initialize a control by calling its `configure_control` function.
@@ -39,6 +40,9 @@ def initialize_control(control: Control, configuration: Configuration,
 
     arguments = {}
     sig = inspect.signature(func)
+
+    if "experiment" in sig.parameters:
+        arguments["experiment"] = experiment
 
     if "secrets" in sig.parameters:
         arguments["secrets"] = secrets
