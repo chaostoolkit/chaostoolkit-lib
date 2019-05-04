@@ -1,24 +1,19 @@
-import os
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Dict, List
 
 from chaoslib.types import Activity, Configuration, \
     Experiment, Hypothesis, Journal, Run, Secrets, Settings
 
-value_from_config = None
 
-
-def configure_control(configuration: Configuration, secrets: Secrets,
-                      settings: Settings):
-    global value_from_config
+def configure_control(experiment: Experiment, configuration: Configuration,
+                      secrets: Secrets, settings: Settings):
     if configuration:
-        value_from_config = configuration.get("dummy-key", "default")
+        experiment["control-value"] = configuration.get("dummy-key", "default")
     elif settings:
-        value_from_config = settings.get("dummy-key", "default")
+        experiment["control-value"] = settings.get("dummy-key", "default")
 
 
 def cleanup_control():
-    global value_from_config
-    value_from_config = None
+    pass
 
 
 def before_experiment_control(context: Experiment, **kwargs):

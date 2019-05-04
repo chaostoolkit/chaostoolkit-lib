@@ -3,7 +3,6 @@ from contextlib import contextmanager
 from copy import deepcopy
 from typing import List, Union
 
-import contextvars
 from logzero import logger
 
 from chaoslib.control.python import apply_python_control, cleanup_control, \
@@ -19,7 +18,10 @@ __all__ = ["controls", "initialize_controls", "cleanup_controls",
            "validate_controls", "Control", "initialize_global_controls",
            "cleanup_global_controls"]
 
-global_controls = contextvars.ContextVar('global_controls', default=[])
+# Should this be protected in some fashion? chaoslib isn't meant to be used
+# concurrently so there is little promise we can support several instances
+# at once. When the day comes...
+global_controls = []
 
 
 def initialize_controls(experiment: Experiment,
@@ -47,7 +49,7 @@ def initialize_controls(experiment: Experiment,
 
         provider = control.get("provider")
         if provider and provider["type"] == "python":
-            initialize_control(control, configuration, secrets)
+            initialize_control(control, experiment, configuration, secrets)
 
 
 def cleanup_controls(experiment: Experiment):
@@ -112,9 +114,14 @@ def validate_controls(experiment: Experiment):
             validate_python_control(c)
 
 
-def initialize_global_controls(settings: Settings):
+def initialize_global_controls(experiment: Experiment,
+                               configuration: Configuration, secrets: Secrets,
+                               settings: Settings):
     """
-    Load and initialize controls declared in the settings
+    Load and initialize controls declared in the settings.
+
+    Notice, if a control fails during its initialization, it is not registered
+    at all and will not be applied throughout the experiment.
     """
     controls = []
     for name, control in settings.get("controls", {}).items():
@@ -123,19 +130,30 @@ def initialize_global_controls(settings: Settings):
 
         provider = control.get("provider")
         if provider and provider["type"] == "python":
-            initialize_control(
-                control, configuration=None, secrets=None,
-                settings=settings)
+            try:
+                initialize_control(
+                    control, experiment=experiment,
+                    configuration=configuration, secrets=secrets,
+                    settings=settings)
+            except Exception:
+                logger.debug(
+                    "Control initialization '{}' failed. "
+                    "It will not be registered.".format(
+                        control['name']),
+                    exc_info=True)
+                # we don't use a control that failed its initialization
+                continue
+
         controls.append(control)
-    global_controls.set(controls)
+    set_global_controls(controls)
 
 
 def cleanup_global_controls():
     """
     Unload and cleanup global controls
     """
-    controls = global_controls.get()
-    global_controls.set([])
+    controls = get_global_controls()
+    reset_global_controls()
 
     for control in controls:
         name = control['name']
@@ -143,14 +161,19 @@ def cleanup_global_controls():
 
         provider = control.get("provider")
         if provider and provider["type"] == "python":
-            cleanup_control(control)
+            try:
+                cleanup_control(control)
+            except Exception:
+                logger.debug(
+                    "Control cleanup '{}' failed".format(control['name']),
+                    exc_info=True)
 
 
 def get_global_controls() -> List[ControlType]:
     """
     All the controls loaded from the settings.
     """
-    return global_controls.get()
+    return global_controls[:]
 
 
 class Control:
@@ -216,6 +239,21 @@ def get_controls(experiment: Experiment) -> List[Control]:
     return controls
 
 
+def set_global_controls(controls: List[ControlType]):
+    """
+    Set the controls loaded from the settings.
+    """
+    global_controls.clear()
+    global_controls.extend(controls)
+
+
+def reset_global_controls():
+    """
+    Invalidate all loaded global controls.
+    """
+    global_controls.clear()
+
+
 def get_context_controls(level: str, experiment: Experiment,
                          context: Union[Activity, Experiment]) \
                          -> List[Control]:
@@ -226,7 +264,7 @@ def get_context_controls(level: str, experiment: Experiment,
     If a control is declared at the current level, do override it with an
     top-level ine.
     """
-    glbl_controls = global_controls.get()[:]
+    glbl_controls = get_global_controls()
     top_level_controls = experiment.get("controls", [])
     controls = context.get("controls", [])
     controls.extend(glbl_controls)
@@ -282,6 +320,7 @@ def apply_controls(level: str, experiment: Experiment,
     settings = get_loaded_settings() or None
     controls = get_context_controls(level, experiment, context)
     if not controls:
+        logger.debug("No controls to apply on '{}'".format(level))
         return
 
     for control in controls:
