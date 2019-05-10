@@ -9,7 +9,8 @@ from fixtures.probes import BackgroundPythonModuleProbe, MissingFuncArgProbe, \
     PythonModuleProbeWithHTTPBodyTolerance, \
     PythonModuleProbeWithProcessStatusTolerance, \
     PythonModuleProbeWithProcessFailedStatusTolerance, \
-    PythonModuleProbeWithProcesStdoutTolerance
+    PythonModuleProbeWithProcesStdoutTolerance, \
+    PythonModuleProbeWithHTTPStatusToleranceDeviation
 
 Secrets = {}
 
@@ -220,6 +221,24 @@ ExperimentNoControls = {
         "title": "hello",
         "probes": [
             deepcopy(PythonModuleProbeWithBoolTolerance)
+        ]
+    },
+    "method": [
+        deepcopy(PythonModuleProbe)
+    ],
+    "rollbacks": [
+        deepcopy(PythonModuleProbeWithBoolTolerance)
+    ]
+}
+
+
+ExperimentNoControlsWithDeviation = {
+    "title": "do cats live in the Internet?",
+    "description": "an experiment of importance",
+    "steady-state-hypothesis": {
+        "title": "hello",
+        "probes": [
+            deepcopy(PythonModuleProbeWithHTTPStatusToleranceDeviation)
         ]
     },
     "method": [

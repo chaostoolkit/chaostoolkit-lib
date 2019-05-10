@@ -191,6 +191,8 @@ def run_steady_state_hypothesis(experiment: Experiment,
     with controls(level="hypothesis", experiment=experiment, context=hypo,
                   configuration=configuration, secrets=secrets) as control:
         probes = hypo.get("probes", [])
+        control.with_state(state)
+
         for activity in probes:
             run = execute_activity(
                 experiment=experiment, activity=activity,
@@ -223,8 +225,6 @@ def run_steady_state_hypothesis(experiment: Experiment,
 
         state["steady_state_met"] = True
         logger.info("Steady state hypothesis is met!")
-
-        control.with_state(state)
 
     return state
 

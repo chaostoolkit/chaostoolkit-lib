@@ -459,3 +459,24 @@ def test_control_failing_its_initialization_must_not_be_registered():
         assert "after_activity_control" in activity
         assert activity["before_activity_control"] is True
         assert activity["after_activity_control"] is True
+
+
+def test_control_must_not_rest_state_before_calling_the_after_side():
+    exp = deepcopy(experiments.ExperimentNoControlsWithDeviation)
+    journal = run_experiment(exp, settings={
+        "controls": {
+            "dummy": {
+                "provider": {
+                    "type": "python",
+                    "module": "fixtures.controls.dummy_need_access_to_end_state"
+                }
+            }
+        }
+    })
+
+    before_hypo_result = journal["steady_states"]["before"]
+    assert "after_hypothesis_control" in before_hypo_result
+    assert before_hypo_result["after_hypothesis_control"] == True
+
+    assert "after_experiment_control" in journal
+    assert journal["after_experiment_control"] == True

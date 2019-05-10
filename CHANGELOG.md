@@ -4,6 +4,13 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.3.0...HEAD
 
+### Changed
+
+- Fix to pass control's state when probe fails during hypothesis [#118][118]
+
+[118]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/118
+
+
 ## [1.3.0][] - 2019-05-04
 
 [1.3.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.2.0...1.3.0

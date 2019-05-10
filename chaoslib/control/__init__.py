@@ -192,11 +192,11 @@ class Control:
             context: Union[Activity, Hypothesis, Experiment],
             configuration: Configuration = None, secrets: Secrets = None):
         state = self.state
-        self.state = None
         apply_controls(
             level=level, experiment=experiment, context=context,
             scope="after", state=state, configuration=configuration,
             secrets=secrets)
+        self.state = None
 
 
 @contextmanager

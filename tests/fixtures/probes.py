@@ -184,6 +184,17 @@ PythonModuleProbeWithHTTPStatusTolerance = {
     }
 }
 
+PythonModuleProbeWithHTTPStatusToleranceDeviation = {
+    "type": "probe",
+    "name": "A dummy tolerance ready probe",
+    "tolerance": [500],
+    "provider": {
+        "type": "http",
+        "url": "http://example.com",
+        "timeout": 30
+    }
+}
+
 PythonModuleProbeWithHTTPBodyTolerance = {
     "type": "probe",
     "name": "A dummy tolerance ready probe",
