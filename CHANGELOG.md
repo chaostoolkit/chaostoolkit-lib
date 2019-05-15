@@ -4,6 +4,23 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.3.1...HEAD
 
+### Changed
+
+- [POTENTIALLY BREAKING] Changed the JSONPath implementation from `jsonpath-ng`
+  to `jsonpath2` as the former does not fully, or correctly, implement the
+  JSON Path specification. The latter is based on the ANTLR grammar and
+  implements filters appropriately. The breaking aspect is due to the fact that
+  your path may not work anylonger as they may be rejected by the new
+  implementation which is more correct. [#119][119].
+
+  Please install `jsonpath2`:
+
+  ```
+  $ pip install jsonpath2
+  ```
+
+[119]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/119
+
 ## [1.3.1][] - 2019-05-10
 
 [1.3.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.3.0...1.3.1

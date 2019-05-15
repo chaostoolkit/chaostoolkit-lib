@@ -61,7 +61,7 @@ extras_require = {
         "hvac>=0.7.2"
     ],
     "jsonpath": [
-        "jsonpath-ng>=1.4.3"
+        "jsonpath2>=0.2.1"
     ],
     "decoders": [
         "cchardet>=2.1.4",

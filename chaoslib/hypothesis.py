@@ -7,9 +7,7 @@ import re
 from typing import Any
 
 try:
-    from jsonpath_ng import jsonpath
-    from jsonpath_ng.ext import parser as jparse
-    from jsonpath_ng.lexer import JsonPathLexerError
+    from jsonpath2.path import Path as JSONPath
     HAS_JSONPATH = True
 except ImportError:
     HAS_JSONPATH = False
@@ -115,7 +113,7 @@ def check_json_path(tolerance: Tolerance):
     """
     if not HAS_JSONPATH:
         raise InvalidActivity(
-            "Install the `jsonpath_ng` package to use a JSON path tolerance: "
+            "Install the `jsonpath2` package to use a JSON path tolerance: "
             "`pip install chaostoolkit-lib[jsonpath]`.")
 
     if "path" not in tolerance:
@@ -127,8 +125,8 @@ def check_json_path(tolerance: Tolerance):
         if not path:
             raise InvalidActivity(
                 "hypothesis probe tolerance JSON path cannot be empty")
-        jparse.parse(path)
-    except AttributeError:
+        JSONPath.parse_str(path)
+    except ValueError:
         raise InvalidActivity(
             "hypothesis probe tolerance JSON path {} is invalid".format(
                 path))
@@ -136,10 +134,6 @@ def check_json_path(tolerance: Tolerance):
         raise InvalidActivity(
             "hypothesis probe tolerance JSON path {} has an invalid "
             "type".format(path))
-    except JsonPathLexerError as e:
-        raise InvalidActivity(
-            "hypothesis probe tolerance JSON path '{}' is invalid: {}".format(
-                str(e)))
 
 
 def check_range(tolerance: Tolerance):
@@ -306,7 +300,7 @@ def _(tolerance: dict, value: Any, configuration: Configuration = None,
         target = tolerance.get("target")
         path = tolerance.get("path")
         count_value = tolerance.get("count", None)
-        px = jparse.parse(path)
+        px = JSONPath.parse_str(path)
 
         if target:
             # if no target was provided, we use the tested value as-is
@@ -321,20 +315,29 @@ def _(tolerance: dict, value: Any, configuration: Configuration = None,
             except json.decoder.JSONDecodeError:
                 pass
 
-        items = px.find(value)
+        values = list(
+            map(lambda match_data: match_data.current_value, px.match(value))
+        )
 
-        result = len(items) > 0
+        result = len(values) > 0
 
         if count_value is not None:
-            result = len(items) == count_value
+            result = len(values) == count_value
 
         if "expect" in tolerance:
             expect = tolerance["expect"]
-            values = [item.value for item in items]
-            if len(values) == 1:
-                result = expect in [values[0], values]
+            if isinstance(expect, str) or len(values) == 1:
+                result = values[0] == expect
             else:
                 result = values == expect
+
+        if result is False:
+            if "expect" in tolerance:
+                logger.debug(
+                    "jsonpath found '{}' but expected '{}'".format(
+                        str(values), str(tolerance["expect"])))
+            else:
+                logger.debug("jsonpath found '{}'".format(str(values)))
 
         return result
     elif tolerance_type == "range":
