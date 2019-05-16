@@ -93,7 +93,7 @@ def test_tolerance_regex():
 def test_tolerance_jsonpath_from_dict():
     t = {
         "type": "jsonpath",
-        "path": "foo[*].baz"
+        "path": "$.foo.*[?(@.baz)]"
     }
     ensure_hypothesis_tolerance_is_valid(t)
     assert within_tolerance(
@@ -105,7 +105,7 @@ def test_tolerance_jsonpath_from_dict():
 def test_tolerance_jsonpath_must_find_items_to_succeed():
     t = {
         "type": "jsonpath",
-        "path": "notsofoo[*].baz"
+        "path": "$.notsofoo.*[?(@.baz)].baz"
     }
     ensure_hypothesis_tolerance_is_valid(t)
     assert within_tolerance(
@@ -117,19 +117,19 @@ def test_tolerance_jsonpath_must_find_items_to_succeed():
 def test_tolerance_jsonpath_must_match_expected_value():
     t = {
         "type": "jsonpath",
-        "path": "foo.baz",
+        "path": "$.foo[?(@.baz)].baz",
         "expect": "hello"
     }
     ensure_hypothesis_tolerance_is_valid(t)
     assert within_tolerance(
         t, value={
             'foo': {"baz": "hello"}
-        }, 
+        }
     ) is True
 
     t = {
         "type": "jsonpath",
-        "path": "foo.baz",
+        "path": "$.foo[?(@.baz)].baz",
         "expect": ["hello", "bonjour"]
     }
     ensure_hypothesis_tolerance_is_valid(t)
@@ -140,10 +140,36 @@ def test_tolerance_jsonpath_must_match_expected_value():
     ) is True
 
 
+def test_tolerance_jsonpath_can_be_filter_by_value():
+    t = {
+        "type": "jsonpath",
+        "path": '$.foo[?(@.baz="hello")]',
+        "count": 1
+    }
+    ensure_hypothesis_tolerance_is_valid(t)
+    assert within_tolerance(
+        t, value={
+            'foo': {"baz": "hello"}
+        }
+    ) is True
+
+    t = {
+        "type": "jsonpath",
+        "path": '$.foo[?(@.baz="bonjour")]',
+        "count": 1
+    }
+    ensure_hypothesis_tolerance_is_valid(t)
+    assert within_tolerance(
+        t, value={
+            'foo': {"baz": "hello"}
+        }
+    ) is False
+
+
 def test_tolerance_jsonpath_must_match_expected_values():
     t = {
         "type": "jsonpath",
-        "path": "foo[*].baz",
+        "path": "$.foo.*[?(@.baz)].baz",
         "expect": ["hello", "bonjour"]
     }
     ensure_hypothesis_tolerance_is_valid(t)
@@ -157,7 +183,7 @@ def test_tolerance_jsonpath_must_match_expected_values():
 def test_tolerance_jsonpath_must_find_items_with_a_given_value_to_succeed():
     t = {
         "type": "jsonpath",
-        "path": "foo[?baz=2]",
+        "path": '$.foo.*[?(@.baz=2)]',
         "count": 1
     }
     ensure_hypothesis_tolerance_is_valid(t)
@@ -168,18 +194,18 @@ def test_tolerance_jsonpath_must_find_items_with_a_given_value_to_succeed():
 
     t = {
         "type": "jsonpath",
-        "path": "foo[0].baz",
+        "path": "$.foo.*[?(@.baz)]",
         "count": 2
     }
     ensure_hypothesis_tolerance_is_valid(t)
     assert within_tolerance(
         t, value={
             'foo': [{'baz': 1}, {'baz': 2}]
-        }) is False
+        }) is True
 
     t = {
         "type": "jsonpath",
-        "path": "foo[?baz=4]",
+        "path": "$.foo.*[?(@.baz=4)]",
         "count": 2
     }
     ensure_hypothesis_tolerance_is_valid(t)
@@ -192,7 +218,7 @@ def test_tolerance_jsonpath_must_find_items_with_a_given_value_to_succeed():
 def test_tolerance_jsonpath_from_jsonstring():
     t = {
         "type": "jsonpath",
-        "path": "foo[*].baz"
+        "path": "$.foo[*].baz"
     }
     ensure_hypothesis_tolerance_is_valid(t)
     assert within_tolerance(
@@ -202,7 +228,7 @@ def test_tolerance_jsonpath_from_jsonstring():
 def test_tolerance_jsonpath_from_bytes():
     t = {
         "type": "jsonpath",
-        "path": "foo[*].baz"
+        "path": "$.foo[*].baz"
     }
     ensure_hypothesis_tolerance_is_valid(t)
     assert within_tolerance(
@@ -358,7 +384,7 @@ def test_tolerance_unsupported_type():
     assert "tolerance type 'boom' is unsupported" in str(e)
 
 
-def test_tolerance_unsupported_type():
+def test_tolerance_missing_jsonpath_backend():
     from chaoslib import hypothesis
     hypothesis.HAS_JSONPATH = False
     with pytest.raises(InvalidActivity) as e:
@@ -367,7 +393,7 @@ def test_tolerance_unsupported_type():
             "path": "whatever"
         })
     hypothesis.HAS_JSONPATH = True
-    assert "Install the `jsonpath_ng` package to use a JSON path" in str(e)
+    assert "Install the `jsonpath2` package to use a JSON path" in str(e)
 
 
 def test_tolerance_range_integer():
