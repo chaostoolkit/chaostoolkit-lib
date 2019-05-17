@@ -4,6 +4,11 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.4.0...HEAD
 
+### Changed
+
+- Fix `expect` validation when the value is a scalar rather than a sequence.
+
+
 ## [1.4.0][] - 2019-05-16
 
 [1.4.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.3.1...1.4.0

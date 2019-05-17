@@ -315,19 +315,15 @@ def _(tolerance: dict, value: Any, configuration: Configuration = None,
             except json.decoder.JSONDecodeError:
                 pass
 
-        values = list(
-            map(lambda match_data: match_data.current_value, px.match(value))
-        )
-
+        values = list(map(lambda m: m.current_value, px.match(value)))
         result = len(values) > 0
-
         if count_value is not None:
             result = len(values) == count_value
 
+        expect = tolerance.get("expect")
         if "expect" in tolerance:
-            expect = tolerance["expect"]
-            if isinstance(expect, str) or len(values) == 1:
-                result = values[0] == expect
+            if not isinstance(expect, list):
+                result = values == [expect]
             else:
                 result = values == expect
 
