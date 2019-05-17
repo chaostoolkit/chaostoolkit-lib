@@ -7,7 +7,8 @@
 ### Changed
 
 - Fix `expect` validation when the value is a scalar rather than a sequence.
-
+- Controls inheritance was getting too greedy because we were extending the
+  same list over and over again.
 
 ## [1.4.0][] - 2019-05-16
 

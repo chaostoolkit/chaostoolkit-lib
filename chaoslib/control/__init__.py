@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
-from copy import deepcopy
+from copy import copy, deepcopy
 from typing import List, Union
 
 from logzero import logger
@@ -266,7 +266,7 @@ def get_context_controls(level: str, experiment: Experiment,
     """
     glbl_controls = get_global_controls()
     top_level_controls = experiment.get("controls", [])
-    controls = context.get("controls", [])
+    controls = copy(context.get("controls", []))
     controls.extend(glbl_controls)
 
     # do we even have something at the top level to be merged?
@@ -287,7 +287,7 @@ def get_context_controls(level: str, experiment: Experiment,
             if c.get("automatic", True)
         ]
 
-    for c in controls.copy():
+    for c in controls:
         if "ref" in c:
             for top_level_control in top_level_controls:
                 if c["ref"] == top_level_control["name"]:
