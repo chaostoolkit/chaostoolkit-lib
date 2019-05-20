@@ -261,6 +261,35 @@ ExperimentWithControls["controls"] = [
     }
 ]
 
+ExperimentWithArgumentsControls = deepcopy(ExperimentNoControls)
+ExperimentWithArgumentsControls["controls"] = [
+    {
+        "name": "dummy",
+        "provider": {
+            "type": "python",
+            "module": "fixtures.controls.dummy_args_in_control_init",
+            "arguments": {
+                "joke": "onyou"
+            }
+        }
+    }
+]
+
+
+ExperimentWithUnexpectedArgumentsControls = deepcopy(ExperimentNoControls)
+ExperimentWithUnexpectedArgumentsControls["controls"] = [
+    {
+        "name": "dummy",
+        "provider": {
+            "type": "python",
+            "module": "fixtures.controls.dummy",
+            "arguments": {
+                "joke": "onyou"
+            }
+        }
+    }
+]
+
 ExperimentUsingConfigToConfigureControls = deepcopy(ExperimentNoControls)
 ExperimentUsingConfigToConfigureControls["configuration"] = {
     "dummy-key": "blah blah"

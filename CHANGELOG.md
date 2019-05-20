@@ -9,6 +9,9 @@
 - Fix `expect` validation when the value is a scalar rather than a sequence.
 - Controls inheritance was getting too greedy because we were extending the
   same list over and over again.
+- Prevent control initializations' failure to bubble up
+- Pass arguments to control initialization function when declared
+
 
 ## [1.4.0][] - 2019-05-16
 

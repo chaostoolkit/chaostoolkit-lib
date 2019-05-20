@@ -38,7 +38,8 @@ def initialize_control(control: Control, experiment: Experiment,
     if not func:
         return
 
-    arguments = {}
+    provider = control["provider"]
+    arguments = deepcopy(provider.get("arguments", {}))
     sig = inspect.signature(func)
 
     if "experiment" in sig.parameters:

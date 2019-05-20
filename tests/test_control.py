@@ -480,3 +480,16 @@ def test_control_must_not_rest_state_before_calling_the_after_side():
 
     assert "after_experiment_control" in journal
     assert journal["after_experiment_control"] == True
+
+
+def test_controls_can_take_arguments_at_initialization():
+    exp = deepcopy(experiments.ExperimentWithArgumentsControls)
+    initialize_controls(exp)
+    assert exp["joke"] == "onyou"
+
+
+def test_controls_not_registered_when_passed_unexpected_args():
+    exp = deepcopy(experiments.ExperimentWithUnexpectedArgumentsControls)
+    initialize_controls(exp)
+
+    assert get_global_controls() == []

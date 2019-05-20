@@ -49,7 +49,14 @@ def initialize_controls(experiment: Experiment,
 
         provider = control.get("provider")
         if provider and provider["type"] == "python":
-            initialize_control(control, experiment, configuration, secrets)
+            try:
+                initialize_control(control, experiment, configuration, secrets)
+            except Exception:
+                logger.debug(
+                    "Control initialization '{}' failed. "
+                    "It will not be registered.".format(
+                        control['name']),
+                    exc_info=True)
 
 
 def cleanup_controls(experiment: Experiment):
