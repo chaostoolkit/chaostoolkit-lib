@@ -217,6 +217,8 @@ def run_experiment(experiment: Experiment,
                 try:
                     journal["run"] = apply_activities(
                         experiment, config, secrets, activity_pool, dry)
+                except InterruptExecution:
+                    raise
                 except Exception:
                     journal["status"] = "aborted"
                     logger.fatal(

@@ -11,7 +11,7 @@
   same list over and over again.
 - Prevent control initializations' failure to bubble up
 - Pass arguments to control initialization function when declared
-
+- Interrupt nicely the experiment from control at the activity level
 
 ## [1.4.0][] - 2019-05-16
 
