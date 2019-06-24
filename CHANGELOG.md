@@ -12,6 +12,7 @@
 - Prevent control initializations' failure to bubble up
 - Pass arguments to control initialization function when declared
 - Interrupt nicely the experiment from control at the activity level
+- Added support for probes in configuration
 
 ## [1.4.0][] - 2019-05-16
 
@@ -51,7 +52,7 @@
 
 ### Changed
 
-- Fix to ensure a control's `configuration` parameter is populated when it the 
+- Fix to ensure a control's `configuration` parameter is populated when it the
   control is being `configured` [#114][114]
 - Load and apply global controls, those declared in the settings, from the
   `run_experiment` function rather than out of band [#116][116]
@@ -118,7 +119,7 @@
 #### Added
 
 - a new tolerance type called `range` to support scenarios such as:
-  
+
   value type is:
   ```
   {
@@ -483,7 +484,7 @@
 
 ### Changed
 
--   Log a message when loading the configuration 
+-   Log a message when loading the configuration
 -   Raise `InvalidExperiment` when a configuration or secret references a key
     in the environment and that key does not exist (it may not be set however)
     [#40][40]. This bails the experiment at validation time so before it runs.
