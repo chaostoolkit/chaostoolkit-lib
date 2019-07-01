@@ -13,7 +13,7 @@ from chaoslib.types import Discovery, DiscoveredActivities, \
 def test_fail_discovery_when_module_cannot_be_loaded():
     with pytest.raises(DiscoveryFailed) as exc:
         discover_activities("fixtures.burp", "probe")
-    assert "could not import extension module" in str(exc)
+    assert "could not import extension module" in str(exc.value)
 
 
 def test_do_not_fail_when_extension_mod_has_not_all():

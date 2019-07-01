@@ -22,7 +22,7 @@ from fixtures import config, experiments
 def test_empty_experiment_is_invalid():
     with pytest.raises(InvalidExperiment) as exc:
         ensure_experiment_is_valid(experiments.EmptyExperiment)
-    assert "an empty experiment is not an experiment" in str(exc)
+    assert "an empty experiment is not an experiment" in str(exc.value)
 
 
 def test_load_yaml():
@@ -60,33 +60,33 @@ def test_unknown_extension():
     with tempfile.NamedTemporaryFile(suffix=".txt") as f:
         with pytest.raises(InvalidExperiment) as x:
             load_experiment(f.name)
-        assert "json, yaml or yml extensions are supported" in str(x)
+        assert "json, yaml or yml extensions are supported" in str(x.value)
 
 
 def test_experiment_must_have_a_method():
     with pytest.raises(InvalidExperiment) as exc:
         ensure_experiment_is_valid(experiments.MissingMethodExperiment)
     assert "an experiment requires a method with "\
-           "at least one activity" in str(exc)
+           "at least one activity" in str(exc.value)
 
 
 def test_experiment_must_have_at_least_one_step():
     with pytest.raises(InvalidExperiment) as exc:
         ensure_experiment_is_valid(experiments.NoStepsMethodExperiment)
     assert "an experiment requires a method with "\
-           "at least one activity" in str(exc)
+           "at least one activity" in str(exc.value)
 
 
 def test_experiment_must_have_a_title():
     with pytest.raises(InvalidExperiment) as exc:
         ensure_experiment_is_valid(experiments.MissingTitleExperiment)
-    assert "experiment requires a title" in str(exc)
+    assert "experiment requires a title" in str(exc.value)
 
 
 def test_experiment_must_have_a_description():
     with pytest.raises(InvalidExperiment) as exc:
         ensure_experiment_is_valid(experiments.MissingDescriptionExperiment)
-    assert "experiment requires a description" in str(exc)
+    assert "experiment requires a description" in str(exc.value)
 
 
 def test_experiment_may_not_have_a_hypothesis():
@@ -97,13 +97,13 @@ def test_experiment_may_not_have_a_hypothesis():
 def test_experiment_hypothesis_must_have_a_title():
     with pytest.raises(InvalidExperiment) as exc:
         ensure_experiment_is_valid(experiments.MissingHypothesisTitleExperiment)
-    assert "hypothesis requires a title" in str(exc)
+    assert "hypothesis requires a title" in str(exc.value)
 
 
 def test_experiment_hypothesis_must_have_a_valid_probe():
     with pytest.raises(InvalidActivity) as exc:
         ensure_experiment_is_valid(experiments.ExperimentWithInvalidHypoProbe)
-    assert "required argument 'path' is missing from activity" in str(exc)
+    assert "required argument 'path' is missing from activity" in str(exc.value)
 
 
 def test_valid_experiment():
@@ -218,7 +218,7 @@ def test_should_bail_experiment_when_env_was_not_found():
     with pytest.raises(InvalidExperiment) as x:
         run_experiment(experiment)
     assert "Configuration makes reference to an environment key that does " \
-           "not exist" in str(x)
+           "not exist" in str(x.value)
 
 def test_validate_all_tolerance_probes():
     with requests_mock.mock() as m:

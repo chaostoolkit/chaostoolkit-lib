@@ -266,7 +266,7 @@ def test_tolerance_jsonpath_cannot_be_empty():
         "path": ""
     }
 
-    with pytest.raises(InvalidActivity) as e:
+    with pytest.raises(InvalidActivity):
         ensure_hypothesis_tolerance_is_valid(t)
 
 
@@ -378,7 +378,7 @@ def test_tolerance_regex_must_have_a_pattern():
             "type": "regex",
             "target": "stdout"
         })
-    assert "tolerance must have a `pattern` key" in str(e)
+    assert "tolerance must have a `pattern` key" in str(e.value)
 
 
 def test_tolerance_regex_must_have_a_valid_pattern_type():
@@ -388,7 +388,7 @@ def test_tolerance_regex_must_have_a_valid_pattern_type():
             "target": "stdout",
             "pattern": None
         })
-    assert "tolerance pattern None has an invalid type" in str(e)
+    assert "tolerance pattern None has an invalid type" in str(e.value)
 
 
 def test_tolerance_regex_must_have_a_valid_pattern():
@@ -398,7 +398,7 @@ def test_tolerance_regex_must_have_a_valid_pattern():
             "target": "stdout",
             "pattern": "[0-9"
         })
-    assert "pattern [0-9 seems invalid" in str(e)
+    assert "pattern [0-9 seems invalid" in str(e.value)
 
 
 def test_tolerance_unsupported_type():
@@ -406,7 +406,7 @@ def test_tolerance_unsupported_type():
         ensure_hypothesis_tolerance_is_valid({
             "type": "boom"
         })
-    assert "tolerance type 'boom' is unsupported" in str(e)
+    assert "tolerance type 'boom' is unsupported" in str(e.value)
 
 
 def test_tolerance_missing_jsonpath_backend():
@@ -418,7 +418,7 @@ def test_tolerance_missing_jsonpath_backend():
             "path": "whatever"
         })
     hypothesis.HAS_JSONPATH = True
-    assert "Install the `jsonpath2` package to use a JSON path" in str(e)
+    assert "Install the `jsonpath2` package to use a JSON path" in str(e.value)
 
 
 def test_tolerance_range_integer():

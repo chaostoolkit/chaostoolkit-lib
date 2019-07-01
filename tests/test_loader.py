@@ -21,7 +21,7 @@ def test_load_from_file(generic_experiment: str):
 def test_load_invalid_filepath(generic_experiment: str):
     with pytest.raises(InvalidSource) as x:
         load_experiment("/tmp/xyuzye.txt")
-    assert 'Path "/tmp/xyuzye.txt" does not exist.' in str(x)
+    assert 'Path "/tmp/xyuzye.txt" does not exist.' in str(x.value)
 
 
 def test_load_from_http_without_auth(generic_experiment: str):
@@ -40,7 +40,7 @@ def test_load_from_http_without_auth(generic_experiment: str):
 def test_load_from_http_with_missing_auth(generic_experiment: str):
     with requests_mock.mock() as m:
         m.get('http://example.com/experiment.json', status_code=401)
-        with pytest.raises(InvalidSource) as x:
+        with pytest.raises(InvalidSource):
             load_experiment('http://example.com/experiment.json')
 
 

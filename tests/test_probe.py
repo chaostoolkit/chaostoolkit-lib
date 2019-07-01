@@ -17,74 +17,74 @@ from fixtures import config, experiments, probes
 def test_empty_probe_is_invalid():
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.EmptyProbe)
-    assert "empty activity is no activity" in str(exc)
+    assert "empty activity is no activity" in str(exc.value)
 
 
 def test_probe_must_have_a_type():
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.MissingTypeProbe)
-    assert "an activity must have a type" in str(exc)
+    assert "an activity must have a type" in str(exc.value)
 
 
 def test_probe_must_have_a_known_type():
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.UnknownTypeProbe)
-    assert "'whatever' is not a supported activity type" in str(exc)
+    assert "'whatever' is not a supported activity type" in str(exc.value)
 
 
 def test_probe_provider_must_have_a_known_type():
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.UnknownProviderTypeProbe)
-    assert "unknown provider type 'pizza'" in str(exc)
+    assert "unknown provider type 'pizza'" in str(exc.value)
 
 
 def test_python_probe_must_have_a_module_path():
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.MissingModuleProbe)
-    assert "a Python activity must have a module path" in str(exc)
+    assert "a Python activity must have a module path" in str(exc.value)
 
 
 def test_python_probe_must_have_a_function_name():
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.MissingFunctionProbe)
-    assert "a Python activity must have a function name" in str(exc)
+    assert "a Python activity must have a function name" in str(exc.value)
 
 
 def test_python_probe_must_be_importable():
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.NotImportableModuleProbe)
-    assert "could not find Python module 'fake.module'" in str(exc)
+    assert "could not find Python module 'fake.module'" in str(exc.value)
 
 
 def test_python_probe_func_must_have_enough_args():
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.MissingFuncArgProbe)
-    assert "required argument 'path' is missing" in str(exc)
+    assert "required argument 'path' is missing" in str(exc.value)
 
 
 def test_python_probe_func_cannot_have_too_many_args():
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.TooManyFuncArgsProbe)
     assert "argument 'should_not_be_here' is not part of the " \
-           "function signature" in str(exc)
+           "function signature" in str(exc.value)
 
 
 def test_process_probe_have_a_path():
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.MissingProcessPathProbe)
-    assert "a process activity must have a path" in str(exc)
+    assert "a process activity must have a path" in str(exc.value)
 
 
 def test_process_probe_path_must_exist():
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.ProcessPathDoesNotExistProbe)
-    assert "path 'None' cannot be found, in activity" in str(exc)
+    assert "path 'None' cannot be found, in activity" in str(exc.value)
 
 
 def test_http_probe_must_have_a_url():
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.MissingHTTPUrlProbe)
-    assert "a HTTP activity must have a URL" in str(exc)
+    assert "a HTTP activity must have a URL" in str(exc.value)
 
 
 def test_run_python_probe_should_return_raw_value():
@@ -135,7 +135,7 @@ def test_run_process_probe_can_timeout():
         run_activity(
             probes.ProcProbe, config.EmptyConfig, 
             experiments.Secrets).decode("utf-8")
-    assert "activity took too long to complete" in str(exc)
+    assert "activity took too long to complete" in str(exc.value)
 
 
 def test_run_http_probe_should_return_parsed_json_value():
