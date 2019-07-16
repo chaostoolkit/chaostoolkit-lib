@@ -210,6 +210,18 @@ PythonModuleProbeWithHTTPBodyTolerance = {
     }
 }
 
+PythonModuleProbeWithHTTPMaxRetries = {
+    "type": "probe",
+    "name": "A dummy tolerance ready probe",
+    "tolerance": [200],
+    "provider": {
+        "type": "http",
+        "url": "http://localhost:{}",
+        "timeout": 10,
+        "max_retries": 1
+    }
+}
+
 PythonModuleProbeWithProcessStatusTolerance = {
     "type": "probe",
     "name": "A dummy tolerance ready probe",
