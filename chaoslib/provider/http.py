@@ -34,6 +34,7 @@ def run_http_activity(activity: Activity, configuration: Configuration,
     timeout = provider.get("timeout", None)
     arguments = provider.get("arguments", None)
     verify_tls = provider.get("verify_tls", True)
+    max_retries = provider.get("max_retries", 0)
 
     if arguments and (configuration or secrets):
         arguments = substitute(arguments, configuration, secrets)
@@ -42,17 +43,21 @@ def run_http_activity(activity: Activity, configuration: Configuration,
         timeout = tuple(timeout)
 
     try:
+        s = requests.Session()
+        a = requests.adapters.HTTPAdapter(max_retries=max_retries)
+        s.mount("http://", a)
+        s.mount("https://", a)
         if method == "GET":
-            r = requests.get(
+            r = s.get(
                 url, params=arguments, headers=headers, timeout=timeout,
                 verify=verify_tls)
         else:
             if headers and headers.get("Content-Type") == "application/json":
-                r = requests.request(
+                r = s.request(
                     method, url, json=arguments, headers=headers,
                     timeout=timeout, verify=verify_tls)
             else:
-                r = requests.request(
+                r = s.request(
                     method, url, data=arguments, headers=headers,
                     timeout=timeout, verify=verify_tls)
 

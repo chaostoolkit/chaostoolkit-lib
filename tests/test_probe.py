@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 import json
 import sys
-import warnings
+import socket
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from threading import Thread
 
 import pytest
 import requests_mock
 
 from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.activity import ensure_activity_is_valid, run_activity
-from chaoslib.provider import process as chaoslib_process
-from chaoslib.types import Probe
 
 from fixtures import config, experiments, probes
 
@@ -133,7 +133,7 @@ def test_run_process_probe_can_timeout():
 
     with pytest.raises(ActivityFailed) as exc:
         run_activity(
-            probes.ProcProbe, config.EmptyConfig, 
+            probes.ProcProbe, config.EmptyConfig,
             experiments.Secrets).decode("utf-8")
     assert "activity took too long to complete" in str(exc.value)
 
@@ -179,3 +179,47 @@ def test_run_http_probe_can_expect_failure():
             run_activity(probe, config.EmptyConfig, experiments.Secrets)
         except ActivityFailed:
             pytest.fail("activity should not have failed")
+
+
+def test_run_http_probe_can_retry():
+    """
+    this test embeds a fake HTTP server to test the retry part
+    it can't be easily tested with libraries like requests_mock or responses
+    we could mock urllib3 retry mechanism as it is used in the requests library but it implies to
+    understand how requests works which is not the idea of this test
+
+    in this test, the first call will lead to a ConnectionAbortedError and the second will work
+    """
+    class MockServerRequestHandler(BaseHTTPRequestHandler):
+        """
+        mock of a real HTTP server to simulate the behavior of
+        a connection aborted error on first call
+        """
+        call_count = 0
+        def do_GET(self):
+            MockServerRequestHandler.call_count += 1
+            if MockServerRequestHandler.call_count == 1:
+                raise ConnectionAbortedError
+            self.send_response(200)
+            self.end_headers()
+            return
+
+    # get a free port to listen on
+    s = socket.socket(socket.AF_INET, type=socket.SOCK_STREAM)
+    s.bind(('localhost', 0))
+    address, port = s.getsockname()
+    s.close()
+
+    # start the fake HTTP server in a dedicated thread on the selected port
+    server = HTTPServer(('localhost', port), MockServerRequestHandler)
+    t = Thread(target=server.serve_forever)
+    t.setDaemon(True)
+    t.start()
+
+    # change probe URL to call the selected port
+    probe = probes.PythonModuleProbeWithHTTPMaxRetries.copy()
+    probe["provider"]["url"] = "http://localhost:{}".format(port)
+    try:
+        run_activity(probe, config.EmptyConfig, experiments.Secrets)
+    except ActivityFailed:
+        pytest.fail("activity should not have failed")

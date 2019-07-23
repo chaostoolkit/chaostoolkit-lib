@@ -6,6 +6,8 @@
 
 ## [1.5.0][] - 2019-07-01
 
+- Add the `max_retries` parameter to the HTTP provider
+
 [1.5.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.4.0...1.5.0
 
 ### Changed
