@@ -285,8 +285,11 @@ def _(tolerance: dict, value: Any, configuration: Configuration = None,
     if tolerance_type == "probe":
         tolerance["provider"]["arguments"]["value"] = value
         try:
-            run_activity(tolerance, configuration, secrets)
-            return True
+            rtn = run_activity(tolerance, configuration, secrets)
+            if rtn is False:
+                return False
+            else:
+                return True
         except ActivityFailed:
             return False
     elif tolerance_type == "regex":
