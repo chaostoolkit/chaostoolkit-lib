@@ -7,6 +7,10 @@
 ### Changed
 
 - Add the `max_retries` parameter to the HTTP provider
+- Changed nested tolerance Python probes to return `True` to the experiment in
+  case the nested probe returns an object or `True`, and to return `False` in
+  case of `None` or `False`. Before, `True` was returned every time except in case
+  of an `ActivityFailed` exception. [#128][128].
 
 ## [1.5.0][] - 2019-07-01
 

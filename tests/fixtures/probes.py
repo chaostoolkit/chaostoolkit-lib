@@ -366,3 +366,5 @@ BackgroundPythonModuleProbe = {
 def must_be_in_range(a: int, b: int, value: Any = None) -> bool:
     if not (a < int(value.get("body")) < b):
         raise ActivityFailed("body is not in expected range")
+    else:
+        return True
