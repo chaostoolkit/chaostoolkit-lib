@@ -286,10 +286,10 @@ def _(tolerance: dict, value: Any, configuration: Configuration = None,
         tolerance["provider"]["arguments"]["value"] = value
         try:
             rtn = run_activity(tolerance, configuration, secrets)
-            if rtn is False:
-                return False
-            else:
+            if rtn:
                 return True
+            else:
+                return False
         except ActivityFailed:
             return False
     elif tolerance_type == "regex":
