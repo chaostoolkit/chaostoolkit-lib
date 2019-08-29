@@ -4,6 +4,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.5.0...HEAD
 
+### Added
+
+- Two new control hook points before and after the experiment loading. These
+  hooks allow a control to perform certain operations before the experiment
+  is actually applied.
+
 ### Changed
 
 - Add the `max_retries` parameter to the HTTP provider

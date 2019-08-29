@@ -207,8 +207,8 @@ class Control:
 
 
 @contextmanager
-def controls(level: str, experiment: Experiment,
-             context: Union[Activity, Hypothesis, Experiment],
+def controls(level: str, experiment: Experiment = None,
+             context: Union[Activity, Hypothesis, Experiment, str] = None,
              configuration: Configuration = None, secrets: Secrets = None):
     """
     Context manager for a block that needs to be wrapped by controls.
@@ -261,8 +261,8 @@ def reset_global_controls():
     global_controls.clear()
 
 
-def get_context_controls(level: str, experiment: Experiment,
-                         context: Union[Activity, Experiment]) \
+def get_context_controls(level: str, experiment: Experiment = None,
+                         context: Union[Activity, Experiment] = None) \
                          -> List[Control]:
     """
     Get the controls at the given level by merging those declared at the
@@ -272,6 +272,9 @@ def get_context_controls(level: str, experiment: Experiment,
     top-level ine.
     """
     glbl_controls = get_global_controls()
+    if not experiment:
+        return glbl_controls
+
     top_level_controls = experiment.get("controls", [])
     controls = copy(context.get("controls", []))
     controls.extend(glbl_controls)
@@ -320,9 +323,10 @@ def apply_controls(level: str, experiment: Experiment,
     Apply the controls at given level
 
     The ̀ level` parameter is one of `"experiment", "hypothesis", "method",
-    "rollback", "activity"`. The `context` is usually an experiment except at
-    the `"activity"` when it must be an activity. The `scope` is one of
-    `"before", "after"` and the `state` is only set on `"after"` scope.
+    "rollback", "activity"` or `"loader"`. The `context` is usually an
+    experiment except at the `"activity"` when it must be an activity. The
+    `scope` is one of `"before", "after"` and the `state` is only set on
+    `"after"` scope.
     """
     settings = get_loaded_settings() or None
     controls = get_context_controls(level, experiment, context)

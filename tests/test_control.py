@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
 from concurrent.futures import ThreadPoolExecutor
+import json
 import os
 import tempfile
 from typing import Any, Dict, List
@@ -17,6 +18,7 @@ from chaoslib.control import initialize_controls, cleanup_controls, \
 from chaoslib.control.python import validate_python_control
 from chaoslib.exceptions import InterruptExecution, InvalidActivity
 from chaoslib.experiment import run_experiment
+from chaoslib.loader import load_experiment
 from chaoslib.types import Activity, Configuration, Control, \
     Experiment, Hypothesis, Journal, Run, Secrets,  Settings
 
@@ -493,3 +495,46 @@ def test_controls_not_registered_when_passed_unexpected_args():
     initialize_controls(exp)
 
     assert get_global_controls() == []
+
+
+def test_controls_on_loading_experiment():
+    initialize_global_controls({}, {}, {}, {
+        "controls": {
+            "dummy": {
+                "provider": {
+                    "type": "python",
+                    "module": "fixtures.controls.dummy_fail_loading_experiment"
+                }
+            }
+        }
+    })
+
+    with tempfile.NamedTemporaryFile(suffix=".json") as f:
+        try:
+            with pytest.raises(InterruptExecution):
+                load_experiment(f.name)
+        finally:
+            cleanup_global_controls()
+
+
+def test_controls_on_loaded_experiment():
+    initialize_global_controls({}, {}, {}, {
+        "controls": {
+            "dummy": {
+                "provider": {
+                    "type": "python",
+                    "module": "fixtures.controls.dummy_retitle_experiment_on_loading"
+                }
+            }
+        }
+    })
+
+    with tempfile.NamedTemporaryFile(suffix=".json") as f:
+        try:
+            f.write(
+                json.dumps(experiments.ExperimentNoControls).encode('utf-8'))
+            f.seek(0)
+            experiment = load_experiment(f.name)
+            assert experiment["title"] == "BOOM I changed it"
+        finally:
+            cleanup_global_controls()

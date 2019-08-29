@@ -25,6 +25,8 @@ _level_mapping = {
     "rollback-after": "after_rollback_control",
     "activity-before": "before_activity_control",
     "activity-after": "after_activity_control",
+    "loader-before": "before_loading_experiment_control",
+    "loader-after": "after_loading_experiment_control"
 }
 
 
@@ -87,7 +89,8 @@ def validate_python_control(control: Control):
                        "nonetheless.".format(mod=mod_name, name=name))
 
 
-def apply_python_control(level: str, control: Control, experiment: Experiment,
+def apply_python_control(level: str, control: Control,  # noqa: C901
+                         experiment: Experiment,
                          context: Union[Activity, Experiment],
                          state: Union[Journal, Run, List[Run]] = None,
                          configuration: Configuration = None,

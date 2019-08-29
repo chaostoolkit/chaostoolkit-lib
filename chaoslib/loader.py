@@ -12,6 +12,7 @@ try:
 except ImportError:
     import json
 
+from chaoslib.control import controls
 from chaoslib.exceptions import InvalidExperiment
 from chaoslib.types import Experiment, Settings
 
@@ -79,33 +80,38 @@ def load_experiment(experiment_source: str,
         value: UIY
     ```
     """
-    if os.path.exists(experiment_source):
-        return parse_experiment_from_file(experiment_source)
+    with controls(level="loader", context=experiment_source) as control:
+        if os.path.exists(experiment_source):
+            parsed = parse_experiment_from_file(experiment_source)
+            control.with_state(parsed)
+            return parsed
 
-    p = urlparse(experiment_source)
-    if not p.scheme and not os.path.exists(p.path):
-        raise InvalidSource('Path "{}" does not exist.'.format(p.path))
+        p = urlparse(experiment_source)
+        if not p.scheme and not os.path.exists(p.path):
+            raise InvalidSource('Path "{}" does not exist.'.format(p.path))
 
-    if p.scheme not in ("http", "https"):
-        raise InvalidSource(
-            "'{}' is not a supported source scheme.".format(p.scheme))
+        if p.scheme not in ("http", "https"):
+            raise InvalidSource(
+                "'{}' is not a supported source scheme.".format(p.scheme))
 
-    headers = {
-        "Accept": "application/json, application/x-yaml"
-    }
-    if settings:
-        auths = settings.get("auths", [])
-        for domain in auths:
-            if domain == p.netloc:
-                auth = auths[domain]
-                headers["Authorization"] = '{} {}'.format(
-                    auth["type"], auth["value"])
-                break
+        headers = {
+            "Accept": "application/json, application/x-yaml"
+        }
+        if settings:
+            auths = settings.get("auths", [])
+            for domain in auths:
+                if domain == p.netloc:
+                    auth = auths[domain]
+                    headers["Authorization"] = '{} {}'.format(
+                        auth["type"], auth["value"])
+                    break
 
-    r = requests.get(experiment_source, headers=headers)
-    if r.status_code != 200:
-        raise InvalidSource(
-            "Failed to fetch the experiment: {}".format(r.text))
+        r = requests.get(experiment_source, headers=headers)
+        if r.status_code != 200:
+            raise InvalidSource(
+                "Failed to fetch the experiment: {}".format(r.text))
 
-    logger.debug("Fetched experiment: \n{}".format(r.text))
-    return parse_experiment_from_http(r)
+        logger.debug("Fetched experiment: \n{}".format(r.text))
+        parsed = parse_experiment_from_http(r)
+        control.with_state(parsed)
+        return parsed
