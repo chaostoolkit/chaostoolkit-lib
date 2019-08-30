@@ -9,8 +9,10 @@ import requests
 import yaml
 try:
     import simplejson as json
+    from simplejson.errors import JSONDecodeError
 except ImportError:
     import json
+    from json.decoder import JSONDecodeError
 
 from chaoslib.control import controls
 from chaoslib.exceptions import InvalidExperiment

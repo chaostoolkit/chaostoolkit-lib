@@ -14,7 +14,8 @@ import pytest
 from chaoslib.activity import execute_activity
 from chaoslib.control import initialize_controls, cleanup_controls, \
     validate_controls, controls, get_all_activities, get_context_controls, \
-    initialize_global_controls, cleanup_global_controls, get_global_controls
+    initialize_global_controls, cleanup_global_controls, get_global_controls, \
+    load_global_controls
 from chaoslib.control.python import validate_python_control
 from chaoslib.exceptions import InterruptExecution, InvalidActivity
 from chaoslib.experiment import run_experiment
@@ -288,7 +289,7 @@ def test_load_global_controls_from_settings():
         assert "after_activity_control" not in activity
 
     assert get_global_controls() == []
-    run_experiment(exp, settings={
+    settings = {
         "dummy-key": "hello there",
         "controls": {
             "dummy": {
@@ -298,7 +299,9 @@ def test_load_global_controls_from_settings():
                 }
             }
         }
-    })
+    }
+    load_global_controls(settings)
+    run_experiment(exp, settings)
     assert get_global_controls() == []
     assert exp["control-value"] == "hello there"
 
@@ -312,7 +315,7 @@ def test_load_global_controls_from_settings():
 def test_get_globally_loaded_controls_from_settings():
     assert get_global_controls() == []
 
-    initialize_global_controls({}, {}, {}, {
+    settings = {
         "controls": {
             "dummy": {
                 "provider": {
@@ -321,7 +324,9 @@ def test_get_globally_loaded_controls_from_settings():
                 }
             }
         }
-    })
+    }
+    load_global_controls(settings)
+    initialize_global_controls({}, {}, {}, settings)
 
     try:
         ctrls = get_global_controls()
@@ -343,7 +348,7 @@ def test_load_global_controls_from_settings_configured_via_exp_config():
         assert "after_activity_control" not in activity
 
     assert get_global_controls() == []
-    run_experiment(exp, settings={
+    settings = {
         "controls": {
             "dummy": {
                 "provider": {
@@ -352,7 +357,9 @@ def test_load_global_controls_from_settings_configured_via_exp_config():
                 }
             }
         }
-    })
+    }
+    load_global_controls(settings)
+    run_experiment(exp, settings)
     assert get_global_controls() == []
     assert exp["control-value"] == "blah blah"
 
@@ -376,7 +383,7 @@ def test_apply_controls_even_on_background_activity():
         assert "after_activity_control" not in activity
 
     assert get_global_controls() == []
-    run_experiment(exp, settings={
+    settings = {
         "dummy-key": "hello there",
         "controls": {
             "dummy": {
@@ -386,7 +393,9 @@ def test_apply_controls_even_on_background_activity():
                 }
             }
         }
-    })
+    }
+    load_global_controls(settings)
+    run_experiment(exp, settings)
     assert get_global_controls() == []
     assert exp["control-value"] == "hello there"
 
@@ -435,7 +444,7 @@ def test_control_initialization_cannot_fail_the_experiment():
 
 def test_control_failing_its_initialization_must_not_be_registered():
     exp = deepcopy(experiments.ExperimentNoControls)
-    run_experiment(exp, settings={
+    settings = {
         "dummy-key": "hello there",
         "controls": {
             "dummy-failed": {
@@ -451,7 +460,9 @@ def test_control_failing_its_initialization_must_not_be_registered():
                 }
             }
         }
-    })
+    }
+    load_global_controls(settings)
+    run_experiment(exp, settings)
 
     assert "should_never_been_called" not in exp
 
@@ -465,7 +476,7 @@ def test_control_failing_its_initialization_must_not_be_registered():
 
 def test_control_must_not_rest_state_before_calling_the_after_side():
     exp = deepcopy(experiments.ExperimentNoControlsWithDeviation)
-    journal = run_experiment(exp, settings={
+    settings = {
         "controls": {
             "dummy": {
                 "provider": {
@@ -474,7 +485,9 @@ def test_control_must_not_rest_state_before_calling_the_after_side():
                 }
             }
         }
-    })
+    }
+    load_global_controls(settings)
+    journal = run_experiment(exp, settings)
 
     before_hypo_result = journal["steady_states"]["before"]
     assert "after_hypothesis_control" in before_hypo_result
@@ -498,7 +511,7 @@ def test_controls_not_registered_when_passed_unexpected_args():
 
 
 def test_controls_on_loading_experiment():
-    initialize_global_controls({}, {}, {}, {
+    settings = {
         "controls": {
             "dummy": {
                 "provider": {
@@ -507,7 +520,9 @@ def test_controls_on_loading_experiment():
                 }
             }
         }
-    })
+    }
+    load_global_controls(settings)
+    initialize_global_controls({}, {}, {}, settings)
 
     with tempfile.NamedTemporaryFile(suffix=".json") as f:
         try:
@@ -518,7 +533,7 @@ def test_controls_on_loading_experiment():
 
 
 def test_controls_on_loaded_experiment():
-    initialize_global_controls({}, {}, {}, {
+    settings = {
         "controls": {
             "dummy": {
                 "provider": {
@@ -527,7 +542,9 @@ def test_controls_on_loaded_experiment():
                 }
             }
         }
-    })
+    }
+    load_global_controls(settings)
+    initialize_global_controls({}, {}, {}, settings)
 
     with tempfile.NamedTemporaryFile(suffix=".json") as f:
         try:

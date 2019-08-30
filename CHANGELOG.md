@@ -17,6 +17,12 @@
   case the nested probe returns an object or `True`, and to return `False` in
   case of `None` or `False`. Before, `True` was returned every time except in case
   of an `ActivityFailed` exception. [#128][128].
+- Global Python controls are now imported from a specific function called
+  `load_global_controls(settings: Settings)`. The reason from loading them
+  separately is so that we can have them declared, and registered, as soon
+  as we can. Before, they were loaded when the experiments started to be
+  executed. Now, we can also run controls when we read the experiment itself,
+  which wasn't possible before.
 
 ## [1.5.0][] - 2019-07-01
 

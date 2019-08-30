@@ -6,7 +6,7 @@ from typing import List, Union
 from logzero import logger
 
 from chaoslib.control.python import apply_python_control, cleanup_control, \
-    initialize_control, validate_python_control
+    initialize_control, validate_python_control, import_control
 from chaoslib.exceptions import InterruptExecution, InvalidControl
 from chaoslib.settings import get_loaded_settings
 from chaoslib.types import Settings
@@ -16,7 +16,7 @@ from chaoslib.types import Activity, Configuration, Control as ControlType, \
 
 __all__ = ["controls", "initialize_controls", "cleanup_controls",
            "validate_controls", "Control", "initialize_global_controls",
-           "cleanup_global_controls"]
+           "cleanup_global_controls", "load_global_controls"]
 
 # Should this be protected in some fashion? chaoslib isn't meant to be used
 # concurrently so there is little promise we can support several instances
@@ -127,12 +127,12 @@ def initialize_global_controls(experiment: Experiment,
     """
     Load and initialize controls declared in the settings.
 
-    Notice, if a control fails during its initialization, it is not registered
-    at all and will not be applied throughout the experiment.
+    Notice, if a control fails during its initialization, it is deregistered
+    and will not be applied throughout the experiment.
     """
-    controls = []
-    for name, control in settings.get("controls", {}).items():
-        control['name'] = name
+    controls = get_global_controls()[:]
+    for control in get_global_controls():
+        name = control['name']
         logger.debug("Initializing global control '{}'".format(name))
 
         provider = control.get("provider")
@@ -148,7 +148,28 @@ def initialize_global_controls(experiment: Experiment,
                     "It will not be registered.".format(
                         control['name']),
                     exc_info=True)
-                # we don't use a control that failed its initialization
+                controls.remove(control)
+    set_global_controls(controls)
+
+
+def load_global_controls(settings: Settings):
+    """
+    Import all controls declared in the settings and global to all experiments.
+
+    This is called as early as possible, even before we loaded the experiment
+    so the loaders controls have a chance to be applied. It does not perform
+    any specific initialization yet, it only tries to load the controls
+    declared in the settings.
+    """
+    controls = []
+    for name, control in settings.get("controls", {}).items():
+        control['name'] = name
+        logger.debug("Loading global control '{}'".format(name))
+
+        provider = control.get("provider")
+        if provider and provider["type"] == "python":
+            mod = import_control(control)
+            if not mod:
                 continue
 
         controls.append(control)

@@ -2,7 +2,7 @@
 from copy import deepcopy
 import importlib
 import inspect
-from typing import Callable, List, Union
+from typing import Any, Callable, List, Optional, Union
 
 from logzero import logger
 
@@ -13,7 +13,7 @@ from chaoslib.types import Activity, Configuration, Control, Experiment, \
 
 
 __all__ = ["apply_python_control", "cleanup_control", "initialize_control",
-           "validate_python_control"]
+           "validate_python_control", "import_control"]
 _level_mapping = {
     "experiment-before": "before_experiment_control",
     "experiment-after": "after_experiment_control",
@@ -28,6 +28,20 @@ _level_mapping = {
     "loader-before": "before_loading_experiment_control",
     "loader-after": "after_loading_experiment_control"
 }
+
+
+def import_control(control: Control) -> Optional[Any]:
+    """
+    Import the module implementing a control.
+    """
+    provider = control["provider"]
+    mod_path = provider["module"]
+    try:
+        return importlib.import_module(mod_path)
+    except ImportError:
+        logger.debug(
+            "Control module '{}' could not be loaded. "
+            "Have you installed it?".format(mod_path))
 
 
 def initialize_control(control: Control, experiment: Experiment,
@@ -137,20 +151,15 @@ def apply_python_control(level: str, control: Control,  # noqa: C901
 # Internals
 ###############################################################################
 def load_func(control: Control, func_name: str) -> Callable:
-    provider = control["provider"]
-    mod_path = provider["module"]
-    try:
-        mod = importlib.import_module(mod_path)
-    except ImportError:
-        logger.debug(
-            "Control module '{}' could not be loaded. "
-            "Have you installed it?".format(mod_path))
+    mod = import_control(control)
+    if not mod:
         return
+
     func = getattr(mod, func_name, None)
     if not func:
         logger.debug(
             "Control module '{}' does not declare '{}'".format(
-                mod_path, func_name
+                mod.__file__, func_name
             ))
         return
 
