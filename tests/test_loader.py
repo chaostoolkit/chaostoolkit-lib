@@ -4,7 +4,7 @@ import pytest
 import requests_mock
 import tempfile
 
-from chaoslib.exceptions import InvalidSource
+from chaoslib.exceptions import InvalidSource, InvalidExperiment
 from chaoslib.loader import load_experiment, parse_experiment_from_file
 from chaoslib.types import Settings
 
@@ -83,4 +83,41 @@ def test_yaml_safe_load_from_http():
             text=experiments.UnsafeYamlExperiment
         )
         with pytest.raises(InvalidSource):
+            load_experiment('http://example.com/experiment.yaml')
+
+
+def test_can_load_json_from_plain_text_http():
+    with requests_mock.mock() as m:
+        m.get(
+            'http://example.com/experiment.yaml', status_code=200,
+            headers={"Content-Type": "text/plain; charset=utf-8"},
+            text=experiments.YamlExperiment
+        )
+        try:
+            load_experiment('http://example.com/experiment.yaml')
+        except InvalidExperiment as x:
+            pytest.fail(str(x))
+
+
+def test_can_load_yaml_from_plain_text_http(generic_experiment: str):
+    with requests_mock.mock() as m:
+        m.get(
+            'http://example.com/experiment.json', status_code=200,
+            headers={"Content-Type": "text/plain; charset=utf-8"},
+            text=json.dumps(generic_experiment)
+        )
+        try:
+            load_experiment('http://example.com/experiment.json')
+        except InvalidExperiment as x:
+            pytest.fail(str(x))
+
+
+def test_http_loads_fails_when_known_type():
+    with requests_mock.mock() as m:
+        m.get(
+            'http://example.com/experiment.yaml', status_code=200,
+            headers={"Content-Type": "text/css"},
+            text="body {}"
+        )
+        with pytest.raises(InvalidExperiment):
             load_experiment('http://example.com/experiment.yaml')

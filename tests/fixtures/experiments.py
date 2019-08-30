@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
+import os
 
 from fixtures.probes import BackgroundPythonModuleProbe, MissingFuncArgProbe, \
     PythonModuleProbe, PythonModuleProbeWithBoolTolerance, \
@@ -357,3 +358,22 @@ ExperimentWithoutControls = {
 UnsafeYamlExperiment = """
 !!python/object/apply:os.system\nargs: ['Hello shell!']
 """
+
+YamlExperiment = """
+---
+title: do cats live in the Internet?
+description: an experiment of importance
+method:
+- type: probe
+  name: path-must-exists
+  pauses:
+    before: 0
+    after: 0.1
+  provider:
+    type: python
+    module: os.path
+    func: exists
+    arguments:
+      path: {}
+    timeout: 30
+""".format(os.path.abspath(__file__))

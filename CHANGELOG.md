@@ -9,6 +9,11 @@
 - Two new control hook points before and after the experiment loading. These
   hooks allow a control to perform certain operations before the experiment
   is actually applied.
+- Experiments can be loaded from HTTP server which returns them using a
+  `text/plain`  content-type [#130][130]. This allows notably to run directly
+  experiments hosted on GitHub.
+
+[130]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/130
 
 ### Changed
 

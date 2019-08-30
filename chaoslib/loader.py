@@ -55,6 +55,15 @@ def parse_experiment_from_http(response: requests.Response) -> Experiment:
         except yaml.YAMLError as ye:
             raise InvalidSource(
                 "Failed parsing YAML experiment: {}".format(str(ye)))
+    elif 'text/plain' in content_type:
+        content = response.text
+        try:
+            return json.loads(content)
+        except JSONDecodeError:
+            try:
+                return yaml.safe_load(content)
+            except yaml.YAMLError:
+                pass
 
     raise InvalidExperiment(
         "only files with json, yaml or yml extensions are supported")
