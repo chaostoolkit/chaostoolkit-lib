@@ -28,6 +28,9 @@
   as we can. Before, they were loaded when the experiments started to be
   executed. Now, we can also run controls when we read the experiment itself,
   which wasn't possible before.
+- Read package version by readsing `__version__` from the `chaoslib/__init__.py`
+  file directly without importing it, to avoid dependency issues of uninstalled
+  third-party packages.
 
 ## [1.5.0][] - 2019-07-01
 
