@@ -146,7 +146,9 @@ def execute_activity(experiment: Experiment, activity: Activity,
         if pause_before:
             logger.info("Pausing before next activity for {d}s...".format(
                 d=pause_before))
-            time.sleep(pause_before)
+            # only pause when not in dry-mode
+            if not dry:
+                time.sleep(pause_before)
 
         if activity.get("background"):
             logger.info("{t}: {n} [in background]".format(
@@ -191,7 +193,9 @@ def execute_activity(experiment: Experiment, activity: Activity,
             if pause_after and not interrupted:
                 logger.info("Pausing after activity for {d}s...".format(
                     d=pause_after))
-                time.sleep(pause_after)
+                # only pause when not in dry-mode
+                if not dry:
+                    time.sleep(pause_after)
 
         control.with_state(run)
 

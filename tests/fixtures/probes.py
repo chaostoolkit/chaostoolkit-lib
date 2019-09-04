@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from copy import deepcopy
 import os.path
 import sys
 from typing import Any
@@ -162,6 +163,10 @@ BackgroundPythonModuleProbeWithLongPause = {
         "timeout": 30
     }
 }
+
+BackgroundPythonModuleProbeWithLongPauseBefore = deepcopy(BackgroundPythonModuleProbeWithLongPause)
+BackgroundPythonModuleProbeWithLongPauseBefore["pauses"]["after"] = 0
+BackgroundPythonModuleProbeWithLongPauseBefore["pauses"]["before"] = 5
 
 PythonModuleProbeWithBoolTolerance = PythonModuleProbe.copy()
 # tolerance can be a scalar, a range or a mapping with lower/upper keys

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 import json
 import os.path
 import signal
@@ -225,3 +226,31 @@ def test_validate_all_tolerance_probes():
         m.get("http://example.com", text="you are number 87")
 
         ensure_experiment_is_valid(experiments.ExperimentWithVariousTolerances)
+
+
+def test_dry_run_should_not_pause_after():
+    experiment = experiments.ExperimentWithLongPause.copy()
+    experiment["dry"] = True
+
+    start = datetime.utcnow()
+    run_experiment(experiment)
+    end = datetime.utcnow()
+
+    experiment_run_time = int((end - start).total_seconds())
+    pause_after_duration = int(experiment["method"][1]["pauses"]["after"])
+
+    assert experiment_run_time < pause_after_duration
+
+
+def test_dry_run_should_not_pause_before():
+    experiment = experiments.ExperimentWithLongPauseBefore.copy()
+    experiment["dry"] = True
+
+    start = datetime.utcnow()
+    run_experiment(experiment)
+    end = datetime.utcnow()
+
+    experiment_run_time = int((end - start).total_seconds())
+    pause_before_duration = int(experiment["method"][1]["pauses"]["before"])
+
+    assert experiment_run_time < pause_before_duration

@@ -4,6 +4,10 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.6.0...HEAD
 
+### Changed
+
+- Fix to ensure a dry run ignores pauses
+
 ## [1.6.0][] - 2019-09-03
 
 [1.6.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.5.0...1.6.0
