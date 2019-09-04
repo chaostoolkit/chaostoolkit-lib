@@ -5,7 +5,7 @@ import os
 from fixtures.probes import BackgroundPythonModuleProbe, MissingFuncArgProbe, \
     PythonModuleProbe, PythonModuleProbeWithBoolTolerance, \
     PythonModuleProbeWithExternalTolerance, PythonModuleProbeWithLongPause, \
-    BackgroundPythonModuleProbeWithLongPause, \
+    BackgroundPythonModuleProbeWithLongPause, BackgroundPythonModuleProbeWithLongPauseBefore,\
     PythonModuleProbeWithHTTPStatusTolerance, DeprecatedProcArgumentsProbe, \
     PythonModuleProbeWithHTTPBodyTolerance, \
     PythonModuleProbeWithProcessStatusTolerance, \
@@ -88,6 +88,9 @@ ExperimentWithLongPause = {
         BackgroundPythonModuleProbe
     ]
 }
+
+ExperimentWithLongPauseBefore = deepcopy(ExperimentWithLongPause)
+ExperimentWithLongPauseBefore["method"][1] = BackgroundPythonModuleProbeWithLongPauseBefore
 
 RefProbeExperiment = {
     "title": "do cats live in the Internet?",
