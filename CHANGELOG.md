@@ -7,6 +7,8 @@
 ### Changed
 
 - Fix to ensure a dry run ignores pauses
+- Allow substitution from configuration and secrets into regex and jsonpath
+  tolerances
 
 ## [1.6.0][] - 2019-09-03
 

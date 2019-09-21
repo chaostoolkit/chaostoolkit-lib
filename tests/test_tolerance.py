@@ -577,3 +577,70 @@ def test_tolerance_with_a_probe():
         },
         "body": "7"
     }) is True
+
+
+def test_tolerance_jsonpath_can_contain_variable_to_be_substituted():
+    t = {
+        "type": "jsonpath",
+        "path": '$.foo[?(@.baz="${msg}")]',
+        "count": 1
+    }
+    ensure_hypothesis_tolerance_is_valid(t)
+    assert within_tolerance(
+        t, value={
+            'foo': {"baz": "hello"}
+        }, configuration={
+            "msg": "hello"
+        }
+    ) is True
+
+    t = {
+        "type": "jsonpath",
+        "path": '$.foo[?(@.baz="${msg}")]',
+        "count": 1
+    }
+    ensure_hypothesis_tolerance_is_valid(t)
+    assert within_tolerance(
+        t, value={
+            'foo': {"baz": "hello"}
+        }, configuration={
+            "msg": "bonjour"
+        }
+    ) is False
+
+
+def test_tolerance_regex_can_contain_variable_to_be_substituted():
+    assert within_tolerance(
+        {
+            "type": "regex",
+            "pattern": "${msg}"
+        },
+        value="jane said hello at sunrise",
+        configuration={
+            "msg": "hello"
+        }
+    ) is True
+
+    assert within_tolerance(
+        {
+            "type": "regex",
+            "pattern": "${msg}"
+        },
+        value="jane said hello at sunrise",
+        configuration={
+            "msg": "bonjour"
+        }
+    ) is False
+
+
+def test_tolerance_complex_regex_can_contain_variable_to_be_substituted():
+    assert within_tolerance(
+        {
+            "type": "regex",
+            "pattern": "^[0-9] \$\{level\} ${msg} - done$"
+        },
+        value="1 ${level} hello - done",
+        configuration={
+            "msg": "hello"
+        }
+    ) is True

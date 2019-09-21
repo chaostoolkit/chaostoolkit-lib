@@ -14,6 +14,7 @@ except ImportError:
 
 from logzero import logger
 
+from chaoslib import substitute
 from chaoslib.activity import ensure_activity_is_valid, execute_activity, \
     run_activity
 from chaoslib.control import controls
@@ -295,6 +296,8 @@ def _(tolerance: dict, value: Any, configuration: Configuration = None,
     elif tolerance_type == "regex":
         target = tolerance.get("target")
         pattern = tolerance.get("pattern")
+        pattern = substitute(pattern, configuration, secrets)
+        logger.debug("Applied pattern is: {}".format(pattern))
         rx = re.compile(pattern)
         if target:
             value = value.get(target, value)
@@ -303,6 +306,8 @@ def _(tolerance: dict, value: Any, configuration: Configuration = None,
         target = tolerance.get("target")
         path = tolerance.get("path")
         count_value = tolerance.get("count", None)
+        path = substitute(path, configuration, secrets)
+        logger.debug("Applied jsonpath is: {}".format(path))
         px = JSONPath.parse_str(path)
 
         if target:
