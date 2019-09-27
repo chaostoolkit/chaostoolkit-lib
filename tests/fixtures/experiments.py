@@ -89,6 +89,20 @@ ExperimentWithLongPause = {
     ]
 }
 
+ExperimentWithRollbackLongPause = {
+    "title": "do cats live in the Internet?",
+    "description": "an experiment of importance",
+    "steady-state-hypothesis": {
+        "title": "hello"
+    },
+    "method": [
+        PythonModuleProbe
+    ],
+    "rollbacks": [
+        PythonModuleProbeWithLongPause
+    ]
+}
+
 ExperimentWithLongPauseBefore = deepcopy(ExperimentWithLongPause)
 ExperimentWithLongPauseBefore["method"][1] = BackgroundPythonModuleProbeWithLongPauseBefore
 

@@ -248,8 +248,12 @@ def run_experiment(experiment: Experiment,
                         "leaving without applying rollbacks.")
         else:
             journal["status"] = journal["status"] or "completed"
-            journal["rollbacks"] = apply_rollbacks(
-                experiment, config, secrets, rollback_pool, dry)
+            try:
+                journal["rollbacks"] = apply_rollbacks(
+                    experiment, config, secrets, rollback_pool, dry)
+            except InterruptExecution as i:
+                journal["status"] = "interrupted"
+                logger.fatal(str(i))
 
         journal["end"] = datetime.utcnow().isoformat()
         journal["duration"] = time.time() - started_at

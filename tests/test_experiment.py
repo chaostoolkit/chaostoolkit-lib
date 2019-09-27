@@ -12,7 +12,7 @@ import requests_mock
 import yaml
 
 from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
-    InvalidExperiment
+    InvalidExperiment, InterruptExecution
 from chaoslib.experiment import ensure_experiment_is_valid, load_experiment, \
     run_experiment, run_activities
 from chaoslib.types import Experiment
@@ -170,6 +170,21 @@ def test_no_rollback_even_on_SystemExit():
         assert journal["status"] == "interrupted"
     except SystemExit:
         pytest.fail("we should have swalled the SystemExit exception")
+
+
+def test_can_interrupt_rollbacks():
+    def handler(signum, frame):
+        raise InterruptExecution("boom")
+
+    signal.signal(signal.SIGALRM, handler)
+    signal.alarm(1)
+
+    try:
+        journal = run_experiment(experiments.ExperimentWithRollbackLongPause)
+        assert isinstance(journal, dict)
+        assert journal["status"] == "interrupted"
+    except Exception:
+        pytest.fail("we should have swalled the InterruptExecution exception")
 
 
 def test_probes_can_reference_each_other():
