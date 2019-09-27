@@ -169,6 +169,12 @@ those dependencies.
 
 
 ```console
+$ pip install -r requirements-dev.txt -r requirements.txt
+```
+
+Then, point your environment to this directory:
+
+```console
 $ pip install -e .
 ```
 
