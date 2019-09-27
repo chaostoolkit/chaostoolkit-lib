@@ -187,6 +187,36 @@ def test_can_interrupt_rollbacks():
         pytest.fail("we should have swalled the InterruptExecution exception")
 
 
+def test_can_interrupt_rollbacks_on_SystemExit():
+    def handler(signum, frame):
+        raise SystemExit()
+
+    signal.signal(signal.SIGALRM, handler)
+    signal.alarm(1)
+
+    try:
+        journal = run_experiment(experiments.ExperimentWithRollbackLongPause)
+        assert isinstance(journal, dict)
+        assert journal["status"] == "interrupted"
+    except SystemExit:
+        pytest.fail("we should have swalled the SystemExit exception")
+
+
+def test_can_interrupt_rollbacks_on_SIGINT():
+    def handler(signum, frame):
+        raise KeyboardInterrupt()
+
+    signal.signal(signal.SIGALRM, handler)
+    signal.alarm(1)
+
+    try:
+        journal = run_experiment(experiments.ExperimentWithRollbackLongPause)
+        assert isinstance(journal, dict)
+        assert journal["status"] == "interrupted"
+    except SystemExit:
+        pytest.fail("we should have swalled the KeyboardInterrupt exception")
+
+
 def test_probes_can_reference_each_other():
     experiment = experiments.RefProbeExperiment.copy()
     experiment["dry"] = True

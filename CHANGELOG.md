@@ -7,9 +7,12 @@
 ### Added
 
 - Catch `InterruptExecution` during rollbacks so that the experiment terminates
-  gracefully [#132][132]
+  gracefully [#132][132].  The remaining rollbacks are not applied.
+- Catch `SIGINT` and `SystemExit` during rollbacks so that the experiment
+  terminates gracefully [#133][133]. The remaining rollbacks are not applied.
 
 [132]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/132
+[133]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/133
 
 ## [1.7.0][] - 2019-09-21
 

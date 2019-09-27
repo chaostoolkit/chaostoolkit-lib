@@ -254,6 +254,11 @@ def run_experiment(experiment: Experiment,
             except InterruptExecution as i:
                 journal["status"] = "interrupted"
                 logger.fatal(str(i))
+            except (KeyboardInterrupt, SystemExit):
+                journal["status"] = "interrupted"
+                logger.warn(
+                    "Received an exit signal."
+                    "Terminating now without running the remaining rollbacks.")
 
         journal["end"] = datetime.utcnow().isoformat()
         journal["duration"] = time.time() - started_at
