@@ -4,6 +4,10 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.7.1...HEAD
 
+### Added
+
+- Optional default value for environment variable in configuration
+
 ## [1.7.1][] - 2019-09-27
 
 [1.7.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.7.0...1.7.1
