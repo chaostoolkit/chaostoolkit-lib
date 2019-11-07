@@ -103,11 +103,14 @@ def run_activities(experiment: Experiment, configuration: Configuration,
                    secrets: Secrets, pool: ThreadPoolExecutor,
                    dry: bool = False) -> Iterator[Run]:
     """
-    Iternal generator that iterates over all activities and execute them.
+    Internal generator that iterates over all activities and execute them.
     Yields either the result of the run or a :class:`concurrent.futures.Future`
     if the activity was set to run in the `background`.
     """
-    method = experiment.get("method")
+    method = experiment.get("method", [])
+
+    if not method:
+        logger.info("No declared activities, let's move on.")
 
     for activity in method:
         if activity.get("background"):

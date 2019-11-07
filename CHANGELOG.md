@@ -9,6 +9,11 @@
 - Optional default value for environment variable in configuration
 - Warn the user for an action process returning a non-zero exit code 
 
+### Changed
+
+- Changed the method's one-step minimum requirement. 
+  An experiment with an empty method (without any activities) is now valid.
+
 ## [1.7.1][] - 2019-09-27
 
 [1.7.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.7.0...1.7.1
