@@ -4,12 +4,12 @@ import os
 import os.path
 import shutil
 import subprocess
-from typing import Any
+from typing import Any, List
 
 from logzero import logger
 
 from chaoslib import decode_bytes, substitute
-from chaoslib.exceptions import ActivityFailed, InvalidActivity
+from chaoslib.exceptions import ActivityFailed, InvalidActivity, ChaosException
 from chaoslib.types import Activity, Configuration, Secrets
 
 
@@ -67,7 +67,7 @@ def run_process_activity(activity: Activity, configuration: Configuration,
     }
 
 
-def validate_process_activity(activity: Activity):
+def validate_process_activity(activity: Activity) -> List[ChaosException]:
     """
     Validate a process activity.
 
@@ -76,24 +76,32 @@ def validate_process_activity(activity: Activity):
     * a `"path"` key which is an absolute path to an executable the current
       user can call
 
-    In all failing cases, raises :exc:`InvalidActivity`.
+    In all failing cases, returns a list of errors.
 
     This should be considered as a private function.
     """
-    name = activity["name"]
-    provider = activity["provider"]
+    errors = []
+
+    name = activity.get("name")
+    provider = activity.get("provider")
 
     path = provider.get("path")
     if not path:
-        raise InvalidActivity("a process activity must have a path")
+        errors.append(InvalidActivity("a process activity must have a path"))
+        # cannot validate any further, if no path is defined
+        return errors
 
     path = shutil.which(path)
     if not path:
-        raise InvalidActivity(
+        errors.append(InvalidActivity(
             "path '{path}' cannot be found, in activity '{name}'".format(
-                path=path, name=name))
+                path=path, name=name)))
+        # cannot validate any further, if path cannot be found
+        return errors
 
     if not os.access(path, os.X_OK):
-        raise InvalidActivity(
+        errors.append(InvalidActivity(
             "no access permission to '{path}', in activity '{name}'".format(
-                path=path, name=name))
+                path=path, name=name)))
+
+    return errors

@@ -7,7 +7,8 @@ from logzero import logger
 
 from chaoslib.control.python import apply_python_control, cleanup_control, \
     initialize_control, validate_python_control, import_control
-from chaoslib.exceptions import InterruptExecution, InvalidControl
+from chaoslib.exceptions import InterruptExecution, InvalidControl, \
+    ChaosException
 from chaoslib.settings import get_loaded_settings
 from chaoslib.types import Settings
 from chaoslib.types import Activity, Configuration, Control as ControlType, \
@@ -85,12 +86,11 @@ def cleanup_controls(experiment: Experiment):
             cleanup_control(control)
 
 
-def validate_controls(experiment: Experiment):
+def validate_controls(experiment: Experiment) -> List[ChaosException]:
     """
     Validate that all declared controls respect the specification.
-
-    Raises :exc:`chaoslib.exceptions.InvalidControl` when they are not valid.
     """
+    errors = []
     controls = get_controls(experiment)
     references = [
         c["name"] for c in get_controls(experiment)
@@ -99,26 +99,29 @@ def validate_controls(experiment: Experiment):
     for c in controls:
         if "ref" in c:
             if c["ref"] not in references:
-                raise InvalidControl(
-                    "Control reference '{}' declaration cannot be found")
+                errors.append(InvalidControl(
+                    "Control reference '{}' declaration cannot be found"))
 
         if "name" not in c:
-            raise InvalidControl("A control must have a `name` property")
+            errors.append(
+                InvalidControl("A control must have a `name` property"))
 
-        name = c["name"]
+        name = c.get("name", '')
         if "provider" not in c:
-            raise InvalidControl(
-                "Control '{}' must have a `provider` property".format(name))
+            errors.append(InvalidControl(
+                "Control '{}' must have a `provider` property".format(name)))
 
         scope = c.get("scope")
         if scope and scope not in ("before", "after"):
-            raise InvalidControl(
+            errors.append(InvalidControl(
                 "Control '{}' scope property must be 'before' or "
-                "'after' only".format(name))
+                "'after' only".format(name)))
 
         provider_type = c.get("provider", {}).get("type")
         if provider_type == "python":
-            validate_python_control(c)
+            errors.extend(validate_python_control(c))
+
+    return errors
 
 
 def initialize_global_controls(experiment: Experiment,
