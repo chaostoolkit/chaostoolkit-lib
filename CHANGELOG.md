@@ -7,6 +7,7 @@
 ### Added
 
 - Optional default value for environment variable in configuration
+- Warn the user for an action process returning a non-zero exit code 
 
 ## [1.7.1][] - 2019-09-27
 
