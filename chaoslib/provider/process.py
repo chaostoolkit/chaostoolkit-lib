@@ -57,6 +57,17 @@ def run_process_activity(activity: Activity, configuration: Configuration,
     except subprocess.TimeoutExpired:
         raise ActivityFailed("process activity took too long to complete")
 
+    # kind warning to the user that this process returned a non--zero
+    # exit code, as traditionally used to indicate a failure,
+    # but not during the hypothesis check because that could also be
+    # exactly what the user want. This warning is helpful during the
+    # method and rollbacks
+    if "tolerance" not in activity and proc.returncode > 0:
+        logger.warning(
+            "This process returned a non-zero exit code. "
+            "This may indicate some error and not what you expected. "
+            "Please have a look at the logs.")
+
     stdout = decode_bytes(proc.stdout)
     stderr = decode_bytes(proc.stderr)
 
