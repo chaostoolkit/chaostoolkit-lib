@@ -38,7 +38,7 @@ def run_process_activity(activity: Activity, configuration: Configuration,
         arguments = substitute(arguments, configuration, secrets)
 
     shell = False
-    path = shutil.which(provider["path"])
+    path = shutil.which(os.path.expanduser(provider["path"]))
     if isinstance(arguments, str):
         shell = True
         arguments = "{} {}".format(path, arguments)
