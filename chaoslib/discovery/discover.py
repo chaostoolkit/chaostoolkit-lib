@@ -10,7 +10,7 @@ from logzero import logger
 
 from chaoslib import __version__
 from chaoslib.discovery.package import get_discover_function, install,\
-    load_package
+    load_package, get_top_level_packages
 from chaoslib.exceptions import DiscoveryFailed
 from chaoslib.types import Discovery, DiscoveredActivities
 
@@ -30,10 +30,26 @@ def discover(package_name: str, discover_system: bool = True,
     """
     if download_and_install:
         install(package_name)
-    package = load_package(package_name)
-    discover_func = get_discover_function(package)
 
-    return discover_func(discover_system=discover_system)
+    discovery = {}
+    top_level_names = get_top_level_packages(package_name)
+    for import_name in top_level_names:
+        package = load_package(import_name)
+        discover_func = get_discover_function(package)
+        if not discover_func:
+            continue
+
+        # call the discovery for the importable package
+        pkg_discovery = discover_func(discover_system=discover_system)
+        # combined activities from both discovery objects
+        activities = discovery.get('activities') or []
+        activities.extend(pkg_discovery.get("activities") or [])
+        # smart merge of discovery with combined list of activities
+        # (a single merge would overwrite the first discovery activities)
+        discovery = {**discovery, **pkg_discovery}
+        discovery["activities"] = activities
+
+    return discovery
 
 
 def initialize_discovery_result(extension_name: str, extension_version: str,

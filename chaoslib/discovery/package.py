@@ -2,13 +2,15 @@
 import importlib
 import inspect
 import subprocess
+from typing import List
 
 from logzero import logger
 import pkg_resources
 
 from chaoslib.exceptions import DiscoveryFailed
 
-__all__ = ["get_discover_function", "install", "load_package"]
+__all__ = ["get_discover_function", "install", "load_package",
+           "get_top_level_packages"]
 
 
 def install(package_name: str):
@@ -41,14 +43,21 @@ def load_package(package_name: str) -> object:
     """
     Import the module into the current process state.
     """
-    name = get_importname_from_package(package_name)
     try:
-        package = importlib.import_module(name)
+        package = importlib.import_module(package_name)
     except ImportError:
         raise DiscoveryFailed(
-            "could not load Python module '{name}'".format(name=name))
+            "could not load Python module '{name}'".format(name=package_name))
 
     return package
+
+
+def get_top_level_packages(package_name: str) -> List[str]:
+    """
+    Returns the list of top_level importable packages available
+    for an installed `package_name` distribution
+    """
+    return get_importnames_from_package(package_name)
 
 
 def get_discover_function(package: object):
@@ -68,10 +77,13 @@ def get_discover_function(package: object):
 ###############################################################################
 # Private functions
 ###############################################################################
-def get_importname_from_package(package_name: str) -> str:
+def get_importnames_from_package(package_name: str) -> List[str]:
     """
     Try to fetch the name of the top-level import name for the given
     package. For some reason, this isn't straightforward.
+
+    We support the case for a setup package (distribution) that contains
+    multiple top level packages embedded.
     """
     reqs = list(pkg_resources.parse_requirements(package_name))
     if not reqs:
@@ -81,10 +93,14 @@ def get_importname_from_package(package_name: str) -> str:
     req = reqs[0]
     dist = pkg_resources.get_distribution(req)
     try:
-        name = dist.get_metadata('top_level.txt').split("\n)", 1)[0]
+        names = [
+            name.strip() for name in
+            dist.get_metadata('top_level.txt').split("\n")
+            if name != ''
+        ]
     except FileNotFoundError:
         raise DiscoveryFailed(
             "failed to load package '{p}' metadata. "
             "Was the package installed properly?".format(p=package_name))
 
-    return name.strip()
+    return names
