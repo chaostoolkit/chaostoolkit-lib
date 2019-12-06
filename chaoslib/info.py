@@ -1,8 +1,7 @@
 from collections import namedtuple
-from email import message_from_string
 from typing import List
 
-from pkg_resources import Environment
+import importlib_metadata
 
 __all__ = ["list_extensions"]
 
@@ -31,26 +30,23 @@ def list_extensions() -> List[ExtensionInfo]:
     a better detection.
     """
     infos = []
-    distros = Environment()
+    distros = importlib_metadata.distributions()
     seen = []
-    for key in distros:
-        for dist in distros[key]:
-            if dist.has_metadata('PKG-INFO'):
-                m = dist.get_metadata('PKG-INFO')
-                info = message_from_string(m)
-                name = info["Name"]
-                if name == "chaostoolkit-lib":
-                    continue
-                if name in seen:
-                    continue
-                seen.append(name)
-                if name.startswith("chaostoolkit-"):
-                    ext = ExtensionInfo(
-                        name=name,
-                        version=info["Version"],
-                        summary=info["Summary"],
-                        license=info["License"],
-                        author=info["Author"],
-                        url=info["Home-page"])
-                    infos.append(ext)
+    for dist in distros:
+        info = dist.metadata
+        name = info['Name']
+        if name == "chaostoolkit-lib":
+            continue
+        if name in seen:
+            continue
+        seen.append(name)
+        if name.startswith("chaostoolkit-"):
+            ext = ExtensionInfo(
+                name=name,
+                version=info["Version"],
+                summary=info["Summary"],
+                license=info["License"],
+                author=info["Author"],
+                url=info["Home-page"])
+            infos.append(ext)
     return infos
