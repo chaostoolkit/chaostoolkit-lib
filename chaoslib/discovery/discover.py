@@ -28,6 +28,8 @@ def discover(package_name: str, discover_system: bool = True,
     Then apply any post discovery hook that are declared in the chaostoolkit
     settings under the `discovery/post-hook` section.
     """
+    logger.info(f"Discovering capabilities from {package_name}")
+
     if download_and_install:
         install(package_name)
 
@@ -86,7 +88,7 @@ def discover_actions(extension_mod_name: str) -> DiscoveredActivities:
     """
     Discover actions from the given extension named `extension_mod_name`.
     """
-    logger.info("Searching for actions")
+    logger.info(f"Searching for actions in {extension_mod_name}")
     return discover_activities(extension_mod_name, "action")
 
 
@@ -94,7 +96,7 @@ def discover_probes(extension_mod_name: str) -> DiscoveredActivities:
     """
     Discover probes from the given extension named `extension_mod_name`.
     """
-    logger.info("Searching for probes")
+    logger.info(f"Searching for probes in {extension_mod_name}")
     return discover_activities(extension_mod_name, "probe")
 
 
