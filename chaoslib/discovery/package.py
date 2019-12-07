@@ -4,7 +4,7 @@ import inspect
 import subprocess
 
 from logzero import logger
-import pkg_resources
+import importlib_metadata
 
 from chaoslib.exceptions import DiscoveryFailed
 
@@ -68,23 +68,47 @@ def get_discover_function(package: object):
 ###############################################################################
 # Private functions
 ###############################################################################
+class PathDistribution(importlib_metadata.PathDistribution):
+    """
+    Extends the class for easier retrieval of top-level package names
+    for a distribution installed package
+    """
+    @property
+    def top_level(self):
+        text = self.read_text('top_level.txt')
+        return text and text.splitlines()
+
+
+# Replace the original class with the extended one
+# until this is officially supported in the API
+importlib_metadata.PathDistribution = PathDistribution
+
+
 def get_importname_from_package(package_name: str) -> str:
     """
     Try to fetch the name of the top-level import name for the given
     package. For some reason, this isn't straightforward.
-    """
-    reqs = list(pkg_resources.parse_requirements(package_name))
-    if not reqs:
-        raise DiscoveryFailed(
-            "no requirements met for package '{p}'".format(p=package_name))
 
-    req = reqs[0]
-    dist = pkg_resources.get_distribution(req)
+    For now, we do not support distribution packages that contains
+    multiple top-level packages.
+    """
     try:
-        name = dist.get_metadata('top_level.txt').split("\n)", 1)[0]
+        dist = importlib_metadata.distribution(package_name)
+    except importlib_metadata.PackageNotFoundError:
+        raise DiscoveryFailed(
+            "Package {p} not found ".format(p=package_name)
+        )
+
+    try:
+        packages = dist.top_level
     except FileNotFoundError:
         raise DiscoveryFailed(
-            "failed to load package '{p}' metadata. "
+            "failed to load package {p} metadata. "
             "Was the package installed properly?".format(p=package_name))
 
-    return name.strip()
+    if len(packages) > 1:
+        raise DiscoveryFailed(
+            "Package {p} contains multiple top-level packages. "
+            "Unable to discover from multiple packages.".format(p=package_name)
+        )
+    return packages[0]
