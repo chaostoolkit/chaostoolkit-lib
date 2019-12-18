@@ -12,7 +12,7 @@ import requests_mock
 import yaml
 
 from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
-    InvalidExperiment, InterruptExecution
+    InvalidExperiment, InterruptExecution, ValidationError
 from chaoslib.experiment import ensure_experiment_is_valid, load_experiment, \
     run_experiment, run_activities
 from chaoslib.types import Experiment
@@ -21,7 +21,7 @@ from fixtures import config, experiments
 
 
 def test_empty_experiment_is_invalid():
-    with pytest.raises(InvalidExperiment) as exc:
+    with pytest.raises(ValidationError) as exc:
         ensure_experiment_is_valid(experiments.EmptyExperiment)
     assert "an empty experiment is not an experiment" in str(exc.value)
 
@@ -65,27 +65,27 @@ def test_unknown_extension():
 
 
 def test_experiment_must_have_a_method():
-    with pytest.raises(InvalidExperiment) as exc:
+    with pytest.raises(ValidationError) as exc:
         ensure_experiment_is_valid(experiments.MissingMethodExperiment)
     assert "an experiment requires a method with "\
            "at least one activity" in str(exc.value)
 
 
 def test_experiment_must_have_at_least_one_step():
-    with pytest.raises(InvalidExperiment) as exc:
+    with pytest.raises(ValidationError) as exc:
         ensure_experiment_is_valid(experiments.NoStepsMethodExperiment)
     assert "an experiment requires a method with "\
            "at least one activity" in str(exc.value)
 
 
 def test_experiment_must_have_a_title():
-    with pytest.raises(InvalidExperiment) as exc:
+    with pytest.raises(ValidationError) as exc:
         ensure_experiment_is_valid(experiments.MissingTitleExperiment)
     assert "experiment requires a title" in str(exc.value)
 
 
 def test_experiment_must_have_a_description():
-    with pytest.raises(InvalidExperiment) as exc:
+    with pytest.raises(ValidationError) as exc:
         ensure_experiment_is_valid(experiments.MissingDescriptionExperiment)
     assert "experiment requires a description" in str(exc.value)
 
@@ -96,13 +96,13 @@ def test_experiment_may_not_have_a_hypothesis():
 
 
 def test_experiment_hypothesis_must_have_a_title():
-    with pytest.raises(InvalidExperiment) as exc:
+    with pytest.raises(ValidationError) as exc:
         ensure_experiment_is_valid(experiments.MissingHypothesisTitleExperiment)
     assert "hypothesis requires a title" in str(exc.value)
 
 
 def test_experiment_hypothesis_must_have_a_valid_probe():
-    with pytest.raises(InvalidExperiment) as exc:
+    with pytest.raises(ValidationError) as exc:
         ensure_experiment_is_valid(experiments.ExperimentWithInvalidHypoProbe)
     assert "required argument 'path' is missing from activity" in str(exc.value)
 
