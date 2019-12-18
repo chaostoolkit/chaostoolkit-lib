@@ -15,7 +15,7 @@ from chaoslib.control import initialize_controls, controls, cleanup_controls, \
     cleanup_global_controls
 from chaoslib.deprecation import warn_about_deprecated_features
 from chaoslib.exceptions import ActivityFailed, ChaosException, \
-    InterruptExecution, InvalidActivity, InvalidExperiment
+    InterruptExecution, InvalidActivity, InvalidExperiment, ValidationError
 from chaoslib.extension import validate_extensions
 from chaoslib.configuration import load_configuration
 from chaoslib.hypothesis import ensure_hypothesis_is_valid, \
@@ -55,10 +55,14 @@ def ensure_experiment_is_valid(experiment: Experiment):
     """
     logger.info("Validating the experiment's syntax")
 
+    full_validation_msg = 'Experiment is not valid, ' \
+                          'please fix the following errors'
     errors = []
 
     if not experiment:
-        raise InvalidExperiment("an empty experiment is not an experiment")
+        # empty experiment, cannot continue validation any further
+        raise ValidationError(full_validation_msg,
+                              "an empty experiment is not an experiment")
 
     if not experiment.get("title"):
         errors.append(InvalidExperiment("experiment requires a title"))
@@ -103,11 +107,7 @@ def ensure_experiment_is_valid(experiment: Experiment):
     errors.extend(validate_controls(experiment))
 
     if errors:
-        full_validation_msg = 'Experiment is not valid, ' \
-                              'please fix the following errors:'
-        for error in errors:
-            full_validation_msg += '\n- {}'.format(error)
-        raise InvalidExperiment(full_validation_msg)
+        raise ValidationError(full_validation_msg, errors)
 
     logger.info("Experiment looks valid")
 
