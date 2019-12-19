@@ -12,7 +12,8 @@ from chaoslib.exceptions import InterruptExecution, InvalidControl, \
 from chaoslib.settings import get_loaded_settings
 from chaoslib.types import Settings
 from chaoslib.types import Activity, Configuration, Control as ControlType, \
-    Experiment, Hypothesis, Journal, Run, Secrets
+    Experiment, Hypothesis, Journal, Run, Secrets, ValidationError
+from chaoslib.validation import Validation
 
 
 __all__ = ["controls", "initialize_controls", "cleanup_controls",
@@ -86,11 +87,12 @@ def cleanup_controls(experiment: Experiment):
             cleanup_control(control)
 
 
-def validate_controls(experiment: Experiment) -> List[ChaosException]:
+def validate_controls(experiment: Experiment) -> List[ValidationError]:
     """
     Validate that all declared controls respect the specification.
     """
-    errors = []
+    v = Validation()
+
     controls = get_controls(experiment)
     references = [
         c["name"] for c in get_controls(experiment)
@@ -99,29 +101,33 @@ def validate_controls(experiment: Experiment) -> List[ChaosException]:
     for c in controls:
         if "ref" in c:
             if c["ref"] not in references:
-                errors.append(InvalidControl(
-                    "Control reference '{}' declaration cannot be found"))
+                msg = "Control reference '{}' declaration cannot be found".\
+                    format(c["ref"])
+                v.add_error("ref", msg, value=c["ref"])
 
         if "name" not in c:
-            errors.append(
-                InvalidControl("A control must have a `name` property"))
+            v.add_error("name", "A control must have a `name` property")
 
         name = c.get("name", '')
         if "provider" not in c:
-            errors.append(InvalidControl(
-                "Control '{}' must have a `provider` property".format(name)))
+            v.add_error(
+                "provider",
+                "Control '{}' must have a `provider` property".format(name))
 
         scope = c.get("scope")
         if scope and scope not in ("before", "after"):
-            errors.append(InvalidControl(
+            v.add_error(
+                "scope",
                 "Control '{}' scope property must be 'before' or "
-                "'after' only".format(name)))
+                "'after' only".format(name),
+                value=scope
+            )
 
         provider_type = c.get("provider", {}).get("type")
         if provider_type == "python":
-            errors.extend(validate_python_control(c))
+            v.extend_errors(validate_python_control(c))
 
-    return errors
+    return v.errors()
 
 
 def initialize_global_controls(experiment: Experiment,

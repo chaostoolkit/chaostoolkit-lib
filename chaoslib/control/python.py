@@ -9,7 +9,8 @@ from logzero import logger
 from chaoslib import substitute
 from chaoslib.exceptions import InvalidActivity, ChaosException
 from chaoslib.types import Activity, Configuration, Control, Experiment, \
-    Journal, Run, Secrets, Settings
+    Journal, Run, Secrets, Settings, ValidationError
+from chaoslib.validation import Validation
 
 
 __all__ = ["apply_python_control", "cleanup_control", "initialize_control",
@@ -83,19 +84,22 @@ def cleanup_control(control: Control):
     func()
 
 
-def validate_python_control(control: Control) -> List[ChaosException]:
+def validate_python_control(control: Control) -> List[ValidationError]:
     """
     Verify that a control block matches the specification
     """
-    errors = []
+    v = Validation()
+
     name = control["name"]
     provider = control["provider"]
     mod_name = provider.get("module")
     if not mod_name:
-        errors.append(InvalidActivity(
-            "Control '{}' must have a module path".format(name)))
+        v.add_error(
+            "module",
+            "Control '{}' must have a module path".format(name)
+        )
         # can not continue any longer - must exit this function
-        return errors
+        return v.errors()
 
     try:
         importlib.import_module(mod_name)

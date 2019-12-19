@@ -7,6 +7,9 @@ from chaoslib.hypothesis import ensure_hypothesis_tolerance_is_valid, \
     within_tolerance
 
 
+from test_validation import assert_in_errors
+
+
 def test_tolerance_int():
     assert within_tolerance(6, value=6) is True
 
@@ -266,8 +269,8 @@ def test_tolerance_jsonpath_cannot_be_empty():
         "path": ""
     }
 
-    with pytest.raises(InvalidActivity):
-        ensure_hypothesis_tolerance_is_valid(t)
+    errors = ensure_hypothesis_tolerance_is_valid(t)
+    assert len(errors)
 
 
 def test_tolerance_regex_stdout_process():
@@ -373,40 +376,36 @@ def test_tolerance_regex_body_http():
 
 
 def test_tolerance_regex_must_have_a_pattern():
-    with pytest.raises(InvalidActivity) as e:
-        ensure_hypothesis_tolerance_is_valid({
+    errors = ensure_hypothesis_tolerance_is_valid({
             "type": "regex",
             "target": "stdout"
         })
-    assert "tolerance must have a `pattern` key" in str(e.value)
+    assert_in_errors("tolerance must have a `pattern` key", errors)
 
 
 def test_tolerance_regex_must_have_a_valid_pattern_type():
-    with pytest.raises(InvalidActivity) as e:
-        ensure_hypothesis_tolerance_is_valid({
+    errors = ensure_hypothesis_tolerance_is_valid({
             "type": "regex",
             "target": "stdout",
             "pattern": None
         })
-    assert "tolerance pattern None has an invalid type" in str(e.value)
+    assert_in_errors("tolerance pattern None has an invalid type", errors)
 
 
 def test_tolerance_regex_must_have_a_valid_pattern():
-    with pytest.raises(InvalidActivity) as e:
-        ensure_hypothesis_tolerance_is_valid({
+    errors = ensure_hypothesis_tolerance_is_valid({
             "type": "regex",
             "target": "stdout",
             "pattern": "[0-9"
         })
-    assert "pattern [0-9 seems invalid" in str(e.value)
+    assert_in_errors("pattern [0-9 seems invalid", errors)
 
 
 def test_tolerance_unsupported_type():
-    with pytest.raises(InvalidActivity) as e:
-        ensure_hypothesis_tolerance_is_valid({
+    errors = ensure_hypothesis_tolerance_is_valid({
             "type": "boom"
         })
-    assert "tolerance type 'boom' is unsupported" in str(e.value)
+    assert_in_errors("tolerance type 'boom' is unsupported", errors)
 
 
 def test_tolerance_missing_jsonpath_backend():
@@ -517,8 +516,8 @@ def test_tolerance_range_lower_boundary_must_be_a_number():
         "target": "body",
         "range": ["a", 6]
     }
-    with pytest.raises(InvalidActivity):
-        ensure_hypothesis_tolerance_is_valid(t)
+    errors = ensure_hypothesis_tolerance_is_valid(t)
+    assert len(errors)
 
 
 def test_tolerance_range_upper_boundary_must_be_a_number():
@@ -527,8 +526,8 @@ def test_tolerance_range_upper_boundary_must_be_a_number():
         "target": "body",
         "range": [6, "b"]
     }
-    with pytest.raises(InvalidActivity):
-        ensure_hypothesis_tolerance_is_valid(t)
+    errors = ensure_hypothesis_tolerance_is_valid(t)
+    assert len(errors)
 
 
 def test_tolerance_range_checked_value_must_be_a_number():

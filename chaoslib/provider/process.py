@@ -9,8 +9,9 @@ from typing import Any, List
 from logzero import logger
 
 from chaoslib import decode_bytes, substitute
-from chaoslib.exceptions import ActivityFailed, InvalidActivity, ChaosException
-from chaoslib.types import Activity, Configuration, Secrets
+from chaoslib.exceptions import ActivityFailed
+from chaoslib.types import Activity, Configuration, Secrets, ValidationError
+from chaoslib.validation import Validation
 
 
 __all__ = ["run_process_activity", "validate_process_activity"]
@@ -67,7 +68,7 @@ def run_process_activity(activity: Activity, configuration: Configuration,
     }
 
 
-def validate_process_activity(activity: Activity) -> List[ChaosException]:
+def validate_process_activity(activity: Activity) -> List[ValidationError]:
     """
     Validate a process activity.
 
@@ -80,28 +81,31 @@ def validate_process_activity(activity: Activity) -> List[ChaosException]:
 
     This should be considered as a private function.
     """
-    errors = []
+    v = Validation()
 
     name = activity.get("name")
     provider = activity.get("provider")
 
-    path = provider.get("path")
+    path = rawpath = provider.get("path")
     if not path:
-        errors.append(InvalidActivity("a process activity must have a path"))
-        # cannot validate any further, if no path is defined
-        return errors
+        v.add_error("path", "a process activity must have a path".
+                    format(name=name))
+        return v.errors()
 
     path = shutil.which(path)
     if not path:
-        errors.append(InvalidActivity(
+        v.add_error(
+            "path",
             "path '{path}' cannot be found, in activity '{name}'".format(
-                path=path, name=name)))
-        # cannot validate any further, if path cannot be found
-        return errors
+                path=rawpath, name=name),
+            value=rawpath)
+        return v.errors()
 
     if not os.access(path, os.X_OK):
-        errors.append(InvalidActivity(
+        v.add_error(
+            "path"
             "no access permission to '{path}', in activity '{name}'".format(
-                path=path, name=name)))
+                path=rawpath, name=name),
+            value=rawpath)
 
-    return errors
+    return v.errors()

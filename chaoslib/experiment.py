@@ -15,7 +15,8 @@ from chaoslib.control import initialize_controls, controls, cleanup_controls, \
     cleanup_global_controls
 from chaoslib.deprecation import warn_about_deprecated_features
 from chaoslib.exceptions import ActivityFailed, ChaosException, \
-    InterruptExecution, InvalidActivity, InvalidExperiment, ValidationError
+    InterruptExecution, InvalidActivity, InvalidExperiment, \
+    ValidationError as ValidationErrorException
 from chaoslib.extension import validate_extensions
 from chaoslib.configuration import load_configuration
 from chaoslib.hypothesis import ensure_hypothesis_is_valid, \
@@ -25,14 +26,17 @@ from chaoslib.rollback import run_rollbacks
 from chaoslib.secret import load_secrets
 from chaoslib.settings import get_loaded_settings
 from chaoslib.types import Configuration, Experiment, Journal, Run, Secrets, \
-    Settings
+    Settings, ValidationError
+from chaoslib.validation import Validation
 
 initialize_global_controls
 __all__ = ["ensure_experiment_is_valid", "run_experiment", "load_experiment"]
 
 
 @with_cache
-def ensure_experiment_is_valid(experiment: Experiment):
+def ensure_experiment_is_valid(experiment: Experiment,
+                               no_raise: bool = False
+                               ) -> List[ValidationError]:
     """
     A chaos experiment consists of a method made of activities to carry
     sequentially.
@@ -52,62 +56,73 @@ def ensure_experiment_is_valid(experiment: Experiment):
     if the experiment is not valid.
     If multiple validation errors are found, the errors are listed
     as part of the exception message
+
+    If `no_raise` is True, the function will not raise any
+    exception but rather return the list of validation errors
     """
     logger.info("Validating the experiment's syntax")
 
-    full_validation_msg = 'Experiment is not valid, ' \
-                          'please fix the following errors'
-    errors = []
+    full_validation_msg = "Experiment is not valid, " \
+                          "please fix the following errors. " \
+                          "\n{}"
+    v = Validation()
 
     if not experiment:
+        v.add_error("$", "an empty experiment is not an experiment")
         # empty experiment, cannot continue validation any further
-        raise ValidationError(full_validation_msg,
-                              "an empty experiment is not an experiment")
+        if no_raise:
+            return v.errors()
+        raise InvalidExperiment(full_validation_msg.format(str(v)))
 
     if not experiment.get("title"):
-        errors.append(InvalidExperiment("experiment requires a title"))
+        v.add_error("title", "experiment requires a title")
 
     if not experiment.get("description"):
-        errors.append(InvalidExperiment("experiment requires a description"))
+        v.add_error("description", "experiment requires a description")
 
     tags = experiment.get("tags")
     if tags:
         if list(filter(lambda t: t == '' or not isinstance(t, str), tags)):
-            errors.append(InvalidExperiment(
-                "experiment tags must be a non-empty string"))
+            v.add_error("tags", "experiment tags must be a non-empty string")
 
-    errors.extend(validate_extensions(experiment))
+    v.extend_errors(validate_extensions(experiment))
 
     config = load_configuration(experiment.get("configuration", {}))
     load_secrets(experiment.get("secrets", {}), config)
 
-    errors.extend(ensure_hypothesis_is_valid(experiment))
+    v.extend_errors(ensure_hypothesis_is_valid(experiment))
 
     method = experiment.get("method")
     if not method:
-        errors.append(InvalidExperiment("an experiment requires a method with "
-                                        "at least one activity"))
+        v.add_error(
+            "method",
+            "an experiment requires a method with at least one activity")
     else:
         for activity in method:
-            errors.extend(ensure_activity_is_valid(activity))
+            v.extend_errors(ensure_activity_is_valid(activity))
 
             # let's see if a ref is indeed found in the experiment
             ref = activity.get("ref")
             if ref and not lookup_activity(ref):
-                errors.append(
-                    InvalidActivity("referenced activity '{r}' could not be "
-                                    "found in the experiment".format(r=ref)))
+                v.add_error(
+                    "ref",
+                    "referenced activity '{r}' could not be "
+                    "found in the experiment".format(r=ref),
+                    value=ref
+                )
 
     rollbacks = experiment.get("rollbacks", [])
     for activity in rollbacks:
-        errors.extend(ensure_activity_is_valid(activity))
+        v.extend_errors(ensure_activity_is_valid(activity))
 
     warn_about_deprecated_features(experiment)
 
-    errors.extend(validate_controls(experiment))
+    v.extend_errors(validate_controls(experiment))
 
-    if errors:
-        raise ValidationError(full_validation_msg, errors)
+    if v.has_errors():
+        if no_raise:
+            return v.errors()
+        raise InvalidExperiment(full_validation_msg.format(str(v)))
 
     logger.info("Experiment looks valid")
 

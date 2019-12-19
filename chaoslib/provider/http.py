@@ -7,7 +7,8 @@ import requests
 
 from chaoslib import substitute
 from chaoslib.exceptions import ActivityFailed, InvalidActivity, ChaosException
-from chaoslib.types import Activity, Configuration, Secrets
+from chaoslib.types import Activity, Configuration, Secrets, ValidationError
+from chaoslib.validation import Validation
 
 
 __all__ = ["run_http_activity", "validate_http_activity"]
@@ -89,7 +90,7 @@ def run_http_activity(activity: Activity, configuration: Configuration,
         raise ActivityFailed("activity took too long to complete")
 
 
-def validate_http_activity(activity: Activity) -> List[ChaosException]:
+def validate_http_activity(activity: Activity) -> List[ValidationError]:
     """
     Validate a HTTP activity.
 
@@ -106,16 +107,15 @@ def validate_http_activity(activity: Activity) -> List[ChaosException]:
 
     This should be considered as a private function.
     """
-    errors = []
+    v = Validation()
 
     provider = activity["provider"]
     url = provider.get("url")
     if not url:
-        errors.append(InvalidActivity("a HTTP activity must have a URL"))
+        v.add_error("url", "a HTTP activity must have a URL")
 
     headers = provider.get("headers")
     if headers and not type(headers) == dict:
-        errors.append(
-            InvalidActivity("a HTTP activities expect headers as a mapping"))
+        v.add_error("headers", "a HTTP activities expect headers as a mapping")
 
-    return errors
+    return v.errors()

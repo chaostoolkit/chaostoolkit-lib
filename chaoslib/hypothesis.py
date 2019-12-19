@@ -4,7 +4,7 @@ from functools import singledispatch
 import json
 from numbers import Number
 import re
-from typing import Any
+from typing import Any, List
 
 try:
     from jsonpath2.path import Path as JSONPath
@@ -21,13 +21,15 @@ from chaoslib.control import controls
 from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
     InvalidExperiment
 from chaoslib.types import Configuration, Experiment, \
-    Secrets, Tolerance
+    Secrets, Tolerance, ValidationError
+from chaoslib.validation import Validation
 
 
 __all__ = ["ensure_hypothesis_is_valid", "run_steady_state_hypothesis"]
 
 
-def ensure_hypothesis_is_valid(experiment: Experiment):
+def ensure_hypothesis_is_valid(experiment: Experiment) \
+        -> List[ValidationError]:
     """
     Validates that the steady state hypothesis entry has the expected schema
     or raises :exc:`InvalidExperiment` or :exc:`InvalidActivity`.
@@ -36,139 +38,190 @@ def ensure_hypothesis_is_valid(experiment: Experiment):
     if hypo is None:
         return []
 
-    errors = []
+    v = Validation()
     if not hypo.get("title"):
-        errors.append(InvalidExperiment("hypothesis requires a title"))
+        v.add_error("title", "hypothesis requires a title")
 
     probes = hypo.get("probes")
     if probes:
         for probe in probes:
-            errors.extend(ensure_activity_is_valid(probe))
+            v.extend_errors(ensure_activity_is_valid(probe))
 
             if "tolerance" not in probe:
-                errors.append(InvalidActivity(
-                    "hypothesis probe must have a tolerance entry"))
+                v.add_error(
+                    "tolerance",
+                    "hypothesis probe must have a tolerance entry")
             else:
-                errors.extend(
+                v.extend_errors(
                     ensure_hypothesis_tolerance_is_valid(probe["tolerance"]))
 
-    return errors
+    return v.errors()
 
 
-def ensure_hypothesis_tolerance_is_valid(tolerance: Tolerance):
+def ensure_hypothesis_tolerance_is_valid(tolerance: Tolerance) \
+        -> List[ValidationError]:
     """
     Validate the tolerance of the hypothesis probe and raises
     :exc:`InvalidActivity` if it isn't valid.
     """
+    v = Validation()
     if not isinstance(tolerance, (
             bool, int, list, str, dict)):
-        raise InvalidActivity(
+        v.add_error(
+            "tolerance",
             "hypothesis probe tolerance must either be an integer, "
             "a string, a boolean or a pair of values for boundaries. "
             "It can also be a dictionary which is a probe activity "
             "definition that takes an argument called `value` with "
-            "the value of the probe itself to be validated")
+            "the value of the probe itself to be validated",
+            value=tolerance
+        )
 
     if isinstance(tolerance, dict):
         tolerance_type = tolerance.get("type")
 
         if tolerance_type == "probe":
-            ensure_activity_is_valid(tolerance)
+            v.extend_errors(ensure_activity_is_valid(tolerance))
         elif tolerance_type == "regex":
-            check_regex_pattern(tolerance)
+            v.extend_errors(check_regex_pattern(tolerance))
         elif tolerance_type == "jsonpath":
-            check_json_path(tolerance)
+            v.extend_errors(check_json_path(tolerance))
         elif tolerance_type == "range":
-            check_range(tolerance)
+            v.extend_errors(check_range(tolerance))
         else:
-            raise InvalidActivity(
+            v.add_error(
+                "type",
                 "hypothesis probe tolerance type '{}' is unsupported".format(
-                    tolerance_type))
+                    tolerance_type),
+                value=tolerance_type
+            )
 
-    # TODO
-    return []
+    return v.errors()
 
 
-def check_regex_pattern(tolerance: Tolerance):
+def check_regex_pattern(tolerance: Tolerance) -> List[ValidationError]:
     """
     Check the regex pattern of a tolerance and raise :exc:`InvalidActivity`
     when the pattern is missing or invalid (meaning, cannot be compiled by
     the Python regex engine).
     """
+    v = Validation()
+
     if "pattern" not in tolerance:
-        raise InvalidActivity(
+        v.add_error(
+            "pattern",
             "hypothesis regex probe tolerance must have a `pattern` key")
+        return v.errors()
 
     pattern = tolerance["pattern"]
     try:
         re.compile(pattern)
     except TypeError:
-        raise InvalidActivity(
+        v.add_error(
+            "pattern",
             "hypothesis probe tolerance pattern {} has an invalid type".format(
-                pattern))
+                pattern),
+            value=pattern
+        )
     except re.error as e:
-        raise InvalidActivity(
+        v.add_error(
+            "pattern",
             "hypothesis probe tolerance pattern {} seems invalid: {}".format(
-                e.pattern, e.msg))
+                e.pattern, e.msg),
+            value=pattern
+        )
+
+    return v.errors()
 
 
-def check_json_path(tolerance: Tolerance):
+def check_json_path(tolerance: Tolerance) -> List[ValidationError]:
     """
     Check the JSON path of a tolerance and raise :exc:`InvalidActivity`
     when the path is missing or invalid.
 
     See: https://github.com/h2non/jsonpath-ng
     """
+    v = Validation()
+
     if not HAS_JSONPATH:
         raise InvalidActivity(
             "Install the `jsonpath2` package to use a JSON path tolerance: "
             "`pip install chaostoolkit-lib[jsonpath]`.")
 
     if "path" not in tolerance:
-        raise InvalidActivity(
+        v.add_error(
+            "path",
             "hypothesis jsonpath probe tolerance must have a `path` key")
+        return v.errors()
 
     try:
         path = tolerance.get("path", "").strip()
         if not path:
-            raise InvalidActivity(
-                "hypothesis probe tolerance JSON path cannot be empty")
+            v.add_error(
+                "path",
+                "hypothesis probe tolerance JSON path cannot be empty",
+                value=path
+            )
         JSONPath.parse_str(path)
     except ValueError:
-        raise InvalidActivity(
+        v.add_error(
+            "path",
             "hypothesis probe tolerance JSON path {} is invalid".format(
-                path))
+                path),
+            value=path
+        )
     except TypeError:
-        raise InvalidActivity(
+        v.add_error(
+            "path",
             "hypothesis probe tolerance JSON path {} has an invalid "
-            "type".format(path))
+            "type".format(path),
+            value=path
+        )
+
+    return v.errors()
 
 
-def check_range(tolerance: Tolerance):
+def check_range(tolerance: Tolerance) -> List[ValidationError]:
     """
     Check a value is within a given range. That range may be set to a min and
     max value or a sequence.
     """
+    v = Validation()
+
     if "range" not in tolerance:
-        raise InvalidActivity(
+        v.add_error(
+            "range",
             "hypothesis range probe tolerance must have a `range` key")
+        return v.errors()
 
     the_range = tolerance["range"]
     if not isinstance(the_range, list):
-        raise InvalidActivity(
+        v.add_error(
+            "range",
             "hypothesis range must be a sequence")
 
     if len(the_range) != 2:
-        raise InvalidActivity(
-            "hypothesis range sequence must be made of two values")
+        v.add_error(
+            "range",
+            "hypothesis range sequence must be made of two values",
+            value=the_range
+        )
 
     if not isinstance(the_range[0], Number):
-        raise InvalidActivity(
-            "hypothesis range lower boundary must be a number")
+        v.add_error(
+            "range",
+            "hypothesis range lower boundary must be a number",
+            value=the_range[0]
+        )
 
     if not isinstance(the_range[1], Number):
-        raise InvalidActivity(
-            "hypothesis range upper boundary must be a number")
+        v.add_error(
+            "range",
+            "hypothesis range upper boundary must be a number",
+            value=the_range[1]
+        )
+
+    return v.errors()
 
 
 def run_steady_state_hypothesis(experiment: Experiment,

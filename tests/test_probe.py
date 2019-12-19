@@ -12,21 +12,7 @@ from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.activity import ensure_activity_is_valid, run_activity
 
 from fixtures import config, experiments, probes
-
-
-def assert_in_errors(msg, errors):
-    """
-    Check whether msg can be found in any of the list of errors
-
-    :param msg: exception string to be found in any of the instances
-    :param errors: list of ChaosException instances
-    """
-    for error in errors:
-        if msg in str(error):
-            # expected exception message is found
-            return
-
-    raise AssertionError("{} not in {}".format(msg, errors))
+from test_validation import assert_in_errors
 
 
 def test_empty_probe_is_invalid():
@@ -82,10 +68,8 @@ def test_process_probe_have_a_path():
 
 
 def test_process_probe_path_must_exist():
-    print(probes.ProcessPathDoesNotExistProbe)
     errors = ensure_activity_is_valid(probes.ProcessPathDoesNotExistProbe)
-    print(errors)
-    assert_in_errors("path 'None' cannot be found, in activity", errors)
+    assert_in_errors("path 'somewhere/not/here' cannot be found, in activity", errors)
 
 
 def test_http_probe_must_have_a_url():

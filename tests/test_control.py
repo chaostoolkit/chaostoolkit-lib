@@ -239,7 +239,6 @@ def test_validate_python_control_needs_a_module():
             }
         })
     assert len(errors)
-    assert type(errors[0]) == InvalidActivity
 
 
 def test_controls_can_access_experiment():

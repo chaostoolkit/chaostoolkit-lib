@@ -16,14 +16,16 @@ from chaoslib.provider.python import run_python_activity, \
     validate_python_activity
 from chaoslib.provider.process import run_process_activity, \
     validate_process_activity
-from chaoslib.types import Activity, Configuration, Experiment, Run, Secrets
+from chaoslib.types import Activity, Configuration, Experiment, Run, Secrets, \
+    ValidationError
+from chaoslib.validation import Validation
 
 
 __all__ = ["ensure_activity_is_valid", "get_all_activities_in_experiment",
            "run_activities"]
 
 
-def ensure_activity_is_valid(activity: Activity):
+def ensure_activity_is_valid(activity: Activity) -> List[ValidationError]:
     """
     Goes through the activity and checks certain of its properties and raise
     :exc:`InvalidActivity` whenever one does not respect the expectations.
@@ -34,75 +36,80 @@ def ensure_activity_is_valid(activity: Activity):
 
     Depending on the type, an activity requires a variety of other keys.
 
-    In all failing cases, raises :exc:`InvalidActivity`.
+    In all failing cases, returns a list of validation errors.
     """
-    errors = []
+    v = Validation()
     if not activity:
-        errors.append(InvalidActivity("empty activity is no activity"))
-        return errors
+        v.add_error("activity", "empty activity is no activity")
+        return v.errors()
 
     # when the activity is just a ref, there is little to validate
     ref = activity.get("ref")
     if ref is not None:
         if not isinstance(ref, str) or ref == '':
-            errors.append(InvalidActivity(
-                "reference to activity must be non-empty strings"))
-        return errors
+            v.add_error(
+                "ref", "reference to activity must be non-empty strings")
+        return v.errors()
 
     activity_type = activity.get("type")
     if not activity_type:
-        errors.append(InvalidActivity("an activity must have a type"))
+        v.add_error("type", "an activity must have a type")
 
     if activity_type not in ("probe", "action"):
-        errors.append(InvalidActivity(
-            "'{t}' is not a supported activity type".format(t=activity_type)))
+        msg = "'{t}' is not a supported activity type".format(t=activity_type)
+        v.add_error("type", msg, value=activity_type)
 
     if not activity.get("name"):
-        errors.append(InvalidActivity("an activity must have a name"))
+        v.add_error("name", "an activity must have a name")
 
     provider = activity.get("provider")
     if not provider:
-        errors.append(InvalidActivity("an activity requires a provider"))
+        v.add_error("provider", "an activity requires a provider")
         provider_type = None
     else:
         provider_type = provider.get("type")
         if not provider_type:
-            errors.append(InvalidActivity("a provider must have a type"))
+            v.add_error("type", "a provider must have a type")
 
         if provider_type not in ("python", "process", "http"):
-            errors.append(InvalidActivity(
-                "unknown provider type '{type}'".format(type=provider_type)))
+            msg = "unknown provider type '{type}'".format(type=provider_type)
+            v.add_error("type", msg, value=provider_type)
 
     timeout = activity.get("timeout")
     if timeout is not None:
         if not isinstance(timeout, numbers.Number):
-            errors.append(
-                InvalidActivity("activity timeout must be a number"))
+            v.add_error(
+                "timeout", "activity timeout must be a number", value=timeout)
 
     pauses = activity.get("pauses")
     if pauses is not None:
         before = pauses.get("before")
         if before is not None and not isinstance(before, numbers.Number):
-            errors.append(
-                InvalidActivity("activity before pause must be a number"))
+            v.add_error(
+                "before", "activity before pause must be a number",
+                value=before
+            )
         after = pauses.get("after")
         if after is not None and not isinstance(after, numbers.Number):
-            errors.append(
-                InvalidActivity("activity after pause must be a number"))
+            v.add_error(
+                "after", "activity after pause must be a number",
+                value=after
+            )
 
     if "background" in activity:
         if not isinstance(activity["background"], bool):
-            errors.append(
-                InvalidActivity("activity background must be a boolean"))
+            v.add_error(
+                "background", "activity background must be a boolean",
+                value=activity["background"])
 
     if provider_type == "python":
-        errors.extend(validate_python_activity(activity))
+        v.extend_errors(validate_python_activity(activity))
     elif provider_type == "process":
-        errors.extend(validate_process_activity(activity))
+        v.extend_errors(validate_process_activity(activity))
     elif provider_type == "http":
-        errors.extend(validate_http_activity(activity))
+        v.extend_errors(validate_http_activity(activity))
 
-    return errors
+    return v.errors()
 
 
 def run_activities(experiment: Experiment, configuration: Configuration,
