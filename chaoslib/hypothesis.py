@@ -34,21 +34,25 @@ def ensure_hypothesis_is_valid(experiment: Experiment):
     """
     hypo = experiment.get("steady-state-hypothesis")
     if hypo is None:
-        return
+        return []
 
+    errors = []
     if not hypo.get("title"):
-        raise InvalidExperiment("hypothesis requires a title")
+        errors.append(InvalidExperiment("hypothesis requires a title"))
 
     probes = hypo.get("probes")
     if probes:
         for probe in probes:
-            ensure_activity_is_valid(probe)
+            errors.extend(ensure_activity_is_valid(probe))
 
             if "tolerance" not in probe:
-                raise InvalidActivity(
-                    "hypothesis probe must have a tolerance entry")
+                errors.append(InvalidActivity(
+                    "hypothesis probe must have a tolerance entry"))
+            else:
+                errors.extend(
+                    ensure_hypothesis_tolerance_is_valid(probe["tolerance"]))
 
-            ensure_hypothesis_tolerance_is_valid(probe["tolerance"])
+    return errors
 
 
 def ensure_hypothesis_tolerance_is_valid(tolerance: Tolerance):
@@ -80,6 +84,9 @@ def ensure_hypothesis_tolerance_is_valid(tolerance: Tolerance):
             raise InvalidActivity(
                 "hypothesis probe tolerance type '{}' is unsupported".format(
                     tolerance_type))
+
+    # TODO
+    return []
 
 
 def check_regex_pattern(tolerance: Tolerance):

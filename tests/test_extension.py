@@ -9,10 +9,10 @@ from fixtures import experiments
 
 
 def test_extensions_must_have_name():
-    with pytest.raises(InvalidExperiment):
-        exp = experiments.Experiment.copy()
-        set_extension(exp, {"somekey": "blah"})
-        validate_extensions(exp)
+    exp = experiments.Experiment.copy()
+    set_extension(exp, {"somekey": "blah"})
+    errors = validate_extensions(exp)
+    assert len(errors)
 
 
 def test_get_extension_returns_nothing_when_not_extensions_block():

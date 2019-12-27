@@ -3,12 +3,12 @@ import importlib
 import inspect
 import sys
 import traceback
-from typing import Any
+from typing import Any, List
 
 from logzero import logger
 
 from chaoslib import substitute
-from chaoslib.exceptions import ActivityFailed, InvalidActivity
+from chaoslib.exceptions import ActivityFailed, InvalidActivity, ChaosException
 from chaoslib.types import Activity, Configuration, Secrets
 
 
@@ -60,7 +60,7 @@ def run_python_activity(activity: Activity, configuration: Configuration,
                     sys.exc_info()[2])
 
 
-def validate_python_activity(activity: Activity):
+def validate_python_activity(activity: Activity) -> List[ChaosException]:
     """
     Validate a Python activity.
 
@@ -72,26 +72,37 @@ def validate_python_activity(activity: Activity):
 
     The `"arguments"` activity key must match the function's signature.
 
-    In all failing cases, raises :exc:`InvalidActivity`.
+    In all failing cases, returns a list of errors.
 
     This should be considered as a private function.
     """
-    name = activity["name"]
-    provider = activity["provider"]
+    errors = []
+
+    name = activity.get("name")
+    provider = activity.get("provider")
     mod_name = provider.get("module")
     if not mod_name:
-        raise InvalidActivity("a Python activity must have a module path")
+        errors.append(
+            InvalidActivity("a Python activity must have a module path"))
 
     func = provider.get("func")
     if not func:
-        raise InvalidActivity("a Python activity must have a function name")
+        errors.append(
+            InvalidActivity("a Python activity must have a function name"))
+
+    if not mod_name or not func:
+        # no module no function, we cannot do anymore validation
+        return errors
 
     try:
         mod = importlib.import_module(mod_name)
     except ImportError:
-        raise InvalidActivity("could not find Python module '{mod}' "
-                              "in activity '{name}'".format(
-                                  mod=mod_name, name=name))
+        errors.append(
+            InvalidActivity("could not find Python module '{mod}' "
+                            "in activity '{name}'".format(
+                                mod=mod_name, name=name)))
+        # module is not imported, we cannot do any more validation
+        return errors
 
     found_func = False
     arguments = provider.get("arguments", {})
@@ -126,21 +137,23 @@ def validate_python_activity(activity: Activity):
                 msg = str(x)
                 if "missing" in msg:
                     arg = msg.rsplit(":", 1)[1].strip()
-                    raise InvalidActivity(
+                    errors.append(InvalidActivity(
                         "required argument {arg} is missing from "
-                        "activity '{name}'".format(arg=arg, name=name))
+                        "activity '{name}'".format(arg=arg, name=name)))
                 elif "unexpected" in msg:
                     arg = msg.rsplit(" ", 1)[1].strip()
-                    raise InvalidActivity(
+                    errors.append(InvalidActivity(
                         "argument {arg} is not part of the "
                         "function signature in activity '{name}'".format(
-                            arg=arg, name=name))
+                            arg=arg, name=name)))
                 else:
                     # another error? let's fail fast
                     raise
             break
 
     if not found_func:
-        raise InvalidActivity(
+        errors.append(InvalidActivity(
             "'{mod}' does not expose '{func}' in activity '{name}'".format(
-                mod=mod_name, func=func, name=name))
+                mod=mod_name, func=func, name=name)))
+
+    return errors

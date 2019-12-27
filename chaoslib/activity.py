@@ -36,67 +36,73 @@ def ensure_activity_is_valid(activity: Activity):
 
     In all failing cases, raises :exc:`InvalidActivity`.
     """
+    errors = []
     if not activity:
-        raise InvalidActivity("empty activity is no activity")
+        errors.append(InvalidActivity("empty activity is no activity"))
+        return errors
 
     # when the activity is just a ref, there is little to validate
     ref = activity.get("ref")
     if ref is not None:
         if not isinstance(ref, str) or ref == '':
-            raise InvalidActivity(
-                "reference to activity must be non-empty strings")
-        return
+            errors.append(InvalidActivity(
+                "reference to activity must be non-empty strings"))
+        return errors
 
     activity_type = activity.get("type")
     if not activity_type:
-        raise InvalidActivity("an activity must have a type")
+        errors.append(InvalidActivity("an activity must have a type"))
 
     if activity_type not in ("probe", "action"):
-        raise InvalidActivity(
-            "'{t}' is not a supported activity type".format(t=activity_type))
+        errors.append(InvalidActivity(
+            "'{t}' is not a supported activity type".format(t=activity_type)))
 
     if not activity.get("name"):
-        raise InvalidActivity("an activity must have a name")
+        errors.append(InvalidActivity("an activity must have a name"))
 
     provider = activity.get("provider")
     if not provider:
-        raise InvalidActivity("an activity requires a provider")
+        errors.append(InvalidActivity("an activity requires a provider"))
+        provider_type = None
+    else:
+        provider_type = provider.get("type")
+        if not provider_type:
+            errors.append(InvalidActivity("a provider must have a type"))
 
-    provider_type = provider.get("type")
-    if not provider_type:
-        raise InvalidActivity("a provider must have a type")
-
-    if provider_type not in ("python", "process", "http"):
-        raise InvalidActivity(
-            "unknown provider type '{type}'".format(type=provider_type))
-
-    if not activity.get("name"):
-        raise InvalidActivity("activity must have a name (cannot be empty)")
+        if provider_type not in ("python", "process", "http"):
+            errors.append(InvalidActivity(
+                "unknown provider type '{type}'".format(type=provider_type)))
 
     timeout = activity.get("timeout")
     if timeout is not None:
         if not isinstance(timeout, numbers.Number):
-            raise InvalidActivity("activity timeout must be a number")
+            errors.append(
+                InvalidActivity("activity timeout must be a number"))
 
     pauses = activity.get("pauses")
     if pauses is not None:
         before = pauses.get("before")
         if before is not None and not isinstance(before, numbers.Number):
-            raise InvalidActivity("activity before pause must be a number")
+            errors.append(
+                InvalidActivity("activity before pause must be a number"))
         after = pauses.get("after")
         if after is not None and not isinstance(after, numbers.Number):
-            raise InvalidActivity("activity after pause must be a number")
+            errors.append(
+                InvalidActivity("activity after pause must be a number"))
 
     if "background" in activity:
         if not isinstance(activity["background"], bool):
-            raise InvalidActivity("activity background must be a boolean")
+            errors.append(
+                InvalidActivity("activity background must be a boolean"))
 
     if provider_type == "python":
-        validate_python_activity(activity)
+        errors.extend(validate_python_activity(activity))
     elif provider_type == "process":
-        validate_process_activity(activity)
+        errors.extend(validate_process_activity(activity))
     elif provider_type == "http":
-        validate_http_activity(activity)
+        errors.extend(validate_http_activity(activity))
+
+    return errors
 
 
 def run_activities(experiment: Experiment, configuration: Configuration,
