@@ -102,7 +102,7 @@ def test_experiment_hypothesis_must_have_a_title():
 
 
 def test_experiment_hypothesis_must_have_a_valid_probe():
-    with pytest.raises(InvalidActivity) as exc:
+    with pytest.raises(InvalidExperiment) as exc:
         ensure_experiment_is_valid(experiments.ExperimentWithInvalidHypoProbe)
     assert "required argument 'path' is missing from activity" in str(exc.value)
 

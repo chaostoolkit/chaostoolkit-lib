@@ -12,79 +12,69 @@ from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.activity import ensure_activity_is_valid, run_activity
 
 from fixtures import config, experiments, probes
+from test_validation import assert_in_errors
 
 
 def test_empty_probe_is_invalid():
-    with pytest.raises(InvalidActivity) as exc:
-        ensure_activity_is_valid(probes.EmptyProbe)
-    assert "empty activity is no activity" in str(exc.value)
+    errors = ensure_activity_is_valid(probes.EmptyProbe)
+    assert_in_errors("empty activity is no activity", errors)
 
 
 def test_probe_must_have_a_type():
-    with pytest.raises(InvalidActivity) as exc:
-        ensure_activity_is_valid(probes.MissingTypeProbe)
-    assert "an activity must have a type" in str(exc.value)
+    errors = ensure_activity_is_valid(probes.MissingTypeProbe)
+    assert_in_errors("an activity must have a type", errors)
 
 
 def test_probe_must_have_a_known_type():
-    with pytest.raises(InvalidActivity) as exc:
-        ensure_activity_is_valid(probes.UnknownTypeProbe)
-    assert "'whatever' is not a supported activity type" in str(exc.value)
+    errors = ensure_activity_is_valid(probes.UnknownTypeProbe)
+    assert_in_errors("'whatever' is not a supported activity type", errors)
 
 
 def test_probe_provider_must_have_a_known_type():
-    with pytest.raises(InvalidActivity) as exc:
-        ensure_activity_is_valid(probes.UnknownProviderTypeProbe)
-    assert "unknown provider type 'pizza'" in str(exc.value)
+    errors = ensure_activity_is_valid(probes.UnknownProviderTypeProbe)
+    assert_in_errors("unknown provider type 'pizza'", errors)
 
 
 def test_python_probe_must_have_a_module_path():
-    with pytest.raises(InvalidActivity) as exc:
-        ensure_activity_is_valid(probes.MissingModuleProbe)
-    assert "a Python activity must have a module path" in str(exc.value)
+    errors = ensure_activity_is_valid(probes.MissingModuleProbe)
+    assert_in_errors("a Python activity must have a module path", errors)
 
 
 def test_python_probe_must_have_a_function_name():
-    with pytest.raises(InvalidActivity) as exc:
-        ensure_activity_is_valid(probes.MissingFunctionProbe)
-    assert "a Python activity must have a function name" in str(exc.value)
+    errors = ensure_activity_is_valid(probes.MissingFunctionProbe)
+    assert_in_errors("a Python activity must have a function name", errors)
 
 
 def test_python_probe_must_be_importable():
-    with pytest.raises(InvalidActivity) as exc:
-        ensure_activity_is_valid(probes.NotImportableModuleProbe)
-    assert "could not find Python module 'fake.module'" in str(exc.value)
+    errors = ensure_activity_is_valid(probes.NotImportableModuleProbe)
+    assert_in_errors("could not find Python module 'fake.module'", errors)
 
 
 def test_python_probe_func_must_have_enough_args():
-    with pytest.raises(InvalidActivity) as exc:
-        ensure_activity_is_valid(probes.MissingFuncArgProbe)
-    assert "required argument 'path' is missing" in str(exc.value)
+    errors = ensure_activity_is_valid(probes.MissingFuncArgProbe)
+    assert_in_errors("required argument 'path' is missing", errors)
 
 
 def test_python_probe_func_cannot_have_too_many_args():
-    with pytest.raises(InvalidActivity) as exc:
-        ensure_activity_is_valid(probes.TooManyFuncArgsProbe)
-    assert "argument 'should_not_be_here' is not part of the " \
-           "function signature" in str(exc.value)
+    errors = ensure_activity_is_valid(probes.TooManyFuncArgsProbe)
+    assert_in_errors(
+        "argument 'should_not_be_here' is not part of the function signature",
+        errors)
 
 
 def test_process_probe_have_a_path():
-    with pytest.raises(InvalidActivity) as exc:
-        ensure_activity_is_valid(probes.MissingProcessPathProbe)
-    assert "a process activity must have a path" in str(exc.value)
+    errors = ensure_activity_is_valid(probes.MissingProcessPathProbe)
+    assert_in_errors("a process activity must have a path", errors)
 
 
 def test_process_probe_path_must_exist():
-    with pytest.raises(InvalidActivity) as exc:
-        ensure_activity_is_valid(probes.ProcessPathDoesNotExistProbe)
-    assert "path 'None' cannot be found, in activity" in str(exc.value)
+    errors = ensure_activity_is_valid(probes.ProcessPathDoesNotExistProbe)
+    assert_in_errors("path 'somewhere/not/here' cannot be found, in activity", errors)
 
 
 def test_http_probe_must_have_a_url():
-    with pytest.raises(InvalidActivity) as exc:
-        ensure_activity_is_valid(probes.MissingHTTPUrlProbe)
-    assert "a HTTP activity must have a URL" in str(exc.value)
+    errors = ensure_activity_is_valid(probes.MissingHTTPUrlProbe)
+    assert_in_errors("a HTTP activity must have a URL", errors)
 
 
 def test_run_python_probe_should_return_raw_value():

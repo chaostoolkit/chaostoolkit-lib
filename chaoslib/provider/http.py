@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-from typing import Any
+from typing import Any, List
 import urllib3
 
 from logzero import logger
 import requests
 
 from chaoslib import substitute
-from chaoslib.exceptions import ActivityFailed, InvalidActivity
-from chaoslib.types import Activity, Configuration, Secrets
+from chaoslib.exceptions import ActivityFailed, InvalidActivity, ChaosException
+from chaoslib.types import Activity, Configuration, Secrets, ValidationError
+from chaoslib.validation import Validation
 
 
 __all__ = ["run_http_activity", "validate_http_activity"]
@@ -89,7 +90,7 @@ def run_http_activity(activity: Activity, configuration: Configuration,
         raise ActivityFailed("activity took too long to complete")
 
 
-def validate_http_activity(activity: Activity):
+def validate_http_activity(activity: Activity) -> List[ValidationError]:
     """
     Validate a HTTP activity.
 
@@ -102,15 +103,19 @@ def validate_http_activity(activity: Activity):
     * `"method"` which is the HTTP verb to use (default to `"GET"`)
     * `"headers"` which must be a mapping of string to string
 
-    In all failing cases, raises :exc:`InvalidActivity`.
+    In all failing cases, returns a list of errors.
 
     This should be considered as a private function.
     """
+    v = Validation()
+
     provider = activity["provider"]
     url = provider.get("url")
     if not url:
-        raise InvalidActivity("a HTTP activity must have a URL")
+        v.add_error("url", "a HTTP activity must have a URL")
 
     headers = provider.get("headers")
     if headers and not type(headers) == dict:
-        raise InvalidActivity("a HTTP activities expect headers as a mapping")
+        v.add_error("headers", "a HTTP activities expect headers as a mapping")
+
+    return v.errors()

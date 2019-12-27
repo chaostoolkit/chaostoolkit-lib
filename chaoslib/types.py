@@ -5,7 +5,7 @@ __all__ = ["MicroservicesStatus", "Probe", "Action", "Experiment", "Layer",
            "TargetLayers", "Activity", "Journal", "Run", "Secrets", "Step",
            "Configuration", "Discovery", "DiscoveredActivities", "Extension",
            "DiscoveredSystemInfo", "Settings", "EventPayload", "Tolerance",
-           "Hypothesis", "Control"]
+           "Hypothesis", "Control", "ValidationError"]
 
 
 Action = Dict[str, Any]
@@ -37,3 +37,5 @@ Tolerance = Union[int, str, bool, list, Dict[str, Any]]
 Extension = Dict[str, Any]
 Hypothesis = Dict[str, Any]
 Control = Dict[str, Any]
+
+ValidationError = Dict[str, Any]

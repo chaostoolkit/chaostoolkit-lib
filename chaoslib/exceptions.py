@@ -3,7 +3,7 @@
 __all__ = ["ChaosException", "InvalidExperiment", "InvalidActivity",
            "ActivityFailed", "DiscoveryFailed", "InvalidSource",
            "InterruptExecution", "ControlPythonFunctionLoadingError",
-           "InvalidControl"]
+           "InvalidControl", "ValidationError"]
 
 
 class ChaosException(Exception):
@@ -43,4 +43,8 @@ class InterruptExecution(ChaosException):
 
 
 class InvalidControl(ChaosException):
+    pass
+
+
+class ValidationError(ChaosException):
     pass

@@ -1,25 +1,31 @@
 # -*- coding: utf-8 -*-
-from typing import Optional
+from typing import Optional, List
 
-from chaoslib.exceptions import InvalidExperiment
-from chaoslib.types import Experiment, Extension
+from chaoslib.exceptions import InvalidExperiment, ChaosException
+from chaoslib.types import Experiment, Extension, ValidationError
+from chaoslib.validation import Validation
 
 __all__ = ["get_extension", "has_extension", "set_extension",
            "merge_extension", "remove_extension", "validate_extensions"]
 
 
-def validate_extensions(experiment: Experiment):
+def validate_extensions(experiment: Experiment) -> List[ValidationError]:
     """
     Validate that extensions respect the specification.
     """
     extensions = experiment.get("extensions")
     if not extensions:
-        return
+        return []
 
+    v = Validation()
     for ext in extensions:
         ext_name = ext.get('name')
         if not ext_name or not ext_name.strip():
-            raise InvalidExperiment("All extensions require a non-empty name")
+            v.add_error(
+                "extensions", "All extensions require a non-empty name")
+            break
+
+    return v.errors()
 
 
 def get_extension(experiment: Experiment, name: str) -> Optional[Extension]:

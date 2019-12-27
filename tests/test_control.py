@@ -232,13 +232,13 @@ def test_validate_python_control_must_be_loadable(logger):
 
 
 def test_validate_python_control_needs_a_module():
-    with pytest.raises(InvalidActivity):
-        validate_python_control({
+    errors = validate_python_control({
             "name": "a-python-control",
             "provider": {
                 "type": "python"
             }
         })
+    assert len(errors)
 
 
 def test_controls_can_access_experiment():

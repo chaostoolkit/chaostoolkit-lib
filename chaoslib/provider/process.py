@@ -4,13 +4,14 @@ import os
 import os.path
 import shutil
 import subprocess
-from typing import Any
+from typing import Any, List
 
 from logzero import logger
 
 from chaoslib import decode_bytes, substitute
-from chaoslib.exceptions import ActivityFailed, InvalidActivity
-from chaoslib.types import Activity, Configuration, Secrets
+from chaoslib.exceptions import ActivityFailed
+from chaoslib.types import Activity, Configuration, Secrets, ValidationError
+from chaoslib.validation import Validation
 
 
 __all__ = ["run_process_activity", "validate_process_activity"]
@@ -78,7 +79,7 @@ def run_process_activity(activity: Activity, configuration: Configuration,
     }
 
 
-def validate_process_activity(activity: Activity):
+def validate_process_activity(activity: Activity) -> List[ValidationError]:
     """
     Validate a process activity.
 
@@ -87,24 +88,35 @@ def validate_process_activity(activity: Activity):
     * a `"path"` key which is an absolute path to an executable the current
       user can call
 
-    In all failing cases, raises :exc:`InvalidActivity`.
+    In all failing cases, returns a list of errors.
 
     This should be considered as a private function.
     """
-    name = activity["name"]
-    provider = activity["provider"]
+    v = Validation()
 
-    path = provider.get("path")
+    name = activity.get("name")
+    provider = activity.get("provider")
+
+    path = rawpath = provider.get("path")
     if not path:
-        raise InvalidActivity("a process activity must have a path")
+        v.add_error("path", "a process activity must have a path".
+                    format(name=name))
+        return v.errors()
 
     path = shutil.which(path)
     if not path:
-        raise InvalidActivity(
+        v.add_error(
+            "path",
             "path '{path}' cannot be found, in activity '{name}'".format(
-                path=path, name=name))
+                path=rawpath, name=name),
+            value=rawpath)
+        return v.errors()
 
     if not os.access(path, os.X_OK):
-        raise InvalidActivity(
+        v.add_error(
+            "path"
             "no access permission to '{path}', in activity '{name}'".format(
-                path=path, name=name))
+                path=rawpath, name=name),
+            value=rawpath)
+
+    return v.errors()
