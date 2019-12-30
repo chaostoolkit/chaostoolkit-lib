@@ -4,7 +4,6 @@ import os.path
 from tempfile import NamedTemporaryFile
 from typing import Generator
 
-import pkg_resources
 import pytest
 
 from chaoslib.settings import load_settings

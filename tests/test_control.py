@@ -7,7 +7,6 @@ import tempfile
 from typing import Any, Dict, List
 from unittest.mock import patch
 
-from pkg_resources import Distribution, EntryPoint, working_set
 import logzero
 import pytest
 
