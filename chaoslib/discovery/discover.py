@@ -70,7 +70,7 @@ def discover_actions(extension_mod_name: str) -> DiscoveredActivities:
     """
     Discover actions from the given extension named `extension_mod_name`.
     """
-    logger.info("Searching for actions")
+    logger.info("Searching for actions in {n}".format(n=extension_mod_name))
     return discover_activities(extension_mod_name, "action")
 
 
@@ -78,7 +78,7 @@ def discover_probes(extension_mod_name: str) -> DiscoveredActivities:
     """
     Discover probes from the given extension named `extension_mod_name`.
     """
-    logger.info("Searching for probes")
+    logger.info("Searching for probes in {n}".format(n=extension_mod_name))
     return discover_activities(extension_mod_name, "probe")
 
 
