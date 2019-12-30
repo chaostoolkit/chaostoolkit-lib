@@ -8,6 +8,7 @@
 
 - Optional default value for environment variable in configuration
 - Warn the user for an action process returning a non-zero exit code 
+- Support for process path relative to homedir ~
 
 ### Changed
 
