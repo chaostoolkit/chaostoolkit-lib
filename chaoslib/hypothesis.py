@@ -198,8 +198,8 @@ def run_steady_state_hypothesis(experiment: Experiment,
             if run["status"] == "failed":
                 run["tolerance_met"] = False
                 state["steady_state_met"] = False
-                logger.warn("Probe terminated unexpectedly, "
-                            "so its tolerance could not be validated")
+                logger.warning("Probe terminated unexpectedly, "
+                               "so its tolerance could not be validated")
                 return state
 
             run["tolerance_met"] = True
