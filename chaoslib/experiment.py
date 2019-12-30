@@ -76,9 +76,12 @@ def ensure_experiment_is_valid(experiment: Experiment):
     ensure_hypothesis_is_valid(experiment)
 
     method = experiment.get("method")
-    if not method:
-        raise InvalidExperiment("an experiment requires a method with "
-                                "at least one activity")
+    if method is None:
+        # we force the method key to be indicated, to make it clear
+        # that the SSH will still be executed before & after the method block
+        raise InvalidExperiment(
+            "an experiment requires a method, "
+            "which can be empty for only checking steady state hypothesis ")
 
     for activity in method:
         ensure_activity_is_valid(activity)
@@ -123,7 +126,7 @@ def get_background_pools(experiment: Experiment) -> ThreadPoolExecutor:
     Create a pool for background activities. The pool is as big as the number
     of declared background activities. If none are declared, returned `None`.
     """
-    method = experiment.get("method")
+    method = experiment.get("method", [])
     rollbacks = experiment.get("rollbacks", [])
 
     activity_background_count = 0

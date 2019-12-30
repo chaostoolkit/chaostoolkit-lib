@@ -67,15 +67,11 @@ def test_unknown_extension():
 def test_experiment_must_have_a_method():
     with pytest.raises(InvalidExperiment) as exc:
         ensure_experiment_is_valid(experiments.MissingMethodExperiment)
-    assert "an experiment requires a method with "\
-           "at least one activity" in str(exc.value)
+    assert "an experiment requires a method" in str(exc.value)
 
 
-def test_experiment_must_have_at_least_one_step():
-    with pytest.raises(InvalidExperiment) as exc:
-        ensure_experiment_is_valid(experiments.NoStepsMethodExperiment)
-    assert "an experiment requires a method with "\
-           "at least one activity" in str(exc.value)
+def test_experiment_method_without_steps():
+    ensure_experiment_is_valid(experiments.NoStepsMethodExperiment)
 
 
 def test_experiment_must_have_a_title():
