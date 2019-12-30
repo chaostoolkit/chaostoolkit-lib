@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import os.path
+from unittest.mock import patch
 from chaoslib.provider.process import run_process_activity
 
 settings_dir = os.path.join(os.path.dirname(__file__), "fixtures")
@@ -19,3 +20,18 @@ def test_process_not_utf8_cannot_fail():
     if result['status'] == 0:
         assert result['stderr'] == u''
         assert result['stdout'] == u'é'
+
+
+@patch('chaoslib.provider.process.logger')
+def test_process_non_exit_zero_warning(logger):
+    result = run_process_activity({
+        "provider": {
+            "type": "process",
+            "path": "python",
+            "arguments": '-c "import sys; sys.exit(1)"'
+        }
+    }, None, None)
+
+    assert logger.warning.call_count == 1
+    assert 'This process returned a non-zero exit code.' in \
+           logger.warning.call_args[0][0]
