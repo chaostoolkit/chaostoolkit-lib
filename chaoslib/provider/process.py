@@ -94,7 +94,7 @@ def validate_process_activity(activity: Activity):
     name = activity["name"]
     provider = activity["provider"]
 
-    path = provider.get("path")
+    path = raw_path = provider.get("path")
     if not path:
         raise InvalidActivity("a process activity must have a path")
 
@@ -102,9 +102,9 @@ def validate_process_activity(activity: Activity):
     if not path:
         raise InvalidActivity(
             "path '{path}' cannot be found, in activity '{name}'".format(
-                path=path, name=name))
+                path=raw_path, name=name))
 
     if not os.access(path, os.X_OK):
         raise InvalidActivity(
             "no access permission to '{path}', in activity '{name}'".format(
-                path=path, name=name))
+                path=raw_path, name=name))

@@ -78,7 +78,7 @@ def test_process_probe_have_a_path():
 def test_process_probe_path_must_exist():
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.ProcessPathDoesNotExistProbe)
-    assert "path 'None' cannot be found, in activity" in str(exc.value)
+    assert "path 'somewhere/not/here' cannot be found, in activity" in str(exc.value)
 
 
 def test_http_probe_must_have_a_url():

@@ -38,11 +38,14 @@
 - Optional default value for environment variable in configuration
 - Warn the user for an action process returning a non-zero exit code 
 - Support for process path relative to homedir ~
+- Indicate path in validation when path is not found nor executable [#159][159]
 
 ### Changed
 
 - Changed the method's one-step minimum requirement. 
   An experiment with an empty method (without any activities) is now valid.
+
+[159]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/159
 
 ## [1.7.1][] - 2019-09-27
 
