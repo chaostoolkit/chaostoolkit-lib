@@ -7,6 +7,7 @@ import tempfile
 from chaoslib.exceptions import InvalidSource, InvalidExperiment
 from chaoslib.loader import load_experiment, parse_experiment_from_file
 from chaoslib.types import Settings
+import requests
 
 from fixtures import experiments
 
@@ -121,3 +122,26 @@ def test_http_loads_fails_when_known_type():
         )
         with pytest.raises(InvalidExperiment):
             load_experiment('http://example.com/experiment.yaml')
+
+
+def test_https_no_verification():
+    with requests_mock.mock() as m:
+        m.get(
+            'https://example.com/experiment.yaml', status_code=200,
+            headers={"Content-Type": "text/css"},
+            text="body {}"
+        )
+        with pytest.raises(InvalidExperiment):
+            load_experiment(
+                'https://example.com/experiment.yaml', verify_tls=False)
+
+
+def test_https_with_verification():
+    with requests_mock.mock() as m:
+        m.get(
+            'https://example.com/experiment.yaml',
+            exc=requests.exceptions.SSLError
+        )
+        with pytest.raises(requests.exceptions.SSLError):
+            load_experiment(
+                'https://example.com/experiment.yaml', verify_tls=True)
