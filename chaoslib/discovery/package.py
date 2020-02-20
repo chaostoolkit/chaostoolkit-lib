@@ -4,7 +4,10 @@ import inspect
 import subprocess
 
 from logzero import logger
-import importlib_metadata
+try:
+    import importlib.metadata as importlib_metadata
+except ImportError:
+    import importlib_metadata
 
 from chaoslib.exceptions import DiscoveryFailed
 
