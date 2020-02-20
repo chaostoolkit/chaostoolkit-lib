@@ -1,6 +1,9 @@
 from unittest.mock import patch
 from typing import List
-from importlib_metadata import Distribution
+try:
+    from importlib.metadata import Distribution
+except ImportError:
+    from importlib_metadata import Distribution
 
 from chaoslib.info import list_extensions
 
