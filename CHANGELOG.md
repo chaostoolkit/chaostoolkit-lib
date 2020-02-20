@@ -2,7 +2,11 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.8.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.8.1...HEAD
+
+## [1.8.1][] - 2020-02-20
+
+[1.8.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.8.0...1.8.1
 
 ### Added
 
@@ -10,7 +14,9 @@
 
 ### Changed
 
-- Fix importlib_metadata call
+- Fix importlib_metadata call [#162][162]
+
+[162]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/162
 
 ## [1.8.0][] - 2020-02-20
 
