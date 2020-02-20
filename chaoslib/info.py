@@ -1,7 +1,10 @@
 from collections import namedtuple
 from typing import List
 
-import importlib_metadata
+try:
+    import importlib.metadata as importlib_metadata
+except ImportError:
+    import importlib_metadata
 
 __all__ = ["list_extensions"]
 
