@@ -4,6 +4,10 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.8.0...HEAD
 
+### Added
+
+- Build and test on Python 3.8
+
 ## [1.8.0][] - 2020-02-20
 
 [1.8.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.7.1...1.8.0
