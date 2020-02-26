@@ -53,7 +53,7 @@ def load_configuration(config_info: Dict[str, str]) -> Configuration:
             if value["type"] == "env":
                 env_key = value["key"]
                 env_default = value.get("default")
-                if env_key not in env and not env_default:
+                if env_key not in env and env_default is None:
                     raise InvalidExperiment(
                         "Configuration makes reference to an environment key"
                         " that does not exist: {}".format(env_key))
