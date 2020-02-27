@@ -3,8 +3,8 @@ import os
 
 import pytest
 
-from chaoslib.exceptions import InvalidExperiment
 from chaoslib.configuration import load_configuration
+from chaoslib.exceptions import InvalidExperiment
 
 
 def test_should_load_configuration():
@@ -89,7 +89,7 @@ def test_should_load_configuration_with_empty_string_as_input_while_default_is_d
 
 def test_load_configuration_should_raise_exception():
     os.environ.clear()
-    try:
+    with pytest.raises(InvalidExperiment) as x:
         load_configuration({
             "token1": "value1",
             "token2": {
@@ -102,7 +102,5 @@ def test_load_configuration_should_raise_exception():
                 "default": ""
             }
         })
-    except InvalidExperiment as err:
-        assert format(err) == "Configuration makes reference to an environment key that does not exist: KUBE_TOKEN"
-    else:
-        raise AssertionError("should raise InvalidExperiment")
+  
+    assert str(x.value) == "Configuration makes reference to an environment key that does not exist: KUBE_TOKEN"
