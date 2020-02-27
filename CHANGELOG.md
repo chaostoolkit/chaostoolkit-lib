@@ -4,6 +4,13 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.8.1...HEAD
 
+### Changed
+
+- Fix error on empty string variables call [#165][165]
+
+[165]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/165
+
+
 ## [1.8.1][] - 2020-02-20
 
 [1.8.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.8.0...1.8.1
