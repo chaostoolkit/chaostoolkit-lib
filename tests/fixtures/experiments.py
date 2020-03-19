@@ -74,6 +74,31 @@ ExperimentWithInvalidHypoProbe = {
     ]
 }
 
+ExperimentWithInterpolatedTitle = {
+    "configuration": {
+        "project_name": {
+            "type": "env",
+            "key": "PROJECT_NAME",
+            "default": "Cats in space"
+        }
+    },
+    "dry_run": True,
+    "title": "${project_name}: do cats live in the Internet?",
+    "description": "an experiment of importance",
+    "steady-state-hypothesis": {
+        "title": "hello",
+        "probes": [
+            PythonModuleProbeWithBoolTolerance,
+        ]
+    },
+    "method": [
+        PythonModuleProbe,
+        {
+            "ref": PythonModuleProbe["name"]
+        }
+    ]
+}
+
 ExperimentWithLongPause = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",

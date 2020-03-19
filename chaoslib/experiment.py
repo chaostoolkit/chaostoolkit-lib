@@ -7,7 +7,7 @@ from typing import List
 
 from logzero import logger
 
-from chaoslib import __version__
+from chaoslib import __version__, substitute
 from chaoslib.activity import ensure_activity_is_valid, run_activities
 from chaoslib.caching import with_cache, lookup_activity
 from chaoslib.control import initialize_controls, controls, cleanup_controls, \
@@ -179,8 +179,6 @@ def run_experiment(experiment: Experiment,
     interrupted, we set the `interrupted` flag of the result accordingly to
     notify the caller this was indeed not terminated properly.
     """
-    logger.info("Running experiment: {t}".format(t=experiment["title"]))
-
     dry = experiment.get("dry", False)
     if dry:
         logger.warning("Dry mode enabled")
@@ -192,6 +190,9 @@ def run_experiment(experiment: Experiment,
     initialize_global_controls(experiment, config, secrets, settings)
     initialize_controls(experiment, config, secrets)
     activity_pool, rollback_pool = get_background_pools(experiment)
+
+    experiment["title"] = substitute(experiment["title"], config, secrets)
+    logger.info("Running experiment: {t}".format(t=experiment["title"]))
 
     control = Control()
     journal = initialize_run_journal(experiment)
