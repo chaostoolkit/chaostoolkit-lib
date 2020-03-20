@@ -3,6 +3,7 @@ import os
 from typing import Dict
 
 from logzero import logger
+
 try:
     import hvac
     HAS_HVAC = True

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from typing import List
 
-from chaoslib.exceptions import InterruptExecution
-
 __all__ = ["many_args", "many_args_with_rich_types", "no_args_docstring",
            "no_args", "one_arg", "one_untyped_arg", "one_arg_with_default",
            "one_untyped_arg_with_default"]

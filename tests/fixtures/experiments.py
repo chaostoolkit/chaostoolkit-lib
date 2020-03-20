@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-from copy import deepcopy
 import os
+from copy import deepcopy
 
 from fixtures.probes import BackgroundPythonModuleProbe, MissingFuncArgProbe, \
     PythonModuleProbe, PythonModuleProbeWithBoolTolerance, \
     PythonModuleProbeWithExternalTolerance, PythonModuleProbeWithLongPause, \
-    BackgroundPythonModuleProbeWithLongPause, BackgroundPythonModuleProbeWithLongPauseBefore,\
+    BackgroundPythonModuleProbeWithLongPause, BackgroundPythonModuleProbeWithLongPauseBefore, \
     PythonModuleProbeWithHTTPStatusTolerance, DeprecatedProcArgumentsProbe, \
     PythonModuleProbeWithHTTPBodyTolerance, \
     PythonModuleProbeWithProcessStatusTolerance, \

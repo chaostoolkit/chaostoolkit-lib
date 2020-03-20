@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 import os
+from unittest.mock import MagicMock, patch, mock_open
 
-from hvac.exceptions import InvalidRequest
 import pytest
+from fixtures import config
+from hvac.exceptions import InvalidRequest
+
 from chaoslib.exceptions import InvalidExperiment
 from chaoslib.secret import load_secrets, load_secrets_from_vault, \
     create_vault_client
-from fixtures import config
-from unittest.mock import ANY, MagicMock, patch, mock_open
 
 
 def test_should_load_environment():

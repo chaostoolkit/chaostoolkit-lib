@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os.path
-from unittest.mock import patch
 import stat
+from unittest.mock import patch
 
 from chaoslib.provider.process import run_process_activity
 

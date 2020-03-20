@@ -1,8 +1,7 @@
-import os
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Dict, List
 
 from chaoslib.types import Activity, Configuration, \
-    Experiment, Hypothesis, Journal, Run, Secrets, Settings
+    Experiment, Hypothesis, Journal, Run, Secrets
 
 value_from_config = None
 

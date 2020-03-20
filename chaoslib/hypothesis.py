@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
+import json
+import re
 from decimal import Decimal, InvalidOperation
 from functools import singledispatch
-import json
 from numbers import Number
-import re
 from typing import Any
 
 try:

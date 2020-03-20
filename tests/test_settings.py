@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os.path
-from chaoslib.settings import get_loaded_settings, load_settings, save_settings
 
+from chaoslib.settings import get_loaded_settings, load_settings, save_settings
 
 settings_dir = os.path.join(os.path.dirname(__file__), "fixtures")
 

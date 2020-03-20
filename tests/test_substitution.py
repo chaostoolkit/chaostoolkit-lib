@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from chaoslib import substitute
-
 from fixtures import config
+
+from chaoslib import substitute
 
 
 def test_substitute_strings_from_configuration():

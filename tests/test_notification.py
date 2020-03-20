@@ -1,15 +1,11 @@
 # -*- coding: utf-8 -*-
 import time
-import types
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-import pytest
 import requests
 import requests_mock
 
-from chaoslib.notification import notify, DiscoverFlowEvent, InitFlowEvent, \
-    RunFlowEvent, ValidateFlowEvent
-from chaoslib.types import Experiment, EventPayload
+from chaoslib.notification import notify, DiscoverFlowEvent, RunFlowEvent
 
 
 def test_no_settings_is_okay():

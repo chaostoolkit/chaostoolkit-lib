@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-from copy import deepcopy
 import importlib
 import inspect
+from copy import deepcopy
 from typing import Any, Callable, List, Optional, Union
 
 from logzero import logger
@@ -10,7 +10,6 @@ from chaoslib import substitute
 from chaoslib.exceptions import InvalidActivity
 from chaoslib.types import Activity, Configuration, Control, Experiment, \
     Journal, Run, Secrets, Settings
-
 
 __all__ = ["apply_python_control", "cleanup_control", "initialize_control",
            "validate_python_control", "import_control"]

@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
-import types
 
 import pytest
 
-from chaoslib.exceptions import DiscoveryFailed
-from chaoslib.discovery import discover, initialize_discovery_result
 from chaoslib.discovery.discover import discover_activities
-from chaoslib.types import Discovery, DiscoveredActivities, \
-    DiscoveredSystemInfo
+from chaoslib.exceptions import DiscoveryFailed
 
 
 def test_fail_discovery_when_module_cannot_be_loaded():

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 """chaostoolkit core library builder and installer"""
 
-import sys
-import os.path
 import io
+import os.path
+import sys
 
 import setuptools
 

@@ -1,29 +1,21 @@
 # -*- coding: utf-8 -*-
-from copy import deepcopy
-from concurrent.futures import ThreadPoolExecutor
 import json
-import os
 import tempfile
-from typing import Any, Dict, List
+from copy import deepcopy
 from unittest.mock import patch
 
-import logzero
 import pytest
+from fixtures import experiments
 
 from chaoslib.activity import execute_activity
 from chaoslib.control import initialize_controls, cleanup_controls, \
-    validate_controls, controls, get_all_activities, get_context_controls, \
+    controls, get_all_activities, get_context_controls, \
     initialize_global_controls, cleanup_global_controls, get_global_controls, \
     load_global_controls
 from chaoslib.control.python import validate_python_control
 from chaoslib.exceptions import InterruptExecution, InvalidActivity
 from chaoslib.experiment import run_experiment
 from chaoslib.loader import load_experiment
-from chaoslib.types import Activity, Configuration, Control, \
-    Experiment, Hypothesis, Journal, Run, Secrets,  Settings
-
-from fixtures import  experiments
-from fixtures.controls import dummy as DummyControl
 
 
 def test_initialize_controls_will_configure_a_control():

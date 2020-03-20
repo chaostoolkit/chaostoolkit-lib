@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 from typing import Any
-import urllib3
 
-from logzero import logger
 import requests
+import urllib3
+from logzero import logger
 
 from chaoslib import substitute
 from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.types import Activity, Configuration, Secrets
-
 
 __all__ = ["run_http_activity", "validate_http_activity"]
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)

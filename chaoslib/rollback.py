@@ -7,7 +7,6 @@ from logzero import logger
 from chaoslib.activity import execute_activity
 from chaoslib.types import Configuration, Experiment, Run, Secrets
 
-
 __all__ = ["run_rollbacks"]
 
 

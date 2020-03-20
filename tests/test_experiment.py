@@ -1,23 +1,19 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
 import json
-import os.path
 import signal
-import sys
 import tempfile
 import types
+from datetime import datetime
 
 import pytest
 import requests_mock
 import yaml
+from fixtures import experiments
 
-from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
+from chaoslib.exceptions import InvalidActivity, \
     InvalidExperiment, InterruptExecution
 from chaoslib.experiment import ensure_experiment_is_valid, load_experiment, \
     run_experiment, run_activities
-from chaoslib.types import Experiment
-
-from fixtures import config, experiments
 
 
 def test_empty_experiment_is_invalid():

@@ -11,7 +11,6 @@ from chaoslib import substitute
 from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.types import Activity, Configuration, Secrets
 
-
 __all__ = ["run_python_activity", "validate_python_activity"]
 
 

@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
-import sys
 import warnings
 
-import pytest
+from fixtures import experiments
 
 from chaoslib import deprecation
 from chaoslib.deprecation import DeprecatedDictArgsMessage, \
     DeprecatedVaultMissingPathMessage, warn_about_deprecated_features
-
-from fixtures import experiments
 
 
 def test_run_dict_arguments_has_been_deprecated_in_favor_of_list():

@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 # Builds an in-memory cache of all declared activities so they can be
 # referenced from other places in the experiment
-from functools import wraps
 import inspect
+from functools import wraps
 from typing import List, Union
 
 from logzero import logger
 
 from chaoslib.types import Activity, Experiment, Settings
-
 
 __all__ = ["cache_activities", "clear_cache", "lookup_activity", "with_cache"]
 

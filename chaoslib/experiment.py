@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
 import platform
 import time
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from typing import List
 
 from logzero import logger
@@ -10,6 +10,7 @@ from logzero import logger
 from chaoslib import __version__
 from chaoslib.activity import ensure_activity_is_valid, run_activities
 from chaoslib.caching import with_cache, lookup_activity
+from chaoslib.configuration import load_configuration
 from chaoslib.control import initialize_controls, controls, cleanup_controls, \
     validate_controls, Control, initialize_global_controls, \
     cleanup_global_controls
@@ -17,7 +18,6 @@ from chaoslib.deprecation import warn_about_deprecated_features
 from chaoslib.exceptions import ActivityFailed, ChaosException, \
     InterruptExecution, InvalidActivity, InvalidExperiment
 from chaoslib.extension import validate_extensions
-from chaoslib.configuration import load_configuration
 from chaoslib.hypothesis import ensure_hypothesis_is_valid, \
     run_steady_state_hypothesis
 from chaoslib.loader import load_experiment

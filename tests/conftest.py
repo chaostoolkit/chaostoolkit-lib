@@ -5,11 +5,10 @@ from tempfile import NamedTemporaryFile
 from typing import Generator
 
 import pytest
+from fixtures import experiments
 
 from chaoslib.settings import load_settings
-from chaoslib.types import Experiment, Settings
-
-from fixtures import experiments
+from chaoslib.types import Settings
 
 
 @pytest.fixture

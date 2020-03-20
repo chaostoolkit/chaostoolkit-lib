@@ -3,10 +3,12 @@ import io
 import os.path
 from urllib.parse import urlparse
 
-from chaoslib.exceptions import InvalidSource
-from logzero import logger
 import requests
 import yaml
+from logzero import logger
+
+from chaoslib.exceptions import InvalidSource
+
 try:
     import simplejson as json
     from simplejson.errors import JSONDecodeError

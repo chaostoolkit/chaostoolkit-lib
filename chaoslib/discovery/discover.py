@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
 import importlib
 import inspect
 import platform
-from typing import Any
 import uuid
+from datetime import datetime
+from typing import Any
 
 from logzero import logger
 
 from chaoslib import __version__
-from chaoslib.discovery.package import get_discover_function, install,\
+from chaoslib.discovery.package import get_discover_function, install, \
     load_package
 from chaoslib.exceptions import DiscoveryFailed
 from chaoslib.types import Discovery, DiscoveredActivities
-
 
 __all__ = ["discover", "discover_activities", "discover_actions",
            "discover_probes", "initialize_discovery_result",

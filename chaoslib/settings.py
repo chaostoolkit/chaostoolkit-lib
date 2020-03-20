@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
+import contextvars
 import os
 import os.path
 
-import contextvars
-from logzero import logger
 import yaml
+from logzero import logger
 
 from chaoslib.types import Settings
 

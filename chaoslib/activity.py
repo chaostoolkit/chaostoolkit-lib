@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
 import numbers
 import time
 import traceback
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from typing import Any, Iterator, List
 
 from logzero import logger
@@ -12,12 +12,11 @@ from chaoslib.caching import lookup_activity
 from chaoslib.control import controls
 from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.provider.http import run_http_activity, validate_http_activity
-from chaoslib.provider.python import run_python_activity, \
-    validate_python_activity
 from chaoslib.provider.process import run_process_activity, \
     validate_process_activity
+from chaoslib.provider.python import run_python_activity, \
+    validate_python_activity
 from chaoslib.types import Activity, Configuration, Experiment, Run, Secrets
-
 
 __all__ = ["ensure_activity_is_valid", "get_all_activities_in_experiment",
            "run_activities"]

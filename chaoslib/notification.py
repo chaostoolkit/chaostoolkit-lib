@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime, timezone
-from enum import Enum
 import importlib
 import inspect
+from datetime import datetime, timezone
+from enum import Enum
 from typing import Any, Dict
 
-from logzero import logger
 import requests
+from logzero import logger
 
 from chaoslib.types import EventPayload, Settings
 

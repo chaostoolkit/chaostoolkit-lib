@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 import json
+import tempfile
+
 import pytest
 import requests_mock
-import tempfile
+from fixtures import experiments
 
 from chaoslib.exceptions import InvalidSource, InvalidExperiment
 from chaoslib.loader import load_experiment, parse_experiment_from_file
 from chaoslib.types import Settings
-
-from fixtures import experiments
 
 
 def test_load_from_file(generic_experiment: str):

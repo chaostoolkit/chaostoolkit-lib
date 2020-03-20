@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 import json
-import sys
 import socket
+import sys
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from threading import Thread
 
 import pytest
 import requests_mock
-
-from chaoslib.exceptions import ActivityFailed, InvalidActivity
-from chaoslib.activity import ensure_activity_is_valid, run_activity
-
 from fixtures import config, experiments, probes
+
+from chaoslib.activity import ensure_activity_is_valid, run_activity
+from chaoslib.exceptions import ActivityFailed, InvalidActivity
 
 
 def test_empty_probe_is_invalid():

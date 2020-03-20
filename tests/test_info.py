@@ -1,5 +1,6 @@
-from unittest.mock import patch
 from typing import List
+from unittest.mock import patch
+
 try:
     from importlib.metadata import Distribution
 except ImportError:

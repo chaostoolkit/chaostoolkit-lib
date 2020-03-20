@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 import pytest
+from fixtures import experiments
 
 from chaoslib.exceptions import InvalidExperiment
-from chaoslib.extension import get_extension, has_extension, merge_extension, \
+from chaoslib.extension import get_extension, merge_extension, \
     remove_extension, set_extension, validate_extensions
-
-from fixtures import experiments
 
 
 def test_extensions_must_have_name():

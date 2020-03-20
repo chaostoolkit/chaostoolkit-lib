@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import pytest
-import sys
 
 from chaoslib.exceptions import InvalidActivity
 from chaoslib.hypothesis import ensure_hypothesis_tolerance_is_valid, \

@@ -9,10 +9,8 @@ from chaoslib.control.python import apply_python_control, cleanup_control, \
     initialize_control, validate_python_control, import_control
 from chaoslib.exceptions import InterruptExecution, InvalidControl
 from chaoslib.settings import get_loaded_settings
-from chaoslib.types import Settings
 from chaoslib.types import Activity, Configuration, Control as ControlType, \
-    Experiment, Hypothesis, Journal, Run, Secrets
-
+    Experiment, Hypothesis, Journal, Run, Secrets, Settings
 
 __all__ = ["controls", "initialize_controls", "cleanup_controls",
            "validate_controls", "Control", "initialize_global_controls",

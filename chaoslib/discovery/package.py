@@ -4,6 +4,7 @@ import inspect
 import subprocess
 
 from logzero import logger
+
 try:
     import importlib.metadata as importlib_metadata
 except ImportError:
