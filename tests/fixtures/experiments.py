@@ -474,6 +474,143 @@ method:
 """.format(os.path.abspath(__file__))
 
 
+SimpleExperiment = {
+    "version": "1.0.0",
+    "title": "Hello world!",
+    "description": "Say hello world.",
+    "steady-state-hypothesis": {
+        "title": "World needs politeness",
+        "probes": [
+            {
+                "type": "probe",
+                "name": "has-world",
+                "tolerance": 0,
+                "provider": {
+                "type": "process",
+                "path": "echo",
+                    "arguments": "hello"
+                }
+            }
+        ]
+    },
+    "method": [
+        {
+            "type": "action",
+            "name": "say-hello",
+            "provider": {
+                "type": "process",
+                "path": "echo",
+                "arguments": "world"
+            },
+            "pauses": {
+                "after": 1
+            }
+        }
+    ]
+}
+
+
+SimpleExperimentWithInterruption = deepcopy(SimpleExperiment)
+SimpleExperimentWithInterruption["controls"] = [
+    {
+        "name": "dummy",
+        "provider": {
+            "type": "python",
+            "module": "fixtures.controls.dummy_with_interrupted_activity",
+            "arguments": {
+                "target_activity_name": "say-hello"
+            }
+        }
+    }
+]
+
+
+SimpleExperimentWithExit = deepcopy(SimpleExperiment)
+SimpleExperimentWithExit["controls"] = [
+    {
+        "name": "dummy",
+        "provider": {
+            "type": "python",
+            "module": "fixtures.controls.dummy_with_exited_activity",
+            "arguments": {
+                "target_activity_name": "say-hello"
+            }
+        }
+    }
+]
+
+
+SimpleExperimentWithException = deepcopy(SimpleExperiment)
+SimpleExperimentWithException["method"].append(
+    {
+        "type": "action",
+        "name": "boom",
+        "provider": {
+            "type": "python",
+            "module": "fixtures.badstuff",
+            "func": "raise_exception"
+        }
+    }
+)
+
+
+SimpleExperimentWithSSHFailingAtSomePoint = deepcopy(SimpleExperiment)
+SimpleExperimentWithSSHFailingAtSomePoint["method"][0]["pauses"]["after"] = 2
+SimpleExperimentWithSSHFailingAtSomePoint["method"].append(
+    {
+        "type": "action",
+        "name": "say-hello-in-french",
+        "provider": {
+            "type": "process",
+            "path": "echo",
+            "arguments": "bonjour"
+        },
+        "pauses": {
+            "before": 1
+        }
+    }
+)
+SimpleExperimentWithSSHFailingAtSomePoint["steady-state-hypothesis"]["probes"].append(
+    {
+        "type": "probe",
+        "name": "fail-at-somepoint",
+        "tolerance":  {
+            "type": "probe",
+            "name": "check-lower-than",
+            "provider": {
+                "type": "python",
+                "module": "fixtures.badstuff",
+                "func": "check_under_treshold",
+                "arguments": {
+                    "target": 2
+                }
+            }
+        },
+        "provider": {
+            "type": "python",
+            "module": "fixtures.badstuff",
+            "func": "count_generator"
+        }
+    }
+)
+SimpleExperimentWithSSHFailingAtSomePoint["rollbacks"] = [
+    {
+        "type": "action",
+        "name": "cleanup",
+        "provider": {
+            "type": "python",
+            "module": "fixtures.badstuff",
+            "func": "cleanup_counter"
+        }
+    }
+]
+
+SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity = deepcopy(
+    SimpleExperimentWithSSHFailingAtSomePoint
+)
+SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity["method"][0]["background"] = True
+SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity["method"][0]["pauses"]["after"] = 2
+
 ExperimentWithRegularRollback = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",

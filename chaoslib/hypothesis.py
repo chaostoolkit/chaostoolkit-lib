@@ -4,7 +4,7 @@ from functools import singledispatch
 import json
 from numbers import Number
 import re
-from typing import Any
+from typing import Any, Dict
 
 try:
     from jsonpath2.path import Path as JSONPath
@@ -166,7 +166,7 @@ def check_range(tolerance: Tolerance):
 
 def run_steady_state_hypothesis(experiment: Experiment,
                                 configuration: Configuration, secrets: Secrets,
-                                dry: bool = False):
+                                dry: bool = False) -> Dict[str, Any]:
     """
     Run all probes in the hypothesis and fail the experiment as soon as any of
     the probe fails or is outside the tolerance zone.
