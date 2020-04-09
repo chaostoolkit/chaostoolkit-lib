@@ -80,6 +80,12 @@ def test_experiment_must_have_a_title():
     assert "experiment requires a title" in str(exc.value)
 
 
+def test_experiment_title_substitution():
+    journal = run_experiment(experiments.ExperimentWithInterpolatedTitle)
+
+    assert journal["experiment"]["title"] in "Cats in space: do cats live in the Internet?"
+
+
 def test_experiment_must_have_a_description():
     with pytest.raises(InvalidExperiment) as exc:
         ensure_experiment_is_valid(experiments.MissingDescriptionExperiment)
@@ -261,6 +267,7 @@ def test_should_bail_experiment_when_env_was_not_found():
         run_experiment(experiment)
     assert "Configuration makes reference to an environment key that does " \
            "not exist" in str(x.value)
+
 
 def test_validate_all_tolerance_probes():
     with requests_mock.mock() as m:
