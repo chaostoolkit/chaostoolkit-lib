@@ -156,7 +156,7 @@ def test_no_rollback_even_on_SIGINT():
         assert isinstance(journal, dict)
         assert journal["status"] == "interrupted"
     except KeyboardInterrupt:
-        pytest.fail("we should have swalled the KeyboardInterrupt exception")
+        pytest.fail("we should have swallowed the KeyboardInterrupt exception")
 
 
 def test_no_rollback_even_on_SystemExit():
@@ -171,7 +171,7 @@ def test_no_rollback_even_on_SystemExit():
         assert isinstance(journal, dict)
         assert journal["status"] == "interrupted"
     except SystemExit:
-        pytest.fail("we should have swalled the SystemExit exception")
+        pytest.fail("we should have swallowed the SystemExit exception")
 
 
 def test_can_interrupt_rollbacks():
@@ -186,7 +186,7 @@ def test_can_interrupt_rollbacks():
         assert isinstance(journal, dict)
         assert journal["status"] == "interrupted"
     except Exception:
-        pytest.fail("we should have swalled the InterruptExecution exception")
+        pytest.fail("we should have swallowed the InterruptExecution exception")
 
 
 def test_can_interrupt_rollbacks_on_SystemExit():
@@ -201,7 +201,7 @@ def test_can_interrupt_rollbacks_on_SystemExit():
         assert isinstance(journal, dict)
         assert journal["status"] == "interrupted"
     except SystemExit:
-        pytest.fail("we should have swalled the SystemExit exception")
+        pytest.fail("we should have swallowed the SystemExit exception")
 
 
 def test_can_interrupt_rollbacks_on_SIGINT():
@@ -216,7 +216,7 @@ def test_can_interrupt_rollbacks_on_SIGINT():
         assert isinstance(journal, dict)
         assert journal["status"] == "interrupted"
     except SystemExit:
-        pytest.fail("we should have swalled the KeyboardInterrupt exception")
+        pytest.fail("we should have swallowed the KeyboardInterrupt exception")
 
 
 def test_probes_can_reference_each_other():
