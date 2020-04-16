@@ -251,6 +251,15 @@ def test_experiment_with_steady_state():
         assert journal["status"] == "failed"
 
 
+def test_experiment_with_failing_steady_state():
+    with requests_mock.mock() as m:
+        m.get('http://example.com', status_code=500)
+        journal = run_experiment(experiments.Experiment)
+        assert isinstance(journal, dict)
+        assert journal["status"] == "failed"
+        assert len(journal["rollbacks"]) == 0
+
+
 def test_experiment_may_run_without_steady_state():
     experiment = experiments.Experiment.copy()
     experiment.pop("steady-state-hypothesis")

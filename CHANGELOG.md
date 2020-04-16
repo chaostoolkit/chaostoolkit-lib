@@ -4,6 +4,10 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.8.1...HEAD
 
+### Added
+
+- Only apply rollbacks if experiment has progressed past the initial steady state hypothesis [#168](168)
+
 ### Changed
 
 - Fix error on empty string variables call [#165][165]
