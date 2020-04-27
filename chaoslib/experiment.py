@@ -216,7 +216,7 @@ def run_experiment(experiment: Experiment,
             except ActivityFailed as a:
                 journal["steady_states"]["before"] = state
                 journal["status"] = "failed"
-                logger.fatal(str(a))
+                raise
             else:
                 try:
                     journal["run"] = apply_activities(
@@ -243,6 +243,8 @@ def run_experiment(experiment: Experiment,
                     except ActivityFailed as a:
                         journal["status"] = "failed"
                         logger.fatal(str(a))
+        except ActivityFailed as a:
+            logger.fatal(str(a))
         except InterruptExecution as i:
             journal["status"] = "interrupted"
             logger.fatal(str(i))
