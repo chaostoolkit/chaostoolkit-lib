@@ -17,7 +17,7 @@ from chaoslib.exceptions import ActivityFailed
 from chaoslib.types import Configuration, Secrets
 
 __all__ = ["__version__", "decode_bytes", "substitute"]
-__version__ = '1.8.1'
+__version__ = '1.9.0'
 
 
 def substitute(data: Union[None, str, Dict[str, Any], List],
