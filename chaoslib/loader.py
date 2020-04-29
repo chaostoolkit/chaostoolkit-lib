@@ -69,8 +69,8 @@ def parse_experiment_from_http(response: requests.Response) -> Experiment:
         "only files with json, yaml or yml extensions are supported")
 
 
-def load_experiment(experiment_source: str,
-                    settings: Settings = None) -> Experiment:
+def load_experiment(experiment_source: str, settings: Settings = None,
+                    verify_tls: bool = True) -> Experiment:
     """
     Load an experiment from the given source.
 
@@ -90,6 +90,10 @@ def load_experiment(experiment_source: str,
         type: digest
         value: UIY
     ```
+
+    Set `verify_tls` to `False` if the source is a over a self-signed
+    certificate HTTP endpoint to instruct the loader to not verify the
+    certificates.
     """
     with controls(level="loader", context=experiment_source) as control:
         if os.path.exists(experiment_source):
@@ -117,7 +121,7 @@ def load_experiment(experiment_source: str,
                         auth["type"], auth["value"])
                     break
 
-        r = requests.get(experiment_source, headers=headers)
+        r = requests.get(experiment_source, headers=headers, verify=verify_tls)
         if r.status_code != 200:
             raise InvalidSource(
                 "Failed to fetch the experiment: {}".format(r.text))

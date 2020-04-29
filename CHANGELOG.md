@@ -7,6 +7,11 @@
 ### Added
 
 - Only apply rollbacks if experiment has progressed past the initial steady state hypothesis [#168](168)
+- Allow to not verify certificates when connecting to a HTTPS endpoint using [#163](163)
+  self-signed certificate.
+
+[168]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/168
+[163]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/163
 
 ### Changed
 
