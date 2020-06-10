@@ -10,13 +10,14 @@ except ImportError:
     HAS_HVAC = False
 
 from chaoslib.exceptions import InvalidExperiment
-from chaoslib.types import Configuration, Secrets
+from chaoslib.types import Configuration, Secrets, SecretVars
 
 __all__ = ["load_secrets", "create_vault_client"]
 
 
 def load_secrets(secrets_info: Dict[str, Dict[str, str]],
-                 configuration: Configuration = None) -> Secrets:
+                 configuration: Configuration = None,
+                 secret_vars: SecretVars = None) -> Secrets:
     """
     Takes the the secrets definition from an experiment and tries to load
     the secrets whenever they relate to external sources such as environmental
@@ -81,7 +82,8 @@ def load_secrets(secrets_info: Dict[str, Dict[str, str]],
 
     secrets = {}
     for loader in loaders:
-        for key, value in loader(secrets_info, configuration).items():
+        for key, value in loader(
+                secrets_info, configuration, secret_vars).items():
             if key not in secrets:
                 secrets[key] = {}
             secrets[key].update(value)
@@ -92,18 +94,21 @@ def load_secrets(secrets_info: Dict[str, Dict[str, str]],
 
 
 def load_inline_secrets(secrets_info: Dict[str, Dict[str, str]],
-                        configuration: Configuration = None) -> Secrets:
+                        configuration: Configuration = None,
+                        secret_vars: SecretVars = None) -> Secrets:
     """
     Load secrets that are inlined in the experiments.
     """
     secrets = {}
+    secret_vars = secret_vars or {}
 
     for (target, keys) in secrets_info.items():
         secrets[target] = {}
+        secret_var = secret_vars.get(target, {})
 
         for (key, value) in keys.items():
             if not isinstance(value, dict):
-                secrets[target][key] = value
+                secrets[target][key] = secret_var.get(key, value)
             elif value.get("type") not in ("env", "vault"):
                 secrets[target][key] = value
 
@@ -114,7 +119,8 @@ def load_inline_secrets(secrets_info: Dict[str, Dict[str, str]],
 
 
 def load_secrets_from_env(secrets_info: Dict[str, Dict[str, str]],
-                          configuration: Configuration = None) -> Secrets:
+                          configuration: Configuration = None,
+                          secret_vars: SecretVars = None) -> Secrets:
     env = os.environ
     secrets = {}
 
@@ -137,7 +143,8 @@ def load_secrets_from_env(secrets_info: Dict[str, Dict[str, str]],
 
 
 def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],
-                            configuration: Configuration = None) -> Secrets:
+                            configuration: Configuration = None,
+                            secret_vars: SecretVars = None) -> Secrets:
     """
     Load secrets from Vault KV secrets store
 

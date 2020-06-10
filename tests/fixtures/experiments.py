@@ -3,7 +3,7 @@ from copy import deepcopy
 import os
 
 from fixtures.actions import DoNothingAction, EchoAction, FailAction, \
-    InterruptAction
+    SecretEchoAction
 from fixtures.probes import BackgroundPythonModuleProbe, MissingFuncArgProbe, \
     PythonModuleProbe, PythonModuleProbeWithBoolTolerance, \
     PythonModuleProbeWithExternalTolerance, PythonModuleProbeWithLongPause, \
@@ -205,6 +205,17 @@ ExperimentWithDeprecatedVaultPayload = {
         }
     },
     "method": []
+}
+
+LeanExperiment = {
+    "title": "do cats live in the Internet?",
+    "description": "an experiment of importance",
+    "configuration": {
+        "message": "hello world"
+    },
+    "method": [
+        EchoAction
+    ]
 }
 
 
@@ -495,3 +506,15 @@ ExperimentWithInterruptedExperimentAndARollback["method"][0]["controls"] = [
         }
     }
 ]
+# the values of the config will be passed at runtime via a var
+ExperimentWithConfigurationFieldFromVars = LeanExperiment.copy()
+
+
+# the values of the secret will be passed at runtime via a var
+ExperimentWitSecretFieldFromVars = LeanExperiment.copy()
+ExperimentWitSecretFieldFromVars['method'] = [SecretEchoAction]
+ExperimentWitSecretFieldFromVars["secrets"] = {
+    "aws": {
+        "mykey": ""
+    }
+}

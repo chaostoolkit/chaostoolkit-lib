@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from collections import ChainMap
+import os
 from string import Template
-from typing import Any, Dict, List, Mapping, Union
+from typing import Any, Dict, List, Mapping, Tuple, Union
 
 HAS_CHARDET = True
 try:
@@ -12,9 +13,16 @@ except ImportError:
     except ImportError:
         HAS_CHARDET = False
 from logzero import logger
+try:
+    import simplejson as json
+    from simplejson.errors import JSONDecodeError
+except ImportError:
+    import json
+    from json.decoder import JSONDecodeError
+import yaml
 
 from chaoslib.exceptions import ActivityFailed
-from chaoslib.types import Configuration, Secrets
+from chaoslib.types import Configuration, ConfigVars, Secrets, SecretVars
 
 __all__ = ["__version__", "decode_bytes", "substitute"]
 __version__ = '1.11.0'
@@ -119,3 +127,68 @@ def decode_bytes(data: bytes, default_encoding: str = 'utf-8') -> str:
     except UnicodeDecodeError:
         raise ActivityFailed(
             "Failed to decode bytes using encoding '{}'".format(encoding))
+
+
+def merge_vars(var: Dict[str, Union[str, float, int, bytes]] = None,
+               var_files: List[str] = None) -> Tuple[ConfigVars, SecretVars]:
+    """
+    Load configuration and secret values from the given set of variables.
+    These values are applicable for substitution when the experiment runs.
+
+    If `var` is set, it must be a dictionary which will be used as
+    configuration values only.
+
+    If `var_files` is set, it can be a list of any of these two items:
+
+    * a Json or Yaml payload which must be also mappings with two top-level
+      keys: `"configuration"` and `"secrets"`. If any is present, it must
+      respect the format of the confiuration and secrets of the experiment
+      format.
+    * a .env file which is used to load environment variable on the fly.
+      In that case, the values are injected in the process environment so that
+      they get picked up during experiment's execution as if they had been
+      from the terminal itself.
+
+    Note that, when multiple var files are provided, they can override each
+    other.
+
+    The output of this function is a tuple made of configuration and secrets
+    that will be used during the experiment's execution for lookup.
+    """
+    config_vars = {}
+    secret_vars = {}
+
+    if var_files:
+        for var_file in var_files:
+            content = None
+            with open(var_file) as f:
+                content = f.read()
+
+            if content:
+                data = None
+                p, ext = os.path.splitext(var_file)
+                if ext in (".yaml", ".yml"):
+                    data = yaml.safe_load(content)
+                elif ext in (".json"):
+                    data = json.loads(content)
+
+                if not data:
+                    for line in content.split(os.linesep):
+                        line = line.strip()
+                        if not line or line.startswith("#"):
+                            continue
+
+                        k, v = line.split('=', 1)
+                        os.environ[k] = v
+                else:
+                    logger.debug(
+                        "Reading configuration/secrets from {}".format(f.name))
+                    config_vars.update(data.get("configuration", {}))
+                    secret_vars.update(data.get("secrets", {}))
+
+    if var:
+        logger.debug("Using configuration variable from command line")
+        for k in var:
+            config_vars[k] = var[k]
+
+    return (config_vars, secret_vars)

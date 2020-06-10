@@ -439,3 +439,25 @@ def test_rollback_never_strategy_does_not_run_on_interrupted_experiment_in_metho
     journal = run_experiment(experiment, settings)
     assert journal["status"] == "interrupted"
     assert len(journal["rollbacks"]) == 0
+def test_can_fill_config_from_vars():
+    experiment = experiments.ExperimentWithConfigurationFieldFromVars.copy()
+
+    config_vars = {
+        "message": "bonjour"
+    }
+    journal = run_experiment(experiment, experiment_vars=(config_vars, None))
+    assert isinstance(journal, dict)
+    assert journal["run"][0]["output"] == "bonjour"
+
+
+def test_can_fill_secret_from_vars():
+    experiment = experiments.ExperimentWitSecretFieldFromVars.copy()
+
+    secret_vars = {
+        "aws": {
+            "mykey": "123456"
+        }
+    }
+    journal = run_experiment(experiment, experiment_vars=(None, secret_vars))
+    assert isinstance(journal, dict)
+    assert journal["run"][0]["output"] == "123456"

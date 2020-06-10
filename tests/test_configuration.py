@@ -104,3 +104,26 @@ def test_load_configuration_should_raise_exception():
         })
   
     assert str(x.value) == "Configuration makes reference to an environment key that does not exist: KUBE_TOKEN"
+
+
+
+def test_should_apply_vars_to_inline_configuration():
+    os.environ["KUBE_TOKEN"] = "value2"
+    config = load_configuration({
+        "token1": "value1",
+        "token2": {
+            "type": "env",
+            "key": "KUBE_TOKEN"
+        },
+        "token3": {
+            "type": "env",
+            "key": "UNDEFINED",
+            "default": "value3"
+        }
+    }, config_vars={
+        "token1": "value78"
+    })
+
+    assert config["token1"] == "value78"
+    assert config["token2"] == "value2"
+    assert config["token3"] == "value3"

@@ -26,6 +26,24 @@ EchoAction = {
 }
 
 
+def echo(message: str):
+    return message
+
+
+EchoAction = {
+    "type": "action",
+    "name": "echo-message",
+    "provider": {
+        "type": "python",
+        "module": "fixtures.actions",
+        "func": "echo",
+        "arguments": {
+            "message": "${message}"
+        }
+    }
+}
+
+
 FailAction = {
     "name": "a name",
     "type": "action",
@@ -44,5 +62,18 @@ InterruptAction = {
         "type": "python",
         "module": "fixtures.fakeext",
         "func": "force_interrupting_experiment"
+    }
+}
+SecretEchoAction = {
+    "type": "action",
+    "name": "echo-secret-key",
+    "provider": {
+        "type": "python",
+        "module": "fixtures.actions",
+        "func": "echo",
+        "secrets": ["aws"],
+        "arguments": {
+            "message": "${mykey}"
+        }
     }
 }

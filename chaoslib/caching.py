@@ -3,11 +3,12 @@
 # referenced from other places in the experiment
 from functools import wraps
 import inspect
-from typing import List, Union
+from typing import List, Tuple, Union
 
 from logzero import logger
 
-from chaoslib.types import Activity, Experiment, Settings
+from chaoslib.types import Activity, ConfigVars, Experiment, SecretVars, \
+    Settings
 
 
 __all__ = ["cache_activities", "clear_cache", "lookup_activity", "with_cache"]
@@ -49,7 +50,8 @@ def with_cache(f):
     function.
     """
     @wraps(f)
-    def wrapped(experiment: Experiment, settings: Settings = None):
+    def wrapped(experiment: Experiment, settings: Settings = None,
+                experiment_vars: Tuple[ConfigVars, SecretVars] = None):
         try:
             if experiment:
                 cache_activities(experiment)
@@ -60,6 +62,9 @@ def with_cache(f):
             }
             if "settings" in sig.parameters:
                 arguments["settings"] = settings
+
+            if "experiment_vars" in sig.parameters:
+                arguments["experiment_vars"] = experiment_vars
             return f(**arguments)
         finally:
             clear_cache()

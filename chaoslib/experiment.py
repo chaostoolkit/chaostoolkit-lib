@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 import platform
 import time
-from typing import List
+from typing import List, Tuple
 
 from logzero import logger
 
@@ -24,8 +24,8 @@ from chaoslib.loader import load_experiment
 from chaoslib.rollback import run_rollbacks
 from chaoslib.secret import load_secrets
 from chaoslib.settings import get_loaded_settings
-from chaoslib.types import Configuration, Experiment, Journal, Run, Secrets, \
-    Settings
+from chaoslib.types import Configuration, ConfigVars, Experiment, Journal, \
+    Run, Secrets, SecretVars, Settings
 
 initialize_global_controls
 __all__ = ["ensure_experiment_is_valid", "run_experiment", "load_experiment"]
@@ -158,7 +158,9 @@ def get_background_pools(experiment: Experiment) -> ThreadPoolExecutor:
 
 @with_cache
 def run_experiment(experiment: Experiment,
-                   settings: Settings = None) -> Journal:
+                   settings: Settings = None,
+                   experiment_vars: Tuple[ConfigVars, SecretVars] = None) \
+                       -> Journal:
     """
     Run the given `experiment` method step by step, in the following sequence:
     steady probe, action, close probe.
@@ -185,8 +187,12 @@ def run_experiment(experiment: Experiment,
 
     started_at = time.time()
     settings = settings if settings is not None else get_loaded_settings()
-    config = load_configuration(experiment.get("configuration", {}))
-    secrets = load_secrets(experiment.get("secrets", {}), config)
+    experiment_vars = experiment_vars or (None, None)
+    config_vars, secret_vars = experiment_vars
+    config = load_configuration(
+        experiment.get("configuration", {}), config_vars=config_vars)
+    secrets = load_secrets(
+        experiment.get("secrets", {}), config, secret_vars=secret_vars)
     initialize_global_controls(experiment, config, secrets, settings)
     initialize_controls(experiment, config, secrets)
     activity_pool, rollback_pool = get_background_pools(experiment)

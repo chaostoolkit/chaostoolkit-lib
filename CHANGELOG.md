@@ -38,6 +38,44 @@
 
 [65]: https://github.com/chaostoolkit/chaostoolkit/issues/65
 
+
+### Added
+
+- Configuration and secrets variables. These structures are mappings that are
+  used to override values inlined into the experiment. So for instance, if the
+  experiment looks like this:
+
+  ```json
+  {
+      "configuration": {
+          "message": "hello world",
+      },
+      "secrets": {
+          "topic": {
+              "name": "fast"
+          }
+      }
+  }
+  ```
+
+  the variables mapping would be:
+
+  ```python
+    "configuration": {
+        "message": "bonjour",
+    },
+    "secrets": {
+        "topic": {
+            "name": "slow"
+        }
+    }
+  ```
+  These values will be used instead of the experiment's ones. You do not have
+  to replace all keys. This is mostly to enable CLI variable overriding as
+  per [chaostoolkit#175][175]
+
+[175]: https://github.com/chaostoolkit/chaostoolkit/issues/175
+
 ## [1.9.0][] - 2020-04-29
 
 [1.9.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.8.1...1.9.0

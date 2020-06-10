@@ -251,3 +251,16 @@ def test_read_secrets_from_vault_with_kv_version_2(hvac):
 
     secrets = load_secrets_from_vault(secrets_info, config)
     assert secrets["k8s"]["a-secret"] == "bar"
+
+
+def test_should_apply_vars_to_inline_secrets():
+    secrets = load_secrets({
+        "kubernetes": {
+            "api_server_url": "http://1.2.3.4"
+        }
+    }, config.EmptyConfig, secret_vars={
+        "kubernetes": {
+            "api_server_url": "http://blah"
+        }
+    })
+    assert secrets["kubernetes"]["api_server_url"] == "http://blah"

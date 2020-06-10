@@ -5,21 +5,42 @@ from typing import Dict
 from logzero import logger
 
 from chaoslib.exceptions import InvalidExperiment
-from chaoslib.types import Configuration
+from chaoslib.types import Configuration, ConfigVars
 
 __all__ = ["load_configuration"]
 
 
-def load_configuration(config_info: Dict[str, str]) -> Configuration:
+def load_configuration(config_info: Dict[str, str],
+                       config_vars: ConfigVars = None) -> Configuration:
     """
     Load the configuration. The `config_info` parameter is a mapping from
     key strings to value as strings or dictionaries. In the former case, the
     value is used as-is. In the latter case, if the dictionary has a key named
     `type` alongside a key named `key`.
+
+    When using a string inlined value, if `config_vars` is provided, the value
+    of the configuration key will be looked up in it and default to the inline
+    value if not found.
+
+    For instance:
+    ```
+    config_vars = {
+        'url': 'https://example.com"
+    }
+
+    config_info = {
+        'url': 'https://dummy.com',
+        'text': 'hello world'
+    }
+    ```
+
+    Then the `url` configuration key will be set to `"https://example.com"`
+    but `text` will remain `"hello world"`.
+
     An optional default value is accepted for dictionary value with a key named
     `default`. The default value will be used only if the environment variable
-    is not defined.
-
+    is not defined. The `config_vars` mapping has no impact on dictionary
+    configuration values.
 
     Here is a sample of what it looks like:
 
@@ -47,6 +68,7 @@ def load_configuration(config_info: Dict[str, str]) -> Configuration:
     logger.debug("Loading configuration...")
     env = os.environ
     conf = {}
+    config_vars = config_vars or {}
 
     for (key, value) in config_info.items():
         if isinstance(value, dict) and "type" in value:
@@ -59,6 +81,6 @@ def load_configuration(config_info: Dict[str, str]) -> Configuration:
                         " that does not exist: {}".format(env_key))
                 conf[key] = env.get(env_key, env_default)
         else:
-            conf[key] = value
+            conf[key] = config_vars.get(key, value)
 
     return conf
