@@ -4,6 +4,13 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.9.0...HEAD
 
+### Added
+
+- Added function to lookup a value in the settings from a dotted path
+  key [chaostoolkit#65][65]
+
+[65]: https://github.com/chaostoolkit/chaostoolkit/issues/65
+
 ## [1.9.0][] - 2020-04-29
 
 [1.9.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.8.1...1.9.0
