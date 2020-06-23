@@ -4,6 +4,25 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.10.0...HEAD
 
+### Added
+
+- Added runtime strategies for rollback as per [chaostoolkit#176][].
+  Until now, they were never played
+  an activity would fail during the hypothesis or if the execution
+  was interrupted from a control. With the strategies, you can now decide
+  that they are always applied, never or only when the experiment deviated.
+  This is a flag passed to the settings as follows:
+  
+  ```
+  runtime:
+    rollbacks:
+      strategy: "always|never|default|deviated"
+  ```
+
+  The `"default"` strategy remains backward compatible.
+
+  [chaostoolkit#176]: https://github.com/chaostoolkit/chaostoolkit/issues/176
+
 ## [1.10.0][] - 2020-06-19
 
 [1.10.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.9.0...1.10.0

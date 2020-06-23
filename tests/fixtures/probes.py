@@ -373,3 +373,14 @@ def must_be_in_range(a: int, b: int, value: Any = None) -> bool:
         raise ActivityFailed("body is not in expected range")
     else:
         return True
+
+FailProbe = {
+    "name": "a name",
+    "type": "probe",
+    "tolerance": True,
+    "provider": {
+        "type": "python",
+        "module": "fixtures.fakeext",
+        "func": "force_failed_activity"
+    }
+}

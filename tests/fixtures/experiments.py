@@ -2,6 +2,8 @@
 from copy import deepcopy
 import os
 
+from fixtures.actions import DoNothingAction, EchoAction, FailAction, \
+    InterruptAction
 from fixtures.probes import BackgroundPythonModuleProbe, MissingFuncArgProbe, \
     PythonModuleProbe, PythonModuleProbeWithBoolTolerance, \
     PythonModuleProbeWithExternalTolerance, PythonModuleProbeWithLongPause, \
@@ -11,7 +13,7 @@ from fixtures.probes import BackgroundPythonModuleProbe, MissingFuncArgProbe, \
     PythonModuleProbeWithProcessStatusTolerance, \
     PythonModuleProbeWithProcessFailedStatusTolerance, \
     PythonModuleProbeWithProcesStdoutTolerance, \
-    PythonModuleProbeWithHTTPStatusToleranceDeviation
+    PythonModuleProbeWithHTTPStatusToleranceDeviation, FailProbe
 
 Secrets = {}
 
@@ -421,3 +423,75 @@ method:
       path: {}
     timeout: 30
 """.format(os.path.abspath(__file__))
+
+
+ExperimentWithRegularRollback = {
+    "title": "do cats live in the Internet?",
+    "description": "an experiment of importance",
+    "steady-state-hypothesis": {
+        "title": "hello"
+    },
+    "method": [
+        EchoAction
+    ],
+    "rollbacks": [
+        EchoAction
+    ]
+}
+
+
+ExperimentWithFailedActionInMethodAndARollback = {
+    "title": "do cats live in the Internet?",
+    "description": "an experiment of importance",
+    "steady-state-hypothesis": {
+        "title": "hello"
+    },
+    "method": [
+        FailAction
+    ],
+    "rollbacks": [
+        EchoAction
+    ]
+}
+
+
+ExperimentWithFailedActionInSSHAndARollback = {
+    "title": "do cats live in the Internet?",
+    "description": "an experiment of importance",
+    "steady-state-hypothesis": {
+        "title": "hello",
+        "probes": [
+            FailProbe
+        ]
+    },
+    "method": [
+        DoNothingAction
+    ],
+    "rollbacks": [
+        EchoAction
+    ]
+}
+
+
+ExperimentWithInterruptedExperimentAndARollback = {
+    "title": "do cats live in the Internet?",
+    "description": "an experiment of importance",
+    "steady-state-hypothesis": {
+        "title": "hello"
+    },
+    "method": [
+        deepcopy(EchoAction)
+    ],
+    "rollbacks": [
+        EchoAction
+    ]
+}
+ExperimentWithInterruptedExperimentAndARollback["method"][0]["controls"] = [
+    {
+        "name": "dummy",
+        "provider": {
+            "type": "python",
+            "module": "fixtures.interruptexperiment"
+        }
+    }
+]
