@@ -190,6 +190,8 @@ def run_experiment(experiment: Experiment,
     initialize_global_controls(experiment, config, secrets, settings)
     initialize_controls(experiment, config, secrets)
     activity_pool, rollback_pool = get_background_pools(experiment)
+    rollback_strategy = settings.get("runtime", {}).get(
+        "rollbacks", {}).get("strategy", "default")
 
     experiment["title"] = substitute(experiment["title"], config, secrets)
     logger.info("Running experiment: {t}".format(t=experiment["title"]))
@@ -254,6 +256,34 @@ def run_experiment(experiment: Experiment,
                            "leaving without applying rollbacks.")
         else:
             journal["status"] = journal["status"] or "completed"
+
+        has_deviated = journal["deviated"]
+        journal_status = journal["status"]
+        play_rollbacks = False
+        if rollback_strategy == "always":
+            logger.warning(
+                "Rollbacks were explicitly requested to be played")
+            play_rollbacks = True
+        elif rollback_strategy == "never":
+            logger.warning(
+                "Rollbacks were explicitly requested to not be played")
+            play_rollbacks = False
+        elif rollback_strategy == "default" and \
+                journal_status not in ["failed", "interrupted"]:
+            play_rollbacks = True
+        elif rollback_strategy == "deviated":
+            if has_deviated:
+                logger.warning(
+                    "Rollbacks will be played only because the experiment "
+                    "deviated")
+                play_rollbacks = True
+            else:
+                logger.warning(
+                    "Rollbacks werre explicitely requested to be played only "
+                    "if the experiment deviated. Since this is not the case, "
+                    "we will not play them.")
+
+        if play_rollbacks:
             try:
                 journal["rollbacks"] = apply_rollbacks(
                     experiment, config, secrets, rollback_pool, dry)
@@ -269,8 +299,7 @@ def run_experiment(experiment: Experiment,
         journal["end"] = datetime.utcnow().isoformat()
         journal["duration"] = time.time() - started_at
 
-        has_deviated = journal["deviated"]
-        status = "deviated" if has_deviated else journal["status"]
+        status = "deviated" if has_deviated else journal_status
 
         logger.info(
             "Experiment ended with status: {s}".format(s=status))

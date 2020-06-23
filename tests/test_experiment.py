@@ -311,3 +311,131 @@ def test_dry_run_should_not_pause_before():
     pause_before_duration = int(experiment["method"][1]["pauses"]["before"])
 
     assert experiment_run_time < pause_before_duration
+
+
+def test_rollback_default_strategy_does_not_run_on_failed_activity_in_ssh():
+    experiment = experiments.ExperimentWithFailedActionInSSHAndARollback
+    #experiment["dry"] = True
+    settings = {
+        "runtime": {
+            "rollbacks": {
+                "strategy": "default"
+            }
+        }
+    }
+
+    journal = run_experiment(experiment, settings)
+    assert journal["status"] == "failed"
+    assert len(journal["rollbacks"]) == 0
+
+
+def test_rollback_default_strategy_runs_on_failed_activity_in_method():
+    experiment = experiments.ExperimentWithFailedActionInMethodAndARollback
+    #experiment["dry"] = True
+    settings = {
+        "runtime": {
+            "rollbacks": {
+                "strategy": "default"
+            }
+        }
+    }
+
+    journal = run_experiment(experiment, settings)
+    assert journal["status"] == "completed"
+    assert len(journal["rollbacks"]) == 1
+
+
+def test_rollback_default_strategy_does_not_run_on_interrupted_experiment_in_method():
+    experiment = experiments.ExperimentWithInterruptedExperimentAndARollback
+    #experiment["dry"] = True
+    settings = {
+        "runtime": {
+            "rollbacks": {
+                "strategy": "always"
+            }
+        }
+    }
+
+    journal = run_experiment(experiment, settings)
+    assert journal["status"] == "interrupted"
+    assert len(journal["rollbacks"]) == 1
+
+
+def test_rollback_always_strategy_runs_on_failed_activity_in_ssh():
+    experiment = experiments.ExperimentWithFailedActionInSSHAndARollback
+    #experiment["dry"] = True
+    settings = {
+        "runtime": {
+            "rollbacks": {
+                "strategy": "always"
+            }
+        }
+    }
+
+    journal = run_experiment(experiment, settings)
+    assert journal["status"] == "failed"
+    assert len(journal["rollbacks"]) == 1
+
+
+def test_rollback_always_strategy_runs_on_interrupted_experiment_in_method():
+    experiment = experiments.ExperimentWithInterruptedExperimentAndARollback
+    #experiment["dry"] = True
+    settings = {
+        "runtime": {
+            "rollbacks": {
+                "strategy": "always"
+            }
+        }
+    }
+
+    journal = run_experiment(experiment, settings)
+    assert journal["status"] == "interrupted"
+    assert len(journal["rollbacks"]) == 1
+
+
+def test_rollback_always_strategy_runs_on_failed_activity_in_method():
+    experiment = experiments.ExperimentWithFailedActionInMethodAndARollback
+    #experiment["dry"] = True
+    settings = {
+        "runtime": {
+            "rollbacks": {
+                "strategy": "always"
+            }
+        }
+    }
+
+    journal = run_experiment(experiment, settings)
+    assert journal["status"] == "completed"
+    assert len(journal["rollbacks"]) == 1
+
+
+def test_rollback_never_strategy_does_not_run_on_failed_activity_in_ssh():
+    experiment = experiments.ExperimentWithFailedActionInSSHAndARollback
+    #experiment["dry"] = True
+    settings = {
+        "runtime": {
+            "rollbacks": {
+                "strategy": "never"
+            }
+        }
+    }
+
+    journal = run_experiment(experiment, settings)
+    assert journal["status"] == "failed"
+    assert len(journal["rollbacks"]) == 0
+
+
+def test_rollback_never_strategy_does_not_run_on_interrupted_experiment_in_method():
+    experiment = experiments.ExperimentWithInterruptedExperimentAndARollback
+    #experiment["dry"] = True
+    settings = {
+        "runtime": {
+            "rollbacks": {
+                "strategy": "never"
+            }
+        }
+    }
+
+    journal = run_experiment(experiment, settings)
+    assert journal["status"] == "interrupted"
+    assert len(journal["rollbacks"]) == 0
