@@ -45,7 +45,6 @@ def test_process_not_utf8_cannot_fail():
         }
     }, None, None)
 
-    print(result['stderr'])
     # unfortunately, this doesn't seem to work well on mac
     if result['status'] == 0:
         assert result['stderr'] == u''
