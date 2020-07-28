@@ -13,7 +13,9 @@ from fixtures.probes import BackgroundPythonModuleProbe, MissingFuncArgProbe, \
     PythonModuleProbeWithProcessStatusTolerance, \
     PythonModuleProbeWithProcessFailedStatusTolerance, \
     PythonModuleProbeWithProcesStdoutTolerance, \
-    PythonModuleProbeWithHTTPStatusToleranceDeviation, FailProbe
+    PythonModuleProbeWithHTTPStatusToleranceDeviation, FailProbe, \
+    GenerateSecretTokenProbe, ReadSecretTokenProbe, \
+    ReadSecretTokenFromSecretsProbe
 
 Secrets = {}
 
@@ -304,6 +306,44 @@ ExperimentWithControls["controls"] = [
         "provider": {
             "type": "python",
             "module": "fixtures.controls.dummy"
+        }
+    }
+]
+
+ExperimentWithControlsThatUpdatedConfiguration = deepcopy(ExperimentNoControls)
+ExperimentWithControlsThatUpdatedConfiguration["configuration"] = {
+    "my_token": "UNSET"
+}
+ExperimentWithControlsThatUpdatedConfiguration["method"] = [
+    deepcopy(GenerateSecretTokenProbe),
+    deepcopy(ReadSecretTokenProbe)
+]
+ExperimentWithControlsThatUpdatedConfiguration["controls"] = [
+    {
+        "name": "dummy",
+        "provider": {
+            "type": "python",
+            "module": "fixtures.controls.dummy_changed_configuration"
+        }
+    }
+]
+
+ExperimentWithControlsThatUpdatedSecrets = deepcopy(ExperimentNoControls)
+ExperimentWithControlsThatUpdatedSecrets["secrets"] = {
+    "mytokens": {
+        "my_token": "UNSET"
+    }
+}
+ExperimentWithControlsThatUpdatedSecrets["method"] = [
+    deepcopy(GenerateSecretTokenProbe),
+    deepcopy(ReadSecretTokenFromSecretsProbe)
+]
+ExperimentWithControlsThatUpdatedSecrets["controls"] = [
+    {
+        "name": "dummy",
+        "provider": {
+            "type": "python",
+            "module": "fixtures.controls.dummy_changed_secrets"
         }
     }
 ]

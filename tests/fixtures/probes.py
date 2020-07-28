@@ -384,3 +384,43 @@ FailProbe = {
         "func": "force_failed_activity"
     }
 }
+
+
+GenerateSecretTokenProbe = {
+    "type": "probe",
+    "name": "generate-token",
+    "provider": {
+        "type": "python",
+        "module": "secrets",
+        "func": "token_hex"
+    }
+}
+
+
+ReadSecretTokenProbe = {
+    "type": "action",
+    "name": "use-token",
+    "provider": {
+        "type": "python",
+        "module": "pprint",
+        "func": "pformat",
+        "arguments": {
+            "object": "${my_token}"
+        }
+    }
+}
+
+
+ReadSecretTokenFromSecretsProbe = {
+    "type": "action",
+    "name": "use-token",
+    "provider": {
+        "type": "python",
+        "module": "pprint",
+        "func": "pformat",
+        "secrets": ["mytokens"],
+        "arguments": {
+            "object": "${my_token}"
+        }
+    }
+}

@@ -554,3 +554,19 @@ def test_controls_on_loaded_experiment():
             assert experiment["title"] == "BOOM I changed it"
         finally:
             cleanup_global_controls()
+
+
+def test_control_can_update_configuration():
+    exp = deepcopy(experiments.ExperimentWithControlsThatUpdatedConfiguration)
+    with controls("experiment", exp, context=exp):
+        state = run_experiment(exp)
+
+    assert state["run"][0]["output"] != "UNSET"
+
+
+def test_control_can_update_secrets():
+    exp = deepcopy(experiments.ExperimentWithControlsThatUpdatedSecrets)
+    with controls("experiment", exp, context=exp):
+        state = run_experiment(exp)
+
+    assert state["run"][0]["output"] != "UNSET"

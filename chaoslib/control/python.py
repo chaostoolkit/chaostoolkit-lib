@@ -127,10 +127,10 @@ def apply_python_control(level: str, control: Control,  # noqa: C901
     if "secrets" in provider and "secrets" in sig.parameters:
         arguments["secrets"] = {}
         for s in provider["secrets"]:
-            arguments["secrets"].update(secrets.get(s, {}).copy())
+            arguments["secrets"].update(secrets.get(s, {}))
 
     if "configuration" in sig.parameters:
-        arguments["configuration"] = configuration.copy()
+        arguments["configuration"] = configuration
 
     if "state" in sig.parameters:
         arguments["state"] = state

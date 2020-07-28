@@ -4,6 +4,13 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.11.0...HEAD
 
+## Changed
+
+- Controls can now update/change configuration and secrets on the fly as per
+  the specification [#181][181]
+
+[181]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/181
+
 ## [1.11.0][] - 2020-07-06
 
 [1.11.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.10.0...1.11.0
