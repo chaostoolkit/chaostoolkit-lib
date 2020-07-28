@@ -391,8 +391,11 @@ GenerateSecretTokenProbe = {
     "name": "generate-token",
     "provider": {
         "type": "python",
-        "module": "secrets",
-        "func": "token_hex"
+        "module": "random",
+        "func": "choice",
+        "arguments": {
+            "seq": ["RED", "BLUE", "YELLOW"]
+        }
     }
 }
 
