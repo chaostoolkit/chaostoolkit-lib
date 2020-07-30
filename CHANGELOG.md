@@ -4,11 +4,19 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.11.1...HEAD
 
+### Added
+
+- Added ways to override configuration and secrets from var files or passed to
+  the chaostoolkit cli [chaostoolkit#175][].
+
+
+[chaostoolkit#175]: https://github.com/chaostoolkit/chaostoolkit/issues/175
+
 ## [1.11.1][] - 2020-07-29
 
 [1.11.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.11.0...1.11.1
 
-## Changed
+### Changed
 
 - Controls can now update/change configuration and secrets on the fly as per
   the specification [#181][181]
