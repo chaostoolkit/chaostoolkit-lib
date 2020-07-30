@@ -3,7 +3,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 import platform
 import time
-from typing import List
+from typing import Any, Dict, List
 
 from logzero import logger
 
@@ -157,8 +157,8 @@ def get_background_pools(experiment: Experiment) -> ThreadPoolExecutor:
 
 
 @with_cache
-def run_experiment(experiment: Experiment,
-                   settings: Settings = None) -> Journal:
+def run_experiment(experiment: Experiment, settings: Settings = None,
+                   experiment_vars: Dict[str, Any] = None) -> Journal:
     """
     Run the given `experiment` method step by step, in the following sequence:
     steady probe, action, close probe.
@@ -185,7 +185,9 @@ def run_experiment(experiment: Experiment,
 
     started_at = time.time()
     settings = settings if settings is not None else get_loaded_settings()
-    config = load_configuration(experiment.get("configuration", {}))
+    config_vars, secret_vars = experiment_vars or (None, None)
+    config = load_configuration(
+        experiment.get("configuration", {}), extra_vars=config_vars)
     secrets = load_secrets(experiment.get("secrets", {}), config)
     initialize_global_controls(experiment, config, secrets, settings)
     initialize_controls(experiment, config, secrets)

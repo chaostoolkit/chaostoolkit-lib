@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from collections import ChainMap
+import os.path
 from string import Template
-from typing import Any, Dict, List, Mapping, Union
+from typing import Any, Dict, List, Mapping, Tuple, Union
 
 HAS_CHARDET = True
 try:
@@ -12,11 +13,19 @@ except ImportError:
     except ImportError:
         HAS_CHARDET = False
 from logzero import logger
+try:
+    import simplejson as json
+    from simplejson.errors import JSONDecodeError
+except ImportError:
+    import json
+    from json.decoder import JSONDecodeError
+import yaml
 
 from chaoslib.exceptions import ActivityFailed
-from chaoslib.types import Configuration, Secrets
+from chaoslib.types import Configuration, ConfigVars, Secrets, SecretVars
 
-__all__ = ["__version__", "decode_bytes", "substitute"]
+__all__ = ["__version__", "decode_bytes", "substitute", "merge_vars",
+           "convert_vars"]
 __version__ = '1.11.1'
 
 
@@ -119,3 +128,126 @@ def decode_bytes(data: bytes, default_encoding: str = 'utf-8') -> str:
     except UnicodeDecodeError:
         raise ActivityFailed(
             "Failed to decode bytes using encoding '{}'".format(encoding))
+
+
+def merge_vars(var: Dict[str, Union[str, float, int, bytes]] = None,  # noqa: C901
+               var_files: List[str] = None) -> Tuple[ConfigVars, SecretVars]:
+    """
+    Load configuration and secret values from the given set of variables.
+    These values are applicable for substitution when the experiment runs.
+    If `var` is set, it must be a dictionary which will be used as
+    configuration values only.
+    If `var_files` is set, it can be a list of any of these two items:
+    * a Json or Yaml payload which must be also mappings with two top-level
+      keys: `"configuration"` and `"secrets"`. If any is present, it must
+      respect the format of the confiuration and secrets of the experiment
+      format.
+    * a .env file which is used to load environment variable on the fly.
+      In that case, the values are injected in the process environment so that
+      they get picked up during experiment's execution as if they had been
+      from the terminal itself.
+    Note that, when multiple var files are provided, they can override each
+    other.
+    The output of this function is a tuple made of configuration and secrets
+    that will be used during the experiment's execution for lookup.
+    """
+    config_vars = {}
+    secret_vars = {}
+
+    if var_files:
+        for var_file in var_files:
+            logger.debug("Loading var from file '{}'".format(var_file))
+
+            if not os.path.isfile(var_file):
+                logger.error("Cannot read var file '{}'".format(var_file))
+                continue
+
+            content = None
+            with open(var_file) as f:
+                content = f.read()
+
+            if not content:
+                logger.debug("Var file '{}' is empty".format(var_file))
+                continue
+
+            data = None
+            _, ext = os.path.splitext(var_file)
+            if ext in (".yaml", ".yml"):
+                try:
+                    data = yaml.safe_load(content)
+                except yaml.YAMLError as y:
+                    logger.error(
+                        "Failed to parse variable file '{}': {}".format(
+                            var_file, str(y)))
+                    continue
+            elif ext in (".json"):
+                try:
+                    data = json.loads(content)
+                except JSONDecodeError as x:
+                    logger.error(
+                        "Failed to parse variable file '{}': {}".format(
+                            var_file, str(x)))
+                    continue
+
+            # process .env files
+            if not data:
+                for line in content.split(os.linesep):
+                    line = line.strip()
+                    if not line or line.startswith("#"):
+                        continue
+
+                    k, v = line.split('=', 1)
+                    os.environ[k] = v
+                    logger.debug(
+                        "Inject environment variable '{}' from "
+                        "file '{}'".format(k, var_file))
+            else:
+                logger.debug(
+                    "Reading configuration/secrets from {}".format(f.name))
+                config_vars.update(data.get("configuration", {}))
+                secret_vars.update(data.get("secrets", {}))
+
+    if var:
+        for k in var:
+            logger.debug("Using configuration variable '{}'".format(k))
+            config_vars[k] = var[k]
+
+    return (config_vars, secret_vars)
+
+
+def convert_vars(value: List[str]) -> Dict[str, Any]:  # noqa: C901
+    """
+    Process all variables and return a dictionnary of them with the
+    value converted to the appropriate type.
+
+    The list of values is as follows: `key[:type]=value` with `type` being one
+    of: str, int, float and bytes. `str` is the default and can be omitted.
+    """
+    var = {}
+    for v in value:
+        try:
+            k, v = v.split('=', 1)
+            if ':' in k:
+                k, typ = k.rsplit(':', 1)
+                try:
+                    if typ == 'str':
+                        pass
+                    elif typ == 'int':
+                        v = int(v)
+                    elif typ == 'float':
+                        v = float(v)
+                    elif typ == 'bytes':
+                        v = v.encode('utf-8')
+                    else:
+                        raise ValueError(
+                            'var supports only: str, int, float and bytes')
+                except (TypeError, UnicodeEncodeError):
+                    raise ValueError(
+                        'var cannot convert value to required type')
+            var[k] = v
+        except ValueError:
+            raise
+        except Exception:
+            raise ValueError('var needs to be in the format name[:type]=value')
+
+    return var

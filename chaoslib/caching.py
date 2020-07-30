@@ -3,7 +3,7 @@
 # referenced from other places in the experiment
 from functools import wraps
 import inspect
-from typing import List, Union
+from typing import Any, List, Dict, Union
 
 from logzero import logger
 
@@ -49,7 +49,8 @@ def with_cache(f):
     function.
     """
     @wraps(f)
-    def wrapped(experiment: Experiment, settings: Settings = None):
+    def wrapped(experiment: Experiment, settings: Settings = None,
+                experiment_vars: Dict[str, Any] = None):
         try:
             if experiment:
                 cache_activities(experiment)
@@ -58,8 +59,13 @@ def with_cache(f):
             arguments = {
                 "experiment": experiment
             }
+
             if "settings" in sig.parameters:
                 arguments["settings"] = settings
+
+            if "experiment_vars" in sig.parameters:
+                arguments["experiment_vars"] = experiment_vars
+
             return f(**arguments)
         finally:
             clear_cache()
