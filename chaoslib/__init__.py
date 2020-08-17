@@ -26,7 +26,7 @@ from chaoslib.types import Configuration, ConfigVars, Secrets, SecretVars
 
 __all__ = ["__version__", "decode_bytes", "substitute", "merge_vars",
            "convert_vars"]
-__version__ = '1.11.1'
+__version__ = '1.12.0'
 
 
 def substitute(data: Union[None, str, Dict[str, Any], List],
