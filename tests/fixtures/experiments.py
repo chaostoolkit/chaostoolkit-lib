@@ -310,6 +310,15 @@ ExperimentWithControls["controls"] = [
     }
 ]
 
+ExperimentWithControlsRequiringSecrets = deepcopy(ExperimentWithControls)
+ExperimentWithControlsRequiringSecrets["secrets"] = {
+    "mystuff": {
+        "somesecret": "somevalue"
+    }
+}
+ExperimentWithControlsRequiringSecrets["controls"][0]["provider"]["module"] = "fixtures.controls.dummy_with_secrets"
+ExperimentWithControlsRequiringSecrets["controls"][0]["provider"]["secrets"] = ["mystuff"]
+
 ExperimentWithControlsThatUpdatedConfiguration = deepcopy(ExperimentNoControls)
 ExperimentWithControlsThatUpdatedConfiguration["configuration"] = {
     "my_token": "UNSET"

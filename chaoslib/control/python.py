@@ -124,10 +124,9 @@ def apply_python_control(level: str, control: Control,  # noqa: C901
         arguments = substitute(arguments, configuration, secrets)
 
     sig = inspect.signature(func)
-    if "secrets" in provider and "secrets" in sig.parameters:
-        arguments["secrets"] = {}
-        for s in provider["secrets"]:
-            arguments["secrets"].update(secrets.get(s, {}))
+
+    if "secrets" in sig.parameters:
+        arguments["secrets"] = secrets
 
     if "configuration" in sig.parameters:
         arguments["configuration"] = configuration

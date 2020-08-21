@@ -4,6 +4,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.12.0...HEAD
 
+### Changed
+
+- Always pass all secrets to control hookpoints [#187][187]
+
+[187]: https://github.com/chaostoolkit/chaostoolkit/issues/187
+
 ## [1.12.0][] - 2020-08-17
 
 [1.12.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.11.1...1.12.0
