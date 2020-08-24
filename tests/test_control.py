@@ -558,15 +558,25 @@ def test_controls_on_loaded_experiment():
 
 def test_control_can_update_configuration():
     exp = deepcopy(experiments.ExperimentWithControlsThatUpdatedConfiguration)
-    with controls("experiment", exp, context=exp):
-        state = run_experiment(exp)
-
+    state = run_experiment(exp)
     assert state["run"][0]["output"] != "UNSET"
 
 
 def test_control_can_update_secrets():
     exp = deepcopy(experiments.ExperimentWithControlsThatUpdatedSecrets)
-    with controls("experiment", exp, context=exp):
-        state = run_experiment(exp)
-
+    state = run_experiment(exp)
     assert state["run"][0]["output"] != "UNSET"
+
+
+def test_secrets_are_passed_to_all_control_hookpoints():
+    exp = deepcopy(experiments.ExperimentWithControlsRequiringSecrets)
+    run_experiment(exp)
+
+    secrets = exp["secrets"]
+    for hookpoint in ("configure_control", "before_experiment_control",
+            "after_experiment_control", "before_method_control",
+            "after_method_control", "before_rollback_control",
+            "after_rollback_control", "before_hypothesis_control",
+            "after_hypothesis_control", "before_activity_control",
+            "after_activity_control"):
+        assert exp["{}_secrets".format(hookpoint)] == secrets, "{} was not provided the secrets".format(hookpoint)
