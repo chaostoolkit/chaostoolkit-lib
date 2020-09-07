@@ -334,6 +334,12 @@ class Runner:
             "rollbacks", {}).get("strategy", "default")
         logger.info("Rollbacks strategy: {}".format(rollback_strategy))
 
+        with_ssh = has_steady_state_hypothesis_with_probes(experiment)
+        if not with_ssh:
+            logger.info(
+                "No steady state hypothesis defined. That's ok, just "
+                "exploring.")
+
         try:
             try:
                 control.begin(
@@ -341,25 +347,25 @@ class Runner:
                     secrets)
 
                 state = object()
-                if should_run_before_method(strategy):
+                if with_ssh and should_run_before_method(strategy):
                     state = run_gate_hypothesis(
                         experiment, journal, configuration, secrets,
                         event_registry, dry)
 
                 if state is not None:
-                    if should_run_during_method(strategy):
+                    if with_ssh and should_run_during_method(strategy):
                         run_hypothesis_during_method(
                             hypo_pool, continous_hypo_event, strategy,
                             schedule, experiment, journal, configuration,
                             secrets, event_registry, dry)
 
                     state = run_method(
-                         strategy, activity_pool, experiment, journal,
-                         configuration, secrets, event_registry, dry)
+                            strategy, activity_pool, experiment, journal,
+                            configuration, secrets, event_registry, dry)
 
                     continous_hypo_event.set()
                     if journal["status"] not in ["interrupted", "aborted"]:
-                        if state is not None and \
+                        if with_ssh and (state is not None) and \
                                 should_run_after_method(strategy):
                             run_deviation_validation_hypothesis(
                                 experiment, journal, configuration, secrets,
@@ -522,6 +528,7 @@ def run_method(strategy: Strategy, activity_pool: ThreadPoolExecutor,
                configuration: Configuration, secrets: Secrets,
                event_registry: EventHandlerRegistry,
                dry: bool = False) -> Optional[List[Run]]:
+    logger.info("Playing your experiment's method now...")
     event_registry.start_method(experiment)
     try:
         state = apply_activities(
@@ -760,3 +767,12 @@ def apply_rollbacks(experiment: Experiment, configuration: Configuration,
         control.with_state(result)
 
     return result
+
+
+def has_steady_state_hypothesis_with_probes(experiment: Experiment) -> bool:
+    steady_state_hypothesis = experiment.get("steady-state-hypothesis")
+    if steady_state_hypothesis:
+        probes = steady_state_hypothesis.get("probes")
+        if probes:
+            return len(probes) > 0
+    return False

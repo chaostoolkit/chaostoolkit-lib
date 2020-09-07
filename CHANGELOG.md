@@ -2,7 +2,16 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.13.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.13.1...HEAD
+
+## [1.13.1][] - 2020-09-07
+
+[1.13.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.13.0...1.13.1
+
+### Changed
+
+- Ensure the method is always executed, even when no steady-state was provided
+  in the experiment.
 
 ## [1.13.0][] - 2020-09-07
 

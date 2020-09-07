@@ -177,8 +177,7 @@ def run_steady_state_hypothesis(experiment: Experiment,
     }
     hypo = experiment.get("steady-state-hypothesis")
     if not hypo:
-        logger.info(
-            "No steady state hypothesis defined. That's ok, just exploring.")
+        logger.debug("No hypothesis declared.")
         return
 
     logger.info("Steady state hypothesis: {h}".format(h=hypo.get("title")))
