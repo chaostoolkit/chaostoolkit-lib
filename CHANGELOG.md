@@ -4,11 +4,28 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.12.0...HEAD
 
+### Added
+
+- Steady-state hypothesos runtime strategies can be now set to determine if the
+  the hypothesis is executed before/after the method as usual (default behavior)
+  or continously throughout the method too. Yo ucan also make it applied
+  before or after only, or even only during the method. [#191][191]
+
+[191]: https://github.com/chaostoolkit/chaostoolkit/pull/191
+
 ### Changed
 
 - Always pass all secrets to control hookpoints [#187][187]
+- Massive refactor of the `run_experiment` function so that it raises now events
+  of where it is during the execution so that external plugins to the Chaos
+  Toolkit can react and impact the run. This goes beyond mere controls and
+  is advanced usage. Still, this is a public interface. [#178][178]
+  In theory, this is an internal change only and the `run_experiment` function
+  has not changed its API. However, this may have deep impact if you already
+  depended on its internals.
 
 [187]: https://github.com/chaostoolkit/chaostoolkit/issues/187
+[178]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/178
 
 ## [1.12.0][] - 2020-08-17
 
@@ -19,6 +36,12 @@
 - Added ways to override configuration and secrets from var files or passed to
   the chaostoolkit cli [chaostoolkit#175][].
 
+### Changed
+
+- Always ensure the [status][statuses] in the journal is one of
+  the specified value, with a default to `"completed"`.
+
+[statuses]: https://docs.chaostoolkit.org/reference/api/journal/#required-properties
 
 [chaostoolkit#175]: https://github.com/chaostoolkit/chaostoolkit/issues/175
 
@@ -79,6 +102,22 @@
 
 [168]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/168
 [163]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/163
+
+### Added
+
+- Refactored run of the experiment so that we can have multiple run strategies
+  such as not running the steady-state hypothesis before or after the method
+  but also one strategy so that the steady-state is continously applied
+  during the method, with the option to bail the experiment as soon as it
+  deviates. [#149][149]
+
+### Changed
+
+- Potentially breaking. The following functions have moved from
+  `chaoslib.experiment` to `chaoslib.run`: `initialize_run_journal`,
+  `apply_activities`, `apply_rollbacks`.
+
+[149]: https://github.com/chaostoolkit/chaostoolkit/issues/149
 
 ### Changed
 

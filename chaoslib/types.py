@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
-from typing import Any, Dict, List, Tuple, Union
+import enum
+from typing import Any, Dict, List, NamedTuple, Tuple, Union
 
 __all__ = ["MicroservicesStatus", "Probe", "Action", "Experiment", "Layer",
            "TargetLayers", "Activity", "Journal", "Run", "Secrets", "Step",
            "Configuration", "Discovery", "DiscoveredActivities", "Extension",
            "DiscoveredSystemInfo", "Settings", "EventPayload", "Tolerance",
-           "Hypothesis", "Control", "ConfigVars", "SecretVars"]
+           "Hypothesis", "Control", "Strategy", "Schedule",
+           "ConfigVars", "SecretVars"]
 
 
 Action = Dict[str, Any]
@@ -40,3 +42,36 @@ Control = Dict[str, Any]
 
 ConfigVars = Dict[str, Any]
 SecretVars = Dict[str, Any]
+
+
+class Strategy(enum.Enum):
+    BEFORE_METHOD = "before-method-only"
+    AFTER_METHOD = "after-method-only"
+    DURING_METHOD = "during-method-only"
+    DEFAULT = "default"
+    CONTINOUS = "continous"
+
+    @staticmethod
+    def from_string(value: str) -> 'Strategy':
+        if value == "default":
+            return Strategy.DEFAULT
+        elif value == "before-method-only":
+            return Strategy.BEFORE_METHOD
+        elif value == "after-method-only":
+            return Strategy.AFTER_METHOD
+        elif value == "during-method-only":
+            return Strategy.DURING_METHOD
+        elif value == "continously":
+            return Strategy.CONTINOUS
+        elif value == "continously-fail-fast":
+            return Strategy.CONTINOUS
+
+        raise ValueError("Unknown strategy")
+
+
+class Schedule:
+    def __init__(self, continous_hypothesis_frequency: float = 1.0,
+                 fail_fast: bool = False, fail_fast_ratio: float = 0):
+        self.continous_hypothesis_frequency = continous_hypothesis_frequency
+        self.fail_fast = fail_fast
+        self.fail_fast_ratio = fail_fast_ratio

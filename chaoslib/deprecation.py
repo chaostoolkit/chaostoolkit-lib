@@ -6,7 +6,7 @@ from logzero import logger
 from chaoslib.activity import get_all_activities_in_experiment
 from chaoslib.types import Experiment
 
-__all__ = ["warn_about_deprecated_features"]
+__all__ = ["warn_about_deprecated_features", "warn_about_moved_function"]
 DeprecatedDictArgsMessage = \
     "Process arguments should now be a list to keep the ordering "\
     "of the arguments. Dictionary arguments are deprecated for "\
@@ -58,3 +58,7 @@ def warn_about_deprecated_features(experiment: Experiment):
                     warnings.warn(
                         DeprecatedVaultMissingPathMessage, DeprecationWarning)
                     logger.warning(DeprecatedVaultMissingPathMessage)
+
+
+def warn_about_moved_function(message: str):
+    warnings.warn(message, DeprecationWarning, stacklevel=2)

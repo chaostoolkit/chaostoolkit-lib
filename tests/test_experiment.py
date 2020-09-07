@@ -11,11 +11,11 @@ import pytest
 import requests_mock
 import yaml
 
+from chaoslib.activity import run_activities
 from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
     InvalidExperiment, InterruptExecution
 from chaoslib.experiment import ensure_experiment_is_valid, load_experiment, \
-    run_experiment, run_activities
-from chaoslib.types import Experiment
+    run_experiment
 
 from fixtures import config, experiments
 

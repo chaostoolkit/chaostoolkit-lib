@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
+from unittest.mock import patch
 import warnings
 
 import pytest
@@ -7,7 +8,9 @@ import pytest
 from chaoslib import deprecation
 from chaoslib.deprecation import DeprecatedDictArgsMessage, \
     DeprecatedVaultMissingPathMessage, warn_about_deprecated_features
-
+from chaoslib import experiment
+from chaoslib.experiment import initialize_run_journal, apply_activities, \
+    apply_rollbacks
 from fixtures import experiments
 
 
@@ -40,3 +43,33 @@ def test_vault_secrets_require_path():
                 warn_counts = warn_counts + 1
 
     assert warn_counts == 1
+
+
+def test_initialize_run_journal_has_moved():
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("module")
+        with patch("chaoslib.experiment.init_journal"):
+            initialize_run_journal(None)
+            assert len(w) == 1
+            assert w[0].filename == experiment.__file__
+            assert "'initialize_run_journal'" in str(w[0].message)
+
+
+def test_apply_activities_has_moved():
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("module")
+        with patch("chaoslib.experiment.apply_act"):
+            apply_activities(None, None, None, None, None)
+            assert len(w) == 1
+            assert w[0].filename == experiment.__file__
+            assert "'apply_activities'" in str(w[0].message)
+
+
+def test_apply_rollbacks_has_moved():
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("module")
+        with patch("chaoslib.experiment.apply_roll"):
+            apply_rollbacks(None, None, None, None)
+            assert len(w) == 1
+            assert w[0].filename == experiment.__file__
+            assert "'apply_rollbacks'" in str(w[0].message)
