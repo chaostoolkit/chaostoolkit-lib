@@ -4,6 +4,22 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.13.1...HEAD
 
+### Added
+
+- Add two functions to programmatically exit the experiment as soon as feasible
+  by the Python VM [#185][185]:
+  * `chaoslib.exit.exit_gracefully`: termintes but abides to the rollback strategy
+  * `chaoslib.exit.exit_ungracefully`: termintes but bypasses rollbacks entirely
+    and does not wait for background actions/probes still running
+  This should mostly be useful to have a harsh way to interrupt an execution
+  and is therefore an advanced concept with undesirable side effects (though
+  Chaos Toolkit tries to do as right as it can).
+
+  CAVEAT: Only works on Unix/Linux systems implementing SIGUSR1/SIGUSR2 signals
+
+[185]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/185
+
+
 ## [1.13.1][] - 2020-09-07
 
 [1.13.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.13.0...1.13.1

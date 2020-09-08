@@ -681,3 +681,255 @@ ExperimentWithInterruptedExperimentAndARollback["method"][0]["controls"] = [
         }
     }
 ]
+
+
+ExperimentGracefulExitLongHTTPCall = {
+    "version": "1.0.0",
+    "title": "Say hello and kaboom",
+    "description": "n/a",
+    "method": [
+        {
+            "type": "probe",
+            "name": "do-whatever-in-the-background",
+            "background": True,
+            "provider": {
+                "type": "python",
+                "module": "fixtures.longpythonfunc",
+                "func": "be_long"
+            }
+        },
+        {
+            "type": "probe",
+            "name": "interrupt-next-action",
+            "background": True,
+            "provider": {
+                "type": "python",
+                "module": "fixtures.interrupter",
+                "func": "interrupt_gracefully_in"
+            }
+        },
+        {
+            "type": "action",
+            "name": "pretend-we-do-stuff",
+            "provider": {
+                "type": "http",
+                "url": "http://localhost:8700/"
+            }
+        }
+    ],
+    "rollbacks": [
+        {
+            "type": "action",
+            "name": "echo-rollback-is-done",
+            "provider": {
+                "type": "process",
+                "path": "echo",
+                "arguments": "done!!"
+            }
+        }
+    ]
+}
+
+
+ExperimentGracefulExitLongProcessCall = {
+    "version": "1.0.0",
+    "title": "Say hello and kaboom",
+    "description": "n/a",
+    "method": [
+        {
+            "type": "probe",
+            "name": "interrupt-next-action",
+            "background": True,
+            "provider": {
+                "type": "python",
+                "module": "fixtures.interrupter",
+                "func": "interrupt_gracefully_in"
+            }
+        },
+        {
+            "type": "action",
+            "name": "pretend-we-do-stuff",
+            "provider": {
+                "type": "process",
+                "path": "cat",
+                "arguments": "-"
+            }
+        }
+    ],
+    "rollbacks": [
+        {
+            "type": "action",
+            "name": "echo-rollback-is-done",
+            "provider": {
+                "type": "process",
+                "path": "echo",
+                "arguments": "done!!"
+            }
+        }
+    ]
+}
+
+
+ExperimentGracefulExitLongPythonCall = {
+    "version": "1.0.0",
+    "title": "Say hello and kaboom",
+    "description": "n/a",
+    "method": [
+        {
+            "type": "probe",
+            "name": "interrupt-next-action",
+            "background": True,
+            "provider": {
+                "type": "python",
+                "module": "fixtures.interrupter",
+                "func": "interrupt_gracefully_in"
+            }
+        },
+        {
+            "type": "action",
+            "name": "pretend-we-do-stuff",
+            "provider": {
+                "type": "python",
+                "module": "fixtures.longpythonfunc",
+                "func": "be_long"
+            }
+        }
+    ],
+    "rollbacks": [
+        {
+            "type": "action",
+            "name": "echo-rollback-is-done",
+            "provider": {
+                "type": "process",
+                "path": "echo",
+                "arguments": "done!!"
+            }
+        }
+    ]
+}
+
+
+ExperimentUngracefulExitLongHTTPCall = {
+    "version": "1.0.0",
+    "title": "Say hello and kaboom",
+    "description": "n/a",
+    "method": [
+        {
+            "type": "probe",
+            "name": "do-whatever-in-the-background",
+            "background": True,
+            "provider": {
+                "type": "python",
+                "module": "fixtures.longpythonfunc",
+                "func": "be_long"
+            }
+        },
+        {
+            "type": "probe",
+            "name": "interrupt-next-action",
+            "background": True,
+            "provider": {
+                "type": "python",
+                "module": "fixtures.interrupter",
+                "func": "interrupt_ungracefully_in"
+            }
+        },
+        {
+            "type": "action",
+            "name": "pretend-we-do-stuff",
+            "provider": {
+                "type": "http",
+                "url": "http://localhost:8700"
+            }
+        }
+    ],
+    "rollbacks": [
+        {
+            "type": "action",
+            "name": "echo-rollback-is-done",
+            "provider": {
+                "type": "process",
+                "path": "echo",
+                "arguments": "done!!"
+            }
+        }
+    ]
+}
+
+
+ExperimentUngracefulExitLongProcessCall = {
+    "version": "1.0.0",
+    "title": "Say hello and kaboom",
+    "description": "n/a",
+    "method": [
+        {
+            "type": "probe",
+            "name": "interrupt-next-action",
+            "background": True,
+            "provider": {
+                "type": "python",
+                "module": "fixtures.interrupter",
+                "func": "interrupt_ungracefully_in"
+            }
+        },
+        {
+            "type": "action",
+            "name": "pretend-we-do-stuff",
+            "provider": {
+                "type": "process",
+                "path": "cat",
+                "arguments": "-"
+            }
+        }
+    ],
+    "rollbacks": [
+        {
+            "type": "action",
+            "name": "echo-rollback-is-done",
+            "provider": {
+                "type": "process",
+                "path": "echo",
+                "arguments": "done!!"
+            }
+        }
+    ]
+}
+
+
+ExperimentUngracefulExitLongPythonCall = {
+    "version": "1.0.0",
+    "title": "Say hello and kaboom",
+    "description": "n/a",
+    "method": [
+        {
+            "type": "probe",
+            "name": "interrupt-next-action",
+            "background": True,
+            "provider": {
+                "type": "python",
+                "module": "fixtures.interrupter",
+                "func": "interrupt_ungracefully_in"
+            }
+        },
+        {
+            "type": "action",
+            "name": "pretend-we-do-stuff",
+            "provider": {
+                "type": "python",
+                "module": "fixtures.longpythonfunc",
+                "func": "be_long"
+            }
+        }
+    ],
+    "rollbacks": [
+        {
+            "type": "action",
+            "name": "echo-rollback-is-done",
+            "provider": {
+                "type": "process",
+                "path": "echo",
+                "arguments": "done!!"
+            }
+        }
+    ]
+}
