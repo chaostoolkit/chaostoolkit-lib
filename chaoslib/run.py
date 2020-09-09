@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from concurrent.futures import Future, ThreadPoolExecutor
+from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError
 from datetime import datetime
 import platform
 import threading
@@ -13,6 +13,7 @@ from chaoslib.activity import run_activities
 from chaoslib.control import initialize_controls, controls, cleanup_controls, \
     Control, initialize_global_controls, cleanup_global_controls
 from chaoslib.exceptions import ChaosException, InterruptExecution
+from chaoslib.exit import exit_signals
 from chaoslib.configuration import load_configuration
 from chaoslib.hypothesis import run_steady_state_hypothesis
 from chaoslib.rollback import run_rollbacks
@@ -296,10 +297,11 @@ class Runner:
             journal: Journal = None) -> Journal:
 
         self.configure(experiment, settings)
-        journal = self._run(
-            self.strategy, self.schedule, experiment, journal,
-            self.config, self.secrets, self.settings, experiment_vars,
-            self.event_registry)
+        with exit_signals():
+            journal = self._run(
+                self.strategy, self.schedule, experiment, journal,
+                self.config, self.secrets, self.settings, experiment_vars,
+                self.event_registry)
         return journal
 
     def _run(self, strategy: Strategy, schedule: Schedule,  # noqa: C901
@@ -334,6 +336,7 @@ class Runner:
             "rollbacks", {}).get("strategy", "default")
         logger.info("Rollbacks strategy: {}".format(rollback_strategy))
 
+        exit_gracefully_with_rollbacks = True
         with_ssh = has_steady_state_hypothesis_with_probes(experiment)
         if not with_ssh:
             logger.info(
@@ -374,17 +377,27 @@ class Runner:
                 journal["status"] = "interrupted"
                 logger.fatal(str(i))
                 event_registry.interrupted(experiment, journal)
-            except (KeyboardInterrupt, SystemExit):
+            except KeyboardInterrupt:
                 journal["status"] = "interrupted"
-                logger.warning("Received an exit signal, "
-                               "leaving without applying rollbacks.")
+                logger.warning("Received a termination signal (Ctrl-C)...")
+                event_registry.signal_exit()
+            except SystemExit as x:
+                journal["status"] = "interrupted"
+                logger.warning("Received the exit signal: {}".format(x.code))
+
+                exit_gracefully_with_rollbacks = x.code != 30
+                if not exit_gracefully_with_rollbacks:
+                    logger.warning("Ignoring rollbacks as per signal")
                 event_registry.signal_exit()
             finally:
                 hypo_pool.shutdown(wait=True)
 
-            run_rollback(
-                rollback_strategy, rollback_pool, experiment, journal,
-                configuration, secrets, event_registry, dry)
+            # just in case a signal overrode everything else to tell us not to
+            # play them anyway (see the exit.py module)
+            if exit_gracefully_with_rollbacks:
+                run_rollback(
+                    rollback_strategy, rollback_pool, experiment, journal,
+                    configuration, secrets, event_registry, dry)
 
             journal["end"] = datetime.utcnow().isoformat()
             journal["duration"] = time.time() - started_at
@@ -533,9 +546,8 @@ def run_method(strategy: Strategy, activity_pool: ThreadPoolExecutor,
     try:
         state = apply_activities(
             experiment, configuration, secrets, activity_pool, journal, dry)
-        journal["run"] = state
         event_registry.method_completed(experiment, state)
-        return journal["run"]
+        return state
     except InterruptExecution:
         event_registry.method_completed(experiment)
         raise
@@ -717,27 +729,66 @@ def apply_activities(experiment: Experiment, configuration: Configuration,
                      journal: Journal, dry: bool = False) -> List[Run]:
     with controls(level="method", experiment=experiment, context=experiment,
                   configuration=configuration, secrets=secrets) as control:
-        runs = []
-        for run in run_activities(
-                experiment, configuration, secrets, pool, dry):
-            runs.append(run)
-            if journal["status"] in ["aborted", "failed", "interrupted"]:
-                break
-
-        if pool:
-            logger.debug("Waiting for background activities to complete...")
-            pool.shutdown(wait=True)
-
         result = []
-        for run in runs:
-            if not run:
-                continue
-            if isinstance(run, dict):
-                result.append(run)
-            else:
-                result.append(run.result())
+        runs = []
+        method = experiment.get("method", [])
+        wait_for_background_activities = True
 
-        control.with_state(result)
+        try:
+            for run in run_activities(
+                    experiment, configuration, secrets, pool, dry):
+                runs.append(run)
+                if journal["status"] in ["aborted", "failed", "interrupted"]:
+                    break
+        except SystemExit as x:
+            # when we got a signal for an ungraceful exit, we can decide
+            # not to wait for background activities. Their statuses will
+            # remain failed.
+            wait_for_background_activities = x.code != 30  # see exit.py
+            raise
+        finally:
+            background_activity_timeout = None
+
+            if wait_for_background_activities and pool:
+                logger.debug("Waiting for background activities to complete")
+                pool.shutdown(wait=True)
+            elif pool:
+                logger.debug(
+                    "Do not wait for the background activities to finish "
+                    "as per signal")
+                background_activity_timeout = 0.1
+                pool.shutdown(wait=False)
+
+            for index, run in enumerate(runs):
+                if not run:
+                    continue
+
+                if isinstance(run, dict):
+                    result.append(run)
+                else:
+                    try:
+                        # background activities
+                        result.append(
+                            run.result(timeout=background_activity_timeout))
+                    except TimeoutError:
+                        # we want an entry for the background activity in our
+                        # results anyway, we won't have anything meaningful
+                        # to say about it
+                        result.append({
+                            "activity": method[index],
+                            "status": "failed",
+                            "output": None,
+                            "duration": None,
+                            "start": None,
+                            "end": None,
+                            "exception": None
+                        })
+
+            # now let's ensure the journal has all activities in their correct
+            # order (background ones included)
+            journal["run"] = result
+
+            control.with_state(result)
 
     return result
 

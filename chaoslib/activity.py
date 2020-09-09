@@ -219,6 +219,7 @@ def run_activity(activity: Activity, configuration: Configuration,
     This is an internal function and should probably avoid being called
     outside this package.
     """
+    result = None
     try:
         provider = activity["provider"]
         activity_type = provider["type"]
