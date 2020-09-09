@@ -20,6 +20,13 @@
 [185]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/185
 
 
+### Changed
+
+- Fix [chaostoolkit#192][chaostoolkit192] to make sure a failing hypothesis
+  prevents the method to be executed.
+
+[chaostoolkit192]: https://github.com/chaostoolkit/chaostoolkit/issues/192
+
 ## [1.13.1][] - 2020-09-07
 
 [1.13.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.13.0...1.13.1
