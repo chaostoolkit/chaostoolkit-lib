@@ -933,3 +933,39 @@ ExperimentUngracefulExitLongPythonCall = {
         }
     ]
 }
+
+
+SimpleExperimentWithFailingHypothesis = {
+    "version": "1.0.0",
+    "title": "Hello world!",
+    "description": "Say hello world.",
+    "steady-state-hypothesis": {
+        "title": "World needs politeness",
+        "probes": [
+            {
+                "type": "probe",
+                "name": "has-world",
+                "tolerance": 1,
+                "provider": {
+                "type": "process",
+                "path": "echo",
+                    "arguments": "hello"
+                }
+            }
+        ]
+    },
+    "method": [
+        {
+            "type": "action",
+            "name": "say-hello",
+            "provider": {
+                "type": "process",
+                "path": "echo",
+                "arguments": "world"
+            },
+            "pauses": {
+                "after": 1
+            }
+        }
+    ]
+}

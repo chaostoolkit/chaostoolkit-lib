@@ -469,6 +469,7 @@ def run_gate_hypothesis(experiment: Experiment, journal: Journal,
             "Steady state probe '{p}' is not in the given "
             "tolerance so failing this experiment".format(
                 p=p["activity"]["name"]))
+        return
     event_registry.hypothesis_before_completed(experiment, state, journal)
     return state
 

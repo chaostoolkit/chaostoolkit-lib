@@ -238,3 +238,15 @@ def test_exceptions_does_not_stop_handler_registry():
         "hypothesis_after_completed",
         "start_cooldown", "cooldown_completed"
     ]
+
+
+def test_do_not_ruin_method_on_failing_before_ssh():
+    experiment = experiments.SimpleExperimentWithFailingHypothesis.copy()
+    journal = run_experiment(experiment, strategy=Strategy.DEFAULT)
+    assert journal is not None
+    assert journal["steady_states"]["before"] is not None
+    assert journal["steady_states"]["after"] is None
+    assert journal["steady_states"]["during"] == []
+    assert journal["status"] == "failed"
+    assert journal["deviated"] == False
+    assert len(journal["run"]) == 0
