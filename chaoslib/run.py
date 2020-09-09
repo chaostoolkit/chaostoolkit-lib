@@ -460,6 +460,7 @@ def run_gate_hypothesis(experiment: Experiment, journal: Journal,
     state = run_steady_state_hypothesis(
         experiment, configuration, secrets, dry=dry)
     journal["steady_states"]["before"] = state
+    event_registry.hypothesis_before_completed(experiment, state, journal)
     if state is not None and not state["steady_state_met"]:
         journal["steady_states"]["before"] = state
         journal["status"] = "failed"
@@ -470,7 +471,6 @@ def run_gate_hypothesis(experiment: Experiment, journal: Journal,
             "tolerance so failing this experiment".format(
                 p=p["activity"]["name"]))
         return
-    event_registry.hypothesis_before_completed(experiment, state, journal)
     return state
 
 
@@ -490,6 +490,7 @@ def run_deviation_validation_hypothesis(experiment: Experiment,
     state = run_steady_state_hypothesis(
         experiment, configuration, secrets, dry=dry)
     journal["steady_states"]["after"] = state
+    event_registry.hypothesis_after_completed(experiment, state, journal)
     if state is not None and \
             not state["steady_state_met"]:
         journal["deviated"] = True
@@ -500,7 +501,6 @@ def run_deviation_validation_hypothesis(experiment: Experiment,
             "given tolerance so failing this "
             "experiment".format(
                 p=p["activity"]["name"]))
-    event_registry.hypothesis_after_completed(experiment, state, journal)
     return state
 
 
