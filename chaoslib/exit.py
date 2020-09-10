@@ -55,9 +55,10 @@ __all__ = ["exit_gracefully", "exit_ungracefully", "exit_signals"]
 @contextmanager
 def exit_signals():
     """
-    Register the handlers for SIGUSR1 and SIGUSR2 signals. Puts back the
-    original handlers when the call ends.
+    Register the handlers for SIGTERM, SIGUSR1 and SIGUSR2 signals.
+    Puts back the original handlers when the call ends.
 
+    SIGTERM will trigger an InterruptExecution exception
     SIGUSR1 is used to terminate the experiment now while keeping the
     rollbacks if they were declared.
     SIGUSR2 is used to terminate the experiment without ever running the
@@ -66,8 +67,10 @@ def exit_signals():
     Generally speaking using signals this way is a bit of an overkill but
     the Python VM has no other mechanism to interrupt blocking calls.
 
-    WARNING: Only available on Unix/Linux systems.
+    WARNING: SIGUSR1 and SIGUSR2 are only available on Unix/Linux systems.
     """
+    sigterm_handler = signal.signal(signal.SIGTERM, _terminate_now)
+
     if hasattr(signal, "SIGUSR1") and hasattr(signal, "SIGUSR2"):
         # keep a reference to the original handlers
         sigusr1_handler = signal.signal(signal.SIGUSR1, _leave_now)
@@ -75,15 +78,20 @@ def exit_signals():
         try:
             yield
         finally:
+            signal.signal(signal.SIGTERM, sigterm_handler)
             signal.signal(signal.SIGUSR1, sigusr1_handler)
             signal.signal(signal.SIGUSR2, sigusr2_handler)
     else:
+
         # On a system that doesn't support SIGUSR signals
         # not much we can do...
         logger.debug(
             "System '{}' does not expose SIGUSR signals".format(
                 platform.platform()))
-        yield
+        try:
+            yield
+        finally:
+            signal.signal(signal.SIGTERM, sigterm_handler)
 
 
 def exit_gracefully():
@@ -142,3 +150,11 @@ def _leave_now(signum: int, frame: FrameType = None) -> None:
 
     elif signum == signal.SIGUSR2:
         raise SystemExit(30)
+
+
+def _terminate_now(signum: int, frame: FrameType = None) -> None:
+    """
+    Signal handler for the SIGTERM event. Raises an `InterruptExecution`.
+    """
+    if signum == signal.SIGTERM:
+        logger.warning("Caught SIGTERM signal, interrupting experiment now")

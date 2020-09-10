@@ -4,6 +4,11 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.14.0...HEAD
 
+### Added
+
+- SIGTERM signal is now listened for. This triggers the interruption mechanism
+  of the experiment.
+
 ## [1.14.0][] - 2020-09-09
 
 [1.14.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.13.1...1.14.0
