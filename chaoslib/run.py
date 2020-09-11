@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError
+try:
+    import ctypes
+    HAS_CTYPES = True
+except ImportError:
+    HAS_CTYPES = False
 from datetime import datetime
 import platform
 import threading
@@ -12,7 +17,8 @@ from chaoslib import __version__, substitute
 from chaoslib.activity import run_activities
 from chaoslib.control import initialize_controls, controls, cleanup_controls, \
     Control, initialize_global_controls, cleanup_global_controls
-from chaoslib.exceptions import ChaosException, InterruptExecution
+from chaoslib.exceptions import ChaosException, ExperimentExitedException, \
+    InterruptExecution
 from chaoslib.exit import exit_signals
 from chaoslib.configuration import load_configuration
 from chaoslib.hypothesis import run_steady_state_hypothesis
@@ -754,10 +760,11 @@ def apply_activities(experiment: Experiment, configuration: Configuration,
                 logger.debug("Waiting for background activities to complete")
                 pool.shutdown(wait=True)
             elif pool:
+                harshly_terminate_pending_background_activities(pool)
                 logger.debug(
                     "Do not wait for the background activities to finish "
                     "as per signal")
-                background_activity_timeout = 0.1
+                background_activity_timeout = 0.2
                 pool.shutdown(wait=False)
 
             for index, run in enumerate(runs):
@@ -828,3 +835,39 @@ def has_steady_state_hypothesis_with_probes(experiment: Experiment) -> bool:
         if probes:
             return len(probes) > 0
     return False
+
+
+def harshly_terminate_pending_background_activities(
+        pool: ThreadPoolExecutor) -> None:
+    """
+    Ugly hack to try to force background activities to terminate now.
+
+    This cano only have an impact over functions that are still in the Python
+    land. Any code outside of the Python VM (say calling a C function, even
+    time.sleep()) will not be impacted and therefore will continue hanging
+    until it does complete of its own accord.
+
+    This could have really bizarre side effects so it's only applied when
+    a SIGUSR2 signal was received.
+    """
+    if not HAS_CTYPES:
+        logger.debug(
+            "Your Python implementation does not provide the `ctypes` "
+            "module and we cannot terminate very harshly running background "
+            "activities.")
+        return
+
+    logger.debug(
+        "Harshly trying to interrupt remaining background activities still "
+        "running")
+
+    # oh and of course we use private properties... might as well when trying
+    # to be ugly
+    for thread in pool._threads:
+        tid = ctypes.c_long(thread.ident)
+        try:
+            gil = ctypes.pythonapi.PyGILState_Ensure()
+            ctypes.pythonapi.PyThreadState_SetAsyncExc(
+                tid, ctypes.py_object(ExperimentExitedException))
+        finally:
+            ctypes.pythonapi.PyGILState_Release(gil)

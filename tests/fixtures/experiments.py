@@ -969,3 +969,37 @@ SimpleExperimentWithFailingHypothesis = {
         }
     ]
 }
+
+
+SimpleExperimentWithBackgroundActivity = {
+    "version": "1.0.0",
+    "title": "Hello world!",
+    "description": "Say hello world.",
+    "method": [
+        {
+            "type": "action",
+            "name": "pretend-we-do-stuff",
+            "background": True,
+            "provider": {
+                "type": "python",
+                "module": "fixtures.longpythonfunc",
+                "func": "be_long",
+                "arguments": {
+                    "howlong": 3
+                }
+            }
+        },
+        {
+            "type": "action",
+            "name": "pretend-we-do-stuff-again",
+            "provider": {
+                "type": "python",
+                "module": "fixtures.longpythonfunc",
+                "func": "be_long",
+                "arguments": {
+                    "howlong": 4
+                }
+            }
+        }
+    ]
+}

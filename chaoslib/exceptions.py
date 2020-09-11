@@ -44,3 +44,16 @@ class InterruptExecution(ChaosException):
 
 class InvalidControl(ChaosException):
     pass
+
+
+class ExperimentExitedException(ChaosException):
+    """
+    Only raised when the process received a SIGUSR2 signal.
+
+    Raised into the blocking background activities of the method only.
+
+    If you catch it, this mean you can clean your activity but you should
+    really raise another exception again to let the Chaos Toolkit
+    quickly terminate.
+    """
+    pass

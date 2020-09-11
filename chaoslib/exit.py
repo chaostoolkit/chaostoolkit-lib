@@ -40,6 +40,7 @@ This will start your probe in the background.
 
 WARNING: Only available on Unix/Linux systems.
 """
+from chaoslib.exceptions import InterruptExecution
 from contextlib import contextmanager
 import inspect
 import os
@@ -158,3 +159,4 @@ def _terminate_now(signum: int, frame: FrameType = None) -> None:
     """
     if signum == signal.SIGTERM:
         logger.warning("Caught SIGTERM signal, interrupting experiment now")
+        raise InterruptExecution("SIGTERM signal received")

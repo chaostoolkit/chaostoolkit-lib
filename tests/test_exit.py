@@ -3,6 +3,7 @@ import threading
 import time
 from wsgiref.simple_server import WSGIServer, WSGIRequestHandler
 
+from chaoslib.exit import exit_gracefully, exit_ungracefully
 from chaoslib.run import Runner
 from chaoslib.types import Strategy
 
@@ -116,14 +117,29 @@ def test_wait_for_background_activity_on_graceful_exit():
 
 
 def test_do_not_wait_for_background_activity_on_ungraceful_exit():
-    server = threading.Thread(target=run_http_server_in_background)
-    server.start()
+    def _exit_soon():
+        time.sleep(1.5)
+        exit_ungracefully()
+    t = threading.Thread(target=_exit_soon)
 
-    x = deepcopy(experiments.ExperimentUngracefulExitLongHTTPCall)
+    x = deepcopy(experiments.SimpleExperimentWithBackgroundActivity)
     with Runner(Strategy.DEFAULT) as runner:
+        t.start()
         journal = runner.run(x)
-
         assert journal["status"] == "interrupted"
         assert journal["run"][0]["status"] == "failed"
+        assert "ExperimentExitedException" in journal["run"][0]["exception"][-1]
 
-    server.join()
+
+def test_wait_for_background_activity_to_finish_on_graceful_exit():
+    def _exit_soon():
+        time.sleep(1.5)
+        exit_gracefully()
+    t = threading.Thread(target=_exit_soon)
+
+    x = deepcopy(experiments.SimpleExperimentWithBackgroundActivity)
+    with Runner(Strategy.DEFAULT) as runner:
+        t.start()
+        journal = runner.run(x)
+        assert journal["status"] == "interrupted"
+        assert journal["run"][0]["status"] == "succeeded"

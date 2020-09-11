@@ -2,7 +2,22 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.14.1...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.14.2...HEAD
+
+### Added
+
+- Raise the `chaoslib.execeptions.InterruptExecution` on `SIGTERM`
+- New exception `chaoslib.execeptions.ExperimentExitedException` that can only
+  be injected into blocking background activities when we received the SIGUSR2
+  signal
+- We now inject `chaoslib.execeptions.ExperimentExitedException` into blocking
+  background activities when we received the SIGUSR2 signal. This is relying
+  on https://docs.python.org/3/c-api/init.html#c.PyThreadState_SetAsyncExc
+  There is much we can to interrupt blocking calls and the limit is now reached
+  because we have no control over any call that is out of the Python VM (just
+  calling `time.sleep()` will get you in that situation). This is a constraint
+  we have to live in and this extension authors must keep this in mind when
+  they create their blocking calls. [#185][185]
 
 ## [1.14.1][] - 2020-09-10
 
