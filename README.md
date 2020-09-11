@@ -1,4 +1,4 @@
-# chaostoolkit-lib
+# Chaos Toolkit Core Library
 
 [![Version](https://img.shields.io/pypi/v/chaostoolkit-lib.svg)](https://img.shields.io/pypi/v/chaostoolkit-lib.svg)
 [![License](https://img.shields.io/pypi/l/chaostoolkit-lib.svg)](https://img.shields.io/pypi/l/chaostoolkit-lib.svg)

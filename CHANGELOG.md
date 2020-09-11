@@ -2,15 +2,19 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.14.2...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.15.0...HEAD
+
+## [1.15.0][] - 2020-09-11
+
+[1.15.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.14.1...1.15.0
 
 ### Added
 
-- Raise the `chaoslib.execeptions.InterruptExecution` on `SIGTERM`
-- New exception `chaoslib.execeptions.ExperimentExitedException` that can only
+- Raise the `chaoslib.exceptions.InterruptExecution` on `SIGTERM`
+- New exception `chaoslib.exceptions.ExperimentExitedException` that can only
   be injected into blocking background activities when we received the SIGUSR2
   signal
-- We now inject `chaoslib.execeptions.ExperimentExitedException` into blocking
+- We now inject `chaoslib.exceptions.ExperimentExitedException` into blocking
   background activities when we received the SIGUSR2 signal. This is relying
   on https://docs.python.org/3/c-api/init.html#c.PyThreadState_SetAsyncExc
   There is much we can to interrupt blocking calls and the limit is now reached
