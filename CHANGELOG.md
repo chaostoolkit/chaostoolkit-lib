@@ -4,6 +4,13 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.15.0...HEAD
 
+### Changed
+
+- Fixed a regression where the extra vars were not passed onto configuration
+  and secrets for overriding substitution [#192][192]
+
+[192]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/192
+
 ## [1.15.0][] - 2020-09-11
 
 [1.15.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.14.1...1.15.0

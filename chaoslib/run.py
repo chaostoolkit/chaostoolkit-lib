@@ -289,11 +289,14 @@ class Runner:
         self.event_registry.register(handler)
 
     def configure(self, experiment: Experiment,
-                  settings: Settings) -> None:
+                  settings: Settings, experiment_vars: Dict[str, Any]) -> None:
+        config_vars, secret_vars = experiment_vars or (None, None)
         self.settings = settings if settings is not None else \
             get_loaded_settings()
-        self.config = load_configuration(experiment.get("configuration", {}))
-        self.secrets = load_secrets(experiment.get("secrets", {}), self.config)
+        self.config = load_configuration(
+            experiment.get("configuration", {}), config_vars)
+        self.secrets = load_secrets(
+            experiment.get("secrets", {}), self.config, secret_vars)
 
     def cleanup(self):
         pass
@@ -302,18 +305,18 @@ class Runner:
             settings: Settings = None, experiment_vars: Dict[str, Any] = None,
             journal: Journal = None) -> Journal:
 
-        self.configure(experiment, settings)
+        self.configure(experiment, settings, experiment_vars)
         with exit_signals():
             journal = self._run(
                 self.strategy, self.schedule, experiment, journal,
-                self.config, self.secrets, self.settings, experiment_vars,
+                self.config, self.secrets, self.settings,
                 self.event_registry)
         return journal
 
     def _run(self, strategy: Strategy, schedule: Schedule,  # noqa: C901
              experiment: Experiment, journal: Journal,
              configuration: Configuration, secrets: Secrets,
-             settings: Settings, experiment_vars: Dict[str, Any],
+             settings: Settings,
              event_registry: EventHandlerRegistry) -> None:
         experiment["title"] = substitute(
             experiment["title"], configuration, secrets)
@@ -323,7 +326,6 @@ class Runner:
         journal = journal or initialize_run_journal(experiment)
         event_registry.started(experiment, journal)
 
-        config_vars, secret_vars = experiment_vars or (None, None)
         control = Control()
         activity_pool, rollback_pool = get_background_pools(experiment)
         hypo_pool = get_hypothesis_pool()

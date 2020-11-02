@@ -241,3 +241,27 @@ def test_convert_invalid_format():
 def test_convert_invalid_type():
     with pytest.raises(ValueError):
         convert_vars(["todo:object=stuff"])
+
+
+def test_should_override_load_configuration_with_var():
+    os.environ["KUBE_TOKEN"] = "value2"
+    config = load_configuration({
+        "token1": "value1",
+        "token2": {
+            "type": "env",
+            "key": "KUBE_TOKEN"
+        },
+        "token3": {
+            "type": "env",
+            "key": "UNDEFINED",
+            "default": "value3"
+        }
+    },
+    {
+        "token1": "othervalue1",
+        "token2": "othervalue2"
+    })
+
+    assert config["token1"] == "othervalue1"
+    assert config["token2"] == "othervalue2"
+    assert config["token3"] == "value3"
