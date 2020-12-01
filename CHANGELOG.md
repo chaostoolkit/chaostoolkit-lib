@@ -4,6 +4,48 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.15.1...HEAD
 
+### Changed
+
+- Allow substitution to keep its original type when done in isolation.
+  [#180][180] [#195][195]. So let's assume we have the following configuration:
+
+  ```json
+  "configuration": {
+      "value": 8
+  }
+  ```
+
+  We can now use it as an argument of an action:
+
+  ```json
+  "provider": {
+      "arguments": {
+          "quantity": "${value}"
+      }
+  }
+  ```
+
+  Now, the `quantity` argument will indeed be an integer, when it was converted
+  to string until now. This works with any support Python objects, whether they
+  are scalars or nested.
+
+  If, you have something like this however
+
+
+  ```json
+  "provider": {
+      "arguments": {
+          "quantity": "I want ${value} apples"
+      }
+  }
+  ```
+
+  This will always remain a string.
+
+
+[180]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/180
+[195]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/195
+
 ## [1.15.1][] - 2020-11-02
 
 [1.15.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.15.0...1.15.1

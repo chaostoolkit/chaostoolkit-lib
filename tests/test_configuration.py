@@ -265,3 +265,20 @@ def test_should_override_load_configuration_with_var():
     assert config["token1"] == "othervalue1"
     assert config["token2"] == "othervalue2"
     assert config["token3"] == "value3"
+
+
+# see https://github.com/chaostoolkit/chaostoolkit-lib/issues/195
+def test_load_nested_object_configuration():
+    os.environ.clear()
+    config = load_configuration({
+        "nested": {
+            "onea": "fdsfdsf",
+            "lol": {
+                "haha": [1, 2, 3]
+            }
+        }
+    })
+
+    assert isinstance(config["nested"], dict)
+    assert config["nested"]["onea"] == "fdsfdsf"
+    assert config["nested"]["lol"] == {"haha": [1, 2, 3]}
