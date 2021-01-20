@@ -1003,3 +1003,21 @@ SimpleExperimentWithBackgroundActivity = {
         }
     ]
 }
+
+ExperimentWithBypassedActivity = {
+    "version": "1.0.0",
+    "title": "do stuff",
+    "description": "n/a",
+    "method": [
+        {
+            "type": "action",
+            "name": "say-hello",
+            "dry": True,
+            "provider": {
+                "type": "process",
+                "path": "echo",
+                "arguments": "hello"
+            }
+        }
+    ]
+}
