@@ -4,6 +4,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.16.0...HEAD
 
+### Added
+
+- Activities can be requested not to be executed on a per activity basis, not
+  just as all or none. This can be used by a control to dynamically make
+  a decision on what to run.
+
 ## [1.16.0][] - 2020-12-02
 
 [1.16.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.15.1...1.16.0

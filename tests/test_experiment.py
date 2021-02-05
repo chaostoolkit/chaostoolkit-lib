@@ -137,6 +137,13 @@ def test_can_run_experiment_in_dry_mode():
     assert isinstance(journal, dict)
 
 
+def test_can_run_experiment_with_activity_in_dry_mode():
+    experiment = experiments.ExperimentWithBypassedActivity.copy()
+    journal = run_experiment(experiment)
+    assert isinstance(journal, dict)
+    assert journal["run"][0]["output"] == None
+
+
 def test_can_iterate_over_activities():
     g = run_activities(
         experiments.Experiment, configuration=None, secrets=None, pool=None,
