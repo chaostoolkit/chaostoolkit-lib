@@ -3,7 +3,7 @@
 [![Version](https://img.shields.io/pypi/v/chaostoolkit-lib.svg)](https://img.shields.io/pypi/v/chaostoolkit-lib.svg)
 [![License](https://img.shields.io/pypi/l/chaostoolkit-lib.svg)](https://img.shields.io/pypi/l/chaostoolkit-lib.svg)
 
-[![Build Status](https://travis-ci.org/chaostoolkit/chaostoolkit-lib.svg?branch=master)](https://travis-ci.org/chaostoolkit/chaostoolkit-lib)
+![Build](https://github.com/chaostoolkit/chaostoolkit-lib/workflows/Build/badge.svg)
 [![codecov](https://codecov.io/gh/chaostoolkit/chaostoolkit-lib/branch/master/graph/badge.svg)](https://codecov.io/gh/chaostoolkit/chaostoolkit-lib)
 [![Python versions](https://img.shields.io/pypi/pyversions/chaostoolkit-lib.svg)](https://www.python.org/)
 
