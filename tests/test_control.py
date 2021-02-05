@@ -580,3 +580,9 @@ def test_secrets_are_passed_to_all_control_hookpoints():
             "after_hypothesis_control", "before_activity_control",
             "after_activity_control"):
         assert exp["{}_secrets".format(hookpoint)] == secrets, "{} was not provided the secrets".format(hookpoint)
+
+
+def test_control_can_be_decorated_functions():
+    exp = deepcopy(experiments.ExperimentWithDecoratedControls)
+    state = run_experiment(exp)
+    assert state["counted_activities"] == 4

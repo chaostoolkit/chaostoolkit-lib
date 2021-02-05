@@ -9,6 +9,9 @@
 - Activities can be requested not to be executed on a per activity basis, not
   just as all or none. This can be used by a control to dynamically make
   a decision on what to run.
+- Test that demonstrate how to wrap controls into decorators [#197][197]
+
+[197]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/197
 
 ## [1.16.0][] - 2020-12-02
 
