@@ -144,6 +144,7 @@ def execute_activity(experiment: Experiment, activity: Activity,
 
     with controls(level="activity", experiment=experiment, context=activity,
                   configuration=configuration, secrets=secrets) as control:
+        dry = activity.get("dry", dry)
         pauses = activity.get("pauses", {})
         pause_before = pauses.get("before")
         if pause_before:
