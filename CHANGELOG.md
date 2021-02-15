@@ -13,6 +13,12 @@
 
 [197]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/197
 
+### Changed
+
+- Moved from TravisCI to GitHub Workflows [#201][201]
+
+[201]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/201
+
 ## [1.16.0][] - 2020-12-02
 
 [1.16.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.15.1...1.16.0
