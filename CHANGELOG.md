@@ -7,8 +7,10 @@
 ### Changed
 
 - Moved from setup.py to declarative setup.cfg [#204][204]
+- Moved to pylama from pycodestyle [#205][205]
 
 [204]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/204
+[205]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/205
 
 ## [1.17.0][] - 2021-02-15
 

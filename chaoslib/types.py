@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import enum
-from typing import Any, Dict, List, NamedTuple, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 __all__ = ["MicroservicesStatus", "Probe", "Action", "Experiment", "Layer",
            "TargetLayers", "Activity", "Journal", "Run", "Secrets", "Step",

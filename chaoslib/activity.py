@@ -23,7 +23,7 @@ __all__ = ["ensure_activity_is_valid", "get_all_activities_in_experiment",
            "run_activities"]
 
 
-def ensure_activity_is_valid(activity: Activity):
+def ensure_activity_is_valid(activity: Activity):  # noqa: C901
     """
     Goes through the activity and checks certain of its properties and raise
     :exc:`InvalidActivity` whenever one does not respect the expectations.

@@ -60,7 +60,7 @@ def run_python_activity(activity: Activity, configuration: Configuration,
                     sys.exc_info()[2])
 
 
-def validate_python_activity(activity: Activity):
+def validate_python_activity(activity: Activity):  # noqa: C901
     """
     Validate a Python activity.
 

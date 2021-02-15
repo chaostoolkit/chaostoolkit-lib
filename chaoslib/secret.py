@@ -144,7 +144,7 @@ def load_secrets_from_env(secrets_info: Dict[str, Dict[str, str]],
     return secrets
 
 
-def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],
+def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],  # noqa: C901
                             configuration: Configuration = None,
                             extra_vars: Dict[str, Any] = None) -> Secrets:
     """

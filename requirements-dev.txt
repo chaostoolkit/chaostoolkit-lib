@@ -10,3 +10,4 @@ pyhcl
 hvac
 jsonpath2
 chardet
+pylama
