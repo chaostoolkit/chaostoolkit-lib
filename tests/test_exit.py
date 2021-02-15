@@ -1,13 +1,18 @@
 from copy import deepcopy
+import os
 import threading
 import time
 from wsgiref.simple_server import WSGIServer, WSGIRequestHandler
+
+import pytest
 
 from chaoslib.exit import exit_gracefully, exit_ungracefully
 from chaoslib.run import Runner
 from chaoslib.types import Strategy
 
 from fixtures import experiments
+
+pytestmark = pytest.mark.skipif(os.getenv("CI") != None, reason="Skip CI")
 
 
 def run_http_server_in_background():
