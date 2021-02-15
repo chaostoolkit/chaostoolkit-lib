@@ -4,6 +4,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.17.0...HEAD
 
+### Changed
+
+- Moved from setup.py to declarative setup.cfg [#204][204]
+
+[204]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/204
+
 ## [1.17.0][] - 2021-02-15
 
 [1.17.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.16.0...1.17.0

@@ -5,8 +5,8 @@ pytest~=5.0; python_version < '3.6'
 pytest~=6.2; python_version >= '3.6'
 pytest-cov
 pytest-sugar
-ply==3.4
-pyhcl>=0.2.1,<0.3.0
+ply
+pyhcl
 hvac
 jsonpath2
 chardet
