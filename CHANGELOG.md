@@ -2,7 +2,15 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.18.1...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.18.2...HEAD
+
+## [1.18.2][] - 2021-02-16
+
+[1.18.2]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.18.1...1.18.2
+
+### Changed
+
+- Fix release workflow by updating to latest setuptools
 
 ## [1.18.1][] - 2021-02-16
 
