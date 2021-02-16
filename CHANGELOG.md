@@ -2,7 +2,15 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.18.2...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.18.3...HEAD
+
+## [1.18.3][] - 2021-02-16
+
+[1.18.3]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.18.2...1.18.3
+
+### Changed
+
+- Fix typo in `setup.cfg` from `install_require` to `install_requires`
 
 ## [1.18.2][] - 2021-02-16
 
