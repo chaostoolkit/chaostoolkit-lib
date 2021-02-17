@@ -1,7 +1,6 @@
 requests-mock
 coverage
 pycodestyle
-pytest~=5.0; python_version < '3.6'
 pytest~=6.2; python_version >= '3.6'
 pytest-cov
 pytest-sugar
