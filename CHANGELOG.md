@@ -4,6 +4,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.18.3...HEAD
 
+### Changed
+
+- Library now requires Python 3.6 [#208][ctk208]
+
+[ctk208]: https://github.com/chaostoolkit/chaostoolkit/issues/208
+
 ## [1.18.3][] - 2021-02-16
 
 [1.18.3]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.18.2...1.18.3
