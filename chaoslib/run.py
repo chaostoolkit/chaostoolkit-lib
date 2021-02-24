@@ -438,7 +438,35 @@ class Runner:
             finally:
                 event_registry.finish(journal)
 
+        # Parse journal and hide secrets
+        # Secrets can be on top level secrets block
+        if "secrets" in journal:
+            journal['secrets'] = journal_hide_secrets(journal['secrets'])
+
+        # Or can be in experiment
+        if "secrets" in journal['experiment']:
+            journal['experiment']['secrets'] = \
+            journal_hide_secrets(journal['experiment']['secrets'])
+
         return journal
+
+
+def journal_hide_secrets(secrets: dict) -> dict:
+
+    for secret in secrets:
+        for secretval in secrets[secret]:
+            # If secret is a env var of vault, no need to hide it
+            if type(secrets[secret][secretval]) is dict:
+                if secrets[secret][secretval].get('type') \
+                not in ('env', 'vault'):
+                    for secretname in secrets[secret][secretval]:
+                        secrets[secret][secretval][secretname] = '*****'
+            else:
+                secrets[secret][secretval] = '*****'
+            
+    return secrets
+
+
 
 
 def should_run_before_method(strategy: Strategy) -> bool:
