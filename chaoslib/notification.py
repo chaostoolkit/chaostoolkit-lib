@@ -43,7 +43,7 @@ class ValidateFlowEvent(FlowEvent):
     ValidateCompleted = "validate-completed"
 
 
-def notify(settings: Settings, event: FlowEvent, payload: Any = None,
+def notify(settings: Settings, event: FlowEvent, payload: Any = None,  #noqa: C901
            error: Any = None):
     """
     Go through all the notification channels declared in the settings and

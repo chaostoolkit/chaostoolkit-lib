@@ -23,7 +23,7 @@ __all__ = ["ensure_activity_is_valid", "get_all_activities_in_experiment",
            "run_activities"]
 
 
-def ensure_activity_is_valid(activity: Activity):
+def ensure_activity_is_valid(activity: Activity):  # noqa: C901
     """
     Goes through the activity and checks certain of its properties and raise
     :exc:`InvalidActivity` whenever one does not respect the expectations.
@@ -144,6 +144,7 @@ def execute_activity(experiment: Experiment, activity: Activity,
 
     with controls(level="activity", experiment=experiment, context=activity,
                   configuration=configuration, secrets=secrets) as control:
+        dry = activity.get("dry", dry)
         pauses = activity.get("pauses", {})
         pause_before = pauses.get("before")
         if pause_before:

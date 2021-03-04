@@ -26,7 +26,7 @@ from chaoslib.types import Configuration, ConfigVars, Secrets, SecretVars
 
 __all__ = ["__version__", "decode_bytes", "substitute", "merge_vars",
            "convert_vars"]
-__version__ = '1.15.0'
+__version__ = '1.19.0'
 
 
 def substitute(data: Union[None, str, Dict[str, Any], List],
@@ -64,8 +64,28 @@ def substitute(data: Union[None, str, Dict[str, Any], List],
     return data
 
 
-def substitute_string(data: str, mapping: Mapping[str, Any]) -> str:
-    return Template(data).safe_substitute(mapping)
+class TypedTemplate(Template):
+    def safe_substitute(self, mapping: Dict[str, Any]) -> Any:
+        """
+        We trick the substitution so that, if the template is made
+        of a single pattern, we returns its value in the type found
+        in the configuration/secrets. Otherwise, we cast to a string.
+
+        "${value}" => returns whatever type is value
+        "hello ${value}" => return a string no matter the type of value
+        """
+        match = self.pattern.fullmatch(self.template)
+        if match is not None:
+            try:
+                _, _, key, _ = match.groups()
+                return mapping[key]
+            except ValueError:
+                pass
+        return Template.safe_substitute(self, mapping)
+
+
+def substitute_string(data: str, mapping: Mapping[str, Any]) -> Any:
+    return TypedTemplate(data).safe_substitute(mapping)
 
 
 def substitute_dict(data: Dict[str, Any],

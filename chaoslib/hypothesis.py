@@ -277,8 +277,8 @@ def _(tolerance: list, value: Any, configuration: Configuration = None,
     return value in tolerance
 
 
-@within_tolerance.register(dict)
-def _(tolerance: dict, value: Any, configuration: Configuration = None,
+@within_tolerance.register(dict)  #noqa: C901
+def _(tolerance: dict, value: Any, configuration: Configuration = None,  #noqa: C901
       secrets: Secrets = None) -> bool:
     tolerance_type = tolerance.get("type")
 

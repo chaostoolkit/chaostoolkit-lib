@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-from typing import Dict
+from typing import Any, Dict
 
 from logzero import logger
 try:
@@ -16,7 +16,8 @@ __all__ = ["load_secrets", "create_vault_client"]
 
 
 def load_secrets(secrets_info: Dict[str, Dict[str, str]],
-                 configuration: Configuration = None) -> Secrets:
+                 configuration: Configuration = None,
+                 extra_vars: Dict[str, Any] = None) -> Secrets:
     """
     Takes the the secrets definition from an experiment and tries to load
     the secrets whenever they relate to external sources such as environmental
@@ -80,8 +81,10 @@ def load_secrets(secrets_info: Dict[str, Dict[str, str]],
     )
 
     secrets = {}
+    extra_vars = extra_vars or {}
     for loader in loaders:
-        for key, value in loader(secrets_info, configuration).items():
+        for key, value in loader(
+                secrets_info, configuration, extra_vars).items():
             if key not in secrets:
                 secrets[key] = {}
             secrets[key].update(value)
@@ -92,7 +95,8 @@ def load_secrets(secrets_info: Dict[str, Dict[str, str]],
 
 
 def load_inline_secrets(secrets_info: Dict[str, Dict[str, str]],
-                        configuration: Configuration = None) -> Secrets:
+                        configuration: Configuration = None,
+                        extra_vars: Dict[str, Any] = None) -> Secrets:
     """
     Load secrets that are inlined in the experiments.
     """
@@ -100,12 +104,13 @@ def load_inline_secrets(secrets_info: Dict[str, Dict[str, str]],
 
     for (target, keys) in secrets_info.items():
         secrets[target] = {}
-
         for (key, value) in keys.items():
             if not isinstance(value, dict):
-                secrets[target][key] = value
+                secrets[target][key] = extra_vars.get(target, {}).get(
+                    key, value)
             elif value.get("type") not in ("env", "vault"):
-                secrets[target][key] = value
+                secrets[target][key] = extra_vars.get(target, {}).get(
+                    key, value)
 
         if not secrets[target]:
             secrets.pop(target)
@@ -114,7 +119,8 @@ def load_inline_secrets(secrets_info: Dict[str, Dict[str, str]],
 
 
 def load_secrets_from_env(secrets_info: Dict[str, Dict[str, str]],
-                          configuration: Configuration = None) -> Secrets:
+                          configuration: Configuration = None,
+                          extra_vars: Dict[str, Any] = None) -> Secrets:
     env = os.environ
     secrets = {}
 
@@ -124,11 +130,13 @@ def load_secrets_from_env(secrets_info: Dict[str, Dict[str, str]],
         for (key, value) in keys.items():
             if isinstance(value, dict) and value.get("type") == "env":
                 env_key = value["key"]
-                if env_key not in env:
+                if (env_key not in env) and \
+                        (key not in extra_vars.get("target", {})):
                     raise InvalidExperiment(
                         "Secrets make reference to an environment key "
                         "that does not exist: {}".format(env_key))
-                secrets[target][key] = env.get(env_key)
+                secrets[target][key] = extra_vars.get(target, {}).get(
+                    key, env.get(env_key))
 
         if not secrets[target]:
             secrets.pop(target)
@@ -136,8 +144,9 @@ def load_secrets_from_env(secrets_info: Dict[str, Dict[str, str]],
     return secrets
 
 
-def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],
-                            configuration: Configuration = None) -> Secrets:
+def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],  # noqa: C901
+                            configuration: Configuration = None,
+                            extra_vars: Dict[str, Any] = None) -> Secrets:
     """
     Load secrets from Vault KV secrets store
 

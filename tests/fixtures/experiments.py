@@ -310,6 +310,17 @@ ExperimentWithControls["controls"] = [
     }
 ]
 
+ExperimentWithDecoratedControls = deepcopy(ExperimentNoControls)
+ExperimentWithDecoratedControls["controls"] = [
+    {
+        "name": "dummy",
+        "provider": {
+            "type": "python",
+            "module": "fixtures.controls.dummy_with_decorated_control"
+        }
+    }
+]
+
 ExperimentWithControlsRequiringSecrets = deepcopy(ExperimentWithControls)
 ExperimentWithControlsRequiringSecrets["secrets"] = {
     "mystuff": {
@@ -999,6 +1010,24 @@ SimpleExperimentWithBackgroundActivity = {
                 "arguments": {
                     "howlong": 4
                 }
+            }
+        }
+    ]
+}
+
+ExperimentWithBypassedActivity = {
+    "version": "1.0.0",
+    "title": "do stuff",
+    "description": "n/a",
+    "method": [
+        {
+            "type": "action",
+            "name": "say-hello",
+            "dry": True,
+            "provider": {
+                "type": "process",
+                "path": "echo",
+                "arguments": "hello"
             }
         }
     ]

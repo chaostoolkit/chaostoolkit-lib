@@ -2,7 +2,129 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.15.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.19.0...HEAD
+
+## [1.19.0][] - 2021-02-16
+
+[1.19.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.18.3...1.19.0
+
+### Changed
+
+- Library now requires Python 3.6 [#208][ctk208]
+
+[ctk208]: https://github.com/chaostoolkit/chaostoolkit/issues/208
+
+## [1.18.3][] - 2021-02-16
+
+[1.18.3]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.18.2...1.18.3
+
+### Changed
+
+- Fix typo in `setup.cfg` from `install_require` to `install_requires`
+
+## [1.18.2][] - 2021-02-16
+
+[1.18.2]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.18.1...1.18.2
+
+### Changed
+
+- Fix release workflow by updating to latest setuptools
+
+## [1.18.1][] - 2021-02-16
+
+[1.18.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.18.0...1.18.1
+
+### Changed
+
+- Fix release package
+
+## [1.18.0][] - 2021-02-16
+
+[1.18.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.17.0...1.18.0
+
+### Changed
+
+- Moved from setup.py to declarative setup.cfg [#204][204]
+- Moved to pylama from pycodestyle [#205][205]
+
+[204]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/204
+[205]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/205
+
+## [1.17.0][] - 2021-02-15
+
+[1.17.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.16.0...1.17.0
+
+### Added
+
+- Activities can be requested not to be executed on a per activity basis, not
+  just as all or none. This can be used by a control to dynamically make
+  a decision on what to run.
+- Test that demonstrate how to wrap controls into decorators [#197][197]
+
+[197]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/197
+
+### Changed
+
+- Moved from TravisCI to GitHub Workflows [#201][201]
+
+[201]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/201
+
+## [1.16.0][] - 2020-12-02
+
+[1.16.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.15.1...1.16.0
+
+### Changed
+
+- Allow substitution to keep its original type when done in isolation.
+  [#180][180] [#195][195]. So let's assume we have the following configuration:
+
+  ```json
+  "configuration": {
+      "value": 8
+  }
+  ```
+
+  We can now use it as an argument of an action:
+
+  ```json
+  "provider": {
+      "arguments": {
+          "quantity": "${value}"
+      }
+  }
+  ```
+
+  Now, the `quantity` argument will indeed be an integer, when it was converted
+  to string until now. This works with any support Python objects, whether they
+  are scalars or nested.
+
+  If, you have something like this however
+
+
+  ```json
+  "provider": {
+      "arguments": {
+          "quantity": "I want ${value} apples"
+      }
+  }
+  ```
+
+  This will always remain a string.
+
+
+[180]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/180
+[195]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/195
+
+## [1.15.1][] - 2020-11-02
+
+[1.15.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.15.0...1.15.1
+
+### Changed
+
+- Fixed a regression where the extra vars were not passed onto configuration
+  and secrets for overriding substitution [#192][192]
+
+[192]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/192
 
 ### Added
 

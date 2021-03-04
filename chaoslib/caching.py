@@ -53,7 +53,7 @@ def with_cache(f):
                 experiment_vars: Dict[str, Any] = None,
                 strategy: Strategy = Strategy.DEFAULT,
                 schedule: Schedule = None,
-                event_handlers: List['RunEventHandler'] = None):
+                event_handlers: List['RunEventHandler'] = None):  #noqa: E0602
         try:
             if experiment:
                 cache_activities(experiment)

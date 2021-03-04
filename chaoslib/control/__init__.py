@@ -282,7 +282,7 @@ def reset_global_controls():
     global_controls.clear()
 
 
-def get_context_controls(level: str, experiment: Experiment = None,
+def get_context_controls(level: str, experiment: Experiment = None,  #noqa: C901
                          context: Union[Activity, Experiment] = None) \
                          -> List[Control]:
     """

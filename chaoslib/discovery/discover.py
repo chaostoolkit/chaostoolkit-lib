@@ -82,7 +82,7 @@ def discover_probes(extension_mod_name: str) -> DiscoveredActivities:
     return discover_activities(extension_mod_name, "probe")
 
 
-def discover_activities(extension_mod_name: str,
+def discover_activities(extension_mod_name: str,  #noqa: C901
                         activity_type: str) -> DiscoveredActivities:
     """
     Discover exported activities from the given extension module name.
@@ -141,7 +141,7 @@ def discover_activities(extension_mod_name: str,
     return activities
 
 
-def portable_type_name(python_type: Any) -> str:
+def portable_type_name(python_type: Any) -> str:  # noqa: C901
     """
     Return a fairly portable name for a Python type. The idea is to make it
     easy for consumer to read without caring for actual Python types
@@ -185,7 +185,7 @@ def portable_type_name(python_type: Any) -> str:
     return "object"
 
 
-def portable_type_name_to_python_type(name: str) -> Any:
+def portable_type_name_to_python_type(name: str) -> Any:  # noqa: C901
     """
     Return the Python type associated to the given portable name.
     """
