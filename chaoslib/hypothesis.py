@@ -336,11 +336,8 @@ def _(tolerance: dict, value: Any, configuration: Configuration = None,  #noqa: 
 
         if "expect" in tolerance and result is False:
             expect_one_of = tolerance.get("expect_one_of")
-            if "expect_one_of" in tolerance:
-                if not isinstance(expect_one_of, list):
-                    result = values == [expect_one_of]
-                else:
-                    result = values == expect_one_of
+            if expect_one_of is not None:
+                result = values == expect_one_of
 
         if result is False:
             if "expect" in tolerance and "expect_one_of" in tolerance:
