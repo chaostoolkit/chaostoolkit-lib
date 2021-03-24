@@ -9,9 +9,8 @@ from chaoslib.secret import load_secrets, load_secrets_from_vault, \
 from fixtures import config
 from unittest.mock import ANY, MagicMock, patch, mock_open
 
-
+@patch.dict(os.environ, {"KUBE_API_URL": "http://1.2.3.4"})
 def test_should_load_environment():
-    os.environ["KUBE_API_URL"] = "http://1.2.3.4"
     secrets = load_secrets({
         "kubernetes": {
             "api_server_url": {
@@ -31,7 +30,7 @@ def test_should_load_inline():
     }, config.EmptyConfig)
     assert secrets["kubernetes"]["api_server_url"] == "http://1.2.3.4"
 
-
+@patch.dict(os.environ, {"KUBE_API_URL": "http://1.2.3.4"})
 def test_should_merge_properly():
     secrets = load_secrets({
         "kubernetes": {
@@ -252,9 +251,8 @@ def test_read_secrets_from_vault_with_kv_version_2(hvac):
     secrets = load_secrets_from_vault(secrets_info, config)
     assert secrets["k8s"]["a-secret"] == "bar"
 
-
+@patch.dict(os.environ, {"KUBE_API_URL": "http://1.2.3.4"})
 def test_override_load_environmen_with_var():
-    os.environ["KUBE_API_URL"] = "http://1.2.3.4"
     secrets = load_secrets({
         "kubernetes": {
             "api_server_url": {
