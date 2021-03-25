@@ -197,7 +197,7 @@ def test_read_secrets_from_vault_with_kv_version_1(hvac):
     hvac.Client.return_value = fake_client
     fake_client.secrets.kv.v1.read_secret.return_value = vault_secret_payload
 
-    secrets = load_secrets_from_vault(secrets_info, config)
+    secrets = load_secrets(secrets_info, config)
     assert secrets["k8s"]["a-secret"] == {
         "my-important-secret": "bar",
         "my-less-important-secret": "baz"
@@ -213,7 +213,7 @@ def test_read_secrets_from_vault_with_kv_version_1(hvac):
         }
     }
 
-    secrets = load_secrets_from_vault(secrets_info, config)
+    secrets = load_secrets(secrets_info, config)
     assert secrets["k8s"]["a-secret"] == "bar"
 
 
@@ -254,7 +254,7 @@ def test_read_secrets_from_vault_with_kv_version_2(hvac):
     hvac.Client.return_value = fake_client
     fake_client.secrets.kv.v2.read_secret_version.return_value = vault_secret_payload
 
-    secrets = load_secrets_from_vault(secrets_info, config)
+    secrets = load_secrets(secrets_info, config)
     assert secrets["k8s"]["a-secret"] == {
         "my-important-secret": "bar",
         "my-less-important-secret": "baz"
@@ -270,7 +270,7 @@ def test_read_secrets_from_vault_with_kv_version_2(hvac):
         }
     }
 
-    secrets = load_secrets_from_vault(secrets_info, config)
+    secrets = load_secrets(secrets_info, config)
     assert secrets["k8s"]["a-secret"] == "bar"
 
 
@@ -383,7 +383,15 @@ def test_vault_replace_entire_declare(hvac):
     assert secrets["myapp"]["token"] == "bar"
 
 @patch('chaoslib.secret.hvac')
-def test_override_vault_with_var(hvac):
+def test_key_not_in_vault(hvac):
+    pass
+
+@patch('chaoslib.secret.hvac')
+def test_no_vault_entry(hvac):
+    pass
+
+@patch('chaoslib.secret.hvac')
+def test_override_vault_with_vars(hvac):
     config = {
         'vault_addr': 'http://someaddr.com',
         'vault_token': 'not_awesome_token',
