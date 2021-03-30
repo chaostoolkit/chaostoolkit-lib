@@ -281,3 +281,81 @@ def test_should_override_load_inline_with_var():
         }
     })
     assert secrets["kubernetes"]["api_server_url"] == "http://elsewhere"
+
+
+@patch('chaoslib.secret.hvac')
+def test_vault_add_subkeys(hvac):
+    config = {
+        'vault_addr': 'http://someaddr.com',
+        'vault_token': 'not_awesome_token',
+        'vault_kv_version': '2'
+    }
+
+    vault_secret_payload = {
+        "data": {
+            "data": {
+                "foo": "bar",
+                "baz": "hello"
+            },
+            "metadata": {
+                "auth": None,
+                "lease_duration": 2764800,
+                "lease_id": "",
+                "renewable": False
+            }
+        }
+    }
+
+    fake_client = MagicMock()
+    hvac.Client.return_value = fake_client
+    fake_client.secrets.kv.v2.read_secret_version.return_value = vault_secret_payload
+
+    secrets = load_secrets({
+        "myapp": {
+            "token": {
+                "type": "vault",
+                "path": "secrets/something"
+            }
+        }
+    }, config)
+    assert secrets["myapp"]["token"]["foo"] == "bar"
+    assert secrets["myapp"]["token"]["baz"] == "hello"
+
+@patch('chaoslib.secret.hvac')
+def test_vault_replace_entire_declare(hvac):
+    config = {
+        'vault_addr': 'http://someaddr.com',
+        'vault_token': 'not_awesome_token',
+        'vault_kv_version': '2'
+    }
+
+    vault_secret_payload = {
+        "data": {
+            "data": {
+                "foo": "bar",
+                "baz": "hello"
+            },
+            "metadata": {
+                "auth": None,
+                "lease_duration": 2764800,
+                "lease_id": "",
+                "renewable": False
+            }
+        }
+    }
+
+    fake_client = MagicMock()
+    hvac.Client.return_value = fake_client
+    fake_client.secrets.kv.v2.read_secret_version.return_value = vault_secret_payload
+
+    secrets = load_secrets({
+        "myapp": {
+            "token": {
+                "type": "vault",
+                "path": "secrets/something",
+                "key": "foo"
+            }
+        }
+    }, config)
+    assert secrets["myapp"]["token"] == "bar"
+
