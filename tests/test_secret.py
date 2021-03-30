@@ -359,3 +359,41 @@ def test_vault_replace_entire_declare(hvac):
     }, config)
     assert secrets["myapp"]["token"] == "bar"
 
+@patch('chaoslib.secret.hvac')
+def test_override_vault_with_var(hvac):
+    config = {
+        'vault_addr': 'http://someaddr.com',
+        'vault_token': 'not_awesome_token',
+        'vault_kv_version': '2'
+    }
+
+    vault_secret_payload = {
+        "data": {
+            "data": {
+                "foo": "bar",
+                "baz": "hello"
+            },
+            "metadata": {
+                "auth": None,
+                "lease_duration": 2764800,
+                "lease_id": "",
+                "renewable": False
+            }
+        }
+    }
+
+    fake_client = MagicMock()
+    hvac.Client.return_value = fake_client
+    fake_client.secrets.kv.v2.read_secret_version.return_value = vault_secret_payload
+
+    secrets = load_secrets({
+        "myapp": {
+            "token": {
+                "type": "vault",
+                "path": "secrets/something",
+                "key": "foo"
+            }
+        }
+    }, config,
+        {"myapp": {"token": "baz"}})
+    assert secrets["myapp"]["token"] == "baz"
