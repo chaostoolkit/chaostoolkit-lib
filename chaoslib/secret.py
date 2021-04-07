@@ -74,74 +74,60 @@ def load_secrets(secrets_info: Dict[str, Dict[str, str]],
     """
     logger.debug("Loading secrets...")
 
-    loaders = (
-        load_inline_secrets,
-        load_secrets_from_env,
-        load_secrets_from_vault,
-    )
+    logger.debug("secrets_info:  %s" % secrets_info)
 
-    secrets = {}
     extra_vars = extra_vars or {}
-    for loader in loaders:
-        for key, value in loader(
-                secrets_info, configuration, extra_vars).items():
-            if key not in secrets:
-                secrets[key] = {}
-            secrets[key].update(value)
 
-    logger.debug("Secrets loaded")
+    logger.debug("extra_vars: %s" % extra_vars)
 
-    return secrets
-
-
-def load_inline_secrets(secrets_info: Dict[str, Dict[str, str]],
-                        configuration: Configuration = None,
-                        extra_vars: Dict[str, Any] = None) -> Secrets:
-    """
-    Load secrets that are inlined in the experiments.
-    """
     secrets = {}
 
-    for (target, keys) in secrets_info.items():
-        secrets[target] = {}
-        for (key, value) in keys.items():
-            if not isinstance(value, dict):
-                secrets[target][key] = extra_vars.get(target, {}).get(
-                    key, value)
-            elif value.get("type") not in ("env", "vault"):
-                secrets[target][key] = extra_vars.get(target, {}).get(
-                    key, value)
+    for (key, value) in secrets_info.items():
+        if isinstance(value, dict):
+            logger.debug("Need to further process %s" % value)
 
-        if not secrets[target]:
-            secrets.pop(target)
+            logger.debug("extra_vars[key]: %s" % extra_vars.get(key, None))
+
+            if extra_vars.get(key, None) is not None:
+                secrets[key] = extra_vars.get(key)
+
+            elif value.get("type") is "env":
+                logger.debug("env processing")
+                secrets[key] = extra_vars or load_secret_from_env(value)
+
+            elif value.get("type") is "vault":
+                logger.debug("vault processing")
+                secrets[key] = load_secret_from_env(value, configuration, extra_vars)
+
+            else:
+                secrets[key] = load_secrets(value, configuration, extra_vars.get(key, None))
+
+        else:
+            secrets[key] = value
+
+    logger.debug(secrets)
+    logger.debug("Done loading secrets")
 
     return secrets
 
+def load_secret_from_env(secrets_info: Dict[str, Dict[str, str]]) -> Secrets:
 
-def load_secrets_from_env(secrets_info: Dict[str, Dict[str, str]],
-                          configuration: Configuration = None,
-                          extra_vars: Dict[str, Any] = None) -> Secrets:
+    logger.debug("load_secret_from_env")
+    logger.debug("secrets_info: %s" % secrets_info)
+
     env = os.environ
-    secrets = {}
 
-    for (target, keys) in secrets_info.items():
-        secrets[target] = {}
+    if isinstance(secrets_info, dict) and secrets_info.get("type") == "env":
 
-        for (key, value) in keys.items():
-            if isinstance(value, dict) and value.get("type") == "env":
-                env_key = value["key"]
-                if (env_key not in env) and \
-                        (key not in extra_vars.get("target", {})):
-                    raise InvalidExperiment(
-                        "Secrets make reference to an environment key "
-                        "that does not exist: {}".format(env_key))
-                secrets[target][key] = extra_vars.get(target, {}).get(
-                    key, env.get(env_key))
+            env_key = secrets_info["key"]
+            if (env_key not in env):
+                raise InvalidExperiment(
+                    "Secrets make reference to an environment key "
+                    "that does not exist: {}".format(env_key))
+            else:
+                secret = env[env_key]
 
-        if not secrets[target]:
-            secrets.pop(target)
-
-    return secrets
+    return secret
 
 
 def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],  # noqa: C901

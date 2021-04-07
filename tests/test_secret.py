@@ -9,6 +9,7 @@ from chaoslib.secret import load_secrets, load_secrets_from_vault, \
 from fixtures import config
 from unittest.mock import ANY, MagicMock, patch, mock_open
 
+
 @patch.dict(os.environ, {"KUBE_API_URL": "http://1.2.3.4"})
 def test_should_load_environment():
     secrets = load_secrets({
@@ -22,6 +23,26 @@ def test_should_load_environment():
     assert secrets["kubernetes"]["api_server_url"] == "http://1.2.3.4"
 
 
+@patch.dict(os.environ, {"KUBE_API_URL": "http://1.2.3.4"})
+def test_should_load_nested_environment():
+    secrets = load_secrets({
+        "kubernetes": {
+            "env1": {
+                "username": "jane",
+                "address": {"host": "whatever", "port": 8090},
+                "api_server_url": {
+                    "type": "env",
+                    "key": "KUBE_API_URL"
+                }
+            }
+        }
+    }, config.EmptyConfig)
+    assert secrets["kubernetes"]["env1"]["username"] == "jane"
+    assert secrets["kubernetes"]["env1"]["address"]["host"] == "whatever"
+    assert secrets["kubernetes"]["env1"]["address"]["port"] == 8090
+    assert secrets["kubernetes"]["env1"]["api_server_url"] == "http://1.2.3.4"
+
+
 def test_should_load_inline():
     secrets = load_secrets({
         "kubernetes": {
@@ -29,6 +50,7 @@ def test_should_load_inline():
         }
     }, config.EmptyConfig)
     assert secrets["kubernetes"]["api_server_url"] == "http://1.2.3.4"
+
 
 @patch.dict(os.environ, {"KUBE_API_URL": "http://1.2.3.4"})
 def test_should_merge_properly():
@@ -251,6 +273,7 @@ def test_read_secrets_from_vault_with_kv_version_2(hvac):
     secrets = load_secrets_from_vault(secrets_info, config)
     assert secrets["k8s"]["a-secret"] == "bar"
 
+
 @patch.dict(os.environ, {"KUBE_API_URL": "http://1.2.3.4"})
 def test_override_load_environmen_with_var():
     secrets = load_secrets({
@@ -260,12 +283,12 @@ def test_override_load_environmen_with_var():
                 "key": "KUBE_API_URL"
             }
         }
-    }, config.EmptyConfig, 
-    {
-        "kubernetes": {
-            "api_server_url": "http://elsewhere"
-        }
-    })
+    }, config.EmptyConfig,
+        {
+            "kubernetes": {
+                "api_server_url": "http://elsewhere"
+            }
+        })
     assert secrets["kubernetes"]["api_server_url"] == "http://elsewhere"
 
 
@@ -275,9 +298,9 @@ def test_should_override_load_inline_with_var():
             "api_server_url": "http://1.2.3.4"
         }
     }, config.EmptyConfig,
-    {
-        "kubernetes": {
-            "api_server_url": "http://elsewhere"
-        }
-    })
+        {
+            "kubernetes": {
+                "api_server_url": "http://elsewhere"
+            }
+        })
     assert secrets["kubernetes"]["api_server_url"] == "http://elsewhere"
