@@ -144,6 +144,8 @@ def _leave_now(signum: int, frame: FrameType = None) -> None:
     Signal handler only interested in SIGUSR1 and SIGUSR2 to indicate
     requested termination of the experiment.
     """
+    logger.warning("Caught signal num: '{}'".format(signum))
+
     if signum == signal.SIGUSR1:
         raise SystemExit(20)
 
