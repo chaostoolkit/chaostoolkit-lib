@@ -2,7 +2,7 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.19.1...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.19.0...HEAD
 
 ## [Unreleased][]
 
@@ -16,7 +16,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 
 [ctk210]: https://github.com/chaostoolkit/chaostoolkit/issues/210
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.19.1...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.19.0...HEAD
 
 ## [1.19.0][] - 2021-02-16
 
