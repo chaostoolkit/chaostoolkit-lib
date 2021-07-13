@@ -4,19 +4,19 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.19.1...HEAD
 
-## [1.19.1][] - 2021-07-13
+## [Unreleased][]
 
 ### Removed
 - Remove the problematic log line from exit.py
 
-  While using the safeguards addon, when some safeguard probe fails, sometimes it doesn't stop the experiment and instead continues to run. In some cases it gets completely stuck.
+While using the safeguards addon, when some safeguard probe fails, sometimes it doesn't stop the experiment and instead continues to run. In some cases it gets completely stuck.
 
-  Problem is that the chaostoolkit uses Signals in order to interrupt threads. Sometimes the interrupt exception gets caught by that logger and it just swallows it.
-  Therefore the experiment continues to run. [#210][ctk210]
+Problem is that the chaostoolkit uses Signals in order to interrupt threads. Sometimes the interrupt exception gets caught by that logger and it just swallows it.
+Therefore the experiment continues to run. [#210][ctk210]
 
 [ctk210]: https://github.com/chaostoolkit/chaostoolkit/issues/210
 
-[1.19.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.19.0...1.19.1
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.19.1...HEAD
 
 ## [1.19.0][] - 2021-02-16
 
