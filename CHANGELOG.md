@@ -6,6 +6,13 @@
 
 ## [Unreleased][]
 
+### Changed
+
+- Fix activity name in the logs shown when the Python provider links to an
+  unknown function [#223][223]
+
+[223]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/223
+
 ### Removed
 - Remove the problematic log line from exit.py
 
