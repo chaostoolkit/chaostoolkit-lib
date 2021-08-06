@@ -76,7 +76,7 @@ def validate_python_activity(activity: Activity):  # noqa: C901
 
     This should be considered as a private function.
     """
-    name = activity["name"]
+    activity_name = activity["name"]
     provider = activity["provider"]
     mod_name = provider.get("module")
     if not mod_name:
@@ -91,7 +91,7 @@ def validate_python_activity(activity: Activity):  # noqa: C901
     except ImportError:
         raise InvalidActivity("could not find Python module '{mod}' "
                               "in activity '{name}'".format(
-                                  mod=mod_name, name=name))
+                                  mod=mod_name, name=activity_name))
 
     found_func = False
     arguments = provider.get("arguments", {})
@@ -143,4 +143,4 @@ def validate_python_activity(activity: Activity):  # noqa: C901
     if not found_func:
         raise InvalidActivity(
             "'{mod}' does not expose '{func}' in activity '{name}'".format(
-                mod=mod_name, func=func, name=name))
+                mod=mod_name, func=func, name=activity_name))

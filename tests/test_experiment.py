@@ -16,6 +16,7 @@ from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
     InvalidExperiment, InterruptExecution
 from chaoslib.experiment import ensure_experiment_is_valid, load_experiment, \
     run_experiment
+from chaoslib.provider.python import validate_python_activity
 
 from fixtures import config, experiments
 
@@ -446,3 +447,20 @@ def test_rollback_never_strategy_does_not_run_on_interrupted_experiment_in_metho
     journal = run_experiment(experiment, settings)
     assert journal["status"] == "interrupted"
     assert len(journal["rollbacks"]) == 0
+
+
+def test_activity_name_is_logged_correctly_when_function_not_exposed_in_module():
+    invalid_python_func_probe = {
+        "name": "hello",
+        "type": "probe",
+        "provider": {
+            "type": "python",
+            "module": "os",
+            "func": "whatever"
+        }
+    }
+
+    with pytest.raises(InvalidActivity) as x:
+        validate_python_activity(invalid_python_func_probe)
+
+    assert str(x.value) == "'os' does not expose 'whatever' in activity 'hello'"
