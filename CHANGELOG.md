@@ -6,6 +6,16 @@
 
 ## [Unreleased][]
 
+### Added
+
+- Added a new control function, called `validate_control` that takes a
+  control declaration and allows the control implementation to validate itself.
+  This is useful when you want to ensure your control is well-formed before
+  starting to run the experiment. The control validates itself. It's an
+  optional control hook, like others. See [#7][7] for context.
+
+[7]: https://github.com/chaostoolkit/chaostoolkit-addons/issues/7
+
 ### Changed
 
 - Fix activity name in the logs shown when the Python provider links to an

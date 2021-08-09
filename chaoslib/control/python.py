@@ -102,6 +102,14 @@ def validate_python_control(control: Control):
                        "module? The experiment will carry on running "
                        "nonetheless.".format(mod=mod_name, name=name))
 
+    # a control can validate itself too
+    # ideally, do it cleanly and raise chaoslib.exceptions.InvalidActivity
+    func = load_func(control, "validate_control")
+    if not func:
+        return
+
+    func(control)
+
 
 def apply_python_control(level: str, control: Control,  # noqa: C901
                          experiment: Experiment,

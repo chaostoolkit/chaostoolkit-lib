@@ -17,7 +17,8 @@ from chaoslib.control import initialize_controls, cleanup_controls, \
     load_global_controls
 from chaoslib.control.python import validate_python_control
 from chaoslib.exceptions import InterruptExecution, InvalidActivity
-from chaoslib.experiment import run_experiment
+from chaoslib.experiment import ensure_experiment_is_valid, \
+    run_experiment
 from chaoslib.loader import load_experiment
 from chaoslib.types import Activity, Configuration, Control, \
     Experiment, Hypothesis, Journal, Run, Secrets,  Settings
@@ -586,3 +587,10 @@ def test_control_can_be_decorated_functions():
     exp = deepcopy(experiments.ExperimentWithDecoratedControls)
     state = run_experiment(exp)
     assert state["counted_activities"] == 4
+
+
+def test_control_can_validate_itself():
+    exp = deepcopy(experiments.ExperimentWithInvalidControls)
+
+    with pytest.raises(InvalidActivity):
+        ensure_experiment_is_valid(exp)

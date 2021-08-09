@@ -1032,3 +1032,16 @@ ExperimentWithBypassedActivity = {
         }
     ]
 }
+
+
+ExperimentWithInvalidControls = deepcopy(ExperimentNoControls)
+ExperimentWithInvalidControls["controls"] = [
+    {
+        "name": "dummy",
+        "should-not-be-here": "boom",
+        "provider": {
+            "type": "python",
+            "module": "fixtures.controls.dummy_validator"
+        }
+    }
+]
