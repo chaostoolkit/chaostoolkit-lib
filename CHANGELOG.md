@@ -2,9 +2,11 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.19.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.20.0...HEAD
 
-## [Unreleased][]
+## [1.20.0][] - 2021-08-17
+
+[1.20.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.19.0...1.20.0
 
 ### Added
 
@@ -32,8 +34,6 @@ Problem is that the chaostoolkit uses Signals in order to interrupt threads. Som
 Therefore the experiment continues to run. [#210][ctk210]
 
 [ctk210]: https://github.com/chaostoolkit/chaostoolkit/issues/210
-
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.19.0...HEAD
 
 ## [1.19.0][] - 2021-02-16
 
