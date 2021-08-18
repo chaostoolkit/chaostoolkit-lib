@@ -331,13 +331,21 @@ class Runner:
         hypo_pool = get_hypothesis_pool()
         continous_hypo_event = threading.Event()
 
-        dry = experiment.get("dry", False)
-        if dry:
+        dry = experiment.get("dry", "no-dry")
+        if dry == "activities":
             logger.warning("Dry mode enabled")
 
-        actionless = experiment.get("actionless", False)
-        if actionless:
+        elif dry == "actions":
             logger.warning("Actionless mode enabled")
+
+        elif dry == "probes":
+            logger.warning("Probeless mode enabled")
+
+        elif dry == "pause":
+            logger.warning("Pauseless mode enabled")
+
+        elif dry == "controls":
+            logger.warning("Controlless mode enabled")
 
         initialize_global_controls(
             experiment, configuration, secrets, settings)
@@ -376,8 +384,7 @@ class Runner:
 
                     state = run_method(
                             strategy, activity_pool, experiment, journal,
-                            configuration, secrets, event_registry, dry,
-                            actionless)
+                            configuration, secrets, event_registry, dry)
 
                     continous_hypo_event.set()
                     if journal["status"] not in ["interrupted", "aborted"]:
@@ -410,7 +417,7 @@ class Runner:
             if exit_gracefully_with_rollbacks:
                 run_rollback(
                     rollback_strategy, rollback_pool, experiment, journal,
-                    configuration, secrets, event_registry, dry, actionless)
+                    configuration, secrets, event_registry, dry)
 
             journal["end"] = datetime.utcnow().isoformat()
             journal["duration"] = time.time() - started_at
@@ -463,7 +470,7 @@ def should_run_during_method(strategy: Strategy) -> bool:
 def run_gate_hypothesis(experiment: Experiment, journal: Journal,
                         configuration: Configuration, secrets: Secrets,
                         event_registry: EventHandlerRegistry,
-                        dry: bool = False) -> Dict[str, Any]:
+                        dry: str = "no-dry") -> Dict[str, Any]:
     """
     Run the hypothesis before the method and bail the execution if it did
     not pass.
@@ -492,7 +499,7 @@ def run_deviation_validation_hypothesis(experiment: Experiment,
                                         configuration: Configuration,
                                         secrets: Secrets,
                                         event_registry: EventHandlerRegistry,
-                                        dry: bool = False) \
+                                        dry: str = "no-dry") \
                                             -> Dict[str, Any]:
     """
     Run the hypothesis after the method and report to the journal if the
@@ -524,7 +531,7 @@ def run_hypothesis_during_method(hypo_pool: ThreadPoolExecutor,
                                  configuration: Configuration,
                                  secrets: Secrets,
                                  event_registry: EventHandlerRegistry,
-                                 dry: bool = False) -> Future:
+                                 dry: str = "no-dry") -> Future:
     """
     Run the hypothesis continously in a background thead and report the
     status in the journal when it raised an exception.
@@ -554,14 +561,13 @@ def run_method(strategy: Strategy, activity_pool: ThreadPoolExecutor,
                experiment: Experiment, journal: Journal,
                configuration: Configuration, secrets: Secrets,
                event_registry: EventHandlerRegistry,
-               dry: bool = False,
-               actionless: bool = False) -> Optional[List[Run]]:
+               dry: str = "no-dry") -> Optional[List[Run]]:
     logger.info("Playing your experiment's method now...")
     event_registry.start_method(experiment)
     try:
         state = apply_activities(
             experiment, configuration, secrets, activity_pool,
-            journal, dry, actionless)
+            journal, dry)
         event_registry.method_completed(experiment, state)
         return state
     except InterruptExecution:
@@ -579,8 +585,7 @@ def run_rollback(rollback_strategy: str, rollback_pool: ThreadPoolExecutor,
                  experiment: Experiment, journal: Journal,
                  configuration: Configuration, secrets: Secrets,
                  event_registry: EventHandlerRegistry,
-                 dry: bool = False,
-                 actionless: bool = False) -> None:
+                 dry: str = "no-dry") -> None:
     has_deviated = journal["deviated"]
     journal_status = journal["status"]
     play_rollbacks = False
@@ -612,7 +617,7 @@ def run_rollback(rollback_strategy: str, rollback_pool: ThreadPoolExecutor,
         try:
             journal["rollbacks"] = apply_rollbacks(
                 experiment, configuration, secrets,
-                rollback_pool, dry, actionless)
+                rollback_pool, dry)
         except InterruptExecution as i:
             journal["status"] = "interrupted"
             logger.fatal(str(i))
@@ -694,7 +699,7 @@ def run_hypothesis_continuously(event: threading.Event, schedule: Schedule,
                                 configuration: Configuration,
                                 secrets: Secrets,
                                 event_registry: EventHandlerRegistry,
-                                dry: bool = False):
+                                dry: str = "no-dry"):
     frequency = schedule.continous_hypothesis_frequency
     fail_fast_ratio = schedule.fail_fast_ratio
 
@@ -745,7 +750,7 @@ def run_hypothesis_continuously(event: threading.Event, schedule: Schedule,
 def apply_activities(experiment: Experiment, configuration: Configuration,
                      secrets: Secrets, pool: ThreadPoolExecutor,
                      journal: Journal,
-                     dry: bool = False, actionless: bool = False) -> List[Run]:
+                     dry: str = "no-dry") -> List[Run]:
     with controls(level="method", experiment=experiment, context=experiment,
                   configuration=configuration, secrets=secrets) as control:
         result = []
@@ -755,7 +760,7 @@ def apply_activities(experiment: Experiment, configuration: Configuration,
 
         try:
             for run in run_activities(
-                    experiment, configuration, secrets, pool, dry, actionless):
+                    experiment, configuration, secrets, pool, dry):
                 runs.append(run)
                 if journal["status"] in ["aborted", "failed", "interrupted"]:
                     break
@@ -815,14 +820,12 @@ def apply_activities(experiment: Experiment, configuration: Configuration,
 
 def apply_rollbacks(experiment: Experiment, configuration: Configuration,
                     secrets: Secrets, pool: ThreadPoolExecutor,
-                    dry: bool = False,
-                    actionless: bool = False) -> List[Run]:
+                    dry: str = "no-dry") -> List[Run]:
     logger.info("Let's rollback...")
     with controls(level="rollback", experiment=experiment, context=experiment,
                   configuration=configuration, secrets=secrets) as control:
         rollbacks = list(
-            run_rollbacks(experiment, configuration, secrets, pool, dry,
-                          actionless))
+            run_rollbacks(experiment, configuration, secrets, pool, dry))
 
         if pool:
             logger.debug("Waiting for background rollbacks to complete...")

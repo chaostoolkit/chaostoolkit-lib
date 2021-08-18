@@ -13,8 +13,7 @@ __all__ = ["run_rollbacks"]
 
 def run_rollbacks(experiment: Experiment, configuration: Configuration,
                   secrets: Secrets, pool: ThreadPoolExecutor,
-                  dry: bool = False,
-                  actionless: bool = False) -> Iterator[Run]:
+                  dry: str = "no-dry") -> Iterator[Run]:
     """
     Run all rollbacks declared in the experiment in their order. Wait for
     each rollback activity to complete before to the next unless the activity
@@ -32,9 +31,8 @@ def run_rollbacks(experiment: Experiment, configuration: Configuration,
             logger.debug("rollback activity will run in the background")
             yield pool.submit(execute_activity, experiment=experiment,
                               activity=activity, configuration=configuration,
-                              secrets=secrets, dry=dry, actionless=actionless)
+                              secrets=secrets, dry=dry)
         else:
             yield execute_activity(experiment, activity,
                                    configuration=configuration,
-                                   secrets=secrets, dry=dry,
-                                   actionless=actionless)
+                                   secrets=secrets, dry=dry)

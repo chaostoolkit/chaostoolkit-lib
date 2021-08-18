@@ -111,7 +111,7 @@ def run_experiment(experiment: Experiment, settings: Settings = None,
     a thread. By the end of runs, those threads block until they are all
     complete.
 
-    If the experiment has the `"dry"` property set to `False`, the experiment
+    If the experiment has the `dry` property set to `activities`,the experiment
     runs without actually executing the activities.
 
     NOTE: Tricky to make a decision whether we should rollback when exiting
@@ -139,7 +139,7 @@ def initialize_run_journal(experiment: Experiment) -> Journal:
 
 def apply_activities(experiment: Experiment, configuration: Configuration,
                      secrets: Secrets, pool: ThreadPoolExecutor,
-                     journal: Journal, dry: bool = False) -> List[Run]:
+                     journal: Journal, dry: str = "no-dry") -> List[Run]:
     warn_about_moved_function(
         "The 'apply_activities' function has now moved to the "
         "'chaoslib.run' package")
@@ -149,7 +149,7 @@ def apply_activities(experiment: Experiment, configuration: Configuration,
 
 def apply_rollbacks(experiment: Experiment, configuration: Configuration,
                     secrets: Secrets, pool: ThreadPoolExecutor,
-                    dry: bool = False) -> List[Run]:
+                    dry: str = "no-dry") -> List[Run]:
     warn_about_moved_function(
         "The 'apply_rollbacks' function has now moved to the "
         "'chaoslib.run' package")
