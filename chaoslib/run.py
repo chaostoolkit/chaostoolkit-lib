@@ -344,9 +344,6 @@ class Runner:
         elif dry == "pause":
             logger.warning("Pauseless mode enabled")
 
-        elif dry == "controls":
-            logger.warning("Controlless mode enabled")
-
         initialize_global_controls(
             experiment, configuration, secrets, settings)
         initialize_controls(experiment, configuration, secrets)
