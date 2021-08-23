@@ -55,13 +55,12 @@ class RunEventHandler:
         logger.debug("Steady state will run continuously now")
 
     def continuous_hypothesis_iteration(self, iteration_index: int,
-                                       state: Any) -> None:
+                                        state: Any) -> None:
         logger.debug("Steady state iteration {}".format(iteration_index))
 
     def continuous_hypothesis_completed(self, experiment: Experiment,
-                                       journal: Journal,
-                                       exception: Exception = None) \
-                                           -> None:
+                                        journal: Journal,
+                                        exception: Exception = None) -> None:
         logger.debug("Continuous steady state is now complete")
 
     def start_hypothesis_before(self, experiment: Experiment) -> None:
@@ -154,7 +153,7 @@ class EventHandlerRegistry:
                         h.__class__.__name__), exc_info=True)
 
     def continuous_hypothesis_iteration(self, iteration_index: int,
-                                       state: Any) -> None:
+                                        state: Any) -> None:
         for h in self.handlers:
             try:
                 h.continuous_hypothesis_iteration(iteration_index, state)
@@ -164,8 +163,8 @@ class EventHandlerRegistry:
                         h.__class__.__name__), exc_info=True)
 
     def continuous_hypothesis_completed(self, experiment: Experiment,
-                                       journal: Journal,
-                                       exception: Exception = None) -> None:
+                                        journal: Journal,
+                                        exception: Exception = None) -> None:
         for h in self.handlers:
             try:
                 h.continuous_hypothesis_completed(
