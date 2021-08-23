@@ -165,8 +165,7 @@ class EventHandlerRegistry:
 
     def continuous_hypothesis_completed(self, experiment: Experiment,
                                        journal: Journal,
-                                       exception: Exception = None) \
-                                           -> None:
+                                       exception: Exception = None) -> None:
         for h in self.handlers:
             try:
                 h.continuous_hypothesis_completed(
