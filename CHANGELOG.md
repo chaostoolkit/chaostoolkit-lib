@@ -6,50 +6,31 @@
 
 ### Changed
 
-- In `run.py`, changed method names: `start_continous_hypothesis` to
-  `start_continuous_hypothesis`, `continous_hypothesis_iteration` to
-  `continuous_hypothesis_iteration` and `continous_hypothesis_completed` to
-  `continuous_hypothesis_completed`
+- In `run.py`, changed method names containing `continous` to `continuous`
 
 - In `run.py`, changed variable `continous_hypo_event` to `continuous_hypo_event`
 
 - In `run.py`, changed `Strategy.CONTINOUS` to `Strategy.CONTINUOUS`
 
 - In `types.py`, changed `Strategy.CONTINOUS` to `Strategy.CONTINUOUS`
+  (BREAKING COMPATABILITY)
 
-- In `types.py`, changed expected `value` value from `continously` to
-  `continuously` and from `continously-fail-fast` to `continuously-fail-fast`
+- In `types.py`, changed expected `value` from `continously` to
+  `continuously`
 
 - In `types.py`, changed expected paramater from `continous_hypothesis_frequency`
   to `continuous_hypothesis_frequency`
 
-- In `test_run.py`, changed method names: `test_run_ssh_continous` to
-  `test_run_ssh_continuous`, `test_exit_continous_ssh_continous_when_experiment_is_interrupted`
-  to `test_exit_continuous_ssh_continuous_when_experiment_is_interrupted`,
-  `test_exit_continous_ssh_continous_when_experiment_is_exited` to
-  `test_exit_continuous_ssh_continuous_when_experiment_is_exited`,
-  `test_exit_continous_ssh_continous_when_activity_raises_unknown_exception` to
-  `test_exit_continuous_ssh_continuous_when_activity_raises_unknown_exception`,
-  `test_exit_immediatly_when_continous_ssh_fails_and_failfast` to
-  `test_exit_immediately_when_continuous_ssh_fails_and_failfast`,
-  `test_do_not_exit_when_continous_ssh_fails_and_no_failfast` to
-  `test_do_not_exit_when_continuous_ssh_fails_and_no_failfast`,
-  `test_exit_immediatly_when_continous_ssh_fails_and_failfast_when_background_activity` to
-  `test_exit_immediately_when_continuous_ssh_fails_and_failfast_when_background_activity`
+- In `test_run.py`, changed method names containing `continous` to `continuous`
+  and method names containing `immediatly` to `immediately`
 
 - In `test_run.py`, changed parameter `continous_hypothesis_frequency` to
   `continuous_hypothesis_frequency` and variable strategy from `Strategy.CONTINOUS`
   to `Strategy.CONTINUOUS`
 
-- In `test_run.py`, changed references: `start_continous_hypothesis` to
-  `start_continuous_hypothesis`, `continous_hypothesis_iteration` to
-  `continuous_hypothesis_iteration` and `continous_hypothesis_completed` to
-  `continuous_hypothesis_completed`
+- In `test_run.py`, changed method names containing `continous` to `continuous`
 
-- In `run_handlers.py`, changed method names: `continous_hypothesis_completed`
-  to `continuous_hypothesis_completed`, `continous_hypothesis_iteration` to
-  `continuous_hypothesis_iteration` and `continous_hypothesis_completed` to
-  `continuous_hypothesis_completed`
+- In `run_handlers.py`, changed method names containing `continous` to `continuous`
 
 - Changed other minor typos
 
