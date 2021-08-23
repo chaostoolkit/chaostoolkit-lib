@@ -61,9 +61,7 @@ class Strategy(enum.Enum):
             return Strategy.AFTER_METHOD
         elif value == "during-method-only":
             return Strategy.DURING_METHOD
-        elif value in ["continously", "continuously"]:
-            return Strategy.CONTINUOUS
-        elif value in ["continously-fail-fast", "continuously-fail-fast"]:
+        elif value == "continuously":
             return Strategy.CONTINUOUS
 
         raise ValueError("Unknown strategy")
