@@ -13,7 +13,7 @@
 - In `run.py`, changed `Strategy.CONTINOUS` to `Strategy.CONTINUOUS`
 
 - In `types.py`, changed `Strategy.CONTINOUS` to `Strategy.CONTINUOUS`
-  (BREAKING COMPATABILITY)
+  **(BREAKING COMPATABILITY)**
 
 - In `types.py`, changed expected `value` from `continously` to
   `continuously`
