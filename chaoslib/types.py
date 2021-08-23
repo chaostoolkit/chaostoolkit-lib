@@ -49,7 +49,7 @@ class Strategy(enum.Enum):
     AFTER_METHOD = "after-method-only"
     DURING_METHOD = "during-method-only"
     DEFAULT = "default"
-    CONTINOUS = "continous"
+    CONTINUOUS = "continuous"
 
     @staticmethod
     def from_string(value: str) -> 'Strategy':
@@ -61,17 +61,17 @@ class Strategy(enum.Enum):
             return Strategy.AFTER_METHOD
         elif value == "during-method-only":
             return Strategy.DURING_METHOD
-        elif value == "continously":
-            return Strategy.CONTINOUS
-        elif value == "continously-fail-fast":
-            return Strategy.CONTINOUS
+        elif value == "continuously":
+            return Strategy.CONTINUOUS
+        elif value == "continuously-fail-fast":
+            return Strategy.CONTINUOUS
 
         raise ValueError("Unknown strategy")
 
 
 class Schedule:
-    def __init__(self, continous_hypothesis_frequency: float = 1.0,
+    def __init__(self, continuous_hypothesis_frequency: float = 1.0,
                  fail_fast: bool = False, fail_fast_ratio: float = 0):
-        self.continous_hypothesis_frequency = continous_hypothesis_frequency
+        self.continuous_hypothesis_frequency = continuous_hypothesis_frequency
         self.fail_fast = fail_fast
         self.fail_fast_ratio = fail_fast_ratio

@@ -20,17 +20,17 @@ class FullRunEventHandler(RunEventHandler):
     def signal_exit(self) -> None:
         self.calls.append("signal_exit")
 
-    def start_continous_hypothesis(self, frequency: int) -> None:
-        self.calls.append("start_continous_hypothesis")
+    def start_continuous_hypothesis(self, frequency: int) -> None:
+        self.calls.append("start_continuous_hypothesis")
 
-    def continous_hypothesis_iteration(self, iteration_index: int,
+    def continuous_hypothesis_iteration(self, iteration_index: int,
                                        state: Any) -> None:
-        self.calls.append("continous_hypothesis_iteration")
+        self.calls.append("continuous_hypothesis_iteration")
 
-    def continous_hypothesis_completed(self, experiment: Experiment,
+    def continuous_hypothesis_completed(self, experiment: Experiment,
                                        journal: Journal,
                                        exception: Exception = None) -> None:
-        self.calls.append("continous_hypothesis_completed")
+        self.calls.append("continuous_hypothesis_completed")
 
     def start_method(self, experiment: Experiment) -> None:
         self.calls.append("start_method")
@@ -84,14 +84,14 @@ class FullExceptionRunEventHandler(RunEventHandler):
     def signal_exit(self) -> None:
         raise Exception()
 
-    def start_continous_hypothesis(self, frequency: int) -> None:
+    def start_continuous_hypothesis(self, frequency: int) -> None:
         raise Exception()
 
-    def continous_hypothesis_iteration(self, iteration_index: int,
+    def continuous_hypothesis_iteration(self, iteration_index: int,
                                        state: Any) -> None:
         raise Exception()
 
-    def continous_hypothesis_completed(self) -> None:
+    def continuous_hypothesis_completed(self) -> None:
         raise Exception()
 
     def start_rollbacks(self, experiment: Experiment) -> None:
