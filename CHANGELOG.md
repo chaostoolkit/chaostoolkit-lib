@@ -4,6 +4,36 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.20.0...HEAD
 
+### Changed
+
+- In `run.py`, changed method names containing `continous` to `continuous`
+
+- In `run.py`, changed variable `continous_hypo_event` to `continuous_hypo_event`
+
+- In `run.py`, changed `Strategy.CONTINOUS` to `Strategy.CONTINUOUS`
+
+- In `types.py`, changed `Strategy.CONTINOUS` to `Strategy.CONTINUOUS`
+  **(BREAKING COMPATABILITY)**
+
+- In `types.py`, changed expected `value` from `continously` to
+  `continuously`
+
+- In `types.py`, changed expected paramater from `continous_hypothesis_frequency`
+  to `continuous_hypothesis_frequency`
+
+- In `test_run.py`, changed method names containing `continous` to `continuous`
+  and method names containing `immediatly` to `immediately`
+
+- In `test_run.py`, changed parameter `continous_hypothesis_frequency` to
+  `continuous_hypothesis_frequency` and variable strategy from `Strategy.CONTINOUS`
+  to `Strategy.CONTINUOUS`
+
+- In `test_run.py`, changed method names containing `continous` to `continuous`
+
+- In `run_handlers.py`, changed method names containing `continous` to `continuous`
+
+- Changed other minor typos
+
 ## [1.20.0][] - 2021-08-17
 
 [1.20.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.19.0...1.20.0
@@ -193,8 +223,8 @@ Therefore the experiment continues to run. [#210][ctk210]
 
 - Add two functions to programmatically exit the experiment as soon as feasible
   by the Python VM [#185][185]:
-  * `chaoslib.exit.exit_gracefully`: termintes but abides to the rollback strategy
-  * `chaoslib.exit.exit_ungracefully`: termintes but bypasses rollbacks entirely
+  * `chaoslib.exit.exit_gracefully`: terminates but abides to the rollback strategy
+  * `chaoslib.exit.exit_ungracefully`: terminates but bypasses rollbacks entirely
     and does not wait for background actions/probes still running
   This should mostly be useful to have a harsh way to interrupt an execution
   and is therefore an advanced concept with undesirable side effects (though
@@ -229,7 +259,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 
 - Steady-state hypothesos runtime strategies can be now set to determine if the
   the hypothesis is executed before/after the method as usual (default behavior)
-  or continously throughout the method too. Yo ucan also make it applied
+  or continuously throughout the method too. You can also make it applied
   before or after only, or even only during the method. [#191][191]
 
 [191]: https://github.com/chaostoolkit/chaostoolkit/pull/191
@@ -328,7 +358,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 
 - Refactored run of the experiment so that we can have multiple run strategies
   such as not running the steady-state hypothesis before or after the method
-  but also one strategy so that the steady-state is continously applied
+  but also one strategy so that the steady-state is continuously applied
   during the method, with the option to bail the experiment as soon as it
   deviates. [#149][149]
 
@@ -968,7 +998,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 
 ### Changed
 
--   Steady stade is optional, so don't expect it here
+-   Steady state is optional, so don't expect it here
 
 ## [0.13.0][] - 2018-01-28
 
@@ -1127,7 +1157,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 
 - Configuration schema support
 - Lots of logging added at the DEBUG level
-- [EXPERIMENTAL] Loading secrets froom HashiCorp vault
+- [EXPERIMENTAL] Loading secrets from HashiCorp vault
 
 ### Changed
 
