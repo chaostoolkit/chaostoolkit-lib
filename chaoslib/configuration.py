@@ -50,13 +50,16 @@ def load_configuration(config_info: Dict[str, str],
     values from the experiment itself. This is useful to the Chaos Toolkit
     CLI mostly to allow overriding values directly from cli arguments. It's
     seldom required otherwise.
+    If keys that defined in `extra_vars` were not defined in the experiment 
+    itslef, they will be merged into the experiment.
     """
     logger.debug("Loading configuration...")
     env = os.environ
     extra_vars = extra_vars or {}
     conf = {}
 
-    for (key, value) in config_info.items():
+    iterable = [config_info.items(),extra_vars.items()]
+    for (key, value) in itertools.chain(*iterable):
         if isinstance(value, dict) and "type" in value:
             if value["type"] == "env":
                 env_key = value["key"]
