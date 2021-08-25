@@ -203,7 +203,7 @@ def run_steady_state_hypothesis(experiment: Experiment,
 
             run["tolerance_met"] = True
 
-            if dry in ("probes", "activities"):
+            if dry in (Dry.PROBES, Dry.ACTIVITIES):
                 # do not check for tolerance when dry mode is on
                 continue
 
