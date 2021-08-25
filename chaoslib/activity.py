@@ -16,7 +16,7 @@ from chaoslib.provider.python import run_python_activity, \
     validate_python_activity
 from chaoslib.provider.process import run_process_activity, \
     validate_process_activity
-from chaoslib.types import Activity, Configuration, Experiment, Run, Secrets
+from chaoslib.types import Activity, Configuration, Experiment, Run, Secrets, Dry
 
 
 __all__ = ["ensure_activity_is_valid", "get_all_activities_in_experiment",
@@ -101,7 +101,7 @@ def ensure_activity_is_valid(activity: Activity):  # noqa: C901
 
 def run_activities(experiment: Experiment, configuration: Configuration,
                    secrets: Secrets, pool: ThreadPoolExecutor,
-                   dry: str = "no-dry") -> Iterator[Run]:
+                   dry: Dry = Dry.NO_DRY) -> Iterator[Run]:
     """
     Internal generator that iterates over all activities and execute them.
     Yields either the result of the run or a :class:`concurrent.futures.Future`
@@ -129,7 +129,7 @@ def run_activities(experiment: Experiment, configuration: Configuration,
 ###############################################################################
 def execute_activity(experiment: Experiment,activity: Activity,
                      configuration: Configuration,
-                     secrets: Secrets, dry: str = "no-dry") -> Run:
+                     secrets: Secrets, dry: Dry = Dry.NO_DRY) -> Iterator[Run]:
     """
     Low-level wrapper around the actual activity provider call to collect
     some meta data (like duration, start/end time, exceptions...) during
@@ -149,20 +149,20 @@ def execute_activity(experiment: Experiment,activity: Activity,
         pause_before = pauses.get("before")
         is_dry = False
         activity_type = activity["type"]
-        if dry == "actions":
+        if dry == Dry.ACTIONS:
             is_dry = activity_type == "action"
 
-        elif dry == "probes":
+        elif dry == Dry.PROBES:
             is_dry = activity_type == "probe"
 
-        elif dry == "activities":
+        elif dry == Dry.ACTIVITIES:
             is_dry = True
 
         if pause_before:
             logger.info("Pausing before next activity for {d}s...".format(
                 d=pause_before))
             # pause when one of the dry flags are set
-            if dry != "pause" and not is_dry:
+            if dry != Dry.PAUSE and not is_dry:
                 time.sleep(pause_before)
 
         if activity.get("background"):
@@ -209,7 +209,7 @@ def execute_activity(experiment: Experiment,activity: Activity,
                 logger.info("Pausing after activity for {d}s...".format(
                     d=pause_after))
                 # pause when one of the dry flags are set
-                if dry != "pause" and not is_dry:
+                if dry != Dry.PAUSE and not is_dry:
                     time.sleep(pause_after)
 
         control.with_state(run)

@@ -19,7 +19,7 @@ from chaoslib.run import Runner, RunEventHandler, \
     apply_rollbacks as apply_roll
 from chaoslib.secret import load_secrets
 from chaoslib.types import Configuration, Experiment, Journal, Run, \
-    Schedule, Secrets, Settings, Strategy
+    Schedule, Secrets, Settings, Strategy, Dry
 
 __all__ = ["ensure_experiment_is_valid", "load_experiment"]
 
@@ -139,7 +139,7 @@ def initialize_run_journal(experiment: Experiment) -> Journal:
 
 def apply_activities(experiment: Experiment, configuration: Configuration,
                      secrets: Secrets, pool: ThreadPoolExecutor,
-                     journal: Journal, dry: str = "no-dry") -> List[Run]:
+                     journal: Journal, dry: Dry = Dry.NO_DRY) -> List[Run]:
     warn_about_moved_function(
         "The 'apply_activities' function has now moved to the "
         "'chaoslib.run' package")
@@ -149,7 +149,7 @@ def apply_activities(experiment: Experiment, configuration: Configuration,
 
 def apply_rollbacks(experiment: Experiment, configuration: Configuration,
                     secrets: Secrets, pool: ThreadPoolExecutor,
-                    dry: str = "no-dry") -> List[Run]:
+                     dry: Dry = Dry.NO_DRY) -> List[Run]:
     warn_about_moved_function(
         "The 'apply_rollbacks' function has now moved to the "
         "'chaoslib.run' package")

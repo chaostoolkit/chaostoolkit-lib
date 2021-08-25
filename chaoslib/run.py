@@ -26,7 +26,7 @@ from chaoslib.rollback import run_rollbacks
 from chaoslib.secret import load_secrets
 from chaoslib.settings import get_loaded_settings
 from chaoslib.types import Configuration, Experiment, Journal, Run, Secrets, \
-    Settings, Schedule, Strategy
+    Settings, Schedule, Strategy, Dry
 
 __all__ = ["Runner", "RunEventHandler"]
 
@@ -331,17 +331,17 @@ class Runner:
         hypo_pool = get_hypothesis_pool()
         continous_hypo_event = threading.Event()
 
-        dry = experiment.get("dry", "no-dry")
-        if dry == "activities":
+        dry:Dry = experiment.get("dry", None)
+        if dry == Dry.ACTIVITIES:
             logger.warning("Dry mode enabled")
 
-        elif dry == "actions":
+        elif dry == Dry.ACTIONS:
             logger.warning("Actionless mode enabled")
 
-        elif dry == "probes":
+        elif dry == Dry.PROBES:
             logger.warning("Probeless mode enabled")
 
-        elif dry == "pause":
+        elif dry == Dry.PAUSE:
             logger.warning("Pauseless mode enabled")
 
         initialize_global_controls(
@@ -467,7 +467,7 @@ def should_run_during_method(strategy: Strategy) -> bool:
 def run_gate_hypothesis(experiment: Experiment, journal: Journal,
                         configuration: Configuration, secrets: Secrets,
                         event_registry: EventHandlerRegistry,
-                        dry: str = "no-dry") -> Dict[str, Any]:
+                         dry: Dry = Dry.NO_DRY) -> Dict[str, Any]:
     """
     Run the hypothesis before the method and bail the execution if it did
     not pass.
@@ -496,7 +496,7 @@ def run_deviation_validation_hypothesis(experiment: Experiment,
                                         configuration: Configuration,
                                         secrets: Secrets,
                                         event_registry: EventHandlerRegistry,
-                                        dry: str = "no-dry") \
+                                         dry: Dry = Dry.NO_DRY) \
                                             -> Dict[str, Any]:
     """
     Run the hypothesis after the method and report to the journal if the
@@ -528,7 +528,7 @@ def run_hypothesis_during_method(hypo_pool: ThreadPoolExecutor,
                                  configuration: Configuration,
                                  secrets: Secrets,
                                  event_registry: EventHandlerRegistry,
-                                 dry: str = "no-dry") -> Future:
+                                  dry: Dry = Dry.NO_DRY) -> Future:
     """
     Run the hypothesis continously in a background thead and report the
     status in the journal when it raised an exception.
@@ -558,7 +558,7 @@ def run_method(strategy: Strategy, activity_pool: ThreadPoolExecutor,
                experiment: Experiment, journal: Journal,
                configuration: Configuration, secrets: Secrets,
                event_registry: EventHandlerRegistry,
-               dry: str = "no-dry") -> Optional[List[Run]]:
+                dry: str = Dry.NO_DRY) -> Optional[List[Run]]:
     logger.info("Playing your experiment's method now...")
     event_registry.start_method(experiment)
     try:
@@ -582,7 +582,7 @@ def run_rollback(rollback_strategy: str, rollback_pool: ThreadPoolExecutor,
                  experiment: Experiment, journal: Journal,
                  configuration: Configuration, secrets: Secrets,
                  event_registry: EventHandlerRegistry,
-                 dry: str = "no-dry") -> None:
+                  dry: Dry = Dry.NO_DRY) -> None:
     has_deviated = journal["deviated"]
     journal_status = journal["status"]
     play_rollbacks = False
@@ -696,7 +696,7 @@ def run_hypothesis_continuously(event: threading.Event, schedule: Schedule,
                                 configuration: Configuration,
                                 secrets: Secrets,
                                 event_registry: EventHandlerRegistry,
-                                dry: str = "no-dry"):
+                                 dry: Dry = Dry.NO_DRY):
     frequency = schedule.continous_hypothesis_frequency
     fail_fast_ratio = schedule.fail_fast_ratio
 
@@ -747,7 +747,7 @@ def run_hypothesis_continuously(event: threading.Event, schedule: Schedule,
 def apply_activities(experiment: Experiment, configuration: Configuration,
                      secrets: Secrets, pool: ThreadPoolExecutor,
                      journal: Journal,
-                     dry: str = "no-dry") -> List[Run]:
+                      dry: Dry = Dry.NO_DRY) -> List[Run]:
     with controls(level="method", experiment=experiment, context=experiment,
                   configuration=configuration, secrets=secrets) as control:
         result = []
@@ -817,7 +817,7 @@ def apply_activities(experiment: Experiment, configuration: Configuration,
 
 def apply_rollbacks(experiment: Experiment, configuration: Configuration,
                     secrets: Secrets, pool: ThreadPoolExecutor,
-                    dry: str = "no-dry") -> List[Run]:
+                     dry: Dry = Dry.NO_DRY) -> List[Run]:
     logger.info("Let's rollback...")
     with controls(level="rollback", experiment=experiment, context=experiment,
                   configuration=configuration, secrets=secrets) as control:

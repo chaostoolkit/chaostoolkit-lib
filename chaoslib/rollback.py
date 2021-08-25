@@ -5,7 +5,7 @@ from typing import Iterator
 from logzero import logger
 
 from chaoslib.activity import execute_activity
-from chaoslib.types import Configuration, Experiment, Run, Secrets
+from chaoslib.types import Configuration, Experiment, Run, Secrets, Dry
 
 
 __all__ = ["run_rollbacks"]
@@ -13,7 +13,7 @@ __all__ = ["run_rollbacks"]
 
 def run_rollbacks(experiment: Experiment, configuration: Configuration,
                   secrets: Secrets, pool: ThreadPoolExecutor,
-                  dry: str = "no-dry") -> Iterator[Run]:
+                   dry: Dry = Dry.NO_DRY) -> Iterator[Run]:
     """
     Run all rollbacks declared in the experiment in their order. Wait for
     each rollback activity to complete before to the next unless the activity
