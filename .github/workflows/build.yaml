@@ -1,6 +1,6 @@
 name: Build, Test, and Lint
 
-on: 
+on:
   push:
     branches: [ master ]
   pull_request:
