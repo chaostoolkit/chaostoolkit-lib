@@ -402,7 +402,7 @@ def test_control_cleanup_cannot_fail_the_experiment():
                 },
             },
         )
-    except:
+    except Exception:
         pytest.fail("Failed to run experiment with a broken cleanup control")
 
 
@@ -423,7 +423,7 @@ def test_control_initialization_cannot_fail_the_experiment():
                 },
             },
         )
-    except:
+    except Exception:
         pytest.fail("Failed to run experiment with a broken init control")
 
 

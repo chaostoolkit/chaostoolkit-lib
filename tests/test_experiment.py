@@ -241,7 +241,7 @@ def test_probes_can_reference_each_other():
 
     try:
         run_experiment(experiment)
-    except:
+    except Exception:
         pytest.fail("experiment should not have failed")
 
 
