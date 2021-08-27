@@ -9,6 +9,11 @@
 * Switched from pycodestyle/pylama to `black`, `flake8`, `isort`
 * Update CI builds to build, lint, and test
 
+### Added
+
+* Added `.github/workflows/check_pr.yaml` which checks if a PR has modified the
+CHANGELOG.md and if it changed/added tests
+
 ## [1.21.0][] - 2021-08-23
 
 [1.21.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.20.0...1.21.0
