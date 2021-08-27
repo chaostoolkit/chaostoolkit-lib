@@ -11,11 +11,7 @@ import yaml
 from fixtures import experiments
 
 from chaoslib.activity import run_activities
-from chaoslib.exceptions import (
-    InterruptExecution,
-    InvalidActivity,
-    InvalidExperiment,
-)
+from chaoslib.exceptions import InterruptExecution, InvalidActivity, InvalidExperiment
 from chaoslib.experiment import (
     ensure_experiment_is_valid,
     load_experiment,

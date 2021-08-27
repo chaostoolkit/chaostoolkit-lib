@@ -5,11 +5,7 @@ from unittest.mock import patch
 import requests
 import requests_mock
 
-from chaoslib.notification import (
-    DiscoverFlowEvent,
-    RunFlowEvent,
-    notify,
-)
+from chaoslib.notification import DiscoverFlowEvent, RunFlowEvent, notify
 
 
 def test_no_settings_is_okay():
