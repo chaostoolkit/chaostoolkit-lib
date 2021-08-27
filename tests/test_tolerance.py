@@ -61,15 +61,7 @@ def test_tolerance_string_returns_false_when_different():
     assert within_tolerance("hello", value="not hello") is False
 
 
-def test_tolerance_string():
-    assert within_tolerance("hello", value="hello") is True
-
-
-def test_tolerance_string_returns_false_when_different():
-    assert within_tolerance("hello", value="not hello") is False
-
-
-def test_tolerance_regex():
+def test_tolerance_regex_true():
     assert (
         within_tolerance(
             {"type": "regex", "pattern": "[0-9]{2}"}, value="you are number 87"
@@ -78,7 +70,7 @@ def test_tolerance_regex():
     )
 
 
-def test_tolerance_regex():
+def test_tolerance_regex_false():
     t = {"type": "regex", "pattern": "[0-9]{2}"}
     ensure_hypothesis_tolerance_is_valid(t)
     assert within_tolerance(t, value="you are number 8") is False
