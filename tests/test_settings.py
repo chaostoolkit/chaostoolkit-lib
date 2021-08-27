@@ -62,7 +62,7 @@ def test_locate_root_level_entry():
     assert parent == settings
     assert entry == settings["auths"]
     assert k == "auths"
-    assert i == None
+    assert i is None
 
 
 def test_locate_dotted_entry():
@@ -71,7 +71,7 @@ def test_locate_dotted_entry():
     assert parent == settings["auths"]
     assert entry == {"type": "bearer"}
     assert k == "chaos.example.com"
-    assert i == None
+    assert i is None
 
 
 def test_locate_indexed_entry():
@@ -91,7 +91,7 @@ def test_locate_indexed_entry():
     )
     assert parent == settings["auths"]["chaos.example.com"]["headers"]
     assert entry == {"name": "X-For", "value": "other"}
-    assert k == None
+    assert k is None
     assert i == 1
 
 
@@ -113,9 +113,9 @@ def test_locate_dotted_key_from_indexed_entry():
     assert parent == settings["auths"]["chaos.example.com"]["headers"][1]
     assert entry == "X-For"
     assert k == "name"
-    assert i == None
+    assert i is None
 
 
 def test_cannot_locate_dotted_entry():
     settings = {"auths": {"chaos.example.com": {"type": "bearer"}}}
-    assert locate_settings_entry(settings, "auths.chaos.example.com") == None
+    assert locate_settings_entry(settings, "auths.chaos.example.com") is None

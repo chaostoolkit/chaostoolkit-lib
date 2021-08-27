@@ -11,7 +11,7 @@ from chaoslib.exit import exit_gracefully, exit_ungracefully
 from chaoslib.run import Runner
 from chaoslib.types import Strategy
 
-pytestmark = pytest.mark.skipif(os.getenv("CI") != None, reason="Skip CI")
+pytestmark = pytest.mark.skipif(os.getenv("CI") is not None, reason="Skip CI")
 
 
 def run_http_server_in_background():

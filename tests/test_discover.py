@@ -58,7 +58,7 @@ def test_discover_all_activities():
     assert activity["name"] == "no_args_docstring"
     assert activity["type"] == "probe"
     assert activity["mod"] == mod
-    assert activity["doc"] == None
+    assert activity["doc"] is None
     assert activity["arguments"] == []
 
     activity = next(activities)
