@@ -85,9 +85,9 @@ def test_load_configuration_should_raise_exception():
             }
         )
 
-    assert (
-        str(x.value)
-        == "Configuration makes reference to an environment key that does not exist: KUBE_TOKEN"
+    assert str(x.value) == (
+        "Configuration makes reference to an environment key that does not exist:"
+        " KUBE_TOKEN"
     )
 
 

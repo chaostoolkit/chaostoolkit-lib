@@ -421,7 +421,7 @@ def test_activity_name_is_logged_correctly_when_function_not_exposed_in_module()
     with pytest.raises(InvalidActivity) as x:
         validate_python_activity(invalid_python_func_probe)
 
-    assert (
-        str(x.value)
-        == "The python module 'os' does not expose a function called 'whatever' in probe 'hello'"
+    assert str(x.value) == (
+        "The python module 'os' does not expose a function called 'whatever' in probe"
+        " 'hello'"
     )

@@ -107,7 +107,10 @@ def test_run_process_probe_should_return_raw_value():
 
 
 def test_run_process_probe_should_pass_arguments_in_array():
-    args = "['-c', '--empty', '--number', '1', '--string', 'with spaces', '--string', 'a second string with the same option']\n"
+    args = (
+        "['-c', '--empty', '--number', '1', '--string', 'with spaces', '--string',"
+        " 'a second string with the same option']\n"
+    )
 
     result = run_activity(
         probes.ProcEchoArrayProbe, config.EmptyConfig, experiments.Secrets
@@ -119,7 +122,10 @@ def test_run_process_probe_should_pass_arguments_in_array():
 
 
 def test_run_process_probe_can_pass_arguments_as_string():
-    args = "['-c', '--empty', '--number', '1', '--string', 'with spaces', '--string', 'a second string with the same option']\n"
+    args = (
+        "['-c', '--empty', '--number', '1', '--string', 'with spaces', "
+        "'--string', 'a second string with the same option']\n"
+    )
 
     result = run_activity(
         probes.ProcEchoStrProbe, config.EmptyConfig, experiments.Secrets
@@ -181,10 +187,11 @@ def test_run_http_probe_can_retry():
     """
     this test embeds a fake HTTP server to test the retry part
     it can't be easily tested with libraries like requests_mock or responses
-    we could mock urllib3 retry mechanism as it is used in the requests library but it implies to
-    understand how requests works which is not the idea of this test
+    we could mock urllib3 retry mechanism as it is used in the requests library but it
+    implies to understand how requests works which is not the idea of this test
 
-    in this test, the first call will lead to a ConnectionAbortedError and the second will work
+    in this test, the first call will lead to a ConnectionAbortedError and the second
+    will work
     """
 
     class MockServerRequestHandler(BaseHTTPRequestHandler):

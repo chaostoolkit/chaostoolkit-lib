@@ -159,9 +159,9 @@ def test_do_not_exit_when_continuous_ssh_fails_and_no_failfast():
     assert len(journal["run"]) == 2
 
 
-def test_exit_immediately_when_continuous_ssh_fails_and_failfast_when_background_activity():
+def test_exit_immediately_when_continuous_ssh_fails_and_failfast_when_background_activity(): # noqa E501
     experiment = (
-        experiments.SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity.copy()
+        experiments.SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity.copy() # noqa E501
     )
     journal = run_experiment(
         experiment,

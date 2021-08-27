@@ -240,7 +240,10 @@ DeprecatedProcArgumentsProbe = {
 
 ProcEchoArrayProbe = {
     "type": "probe",
-    "name": "This probe is a process probe that simply echoes its arguments passed as an array",
+    "name": (
+        "This probe is a process probe that simply echoes its arguments passed"
+        " as an array"
+    ),
     "pauses": {"before": 0, "after": 0.1},
     "provider": {
         "type": "process",
@@ -262,12 +265,18 @@ ProcEchoArrayProbe = {
 
 ProcEchoStrProbe = {
     "type": "probe",
-    "name": "This probe is a process probe that simply echoes its arguments passed as a string",
+    "name": (
+        "This probe is a process probe that simply echoes its arguments passed"
+        " as a string"
+    ),
     "pauses": {"before": 0, "after": 0.1},
     "provider": {
         "type": "process",
         "path": sys.executable,
-        "arguments": "-c 'import sys; print(sys.argv)' --empty --number 1 --string 'with spaces' --string 'a second string with the same option'",
+        "arguments": (
+            "-c 'import sys; print(sys.argv)' --empty --number 1 --string 'with spaces'"
+            " --string 'a second string with the same option'"
+        ),
         "timeout": 1,
     },
 }

@@ -41,7 +41,9 @@ def test_process_not_utf8_cannot_fail():
             "provider": {
                 "type": "process",
                 "path": "python",
-                "arguments": "-c \"import sys; sys.stdout.buffer.write(bytes('é', 'latin-1'))\"",
+                "arguments": (
+                    "-c \"import sys; sys.stdout.buffer.write(bytes('é', 'latin-1'))\""
+                ),
             }
         },
         None,
