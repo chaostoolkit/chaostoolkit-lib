@@ -4,6 +4,12 @@ from collections import ChainMap
 from string import Template
 from typing import Any, Dict, List, Mapping, Tuple, Union
 
+import yaml
+from logzero import logger
+
+from chaoslib.exceptions import ActivityFailed
+from chaoslib.types import Configuration, ConfigVars, Secrets, SecretVars
+
 HAS_CHARDET = True
 try:
     import cchardet as chardet
@@ -12,7 +18,6 @@ except ImportError:
         import chardet
     except ImportError:
         HAS_CHARDET = False
-from logzero import logger
 
 try:
     import simplejson as json
@@ -21,10 +26,6 @@ except ImportError:
     import json
     from json.decoder import JSONDecodeError
 
-import yaml
-
-from chaoslib.exceptions import ActivityFailed
-from chaoslib.types import Configuration, ConfigVars, Secrets, SecretVars
 
 __all__ = ["__version__", "decode_bytes", "substitute", "merge_vars", "convert_vars"]
 __version__ = "1.21.0"
