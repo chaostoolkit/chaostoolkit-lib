@@ -37,8 +37,6 @@ def test_notify_to_http_endpoint():
 @patch("chaoslib.notification.logger", autospec=True)
 def test_notify_to_http_endpoint_can_timeout(logger):
     url = "http://example.com"
-    payload = {"msg": "hello", "ts": str(time.time())}
-    event_payload = {"event": str(RunFlowEvent.RunStarted), "payload": payload}
 
     exc_mock = requests.exceptions.ConnectTimeout()
     with requests_mock.mock() as m:
@@ -54,7 +52,6 @@ def test_notify_to_http_endpoint_can_timeout(logger):
 
 @patch("chaoslib.notification.logger", autospec=True)
 def test_notify_to_http_endpoint_requires_a_url(logger):
-    url = "http://example.com"
     payload = {"msg": "hello", "ts": str(time.time())}
     event_payload = {"event": str(RunFlowEvent.RunStarted), "payload": payload}
     with requests_mock.mock() as m:
@@ -69,8 +66,6 @@ def test_notify_to_http_endpoint_requires_a_url(logger):
 @patch("chaoslib.notification.logger", autospec=True)
 def test_notify_to_http_endpoint_may_fail(logger):
     url = "http://example.com"
-    payload = {"msg": "hello", "ts": str(time.time())}
-    event_payload = {"event": str(RunFlowEvent.RunStarted), "payload": payload}
     with requests_mock.mock() as m:
         m.post("http://example.com", status_code=404, text="boom")
 
@@ -84,8 +79,6 @@ def test_notify_to_http_endpoint_may_fail(logger):
 
 @patch("fixtures.notifier.logger", autospec=True)
 def test_notify_via_plugin(logger):
-    payload = {"msg": "hello", "ts": str(time.time())}
-    event_payload = {"event": str(RunFlowEvent.RunStarted), "payload": payload}
     notify(
         {"notifications": [{"type": "plugin", "module": "fixtures.notifier"}]},
         RunFlowEvent.RunStarted,
@@ -95,8 +88,6 @@ def test_notify_via_plugin(logger):
 
 @patch("fixtures.notifier.logger", autospec=True)
 def test_notify_via_plugin_with_non_default_func_name(logger):
-    payload = {"msg": "hello", "ts": str(time.time())}
-    event_payload = {"event": str(RunFlowEvent.RunStarted), "payload": payload}
     notify(
         {
             "notifications": [
@@ -114,8 +105,6 @@ def test_notify_via_plugin_with_non_default_func_name(logger):
 
 @patch("chaoslib.notification.logger", autospec=True)
 def test_notify_via_plugin_failed_to_import_plugin(logger):
-    payload = {"msg": "hello", "ts": str(time.time())}
-    event_payload = {"event": str(RunFlowEvent.RunStarted), "payload": payload}
     notify(
         {"notifications": [{"type": "plugin", "module": "fixtures.notifier___"}]},
         RunFlowEvent.RunStarted,
@@ -130,8 +119,6 @@ def test_notify_via_plugin_failed_to_import_plugin(logger):
 
 @patch("chaoslib.notification.logger", autospec=True)
 def test_notify_via_plugin_failed_to_import_func(logger):
-    payload = {"msg": "hello", "ts": str(time.time())}
-    event_payload = {"event": str(RunFlowEvent.RunStarted), "payload": payload}
     notify(
         {
             "notifications": [

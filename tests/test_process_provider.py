@@ -17,7 +17,6 @@ def setup_module(module):
 
     - create the dummy script that can be used as process action
     """
-    path = "./tests/script.sh"
     with open(dummy_script, "w") as f:
         f.write("#!/bin/bash\n")
         f.write("exit 0\n")
@@ -89,7 +88,7 @@ def test_process_cwd_relative_path():
 
 @patch("chaoslib.provider.process.logger")
 def test_process_non_exit_zero_warning(logger):
-    result = run_process_activity(
+    run_process_activity(
         {
             "provider": {
                 "type": "process",
