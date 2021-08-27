@@ -2,7 +2,7 @@
 import os
 from copy import deepcopy
 
-from fixtures.actions import DoNothingAction, EchoAction, FailAction, InterruptAction
+from fixtures.actions import DoNothingAction, EchoAction, FailAction
 from fixtures.probes import (
     BackgroundPythonModuleProbe,
     BackgroundPythonModuleProbeWithLongPause,

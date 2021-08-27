@@ -1,16 +1,11 @@
 # -*- coding: utf-8 -*-
 import json
-import os
 import tempfile
-from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
-from typing import Any, Dict, List
 from unittest.mock import patch
 
-import logzero
 import pytest
 from fixtures import experiments
-from fixtures.controls import dummy as DummyControl
 
 from chaoslib.activity import execute_activity
 from chaoslib.control import (
@@ -23,23 +18,11 @@ from chaoslib.control import (
     initialize_controls,
     initialize_global_controls,
     load_global_controls,
-    validate_controls,
 )
 from chaoslib.control.python import validate_python_control
 from chaoslib.exceptions import InterruptExecution, InvalidActivity
 from chaoslib.experiment import ensure_experiment_is_valid, run_experiment
 from chaoslib.loader import load_experiment
-from chaoslib.types import (
-    Activity,
-    Configuration,
-    Control,
-    Experiment,
-    Hypothesis,
-    Journal,
-    Run,
-    Secrets,
-    Settings,
-)
 
 
 def test_initialize_controls_will_configure_a_control():

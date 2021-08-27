@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-import sys
 import warnings
 from unittest.mock import patch
 
-import pytest
 from fixtures import experiments
 
 from chaoslib import deprecation, experiment

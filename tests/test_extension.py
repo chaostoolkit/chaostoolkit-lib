@@ -5,7 +5,6 @@ from fixtures import experiments
 from chaoslib.exceptions import InvalidExperiment
 from chaoslib.extension import (
     get_extension,
-    has_extension,
     merge_extension,
     remove_extension,
     set_extension,

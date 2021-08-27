@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
-import os.path
 import signal
-import sys
 import tempfile
 import types
 from datetime import datetime
@@ -10,11 +8,10 @@ from datetime import datetime
 import pytest
 import requests_mock
 import yaml
-from fixtures import config, experiments
+from fixtures import experiments
 
 from chaoslib.activity import run_activities
 from chaoslib.exceptions import (
-    ActivityFailed,
     InterruptExecution,
     InvalidActivity,
     InvalidExperiment,

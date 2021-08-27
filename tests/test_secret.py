@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-from unittest.mock import ANY, MagicMock, mock_open, patch
+from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
 from fixtures import config
