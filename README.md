@@ -144,12 +144,13 @@ seeks [discussions][join] and continuous improvement.
 [join]: https://join.chaostoolkit.org/
 
 From a code perspective, if you wish to contribute, you will need to run a 
-Python 3.5+ environment. Then, fork this repository and submit a PR. The
-project cares for code readability and checks the code style to match best
-practices defined in [PEP8][pep8]. Please also make sure you provide tests
-whenever you submit a PR so we keep the code reliable.
+Python 3.6+ environment. Please, fork this project, write unit tests to cover
+the proposed changes, implement the changes, ensure they meet the formatting
+standards set out by `black`, `flake8`, and `isort`, add an entry into 
+`CHANGELOG.md`, and then raise a PR to the repository for review.
 
-[pep8]: https://pycodestyle.readthedocs.io/en/latest/
+Please refer to the [formatting](#formatting-and-linting) section for more
+information on the formatting standards.
 
 The Chaos Toolkit projects require all contributors must sign a
 [Developer Certificate of Origin][dco] on each commit they would like to merge
@@ -169,13 +170,7 @@ those dependencies.
 
 
 ```console
-$ pip install -r requirements-dev.txt -r requirements.txt
-```
-
-Then, point your environment to this directory:
-
-```console
-$ pip install -e .
+$ make install-dev
 ```
 
 Now, you can edit the files and they will be automatically be seen by your
@@ -186,5 +181,33 @@ environment, even when running from the `chaos` command locally.
 To run the tests for the project execute the following:
 
 ```
-$ pytest
+$ make tests
 ```
+
+### Formatting and Linting
+
+We use a combination of [`black`][black], [`flake8`][flake8], and [`isort`][isort]
+to both lint and format this repositories code.
+
+[black]: https://github.com/psf/black
+[flake8]: https://github.com/PyCQA/flake8
+[isort]: https://github.com/PyCQA/isort
+
+Before raising a Pull Request, we recommend you run formatting against your
+code with:
+
+```console
+$ make format
+```
+
+This will automatically format any code that doesn't adhere to the formatting
+standards.
+
+As some things are not picked up by the formatting, we also recommend you run:
+
+```console
+$ make lint
+```
+
+To ensure that any unused import statements/strings that are too long, etc.
+are also picked up.
