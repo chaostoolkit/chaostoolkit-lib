@@ -206,7 +206,7 @@ def test_tolerance_regex_stderr_process():
     )
 
 
-def test_tolerance_regex_stdout_process_needs_to_match():
+def test_tolerance_regex_stderr_process_needs_to_match():
     t = {"type": "regex", "target": "stderr", "pattern": "[0-9]{2}"}
     ensure_hypothesis_tolerance_is_valid(t)
     assert (
