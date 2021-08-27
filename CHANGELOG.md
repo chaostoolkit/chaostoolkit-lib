@@ -4,6 +4,11 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.21.0...HEAD
 
+### Changed
+
+* Switched from pycodestyle/pylama to `black`, `flake8`, `isort`
+* Update CI builds to build, lint, and test
+
 ## [1.21.0][] - 2021-08-23
 
 [1.21.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.20.0...1.21.0
@@ -323,7 +328,7 @@ Therefore the experiment continues to run. [#210][ctk210]
   was interrupted from a control. With the strategies, you can now decide
   that they are always applied, never or only when the experiment deviated.
   This is a flag passed to the settings as follows:
-  
+
   ```
   runtime:
     rollbacks:
@@ -402,13 +407,13 @@ Therefore the experiment continues to run. [#210][ctk210]
 ### Added
 
 - Optional default value for environment variable in configuration
-- Warn the user for an action process returning a non-zero exit code 
+- Warn the user for an action process returning a non-zero exit code
 - Support for process path relative to homedir ~
 - Indicate path in validation when path is not found nor executable [#159][159]
 
 ### Changed
 
-- Changed the method's one-step minimum requirement. 
+- Changed the method's one-step minimum requirement.
   An experiment with an empty method (without any activities) is now valid.
 
 [159]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/159
@@ -520,7 +525,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 
 ### Changed
 
-- Fix to ensure a control's `configuration` parameter is populated when it the 
+- Fix to ensure a control's `configuration` parameter is populated when it the
   control is being `configured` [#114][114]
 - Load and apply global controls, those declared in the settings, from the
   `run_experiment` function rather than out of band [#116][116]
@@ -587,7 +592,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 #### Added
 
 - a new tolerance type called `range` to support scenarios such as:
-  
+
   value type is:
   ```
   {
@@ -952,7 +957,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 
 ### Changed
 
--   Log a message when loading the configuration 
+-   Log a message when loading the configuration
 -   Raise `InvalidExperiment` when a configuration or secret references a key
     in the environment and that key does not exist (it may not be set however)
     [#40][40]. This bails the experiment at validation time so before it runs.
