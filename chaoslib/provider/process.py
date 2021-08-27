@@ -12,12 +12,12 @@ from chaoslib import decode_bytes, substitute
 from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.types import Activity, Configuration, Secrets
 
-
 __all__ = ["run_process_activity", "validate_process_activity"]
 
 
-def run_process_activity(activity: Activity, configuration: Configuration,
-                         secrets: Secrets) -> Any:
+def run_process_activity(
+    activity: Activity, configuration: Configuration, secrets: Secrets
+) -> Any:
     """
     Run the a process activity.
 
@@ -52,8 +52,13 @@ def run_process_activity(activity: Activity, configuration: Configuration,
     try:
         logger.debug("Running: {a}".format(a=str(arguments)))
         proc = subprocess.run(
-            arguments, timeout=timeout, stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE, env=os.environ, shell=shell)
+            arguments,
+            timeout=timeout,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=os.environ,
+            shell=shell,
+        )
     except subprocess.TimeoutExpired:
         raise ActivityFailed("process activity took too long to complete")
 
@@ -66,16 +71,13 @@ def run_process_activity(activity: Activity, configuration: Configuration,
         logger.warning(
             "This process returned a non-zero exit code. "
             "This may indicate some error and not what you expected. "
-            "Please have a look at the logs.")
+            "Please have a look at the logs."
+        )
 
     stdout = decode_bytes(proc.stdout)
     stderr = decode_bytes(proc.stderr)
 
-    return {
-        "status": proc.returncode,
-        "stdout": stdout,
-        "stderr": stderr
-    }
+    return {"status": proc.returncode, "stdout": stdout, "stderr": stderr}
 
 
 def validate_process_activity(activity: Activity):
@@ -102,9 +104,13 @@ def validate_process_activity(activity: Activity):
     if not path:
         raise InvalidActivity(
             "path '{path}' cannot be found, in activity '{name}'".format(
-                path=raw_path, name=name))
+                path=raw_path, name=name
+            )
+        )
 
     if not os.access(path, os.X_OK):
         raise InvalidActivity(
             "no access permission to '{path}', in activity '{name}'".format(
-                path=raw_path, name=name))
+                path=raw_path, name=name
+            )
+        )

@@ -11,12 +11,12 @@ from chaoslib import substitute
 from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.types import Activity, Configuration, Secrets
 
-
 __all__ = ["run_python_activity", "validate_python_activity"]
 
 
-def run_python_activity(activity: Activity, configuration: Configuration,
-                        secrets: Secrets) -> Any:
+def run_python_activity(
+    activity: Activity, configuration: Configuration, secrets: Secrets
+) -> Any:
     """
     Run a Python activity.
 
@@ -33,7 +33,9 @@ def run_python_activity(activity: Activity, configuration: Configuration,
     try:
         logger.debug(
             "Activity '{}' loaded from '{}'".format(
-                activity.get("name"), inspect.getfile(func)))
+                activity.get("name"), inspect.getfile(func)
+            )
+        )
     except TypeError:
         pass
 
@@ -55,9 +57,8 @@ def run_python_activity(activity: Activity, configuration: Configuration,
         return func(**arguments)
     except Exception as x:
         raise ActivityFailed(
-            traceback.format_exception_only(
-                type(x), x)[0].strip()).with_traceback(
-                    sys.exc_info()[2])
+            traceback.format_exception_only(type(x), x)[0].strip()
+        ).with_traceback(sys.exc_info()[2])
 
 
 def validate_python_activity(activity: Activity):  # noqa: C901
@@ -89,15 +90,16 @@ def validate_python_activity(activity: Activity):  # noqa: C901
     try:
         mod = importlib.import_module(mod_name)
     except ImportError:
-        raise InvalidActivity("could not find Python module '{mod}' "
-                              "in activity '{name}'".format(
-                                  mod=mod_name, name=activity_name))
+        raise InvalidActivity(
+            "could not find Python module '{mod}' "
+            "in activity '{name}'".format(mod=mod_name, name=activity_name)
+        )
 
     found_func = False
     arguments = provider.get("arguments", {})
-    candidates = set(
-        inspect.getmembers(mod, inspect.isfunction)).union(
-            inspect.getmembers(mod, inspect.isbuiltin))
+    candidates = set(inspect.getmembers(mod, inspect.isfunction)).union(
+        inspect.getmembers(mod, inspect.isbuiltin)
+    )
     for (name, cb) in candidates:
         if name == func:
             found_func = True
@@ -128,13 +130,16 @@ def validate_python_activity(activity: Activity):  # noqa: C901
                     arg = msg.rsplit(":", 1)[1].strip()
                     raise InvalidActivity(
                         "required argument {arg} is missing from "
-                        "activity '{name}'".format(arg=arg, name=name))
+                        "activity '{name}'".format(arg=arg, name=name)
+                    )
                 elif "unexpected" in msg:
                     arg = msg.rsplit(" ", 1)[1].strip()
                     raise InvalidActivity(
                         "argument {arg} is not part of the "
                         "function signature in activity '{name}'".format(
-                            arg=arg, name=name))
+                            arg=arg, name=name
+                        )
+                    )
                 else:
                     # another error? let's fail fast
                     raise
@@ -144,5 +149,6 @@ def validate_python_activity(activity: Activity):  # noqa: C901
         raise InvalidActivity(
             "The python module '{mod}' does not expose a function called "
             "'{func}' in {type} '{name}'".format(
-                mod=mod_name, func=func, type=activity['type'],
-                name=activity_name))
+                mod=mod_name, func=func, type=activity["type"], name=activity_name
+            )
+        )

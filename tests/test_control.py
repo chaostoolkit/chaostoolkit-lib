@@ -1,38 +1,33 @@
 # -*- coding: utf-8 -*-
-from copy import deepcopy
-from concurrent.futures import ThreadPoolExecutor
 import json
-import os
 import tempfile
-from typing import Any, Dict, List
+from copy import deepcopy
 from unittest.mock import patch
 
-import logzero
 import pytest
+from fixtures import experiments
 
 from chaoslib.activity import execute_activity
-from chaoslib.control import initialize_controls, cleanup_controls, \
-    validate_controls, controls, get_all_activities, get_context_controls, \
-    initialize_global_controls, cleanup_global_controls, get_global_controls, \
-    load_global_controls
+from chaoslib.control import (
+    cleanup_controls,
+    cleanup_global_controls,
+    controls,
+    get_all_activities,
+    get_context_controls,
+    get_global_controls,
+    initialize_controls,
+    initialize_global_controls,
+    load_global_controls,
+)
 from chaoslib.control.python import validate_python_control
 from chaoslib.exceptions import InterruptExecution, InvalidActivity
-from chaoslib.experiment import ensure_experiment_is_valid, \
-    run_experiment
+from chaoslib.experiment import ensure_experiment_is_valid, run_experiment
 from chaoslib.loader import load_experiment
-from chaoslib.types import Activity, Configuration, Control, \
-    Experiment, Hypothesis, Journal, Run, Secrets,  Settings
-
-from fixtures import  experiments
-from fixtures.controls import dummy as DummyControl
 
 
 def test_initialize_controls_will_configure_a_control():
     exp = deepcopy(experiments.ExperimentWithControls)
-    initialize_controls(
-        exp, configuration={
-            "dummy-key": "dummy-value"
-        })
+    initialize_controls(exp, configuration={"dummy-key": "dummy-value"})
     assert exp["control-value"] == "dummy-value"
     cleanup_controls(exp)
 
@@ -216,29 +211,27 @@ def test_not_automatic_does_not_go_deep_down_the_tree():
         assert len(controls) == 0
 
 
-@patch('chaoslib.control.python.logger', autospec=True)
+@patch("chaoslib.control.python.logger", autospec=True)
 def test_validate_python_control_must_be_loadable(logger):
-    validate_python_control({
-        "name": "a-python-control",
-        "provider": {
-            "type": "python",
-            "module": "blah.blah"
+    validate_python_control(
+        {
+            "name": "a-python-control",
+            "provider": {"type": "python", "module": "blah.blah"},
         }
-    })
+    )
     args = logger.warning.call_args
-    msg = "Could not find Python module 'blah.blah' in control " \
+    msg = (
+        "Could not find Python module 'blah.blah' in control "
         "'a-python-control'. Did you install the Python module?"
+    )
     assert msg in args[0][0]
 
 
 def test_validate_python_control_needs_a_module():
     with pytest.raises(InvalidActivity):
-        validate_python_control({
-            "name": "a-python-control",
-            "provider": {
-                "type": "python"
-            }
-        })
+        validate_python_control(
+            {"name": "a-python-control", "provider": {"type": "python"}}
+        )
 
 
 def test_controls_can_access_experiment():
@@ -293,12 +286,9 @@ def test_load_global_controls_from_settings():
         "dummy-key": "hello there",
         "controls": {
             "dummy": {
-                "provider": {
-                    "type": "python",
-                    "module": "fixtures.controls.dummy"
-                }
+                "provider": {"type": "python", "module": "fixtures.controls.dummy"}
             }
-        }
+        },
     }
     load_global_controls(settings)
     run_experiment(exp, settings)
@@ -318,10 +308,7 @@ def test_get_globally_loaded_controls_from_settings():
     settings = {
         "controls": {
             "dummy": {
-                "provider": {
-                    "type": "python",
-                    "module": "fixtures.controls.dummy"
-                }
+                "provider": {"type": "python", "module": "fixtures.controls.dummy"}
             }
         }
     }
@@ -351,10 +338,7 @@ def test_load_global_controls_from_settings_configured_via_exp_config():
     settings = {
         "controls": {
             "dummy": {
-                "provider": {
-                    "type": "python",
-                    "module": "fixtures.controls.dummy"
-                }
+                "provider": {"type": "python", "module": "fixtures.controls.dummy"}
             }
         }
     }
@@ -373,9 +357,7 @@ def test_load_global_controls_from_settings_configured_via_exp_config():
 def test_apply_controls_even_on_background_activity():
     exp = deepcopy(experiments.ExperimentNoControls)
     exp["method"][0]["background"] = True
-    exp["method"][0]["pauses"] = {
-        "after": 1
-    }
+    exp["method"][0]["pauses"] = {"after": 1}
     activities = get_all_activities(exp)
 
     for activity in activities:
@@ -387,12 +369,9 @@ def test_apply_controls_even_on_background_activity():
         "dummy-key": "hello there",
         "controls": {
             "dummy": {
-                "provider": {
-                    "type": "python",
-                    "module": "fixtures.controls.dummy"
-                }
+                "provider": {"type": "python", "module": "fixtures.controls.dummy"}
             }
-        }
+        },
     }
     load_global_controls(settings)
     run_experiment(exp, settings)
@@ -409,36 +388,42 @@ def test_apply_controls_even_on_background_activity():
 def test_control_cleanup_cannot_fail_the_experiment():
     exp = deepcopy(experiments.ExperimentNoControls)
     try:
-        run_experiment(exp, settings={
-            "dummy-key": "hello there",
-            "controls": {
-                "dummy": {
-                    "provider": {
-                        "type": "python",
-                        "module": "fixtures.controls.dummy_with_failing_cleanup"
+        run_experiment(
+            exp,
+            settings={
+                "dummy-key": "hello there",
+                "controls": {
+                    "dummy": {
+                        "provider": {
+                            "type": "python",
+                            "module": "fixtures.controls.dummy_with_failing_cleanup",
+                        }
                     }
-                }
-            }
-        })
-    except:
+                },
+            },
+        )
+    except Exception:
         pytest.fail("Failed to run experiment with a broken cleanup control")
 
 
 def test_control_initialization_cannot_fail_the_experiment():
     exp = deepcopy(experiments.ExperimentNoControls)
     try:
-        run_experiment(exp, settings={
-            "dummy-key": "hello there",
-            "controls": {
-                "dummy": {
-                    "provider": {
-                        "type": "python",
-                        "module": "fixtures.controls.dummy_with_failing_init"
+        run_experiment(
+            exp,
+            settings={
+                "dummy-key": "hello there",
+                "controls": {
+                    "dummy": {
+                        "provider": {
+                            "type": "python",
+                            "module": "fixtures.controls.dummy_with_failing_init",
+                        }
                     }
-                }
-            }
-        })
-    except:
+                },
+            },
+        )
+    except Exception:
         pytest.fail("Failed to run experiment with a broken init control")
 
 
@@ -450,16 +435,13 @@ def test_control_failing_its_initialization_must_not_be_registered():
             "dummy-failed": {
                 "provider": {
                     "type": "python",
-                    "module": "fixtures.controls.dummy_with_failing_init"
+                    "module": "fixtures.controls.dummy_with_failing_init",
                 }
             },
             "dummy": {
-                "provider": {
-                    "type": "python",
-                    "module": "fixtures.controls.dummy"
-                }
-            }
-        }
+                "provider": {"type": "python", "module": "fixtures.controls.dummy"}
+            },
+        },
     }
     load_global_controls(settings)
     run_experiment(exp, settings)
@@ -481,7 +463,7 @@ def test_control_must_not_rest_state_before_calling_the_after_side():
             "dummy": {
                 "provider": {
                     "type": "python",
-                    "module": "fixtures.controls.dummy_need_access_to_end_state"
+                    "module": "fixtures.controls.dummy_need_access_to_end_state",
                 }
             }
         }
@@ -491,10 +473,10 @@ def test_control_must_not_rest_state_before_calling_the_after_side():
 
     before_hypo_result = journal["steady_states"]["before"]
     assert "after_hypothesis_control" in before_hypo_result
-    assert before_hypo_result["after_hypothesis_control"] == True
+    assert before_hypo_result["after_hypothesis_control"] is True
 
     assert "after_experiment_control" in journal
-    assert journal["after_experiment_control"] == True
+    assert journal["after_experiment_control"] is True
 
 
 def test_controls_can_take_arguments_at_initialization():
@@ -516,7 +498,7 @@ def test_controls_on_loading_experiment():
             "dummy": {
                 "provider": {
                     "type": "python",
-                    "module": "fixtures.controls.dummy_fail_loading_experiment"
+                    "module": "fixtures.controls.dummy_fail_loading_experiment",
                 }
             }
         }
@@ -538,7 +520,7 @@ def test_controls_on_loaded_experiment():
             "dummy": {
                 "provider": {
                     "type": "python",
-                    "module": "fixtures.controls.dummy_retitle_experiment_on_loading"
+                    "module": "fixtures.controls.dummy_retitle_experiment_on_loading",
                 }
             }
         }
@@ -548,8 +530,7 @@ def test_controls_on_loaded_experiment():
 
     with tempfile.NamedTemporaryFile(suffix=".json") as f:
         try:
-            f.write(
-                json.dumps(experiments.ExperimentNoControls).encode('utf-8'))
+            f.write(json.dumps(experiments.ExperimentNoControls).encode("utf-8"))
             f.seek(0)
             experiment = load_experiment(f.name)
             assert experiment["title"] == "BOOM I changed it"
@@ -574,13 +555,22 @@ def test_secrets_are_passed_to_all_control_hookpoints():
     run_experiment(exp)
 
     secrets = exp["secrets"]
-    for hookpoint in ("configure_control", "before_experiment_control",
-            "after_experiment_control", "before_method_control",
-            "after_method_control", "before_rollback_control",
-            "after_rollback_control", "before_hypothesis_control",
-            "after_hypothesis_control", "before_activity_control",
-            "after_activity_control"):
-        assert exp["{}_secrets".format(hookpoint)] == secrets, "{} was not provided the secrets".format(hookpoint)
+    for hookpoint in (
+        "configure_control",
+        "before_experiment_control",
+        "after_experiment_control",
+        "before_method_control",
+        "after_method_control",
+        "before_rollback_control",
+        "after_rollback_control",
+        "before_hypothesis_control",
+        "after_hypothesis_control",
+        "before_activity_control",
+        "after_activity_control",
+    ):
+        assert (
+            exp["{}_secrets".format(hookpoint)] == secrets
+        ), "{} was not provided the secrets".format(hookpoint)
 
 
 def test_control_can_be_decorated_functions():

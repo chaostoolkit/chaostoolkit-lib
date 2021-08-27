@@ -10,8 +10,9 @@ from chaoslib.types import Configuration
 __all__ = ["load_configuration"]
 
 
-def load_configuration(config_info: Dict[str, str],
-                       extra_vars: Dict[str, Any] = None) -> Configuration:
+def load_configuration(
+    config_info: Dict[str, str], extra_vars: Dict[str, Any] = None
+) -> Configuration:
     """
     Load the configuration. The `config_info` parameter is a mapping from
     key strings to value as strings or dictionaries. In the former case, the
@@ -61,11 +62,15 @@ def load_configuration(config_info: Dict[str, str],
             if value["type"] == "env":
                 env_key = value["key"]
                 env_default = value.get("default")
-                if (env_key not in env) and (env_default is None) and \
-                        (key not in extra_vars):
+                if (
+                    (env_key not in env)
+                    and (env_default is None)
+                    and (key not in extra_vars)
+                ):
                     raise InvalidExperiment(
                         "Configuration makes reference to an environment key"
-                        " that does not exist: {}".format(env_key))
+                        " that does not exist: {}".format(env_key)
+                    )
                 conf[key] = extra_vars.get(key, env.get(env_key, env_default))
         else:
             conf[key] = extra_vars.get(key, value)

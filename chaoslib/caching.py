@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 # Builds an in-memory cache of all declared activities so they can be
 # referenced from other places in the experiment
-from functools import wraps
 import inspect
-from typing import Any, List, Dict, Union
+from functools import wraps
+from typing import Any, Dict, List, Union
 
 from logzero import logger
 
-from chaoslib.types import Activity, Experiment, Settings, Schedule, Strategy
-
+import chaoslib
+from chaoslib.types import Activity, Experiment, Schedule, Settings, Strategy
 
 __all__ = ["cache_activities", "clear_cache", "lookup_activity", "with_cache"]
 
@@ -24,8 +24,9 @@ def cache_activities(experiment: Experiment) -> List[Activity]:
     """
     logger.debug("Building activity cache...")
 
-    lot = experiment.get("method", []) + \
-        experiment.get("steady-state-hypothesis", {}).get("probes", [])
+    lot = experiment.get("method", []) + experiment.get(
+        "steady-state-hypothesis", {}
+    ).get("probes", [])
 
     for activity in lot:
         name = activity.get("name")
@@ -48,20 +49,22 @@ def with_cache(f):
     Ensure the activities cache is populated before calling the wrapped
     function.
     """
+
     @wraps(f)
-    def wrapped(experiment: Experiment, settings: Settings = None,
-                experiment_vars: Dict[str, Any] = None,
-                strategy: Strategy = Strategy.DEFAULT,
-                schedule: Schedule = None,
-                event_handlers: List['RunEventHandler'] = None):  #noqa: E0602
+    def wrapped(
+        experiment: Experiment,
+        settings: Settings = None,
+        experiment_vars: Dict[str, Any] = None,
+        strategy: Strategy = Strategy.DEFAULT,
+        schedule: Schedule = None,
+        event_handlers: List[chaoslib.run.RunEventHandler] = None,
+    ):
         try:
             if experiment:
                 cache_activities(experiment)
 
             sig = inspect.signature(f)
-            arguments = {
-                "experiment": experiment
-            }
+            arguments = {"experiment": experiment}
 
             if "settings" in sig.parameters:
                 arguments["settings"] = settings
@@ -76,6 +79,7 @@ def with_cache(f):
             return f(**arguments)
         finally:
             clear_cache()
+
     return wrapped
 
 

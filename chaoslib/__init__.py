@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
-from collections import ChainMap
 import os.path
+from collections import ChainMap
 from string import Template
 from typing import Any, Dict, List, Mapping, Tuple, Union
+
+import yaml
+from logzero import logger
+
+from chaoslib.exceptions import ActivityFailed
+from chaoslib.types import Configuration, ConfigVars, Secrets, SecretVars
 
 HAS_CHARDET = True
 try:
@@ -12,26 +18,24 @@ except ImportError:
         import chardet
     except ImportError:
         HAS_CHARDET = False
-from logzero import logger
+
 try:
     import simplejson as json
     from simplejson.errors import JSONDecodeError
 except ImportError:
     import json
     from json.decoder import JSONDecodeError
-import yaml
-
-from chaoslib.exceptions import ActivityFailed
-from chaoslib.types import Configuration, ConfigVars, Secrets, SecretVars
-
-__all__ = ["__version__", "decode_bytes", "substitute", "merge_vars",
-           "convert_vars"]
-__version__ = '1.21.0'
 
 
-def substitute(data: Union[None, str, Dict[str, Any], List],
-               configuration: Configuration,
-               secrets: Secrets) -> Dict[str, Any]:
+__all__ = ["__version__", "decode_bytes", "substitute", "merge_vars", "convert_vars"]
+__version__ = "1.21.0"
+
+
+def substitute(
+    data: Union[None, str, Dict[str, Any], List],
+    configuration: Configuration,
+    secrets: Secrets,
+) -> Dict[str, Any]:
     """
     Replace forms such as `${name}` with the first value found in either the
     `configuration` or `secrets` mappings within the given `data`.
@@ -88,8 +92,7 @@ def substitute_string(data: str, mapping: Mapping[str, Any]) -> Any:
     return TypedTemplate(data).safe_substitute(mapping)
 
 
-def substitute_dict(data: Dict[str, Any],
-                    mapping: Mapping[str, Any]) -> Dict[str, Any]:
+def substitute_dict(data: Dict[str, Any], mapping: Mapping[str, Any]) -> Dict[str, Any]:
     if not data:
         return data
 
@@ -106,8 +109,7 @@ def substitute_dict(data: Dict[str, Any],
     return args
 
 
-def substitute_in_sequence(data: List[Any],
-                           mapping: Mapping[str, Any]) -> List[Any]:
+def substitute_in_sequence(data: List[Any], mapping: Mapping[str, Any]) -> List[Any]:
     if not data:
         return data
 
@@ -124,7 +126,7 @@ def substitute_in_sequence(data: List[Any],
     return new_value
 
 
-def decode_bytes(data: bytes, default_encoding: str = 'utf-8') -> str:
+def decode_bytes(data: bytes, default_encoding: str = "utf-8") -> str:
     """
     Decode the given bytes and return the decoded unicode string or raises
     `ActivityFailed`.
@@ -136,22 +138,26 @@ def decode_bytes(data: bytes, default_encoding: str = 'utf-8') -> str:
     encoding = default_encoding
     if HAS_CHARDET:
         detected = chardet.detect(data) or {}
-        confidence = detected.get('confidence') or 0
+        confidence = detected.get("confidence") or 0
         if confidence >= 0.5:
-            encoding = detected['encoding']
+            encoding = detected["encoding"]
             logger.debug(
                 "Data encoding detected as '{}' "
-                "with a confidence of {}".format(encoding, confidence))
+                "with a confidence of {}".format(encoding, confidence)
+            )
 
     try:
         return data.decode(encoding)
     except UnicodeDecodeError:
         raise ActivityFailed(
-            "Failed to decode bytes using encoding '{}'".format(encoding))
+            "Failed to decode bytes using encoding '{}'".format(encoding)
+        )
 
 
-def merge_vars(var: Dict[str, Union[str, float, int, bytes]] = None,  # noqa: C901
-               var_files: List[str] = None) -> Tuple[ConfigVars, SecretVars]:
+def merge_vars(
+    var: Dict[str, Union[str, float, int, bytes]] = None,  # noqa: C901
+    var_files: List[str] = None,
+) -> Tuple[ConfigVars, SecretVars]:
     """
     Load configuration and secret values from the given set of variables.
     These values are applicable for substitution when the experiment runs.
@@ -198,7 +204,9 @@ def merge_vars(var: Dict[str, Union[str, float, int, bytes]] = None,  # noqa: C9
                 except yaml.YAMLError as y:
                     logger.error(
                         "Failed to parse variable file '{}': {}".format(
-                            var_file, str(y)))
+                            var_file, str(y)
+                        )
+                    )
                     continue
             elif ext in (".json"):
                 try:
@@ -206,7 +214,9 @@ def merge_vars(var: Dict[str, Union[str, float, int, bytes]] = None,  # noqa: C9
                 except JSONDecodeError as x:
                     logger.error(
                         "Failed to parse variable file '{}': {}".format(
-                            var_file, str(x)))
+                            var_file, str(x)
+                        )
+                    )
                     continue
 
             # process .env files
@@ -216,14 +226,14 @@ def merge_vars(var: Dict[str, Union[str, float, int, bytes]] = None,  # noqa: C9
                     if not line or line.startswith("#"):
                         continue
 
-                    k, v = line.split('=', 1)
+                    k, v = line.split("=", 1)
                     os.environ[k] = v
                     logger.debug(
                         "Inject environment variable '{}' from "
-                        "file '{}'".format(k, var_file))
+                        "file '{}'".format(k, var_file)
+                    )
             else:
-                logger.debug(
-                    "Reading configuration/secrets from {}".format(f.name))
+                logger.debug("Reading configuration/secrets from {}".format(f.name))
                 config_vars.update(data.get("configuration", {}))
                 secret_vars.update(data.get("secrets", {}))
 
@@ -246,28 +256,26 @@ def convert_vars(value: List[str]) -> Dict[str, Any]:  # noqa: C901
     var = {}
     for v in value:
         try:
-            k, v = v.split('=', 1)
-            if ':' in k:
-                k, typ = k.rsplit(':', 1)
+            k, v = v.split("=", 1)
+            if ":" in k:
+                k, typ = k.rsplit(":", 1)
                 try:
-                    if typ == 'str':
+                    if typ == "str":
                         pass
-                    elif typ == 'int':
+                    elif typ == "int":
                         v = int(v)
-                    elif typ == 'float':
+                    elif typ == "float":
                         v = float(v)
-                    elif typ == 'bytes':
-                        v = v.encode('utf-8')
+                    elif typ == "bytes":
+                        v = v.encode("utf-8")
                     else:
-                        raise ValueError(
-                            'var supports only: str, int, float and bytes')
+                        raise ValueError("var supports only: str, int, float and bytes")
                 except (TypeError, UnicodeEncodeError):
-                    raise ValueError(
-                        'var cannot convert value to required type')
+                    raise ValueError("var cannot convert value to required type")
             var[k] = v
         except ValueError:
             raise
         except Exception:
-            raise ValueError('var needs to be in the format name[:type]=value')
+            raise ValueError("var needs to be in the format name[:type]=value")
 
     return var

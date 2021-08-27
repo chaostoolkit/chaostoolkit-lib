@@ -1,20 +1,25 @@
 # -*- coding: utf-8 -*-
+import contextvars
 import os
 import os.path
 import re
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-import contextvars
-from logzero import logger
 import yaml
+from logzero import logger
 
 from chaoslib.types import Settings
 
-__all__ = ["get_loaded_settings", "load_settings", "save_settings",
-           "locate_settings_entry"]
+__all__ = [
+    "get_loaded_settings",
+    "load_settings",
+    "save_settings",
+    "locate_settings_entry",
+]
 CHAOSTOOLKIT_CONFIG_PATH = os.path.abspath(
-    os.path.expanduser("~/.chaostoolkit/settings.yaml"))
-loaded_settings = contextvars.ContextVar('loaded_settings', default={})
+    os.path.expanduser("~/.chaostoolkit/settings.yaml")
+)
+loaded_settings = contextvars.ContextVar("loaded_settings", default={})
 
 
 def load_settings(settings_path: str = CHAOSTOOLKIT_CONFIG_PATH) -> Settings:
@@ -23,8 +28,10 @@ def load_settings(settings_path: str = CHAOSTOOLKIT_CONFIG_PATH) -> Settings:
     when the file could not be found.
     """
     if not os.path.exists(settings_path):
-        logger.debug("The Chaos Toolkit settings file could not be found at "
-                     "'{c}'.".format(c=settings_path))
+        logger.debug(
+            "The Chaos Toolkit settings file could not be found at "
+            "'{c}'.".format(c=settings_path)
+        )
         return
 
     with open(settings_path) as f:
@@ -36,8 +43,7 @@ def load_settings(settings_path: str = CHAOSTOOLKIT_CONFIG_PATH) -> Settings:
             logger.error("Failed parsing YAML settings: {}".format(str(ye)))
 
 
-def save_settings(settings: Settings,
-                  settings_path: str = CHAOSTOOLKIT_CONFIG_PATH):
+def save_settings(settings: Settings, settings_path: str = CHAOSTOOLKIT_CONFIG_PATH):
     """
     Save chaostoolkit settings as a mapping of key/values, overwriting any file
     that may already be present.
@@ -47,7 +53,7 @@ def save_settings(settings: Settings,
     if not os.path.isdir(settings_dir):
         os.mkdir(settings_dir)
 
-    with open(settings_path, 'w') as outfile:
+    with open(settings_path, "w") as outfile:
         yaml.dump(settings, outfile, default_flow_style=False)
 
 
@@ -58,15 +64,9 @@ def get_loaded_settings() -> Settings:
     return loaded_settings.get()
 
 
-def locate_settings_entry(settings: Settings, key: str) \
-        -> Optional[
-            Tuple[
-                Union[Dict[str, Any], List],
-                Any,
-                Optional[str],
-                Optional[int]
-            ]
-           ]:
+def locate_settings_entry(
+    settings: Settings, key: str
+) -> Optional[Tuple[Union[Dict[str, Any], List], Any, Optional[str], Optional[int]]]:
     """
     Lookup the entry at the given dotted key in the provided settings and
     return a a tuple as follows:
@@ -100,11 +100,11 @@ def locate_settings_entry(settings: Settings, key: str) \
     last_index = None
     for part in parts:
         # we don't know to escape now that we have our part
-        part = part.replace('\\', '')
+        part = part.replace("\\", "")
         m = array_index.search(part)
         if m:
             # this is part with an index
-            part = part[:m.start()]
+            part = part[: m.start()]
             if part not in current:
                 return
             current = current.get(part)

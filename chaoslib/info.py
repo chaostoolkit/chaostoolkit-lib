@@ -9,10 +9,10 @@ except ImportError:
 __all__ = ["list_extensions"]
 
 
-info_fields = ['name', 'version', 'summary', 'license', 'author', 'url']
+info_fields = ["name", "version", "summary", "license", "author", "url"]
 
 
-class ExtensionInfo(namedtuple('ExtensionInfo', info_fields)):
+class ExtensionInfo(namedtuple("ExtensionInfo", info_fields)):
     __slots__ = ()
 
 
@@ -37,7 +37,7 @@ def list_extensions() -> List[ExtensionInfo]:
     seen = []
     for dist in distros:
         info = dist.metadata
-        name = info['Name']
+        name = info["Name"]
         if name == "chaostoolkit-lib":
             continue
         if name in seen:
@@ -50,6 +50,7 @@ def list_extensions() -> List[ExtensionInfo]:
                 summary=info["Summary"],
                 license=info["License"],
                 author=info["Author"],
-                url=info["Home-page"])
+                url=info["Home-page"],
+            )
             infos.append(ext)
     return infos

@@ -1,8 +1,14 @@
-import os
-from typing import Any, Callable, Dict, List, Union
+from typing import Any, Dict, List
 
-from chaoslib.types import Activity, Configuration, \
-    Experiment, Hypothesis, Journal, Run, Secrets, Settings
+from chaoslib.types import (
+    Activity,
+    Configuration,
+    Experiment,
+    Hypothesis,
+    Journal,
+    Run,
+    Secrets,
+)
 
 value_from_config = None
 
@@ -31,8 +37,9 @@ def before_hypothesis_control(experiment: Experiment, context: Hypothesis, **kwa
     context["has_experiment_before"] = experiment is not None
 
 
-def after_hypothesis_control(experiment: Experiment, context: Hypothesis,
-                             state: Dict[str, Any], **kwargs):
+def after_hypothesis_control(
+    experiment: Experiment, context: Hypothesis, state: Dict[str, Any], **kwargs
+):
     context["after_hypothesis_control"] = True
     state["after_hypothesis_control"] = True
     context["has_experiment_after"] = experiment is not None
@@ -61,8 +68,9 @@ def before_activity_control(experiment: Experiment, context: Activity, **kwargs)
     context["has_experiment_before"] = experiment is not None
 
 
-def after_activity_control(experiment: Experiment, context: Activity,
-                           state: Run, **kwargs):
+def after_activity_control(
+    experiment: Experiment, context: Activity, state: Run, **kwargs
+):
     context["after_activity_control"] = True
     state["after_activity_control"] = True
     context["has_experiment_after"] = experiment is not None

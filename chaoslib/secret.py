@@ -3,8 +3,10 @@ import os
 from typing import Any, Dict
 
 from logzero import logger
+
 try:
     import hvac
+
     HAS_HVAC = True
 except ImportError:
     HAS_HVAC = False
@@ -15,9 +17,11 @@ from chaoslib.types import Configuration, Secrets
 __all__ = ["load_secrets", "create_vault_client"]
 
 
-def load_secrets(secrets_info: Dict[str, Dict[str, str]],
-                 configuration: Configuration = None,
-                 extra_vars: Dict[str, Any] = None) -> Secrets:
+def load_secrets(
+    secrets_info: Dict[str, Dict[str, str]],
+    configuration: Configuration = None,
+    extra_vars: Dict[str, Any] = None,
+) -> Secrets:
     """
     Takes the the secrets definition from an experiment and tries to load
     the secrets whenever they relate to external sources such as environmental
@@ -83,8 +87,7 @@ def load_secrets(secrets_info: Dict[str, Dict[str, str]],
     secrets = {}
     extra_vars = extra_vars or {}
     for loader in loaders:
-        for key, value in loader(
-                secrets_info, configuration, extra_vars).items():
+        for key, value in loader(secrets_info, configuration, extra_vars).items():
             if key not in secrets:
                 secrets[key] = {}
             secrets[key].update(value)
@@ -94,9 +97,11 @@ def load_secrets(secrets_info: Dict[str, Dict[str, str]],
     return secrets
 
 
-def load_inline_secrets(secrets_info: Dict[str, Dict[str, str]],
-                        configuration: Configuration = None,
-                        extra_vars: Dict[str, Any] = None) -> Secrets:
+def load_inline_secrets(
+    secrets_info: Dict[str, Dict[str, str]],
+    configuration: Configuration = None,
+    extra_vars: Dict[str, Any] = None,
+) -> Secrets:
     """
     Load secrets that are inlined in the experiments.
     """
@@ -106,11 +111,9 @@ def load_inline_secrets(secrets_info: Dict[str, Dict[str, str]],
         secrets[target] = {}
         for (key, value) in keys.items():
             if not isinstance(value, dict):
-                secrets[target][key] = extra_vars.get(target, {}).get(
-                    key, value)
+                secrets[target][key] = extra_vars.get(target, {}).get(key, value)
             elif value.get("type") not in ("env", "vault"):
-                secrets[target][key] = extra_vars.get(target, {}).get(
-                    key, value)
+                secrets[target][key] = extra_vars.get(target, {}).get(key, value)
 
         if not secrets[target]:
             secrets.pop(target)
@@ -118,9 +121,11 @@ def load_inline_secrets(secrets_info: Dict[str, Dict[str, str]],
     return secrets
 
 
-def load_secrets_from_env(secrets_info: Dict[str, Dict[str, str]],
-                          configuration: Configuration = None,
-                          extra_vars: Dict[str, Any] = None) -> Secrets:
+def load_secrets_from_env(
+    secrets_info: Dict[str, Dict[str, str]],
+    configuration: Configuration = None,
+    extra_vars: Dict[str, Any] = None,
+) -> Secrets:
     env = os.environ
     secrets = {}
 
@@ -130,13 +135,14 @@ def load_secrets_from_env(secrets_info: Dict[str, Dict[str, str]],
         for (key, value) in keys.items():
             if isinstance(value, dict) and value.get("type") == "env":
                 env_key = value["key"]
-                if (env_key not in env) and \
-                        (key not in extra_vars.get("target", {})):
+                if (env_key not in env) and (key not in extra_vars.get("target", {})):
                     raise InvalidExperiment(
                         "Secrets make reference to an environment key "
-                        "that does not exist: {}".format(env_key))
+                        "that does not exist: {}".format(env_key)
+                    )
                 secrets[target][key] = extra_vars.get(target, {}).get(
-                    key, env.get(env_key))
+                    key, env.get(env_key)
+                )
 
         if not secrets[target]:
             secrets.pop(target)
@@ -144,9 +150,11 @@ def load_secrets_from_env(secrets_info: Dict[str, Dict[str, str]],
     return secrets
 
 
-def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],  # noqa: C901
-                            configuration: Configuration = None,
-                            extra_vars: Dict[str, Any] = None) -> Secrets:
+def load_secrets_from_vault(
+    secrets_info: Dict[str, Dict[str, str]],  # noqa: C901
+    configuration: Configuration = None,
+    extra_vars: Dict[str, Any] = None,
+) -> Secrets:
     """
     Load secrets from Vault KV secrets store
 
@@ -204,13 +212,13 @@ def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],  # noqa: C9
                 if not HAS_HVAC:
                     logger.error(
                         "Install the `hvac` package to fetch secrets "
-                        "from Vault: `pip install chaostoolkit-lib[vault]`.")
+                        "from Vault: `pip install chaostoolkit-lib[vault]`."
+                    )
                     return {}
 
                 path = value.get("path")
                 if path is None:
-                    logger.warning(
-                        "Missing Vault secret path for '{}'".format(key))
+                    logger.warning("Missing Vault secret path for '{}'".format(key))
                     continue
 
                 # see https://github.com/chaostoolkit/chaostoolkit/issues/98
@@ -220,16 +228,19 @@ def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],  # noqa: C9
                     vault_payload = kv.v1.read_secret(
                         path=path,
                         mount_point=configuration.get(
-                            "vault_secrets_mount_point", "secret"))
+                            "vault_secrets_mount_point", "secret"
+                        ),
+                    )
                 else:
                     vault_payload = kv.v2.read_secret_version(
                         path=path,
                         mount_point=configuration.get(
-                            "vault_secrets_mount_point", "secret"))
+                            "vault_secrets_mount_point", "secret"
+                        ),
+                    )
 
                 if not vault_payload:
-                    logger.warning(
-                        "No Vault secret found at path: {}".format(path))
+                    logger.warning("No Vault secret found at path: {}".format(path))
                     continue
 
                 if is_kv1:
@@ -242,7 +253,9 @@ def load_secrets_from_vault(secrets_info: Dict[str, Dict[str, str]],  # noqa: C9
                     if vault_key not in data:
                         logger.warning(
                             "No Vault key '{}' at secret path '{}'".format(
-                                vault_key, path))
+                                vault_key, path
+                            )
+                        )
                         continue
 
                     secrets[target][key] = data.get(vault_key)
@@ -268,16 +281,18 @@ def create_vault_client(configuration: Configuration = None):
         url = configuration.get("vault_addr")
         client = hvac.Client(url=url)
 
-        client.secrets.kv.default_kv_version = str(configuration.get(
-            "vault_kv_version", "2"))
+        client.secrets.kv.default_kv_version = str(
+            configuration.get("vault_kv_version", "2")
+        )
         logger.debug(
             "Using Vault secrets KV version {}".format(
-                client.secrets.kv.default_kv_version))
+                client.secrets.kv.default_kv_version
+            )
+        )
 
         if "vault_token" in configuration:
             client.token = configuration.get("vault_token")
-        elif "vault_role_id" in configuration and \
-             "vault_role_secret" in configuration:
+        elif "vault_role_id" in configuration and "vault_role_secret" in configuration:
             role_id = configuration.get("vault_role_id")
             role_secret = configuration.get("vault_role_secret")
 
@@ -285,33 +300,35 @@ def create_vault_client(configuration: Configuration = None):
                 app_role = client.auth_approle(role_id, role_secret)
             except Exception as ve:
                 raise InvalidExperiment(
-                    "Failed to connect to Vault with the AppRole: {}".format(
-                        str(ve)))
+                    "Failed to connect to Vault with the AppRole: {}".format(str(ve))
+                )
 
-            client.token = app_role['auth']['client_token']
+            client.token = app_role["auth"]["client_token"]
         elif "vault_sa_role" in configuration:
-            sa_token_path = configuration.get(
-                "vault_sa_token_path", "") or \
-                "/var/run/secrets/kubernetes.io/serviceaccount/token"
+            sa_token_path = (
+                configuration.get("vault_sa_token_path", "")
+                or "/var/run/secrets/kubernetes.io/serviceaccount/token"
+            )
 
-            mount_point = configuration.get(
-                "vault_k8s_mount_point", "kubernetes")
+            mount_point = configuration.get("vault_k8s_mount_point", "kubernetes")
 
             try:
                 with open(sa_token_path) as sa_token:
                     jwt = sa_token.read()
                     role = configuration.get("vault_sa_role")
-                    client.auth_kubernetes(role=role,
-                                           jwt=jwt,
-                                           use_token=True,
-                                           mount_point=mount_point)
+                    client.auth_kubernetes(
+                        role=role, jwt=jwt, use_token=True, mount_point=mount_point
+                    )
             except IOError:
                 raise InvalidExperiment(
                     "Failed to get service account token at: {path}".format(
-                        path=sa_token_path))
+                        path=sa_token_path
+                    )
+                )
             except Exception as e:
                 raise InvalidExperiment(
                     "Failed to connect to Vault using service account with "
-                    "errors: '{errors}'".format(errors=str(e)))
+                    "errors: '{errors}'".format(errors=str(e))
+                )
 
     return client

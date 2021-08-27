@@ -15,6 +15,7 @@ def initcounter(f: Callable) -> Callable:
         global counter
         counter = count()
         f(*args, **kwargs)
+
     return wrapped
 
 
@@ -23,6 +24,7 @@ def keepcount(f: Callable) -> Callable:
     def wrapped(*args, **kwargs) -> None:
         next(counter)
         f(*args, **kwargs)
+
     return wrapped
 
 
