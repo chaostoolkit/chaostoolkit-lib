@@ -75,7 +75,7 @@ def test_exit_continuous_ssh_continuous_when_experiment_is_interrupted():
     assert journal["steady_states"]["before"] is not None
     assert journal["steady_states"]["after"] is None
     assert journal["steady_states"]["during"] is not None
-    assert journal["deviated"] == False
+    assert journal["deviated"] is False
     assert journal["status"] == "interrupted"
     assert sorted(handlers_called) == ["interrupted", "started"]
 
@@ -101,7 +101,7 @@ def test_exit_continuous_ssh_continuous_when_experiment_is_exited():
     assert journal["steady_states"]["before"] is not None
     assert journal["steady_states"]["after"] is None
     assert journal["steady_states"]["during"] is not None
-    assert journal["deviated"] == False
+    assert journal["deviated"] is False
     assert journal["status"] == "interrupted"
     assert sorted(handlers_called) == ["started"]
 
@@ -118,7 +118,7 @@ def test_exit_continuous_ssh_continuous_when_activity_raises_unknown_exception()
     assert journal["steady_states"]["before"] is not None
     assert journal["steady_states"]["after"] is not None
     assert journal["steady_states"]["during"] is not None
-    assert journal["deviated"] == False
+    assert journal["deviated"] is False
     assert journal["status"] == "completed"
     assert len(journal["run"]) == 2
     assert journal["run"][-1]["status"] == "failed"
@@ -138,7 +138,7 @@ def test_exit_immediately_when_continuous_ssh_fails_and_failfast():
     assert journal["steady_states"]["after"] is not None
     assert journal["steady_states"]["during"] is not None
     assert journal["status"] == "failed"
-    assert journal["deviated"] == True
+    assert journal["deviated"] is True
     assert len(journal["run"]) == 1
 
 
@@ -155,7 +155,7 @@ def test_do_not_exit_when_continuous_ssh_fails_and_no_failfast():
     assert journal["steady_states"]["after"] is not None
     assert journal["steady_states"]["during"] is not None
     assert journal["status"] == "failed"
-    assert journal["deviated"] == True
+    assert journal["deviated"] is True
     assert len(journal["run"]) == 2
 
 
@@ -174,7 +174,7 @@ def test_exit_immediately_when_continuous_ssh_fails_and_failfast_when_background
     assert journal["steady_states"]["after"] is not None
     assert journal["steady_states"]["during"] is not None
     assert journal["status"] == "failed"
-    assert journal["deviated"] == True
+    assert journal["deviated"] is True
     assert len(journal["run"]) == 2
 
 
@@ -275,5 +275,5 @@ def test_do_not_ruin_method_on_failing_before_ssh():
     assert journal["steady_states"]["after"] is None
     assert journal["steady_states"]["during"] == []
     assert journal["status"] == "failed"
-    assert journal["deviated"] == False
+    assert journal["deviated"] is False
     assert len(journal["run"]) == 0

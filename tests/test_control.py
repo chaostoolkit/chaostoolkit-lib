@@ -473,10 +473,10 @@ def test_control_must_not_rest_state_before_calling_the_after_side():
 
     before_hypo_result = journal["steady_states"]["before"]
     assert "after_hypothesis_control" in before_hypo_result
-    assert before_hypo_result["after_hypothesis_control"] == True
+    assert before_hypo_result["after_hypothesis_control"] is True
 
     assert "after_experiment_control" in journal
-    assert journal["after_experiment_control"] == True
+    assert journal["after_experiment_control"] is True
 
 
 def test_controls_can_take_arguments_at_initialization():
