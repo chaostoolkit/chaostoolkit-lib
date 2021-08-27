@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Union
 
 from logzero import logger
 
+import chaoslib
 from chaoslib.types import Activity, Experiment, Schedule, Settings, Strategy
 
 __all__ = ["cache_activities", "clear_cache", "lookup_activity", "with_cache"]
@@ -56,8 +57,8 @@ def with_cache(f):
         experiment_vars: Dict[str, Any] = None,
         strategy: Strategy = Strategy.DEFAULT,
         schedule: Schedule = None,
-        event_handlers: List["RunEventHandler"] = None,
-    ):  # noqa: E0602
+        event_handlers: List[chaoslib.run.RunEventHandler] = None,
+    ):
         try:
             if experiment:
                 cache_activities(experiment)
