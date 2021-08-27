@@ -3,11 +3,10 @@ import types
 
 import pytest
 
-from chaoslib.exceptions import DiscoveryFailed
 from chaoslib.discovery import discover, initialize_discovery_result
 from chaoslib.discovery.discover import discover_activities
-from chaoslib.types import Discovery, DiscoveredActivities, \
-    DiscoveredSystemInfo
+from chaoslib.exceptions import DiscoveryFailed
+from chaoslib.types import DiscoveredActivities, DiscoveredSystemInfo, Discovery
 
 
 def test_fail_discovery_when_module_cannot_be_loaded():
@@ -34,15 +33,8 @@ def test_discover_all_activities():
     assert activity["mod"] == mod
     assert activity["doc"] == "Many arguments."
     assert activity["arguments"] == [
-        {
-            "name": "message",
-            "type": "string"
-        },
-        {
-            "name": "colour",
-            "default": "blue",
-            "type": "string"
-        }
+        {"name": "message", "type": "string"},
+        {"name": "colour", "default": "blue", "type": "string"},
     ]
 
     activity = next(activities)
@@ -51,34 +43,12 @@ def test_discover_all_activities():
     assert activity["mod"] == mod
     assert activity["doc"] == "Many arguments with rich types."
     assert activity["arguments"] == [
-        {
-            "name": "message",
-            "type": "string"
-        },
-        {
-            "name": "recipients",
-            "type": "list"
-        },
-        {
-            "name": "colour",
-            "default": "blue",
-            "type": "string"
-        },
-        {
-            "name": "count",
-            "default": 1,
-            "type": "integer"
-        },
-        {
-            "name": "logit",
-            "default": False,
-            "type": "boolean"
-        },
-        {
-            "name": "other",
-            "default": None,
-            "type": "object"
-        }
+        {"name": "message", "type": "string"},
+        {"name": "recipients", "type": "list"},
+        {"name": "colour", "default": "blue", "type": "string"},
+        {"name": "count", "default": 1, "type": "integer"},
+        {"name": "logit", "default": False, "type": "boolean"},
+        {"name": "other", "default": None, "type": "object"},
     ]
 
     activity = next(activities)
@@ -100,12 +70,7 @@ def test_discover_all_activities():
     assert activity["type"] == "probe"
     assert activity["mod"] == mod
     assert activity["doc"] == "One typed argument."
-    assert activity["arguments"] == [
-        {
-            "name": "message",
-            "type": "string"
-        }
-    ]
+    assert activity["arguments"] == [{"name": "message", "type": "string"}]
 
     activity = next(activities)
     assert activity["name"] == "one_arg_with_default"
@@ -113,11 +78,7 @@ def test_discover_all_activities():
     assert activity["mod"] == mod
     assert activity["doc"] == "One typed argument with a default value."
     assert activity["arguments"] == [
-        {
-            "name": "message",
-            "default": "hello",
-            "type": "string"
-        }
+        {"name": "message", "default": "hello", "type": "string"}
     ]
 
     activity = next(activities)
@@ -125,20 +86,11 @@ def test_discover_all_activities():
     assert activity["type"] == "probe"
     assert activity["mod"] == mod
     assert activity["doc"] == "One untyped argument."
-    assert activity["arguments"] == [
-        {
-            "name": "message"
-        }
-    ]
+    assert activity["arguments"] == [{"name": "message"}]
 
     activity = next(activities)
     assert activity["name"] == "one_untyped_arg_with_default"
     assert activity["type"] == "probe"
     assert activity["mod"] == mod
     assert activity["doc"] == "One untyped argument with a default value."
-    assert activity["arguments"] == [
-        {
-            "name": "message",
-            "default": "hello"
-        }
-    ]
+    assert activity["arguments"] == [{"name": "message", "default": "hello"}]

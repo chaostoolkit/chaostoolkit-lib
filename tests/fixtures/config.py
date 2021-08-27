@@ -2,11 +2,4 @@
 
 EmptyConfig = {}
 
-SomeConfig = {
-    "name": "Jane",
-    "age": 34,
-    "path": {
-        "type": "env",
-        "key": "PATH"
-    }
-}
+SomeConfig = {"name": "Jane", "age": 34, "path": {"type": "env", "key": "PATH"}}

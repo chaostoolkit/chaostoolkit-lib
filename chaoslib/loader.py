@@ -3,10 +3,12 @@ import io
 import os.path
 from urllib.parse import urlparse
 
-from chaoslib.exceptions import InvalidSource
-from logzero import logger
 import requests
 import yaml
+from logzero import logger
+
+from chaoslib.exceptions import InvalidSource
+
 try:
     import simplejson as json
     from simplejson.errors import JSONDecodeError
@@ -17,7 +19,6 @@ except ImportError:
 from chaoslib.control import controls
 from chaoslib.exceptions import InvalidExperiment
 from chaoslib.types import Experiment, Settings
-
 
 __all__ = ["load_experiment"]
 
@@ -33,12 +34,14 @@ def parse_experiment_from_file(path: str) -> Experiment:
                 return yaml.safe_load(f)
             except yaml.YAMLError as ye:
                 raise InvalidSource(
-                    "Failed parsing YAML experiment: {}".format(str(ye)))
+                    "Failed parsing YAML experiment: {}".format(str(ye))
+                )
         elif ext == ".json":
             return json.load(f)
 
     raise InvalidExperiment(
-        "only files with json, yaml or yml extensions are supported")
+        "only files with json, yaml or yml extensions are supported"
+    )
 
 
 def parse_experiment_from_http(response: requests.Response) -> Experiment:
@@ -47,15 +50,14 @@ def parse_experiment_from_http(response: requests.Response) -> Experiment:
     """
     content_type = response.headers.get("Content-Type")
 
-    if 'application/json' in content_type:
+    if "application/json" in content_type:
         return response.json()
-    elif 'application/x-yaml' in content_type or 'text/yaml' in content_type:
+    elif "application/x-yaml" in content_type or "text/yaml" in content_type:
         try:
             return yaml.safe_load(response.text)
         except yaml.YAMLError as ye:
-            raise InvalidSource(
-                "Failed parsing YAML experiment: {}".format(str(ye)))
-    elif 'text/plain' in content_type:
+            raise InvalidSource("Failed parsing YAML experiment: {}".format(str(ye)))
+    elif "text/plain" in content_type:
         content = response.text
         try:
             return json.loads(content)
@@ -66,11 +68,13 @@ def parse_experiment_from_http(response: requests.Response) -> Experiment:
                 pass
 
     raise InvalidExperiment(
-        "only files with json, yaml or yml extensions are supported")
+        "only files with json, yaml or yml extensions are supported"
+    )
 
 
-def load_experiment(experiment_source: str, settings: Settings = None,
-                    verify_tls: bool = True) -> Experiment:
+def load_experiment(
+    experiment_source: str, settings: Settings = None, verify_tls: bool = True
+) -> Experiment:
     """
     Load an experiment from the given source.
 
@@ -107,24 +111,23 @@ def load_experiment(experiment_source: str, settings: Settings = None,
 
         if p.scheme not in ("http", "https"):
             raise InvalidSource(
-                "'{}' is not a supported source scheme.".format(p.scheme))
+                "'{}' is not a supported source scheme.".format(p.scheme)
+            )
 
-        headers = {
-            "Accept": "application/json, application/x-yaml"
-        }
+        headers = {"Accept": "application/json, application/x-yaml"}
         if settings:
             auths = settings.get("auths", [])
             for domain in auths:
                 if domain == p.netloc:
                     auth = auths[domain]
-                    headers["Authorization"] = '{} {}'.format(
-                        auth["type"], auth["value"])
+                    headers["Authorization"] = "{} {}".format(
+                        auth["type"], auth["value"]
+                    )
                     break
 
         r = requests.get(experiment_source, headers=headers, verify=verify_tls)
         if r.status_code != 200:
-            raise InvalidSource(
-                "Failed to fetch the experiment: {}".format(r.text))
+            raise InvalidSource("Failed to fetch the experiment: {}".format(r.text))
 
         logger.debug("Fetched experiment: \n{}".format(r.text))
         parsed = parse_experiment_from_http(r)

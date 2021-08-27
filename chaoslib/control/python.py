@@ -1,19 +1,31 @@
 # -*- coding: utf-8 -*-
-from copy import deepcopy
 import importlib
 import inspect
+from copy import deepcopy
 from typing import Any, Callable, List, Optional, Union
 
 from logzero import logger
 
 from chaoslib import substitute
 from chaoslib.exceptions import InvalidActivity
-from chaoslib.types import Activity, Configuration, Control, Experiment, \
-    Journal, Run, Secrets, Settings
+from chaoslib.types import (
+    Activity,
+    Configuration,
+    Control,
+    Experiment,
+    Journal,
+    Run,
+    Secrets,
+    Settings,
+)
 
-
-__all__ = ["apply_python_control", "cleanup_control", "initialize_control",
-           "validate_python_control", "import_control"]
+__all__ = [
+    "apply_python_control",
+    "cleanup_control",
+    "initialize_control",
+    "validate_python_control",
+    "import_control",
+]
 _level_mapping = {
     "experiment-before": "before_experiment_control",
     "experiment-after": "after_experiment_control",
@@ -26,7 +38,7 @@ _level_mapping = {
     "activity-before": "before_activity_control",
     "activity-after": "after_activity_control",
     "loader-before": "before_loading_experiment_control",
-    "loader-after": "after_loading_experiment_control"
+    "loader-after": "after_loading_experiment_control",
 }
 
 
@@ -41,12 +53,17 @@ def import_control(control: Control) -> Optional[Any]:
     except ImportError:
         logger.debug(
             "Control module '{}' could not be loaded. "
-            "Have you installed it?".format(mod_path))
+            "Have you installed it?".format(mod_path)
+        )
 
 
-def initialize_control(control: Control, experiment: Experiment,
-                       configuration: Configuration,
-                       secrets: Secrets, settings: Settings = None):
+def initialize_control(
+    control: Control,
+    experiment: Experiment,
+    configuration: Configuration,
+    secrets: Secrets,
+    settings: Settings = None,
+):
     """
     Initialize a control by calling its `configure_control` function.
     """
@@ -91,16 +108,17 @@ def validate_python_control(control: Control):
     provider = control["provider"]
     mod_name = provider.get("module")
     if not mod_name:
-        raise InvalidActivity(
-            "Control '{}' must have a module path".format(name))
+        raise InvalidActivity("Control '{}' must have a module path".format(name))
 
     try:
         importlib.import_module(mod_name)
     except ImportError:
-        logger.warning("Could not find Python module '{mod}' "
-                       "in control '{name}'. Did you install the Python "
-                       "module? The experiment will carry on running "
-                       "nonetheless.".format(mod=mod_name, name=name))
+        logger.warning(
+            "Could not find Python module '{mod}' "
+            "in control '{name}'. Did you install the Python "
+            "module? The experiment will carry on running "
+            "nonetheless.".format(mod=mod_name, name=name)
+        )
 
     # a control can validate itself too
     # ideally, do it cleanly and raise chaoslib.exceptions.InvalidActivity
@@ -111,12 +129,16 @@ def validate_python_control(control: Control):
     func(control)
 
 
-def apply_python_control(level: str, control: Control,  # noqa: C901
-                         experiment: Experiment,
-                         context: Union[Activity, Experiment],
-                         state: Union[Journal, Run, List[Run]] = None,
-                         configuration: Configuration = None,
-                         secrets: Secrets = None, settings: Settings = None):
+def apply_python_control(
+    level: str,
+    control: Control,  # noqa: C901
+    experiment: Experiment,
+    context: Union[Activity, Experiment],
+    state: Union[Journal, Run, List[Run]] = None,
+    configuration: Configuration = None,
+    secrets: Secrets = None,
+    settings: Settings = None,
+):
     """
     Apply a control by calling a function matching the given level.
     """
@@ -165,15 +187,14 @@ def load_func(control: Control, func_name: str) -> Callable:
     func = getattr(mod, func_name, None)
     if not func:
         logger.debug(
-            "Control module '{}' does not declare '{}'".format(
-                mod.__file__, func_name
-            ))
+            "Control module '{}' does not declare '{}'".format(mod.__file__, func_name)
+        )
         return
 
     try:
         logger.debug(
-            "Control '{}' loaded from '{}'".format(
-                func_name, inspect.getfile(func)))
+            "Control '{}' loaded from '{}'".format(func_name, inspect.getfile(func))
+        )
     except TypeError:
         pass
 

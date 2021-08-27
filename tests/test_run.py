@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 from typing import NoReturn
 
-from chaoslib.experiment import run_experiment
-from chaoslib.run import EventHandlerRegistry, RunEventHandler, Schedule, \
-    Strategy
-from chaoslib.types import Experiment, Journal
-
 from fixtures import experiments, run_handlers
+
+from chaoslib.experiment import run_experiment
+from chaoslib.run import EventHandlerRegistry, RunEventHandler, Schedule, Strategy
+from chaoslib.types import Experiment, Journal
 
 
 def test_run_ssh_before_method_only():
     experiment = experiments.SimpleExperiment.copy()
-    journal = run_experiment(
-        experiment, strategy=Strategy.BEFORE_METHOD)
+    journal = run_experiment(experiment, strategy=Strategy.BEFORE_METHOD)
     assert journal is not None
     assert journal["steady_states"]["before"] is not None
     assert journal["steady_states"]["after"] is None
@@ -20,8 +18,7 @@ def test_run_ssh_before_method_only():
 
 def test_run_ssh_after_method_only():
     experiment = experiments.SimpleExperiment.copy()
-    journal = run_experiment(
-        experiment, strategy=Strategy.AFTER_METHOD)
+    journal = run_experiment(experiment, strategy=Strategy.AFTER_METHOD)
     assert journal is not None
     assert journal["steady_states"]["before"] is None
     assert journal["steady_states"]["after"] is not None
@@ -29,8 +26,7 @@ def test_run_ssh_after_method_only():
 
 def test_run_ssh_default_strategy():
     experiment = experiments.SimpleExperiment.copy()
-    journal = run_experiment(
-        experiment, strategy=Strategy.DEFAULT)
+    journal = run_experiment(experiment, strategy=Strategy.DEFAULT)
     assert journal is not None
     assert journal["steady_states"]["before"] is not None
     assert journal["steady_states"]["after"] is not None
@@ -38,8 +34,7 @@ def test_run_ssh_default_strategy():
 
 def test_run_ssh_during_method_only():
     experiment = experiments.SimpleExperiment.copy()
-    journal = run_experiment(
-        experiment, strategy=Strategy.DURING_METHOD)
+    journal = run_experiment(experiment, strategy=Strategy.DURING_METHOD)
     assert journal is not None
     assert journal["steady_states"]["before"] is None
     assert journal["steady_states"]["after"] is None
@@ -49,8 +44,10 @@ def test_run_ssh_during_method_only():
 def test_run_ssh_continuous():
     experiment = experiments.SimpleExperiment.copy()
     journal = run_experiment(
-        experiment, strategy=Strategy.CONTINUOUS,
-        schedule=Schedule(continuous_hypothesis_frequency=0.1))
+        experiment,
+        strategy=Strategy.CONTINUOUS,
+        schedule=Schedule(continuous_hypothesis_frequency=0.1),
+    )
     assert journal is not None
     assert journal["steady_states"]["before"] is not None
     assert journal["steady_states"]["after"] is not None
@@ -59,20 +56,21 @@ def test_run_ssh_continuous():
 
 def test_exit_continuous_ssh_continuous_when_experiment_is_interrupted():
     handlers_called = []
+
     class Handler(RunEventHandler):
-        def started(self, experiment: Experiment,
-                    journal: Journal) -> NoReturn:
+        def started(self, experiment: Experiment, journal: Journal) -> NoReturn:
             handlers_called.append("started")
 
-        def interrupted(self, experiment: Experiment,
-                        journal: Journal) -> NoReturn:
+        def interrupted(self, experiment: Experiment, journal: Journal) -> NoReturn:
             handlers_called.append("interrupted")
 
     experiment = experiments.SimpleExperimentWithInterruption.copy()
     journal = run_experiment(
-        experiment, strategy=Strategy.CONTINUOUS,
+        experiment,
+        strategy=Strategy.CONTINUOUS,
         schedule=Schedule(continuous_hypothesis_frequency=0.1),
-        event_handlers=[Handler()])
+        event_handlers=[Handler()],
+    )
     assert journal is not None
     assert journal["steady_states"]["before"] is not None
     assert journal["steady_states"]["after"] is None
@@ -84,20 +82,21 @@ def test_exit_continuous_ssh_continuous_when_experiment_is_interrupted():
 
 def test_exit_continuous_ssh_continuous_when_experiment_is_exited():
     handlers_called = []
+
     class Handler(RunEventHandler):
-        def started(self, experiment: Experiment,
-                    journal: Journal) -> NoReturn:
+        def started(self, experiment: Experiment, journal: Journal) -> NoReturn:
             handlers_called.append("started")
 
-        def interrupted(self, experiment: Experiment,
-                        journal: Journal) -> NoReturn:
+        def interrupted(self, experiment: Experiment, journal: Journal) -> NoReturn:
             handlers_called.append("interrupted")
 
     experiment = experiments.SimpleExperimentWithExit.copy()
     journal = run_experiment(
-        experiment, strategy=Strategy.CONTINUOUS,
+        experiment,
+        strategy=Strategy.CONTINUOUS,
         schedule=Schedule(continuous_hypothesis_frequency=0.1),
-        event_handlers=[Handler()])
+        event_handlers=[Handler()],
+    )
     assert journal is not None
     assert journal["steady_states"]["before"] is not None
     assert journal["steady_states"]["after"] is None
@@ -107,13 +106,14 @@ def test_exit_continuous_ssh_continuous_when_experiment_is_exited():
     assert sorted(handlers_called) == ["started"]
 
 
-
 def test_exit_continuous_ssh_continuous_when_activity_raises_unknown_exception():
     experiment = experiments.SimpleExperimentWithException.copy()
     journal = run_experiment(
-        experiment, strategy=Strategy.CONTINUOUS,
+        experiment,
+        strategy=Strategy.CONTINUOUS,
         schedule=Schedule(continuous_hypothesis_frequency=0.1),
-        settings={"runtime": {"rollbacks": {"strategy": "always"}}})
+        settings={"runtime": {"rollbacks": {"strategy": "always"}}},
+    )
     assert journal is not None
     assert journal["steady_states"]["before"] is not None
     assert journal["steady_states"]["after"] is not None
@@ -128,9 +128,11 @@ def test_exit_continuous_ssh_continuous_when_activity_raises_unknown_exception()
 def test_exit_immediately_when_continuous_ssh_fails_and_failfast():
     experiment = experiments.SimpleExperimentWithSSHFailingAtSomePoint.copy()
     journal = run_experiment(
-        experiment, strategy=Strategy.CONTINUOUS,
+        experiment,
+        strategy=Strategy.CONTINUOUS,
         schedule=Schedule(continuous_hypothesis_frequency=0.1, fail_fast=True),
-        settings={"runtime": {"rollbacks": {"strategy": "always"}}})
+        settings={"runtime": {"rollbacks": {"strategy": "always"}}},
+    )
     assert journal is not None
     assert journal["steady_states"]["before"] is not None
     assert journal["steady_states"]["after"] is not None
@@ -143,9 +145,11 @@ def test_exit_immediately_when_continuous_ssh_fails_and_failfast():
 def test_do_not_exit_when_continuous_ssh_fails_and_no_failfast():
     experiment = experiments.SimpleExperimentWithSSHFailingAtSomePoint.copy()
     journal = run_experiment(
-        experiment, strategy=Strategy.CONTINUOUS,
+        experiment,
+        strategy=Strategy.CONTINUOUS,
         schedule=Schedule(continuous_hypothesis_frequency=0.1, fail_fast=False),
-        settings={"runtime": {"rollbacks": {"strategy": "always"}}})
+        settings={"runtime": {"rollbacks": {"strategy": "always"}}},
+    )
     assert journal is not None
     assert journal["steady_states"]["before"] is not None
     assert journal["steady_states"]["after"] is not None
@@ -156,11 +160,15 @@ def test_do_not_exit_when_continuous_ssh_fails_and_no_failfast():
 
 
 def test_exit_immediately_when_continuous_ssh_fails_and_failfast_when_background_activity():
-    experiment = experiments.SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity.copy()
+    experiment = (
+        experiments.SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity.copy()
+    )
     journal = run_experiment(
-        experiment, strategy=Strategy.CONTINUOUS,
+        experiment,
+        strategy=Strategy.CONTINUOUS,
         schedule=Schedule(continuous_hypothesis_frequency=0.1, fail_fast=True),
-        settings={"runtime": {"rollbacks": {"strategy": "always"}}})
+        settings={"runtime": {"rollbacks": {"strategy": "always"}}},
+    )
     assert journal is not None
     assert journal["steady_states"]["before"] is not None
     assert journal["steady_states"]["after"] is not None
@@ -168,7 +176,6 @@ def test_exit_immediately_when_continuous_ssh_fails_and_failfast_when_background
     assert journal["status"] == "failed"
     assert journal["deviated"] == True
     assert len(journal["run"]) == 2
-
 
 
 def test_run_handler_is_called_on_each_handler():
@@ -195,13 +202,23 @@ def test_run_handler_is_called_on_each_handler():
     registry.cooldown_completed()
 
     assert h.calls == [
-        "started", "finish", "interrupted", "signal_exit",
-        "start_continuous_hypothesis", "continuous_hypothesis_iteration",
-        "continuous_hypothesis_completed", "start_method", "method_completed",
-        "start_rollbacks", "rollbacks_completed", "start_hypothesis_before",
-        "hypothesis_before_completed", "start_hypothesis_after",
+        "started",
+        "finish",
+        "interrupted",
+        "signal_exit",
+        "start_continuous_hypothesis",
+        "continuous_hypothesis_iteration",
+        "continuous_hypothesis_completed",
+        "start_method",
+        "method_completed",
+        "start_rollbacks",
+        "rollbacks_completed",
+        "start_hypothesis_before",
+        "hypothesis_before_completed",
+        "start_hypothesis_after",
         "hypothesis_after_completed",
-        "start_cooldown", "cooldown_completed"
+        "start_cooldown",
+        "cooldown_completed",
     ]
 
 
@@ -230,13 +247,23 @@ def test_exceptions_does_not_stop_handler_registry():
     registry.cooldown_completed()
 
     assert h.calls == [
-        "started", "finish", "interrupted", "signal_exit",
-        "start_continuous_hypothesis", "continuous_hypothesis_iteration",
-        "continuous_hypothesis_completed", "start_method", "method_completed",
-        "start_rollbacks", "rollbacks_completed", "start_hypothesis_before",
-        "hypothesis_before_completed", "start_hypothesis_after",
+        "started",
+        "finish",
+        "interrupted",
+        "signal_exit",
+        "start_continuous_hypothesis",
+        "continuous_hypothesis_iteration",
+        "continuous_hypothesis_completed",
+        "start_method",
+        "method_completed",
+        "start_rollbacks",
+        "rollbacks_completed",
+        "start_hypothesis_before",
+        "hypothesis_before_completed",
+        "start_hypothesis_after",
         "hypothesis_after_completed",
-        "start_cooldown", "cooldown_completed"
+        "start_cooldown",
+        "cooldown_completed",
     ]
 
 

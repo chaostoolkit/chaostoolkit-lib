@@ -1,27 +1,32 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
 import importlib
 import inspect
 import platform
-from typing import Any
 import uuid
+from datetime import datetime
+from typing import Any
 
 from logzero import logger
 
 from chaoslib import __version__
-from chaoslib.discovery.package import get_discover_function, install,\
-    load_package
+from chaoslib.discovery.package import get_discover_function, install, load_package
 from chaoslib.exceptions import DiscoveryFailed
-from chaoslib.types import Discovery, DiscoveredActivities
+from chaoslib.types import DiscoveredActivities, Discovery
+
+__all__ = [
+    "discover",
+    "discover_activities",
+    "discover_actions",
+    "discover_probes",
+    "initialize_discovery_result",
+    "portable_type_name",
+    "portable_type_name_to_python_type",
+]
 
 
-__all__ = ["discover", "discover_activities", "discover_actions",
-           "discover_probes", "initialize_discovery_result",
-           "portable_type_name", "portable_type_name_to_python_type"]
-
-
-def discover(package_name: str, discover_system: bool = True,
-             download_and_install: bool = True) -> Discovery:
+def discover(
+    package_name: str, discover_system: bool = True, download_and_install: bool = True
+) -> Discovery:
     """
     Discover the capabilities of an extension as well as the system it targets.
 
@@ -36,8 +41,9 @@ def discover(package_name: str, discover_system: bool = True,
     return discover_func(discover_system=discover_system)
 
 
-def initialize_discovery_result(extension_name: str, extension_version: str,
-                                discovery_type: str) -> Discovery:
+def initialize_discovery_result(
+    extension_name: str, extension_version: str, discovery_type: str
+) -> Discovery:
     """
     Intialize the discovery result payload to fill with activities and system
     discovery.
@@ -55,14 +61,14 @@ def initialize_discovery_result(extension_name: str, extension_version: str,
             "version": plt.version,
             "machine": plt.machine,
             "proc": plt.processor,
-            "python": platform.python_version()
+            "python": platform.python_version(),
         },
         "extension": {
             "name": extension_name,
             "version": extension_version,
         },
         "activities": [],
-        "system": None
+        "system": None,
     }
 
 
@@ -82,8 +88,9 @@ def discover_probes(extension_mod_name: str) -> DiscoveredActivities:
     return discover_activities(extension_mod_name, "probe")
 
 
-def discover_activities(extension_mod_name: str,  #noqa: C901
-                        activity_type: str) -> DiscoveredActivities:
+def discover_activities(
+    extension_mod_name: str, activity_type: str  # noqa: C901
+) -> DiscoveredActivities:
     """
     Discover exported activities from the given extension module name.
     """
@@ -91,8 +98,8 @@ def discover_activities(extension_mod_name: str,  #noqa: C901
         mod = importlib.import_module(extension_mod_name)
     except ImportError:
         raise DiscoveryFailed(
-            "could not import extension module '{m}'".format(
-                m=extension_mod_name))
+            "could not import extension module '{m}'".format(m=extension_mod_name)
+        )
 
     activities = []
     try:
@@ -101,7 +108,8 @@ def discover_activities(extension_mod_name: str,  #noqa: C901
         logger.warning(
             "'{m}' does not expose the __all__ attribute. "
             "It is required to determine what functions are actually "
-            "exported as activities.".format(m=extension_mod_name))
+            "exported as activities.".format(m=extension_mod_name)
+        )
         return activities
 
     funcs = inspect.getmembers(mod, inspect.isfunction)
@@ -116,7 +124,7 @@ def discover_activities(extension_mod_name: str,  #noqa: C901
             "name": name,
             "mod": mod.__name__,
             "doc": inspect.getdoc(func),
-            "arguments": []
+            "arguments": [],
         }
 
         if sig.return_annotation is not inspect.Signature.empty:
@@ -171,16 +179,16 @@ def portable_type_name(python_type: Any) -> str:  # noqa: C901
         return "list"
     elif python_type is dict:
         return "mapping"
-    elif str(python_type).startswith('typing.Dict'):
+    elif str(python_type).startswith("typing.Dict"):
         return "mapping"
-    elif str(python_type).startswith('typing.List'):
+    elif str(python_type).startswith("typing.List"):
         return "list"
-    elif str(python_type).startswith('typing.Set'):
+    elif str(python_type).startswith("typing.Set"):
         return "set"
 
     logger.debug(
-        "'{}' could not be ported to something meaningful".format(
-            str(python_type)))
+        "'{}' could not be ported to something meaningful".format(str(python_type))
+    )
 
     return "object"
 

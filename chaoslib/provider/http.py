@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 from typing import Any
-import urllib3
 
-from logzero import logger
 import requests
+import urllib3
+from logzero import logger
 
 from chaoslib import substitute
 from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.types import Activity, Configuration, Secrets
 
-
 __all__ = ["run_http_activity", "validate_http_activity"]
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-def run_http_activity(activity: Activity, configuration: Configuration,
-                      secrets: Secrets) -> Any:
+def run_http_activity(
+    activity: Activity, configuration: Configuration, secrets: Secrets
+) -> Any:
     """
     Run a HTTP activity.
 
@@ -49,17 +49,31 @@ def run_http_activity(activity: Activity, configuration: Configuration,
         s.mount("https://", a)
         if method == "GET":
             r = s.get(
-                url, params=arguments, headers=headers, timeout=timeout,
-                verify=verify_tls)
+                url,
+                params=arguments,
+                headers=headers,
+                timeout=timeout,
+                verify=verify_tls,
+            )
         else:
             if headers and headers.get("Content-Type") == "application/json":
                 r = s.request(
-                    method, url, json=arguments, headers=headers,
-                    timeout=timeout, verify=verify_tls)
+                    method,
+                    url,
+                    json=arguments,
+                    headers=headers,
+                    timeout=timeout,
+                    verify=verify_tls,
+                )
             else:
                 r = s.request(
-                    method, url, data=arguments, headers=headers,
-                    timeout=timeout, verify=verify_tls)
+                    method,
+                    url,
+                    data=arguments,
+                    headers=headers,
+                    timeout=timeout,
+                    verify=verify_tls,
+                )
 
         body = None
         if r.headers.get("Content-Type") == "application/json":
@@ -75,16 +89,12 @@ def run_http_activity(activity: Activity, configuration: Configuration,
             logger.warning(
                 "This HTTP call returned a response with a HTTP status code "
                 "above 400. This may indicate some error and not "
-                "what you expected. Please have a look at the logs.")
+                "what you expected. Please have a look at the logs."
+            )
 
-        return {
-            "status": r.status_code,
-            "headers": dict(**r.headers),
-            "body": body
-        }
+        return {"status": r.status_code, "headers": dict(**r.headers), "body": body}
     except requests.exceptions.ConnectionError as cex:
-        raise ActivityFailed("failed to connect to {u}: {x}".format(
-            u=url, x=str(cex)))
+        raise ActivityFailed("failed to connect to {u}: {x}".format(u=url, x=str(cex)))
     except requests.exceptions.Timeout:
         raise ActivityFailed("activity took too long to complete")
 

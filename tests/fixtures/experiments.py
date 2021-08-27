@@ -1,81 +1,70 @@
 # -*- coding: utf-8 -*-
-from copy import deepcopy
 import os
+from copy import deepcopy
 
-from fixtures.actions import DoNothingAction, EchoAction, FailAction, \
-    InterruptAction
-from fixtures.probes import BackgroundPythonModuleProbe, MissingFuncArgProbe, \
-    PythonModuleProbe, PythonModuleProbeWithBoolTolerance, \
-    PythonModuleProbeWithExternalTolerance, PythonModuleProbeWithLongPause, \
-    BackgroundPythonModuleProbeWithLongPause, BackgroundPythonModuleProbeWithLongPauseBefore,\
-    PythonModuleProbeWithHTTPStatusTolerance, DeprecatedProcArgumentsProbe, \
-    PythonModuleProbeWithHTTPBodyTolerance, \
-    PythonModuleProbeWithProcessStatusTolerance, \
-    PythonModuleProbeWithProcessFailedStatusTolerance, \
-    PythonModuleProbeWithProcesStdoutTolerance, \
-    PythonModuleProbeWithHTTPStatusToleranceDeviation, FailProbe, \
-    GenerateSecretTokenProbe, ReadSecretTokenProbe, \
-    ReadSecretTokenFromSecretsProbe
+from fixtures.actions import DoNothingAction, EchoAction, FailAction, InterruptAction
+from fixtures.probes import (
+    BackgroundPythonModuleProbe,
+    BackgroundPythonModuleProbeWithLongPause,
+    BackgroundPythonModuleProbeWithLongPauseBefore,
+    DeprecatedProcArgumentsProbe,
+    FailProbe,
+    GenerateSecretTokenProbe,
+    MissingFuncArgProbe,
+    PythonModuleProbe,
+    PythonModuleProbeWithBoolTolerance,
+    PythonModuleProbeWithExternalTolerance,
+    PythonModuleProbeWithHTTPBodyTolerance,
+    PythonModuleProbeWithHTTPStatusTolerance,
+    PythonModuleProbeWithHTTPStatusToleranceDeviation,
+    PythonModuleProbeWithLongPause,
+    PythonModuleProbeWithProcessFailedStatusTolerance,
+    PythonModuleProbeWithProcessStatusTolerance,
+    PythonModuleProbeWithProcesStdoutTolerance,
+    ReadSecretTokenFromSecretsProbe,
+    ReadSecretTokenProbe,
+)
 
 Secrets = {}
 
 EmptyExperiment = {}
 
-MissingTitleExperiment = {
-    "description": "blah"
-}
+MissingTitleExperiment = {"description": "blah"}
 
-MissingDescriptionExperiment = {
-    "title": "kaboom"
-}
+MissingDescriptionExperiment = {"title": "kaboom"}
 
 MissingHypothesisExperiment = {
     "title": "kaboom",
     "description": "blah",
-    "method": [PythonModuleProbeWithBoolTolerance]
+    "method": [PythonModuleProbeWithBoolTolerance],
 }
 
 MissingHypothesisTitleExperiment = {
     "title": "kaboom",
     "description": "blah",
     "steady-state-hypothesis": {},
-    "method": []
+    "method": [],
 }
 
 MissingMethodExperiment = {
     "title": "kaboom",
     "description": "blah",
-    "steady-state-hypothesis": {
-        "title": "hello"
-    }
+    "steady-state-hypothesis": {"title": "hello"},
 }
 
 NoStepsMethodExperiment = {
     "title": "kaboom",
     "description": "blah",
-    "steady-state-hypothesis": {
-        "title": "hello"
-    },
-    "method": []
+    "steady-state-hypothesis": {"title": "hello"},
+    "method": [],
 }
 
 ExperimentWithInvalidHypoProbe = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",
-    "steady-state-hypothesis": {
-        "title": "hello",
-        "probes": [
-            MissingFuncArgProbe
-        ]
-    },
-    "method": [
-        PythonModuleProbe, BackgroundPythonModuleProbe
-    ],
-    "rollbacks": [
-        {
-            "ref": PythonModuleProbe["name"]
-        }
-    ]
+    "steady-state-hypothesis": {"title": "hello", "probes": [MissingFuncArgProbe]},
+    "method": [PythonModuleProbe, BackgroundPythonModuleProbe],
+    "rollbacks": [{"ref": PythonModuleProbe["name"]}],
 }
 
 ExperimentWithInterpolatedTitle = {
@@ -83,7 +72,7 @@ ExperimentWithInterpolatedTitle = {
         "project_name": {
             "type": "env",
             "key": "PROJECT_NAME",
-            "default": "Cats in space"
+            "default": "Cats in space",
         }
     },
     "dry_run": True,
@@ -93,47 +82,34 @@ ExperimentWithInterpolatedTitle = {
         "title": "hello",
         "probes": [
             PythonModuleProbeWithBoolTolerance,
-        ]
+        ],
     },
-    "method": [
-        PythonModuleProbe,
-        {
-            "ref": PythonModuleProbe["name"]
-        }
-    ]
+    "method": [PythonModuleProbe, {"ref": PythonModuleProbe["name"]}],
 }
 
 ExperimentWithLongPause = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",
-    "steady-state-hypothesis": {
-        "title": "hello"
-    },
+    "steady-state-hypothesis": {"title": "hello"},
     "method": [
-        PythonModuleProbeWithLongPause, 
-        BackgroundPythonModuleProbeWithLongPause
+        PythonModuleProbeWithLongPause,
+        BackgroundPythonModuleProbeWithLongPause,
     ],
-    "rollbacks": [
-        BackgroundPythonModuleProbe
-    ]
+    "rollbacks": [BackgroundPythonModuleProbe],
 }
 
 ExperimentWithRollbackLongPause = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",
-    "steady-state-hypothesis": {
-        "title": "hello"
-    },
-    "method": [
-        PythonModuleProbe
-    ],
-    "rollbacks": [
-        PythonModuleProbeWithLongPause
-    ]
+    "steady-state-hypothesis": {"title": "hello"},
+    "method": [PythonModuleProbe],
+    "rollbacks": [PythonModuleProbeWithLongPause],
 }
 
 ExperimentWithLongPauseBefore = deepcopy(ExperimentWithLongPause)
-ExperimentWithLongPauseBefore["method"][1] = BackgroundPythonModuleProbeWithLongPauseBefore
+ExperimentWithLongPauseBefore["method"][
+    1
+] = BackgroundPythonModuleProbeWithLongPauseBefore
 
 RefProbeExperiment = {
     "title": "do cats live in the Internet?",
@@ -142,14 +118,9 @@ RefProbeExperiment = {
         "title": "hello",
         "probes": [
             PythonModuleProbeWithBoolTolerance,
-        ]
+        ],
     },
-    "method": [
-        PythonModuleProbe,
-        {
-            "ref": PythonModuleProbe["name"]
-        }
-    ]
+    "method": [PythonModuleProbe, {"ref": PythonModuleProbe["name"]}],
 }
 
 MissingRefProbeExperiment = {
@@ -159,14 +130,9 @@ MissingRefProbeExperiment = {
         "title": "hello",
         "probes": [
             PythonModuleProbeWithBoolTolerance,
-        ]
+        ],
     },
-    "method": [
-        PythonModuleProbe,
-        {
-            "ref": "pizza"
-        }
-    ]
+    "method": [PythonModuleProbe, {"ref": "pizza"}],
 }
 
 HTTPToleranceExperiment = {
@@ -174,12 +140,10 @@ HTTPToleranceExperiment = {
     "description": "an experiment of importance",
     "steady-state-hypothesis": {
         "title": "hello",
-        "probes": [
-            PythonModuleProbeWithHTTPStatusTolerance
-        ]
+        "probes": [PythonModuleProbeWithHTTPStatusTolerance],
     },
     "method": [],
-    "rollbacks": []
+    "rollbacks": [],
 }
 
 
@@ -189,24 +153,14 @@ DeprecatedProcArgumentsProbeTwin["name"] = "another-proc-probe"
 ExperimentWithDeprecatedProcArgsProbe = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",
-    "method": [
-        DeprecatedProcArgumentsProbe,
-        DeprecatedProcArgumentsProbeTwin
-    ]
+    "method": [DeprecatedProcArgumentsProbe, DeprecatedProcArgumentsProbeTwin],
 }
 
 ExperimentWithDeprecatedVaultPayload = {
     "title": "vault is missing a path",
     "description": "an experiment of importance",
-    "secrets": {
-        "k8s": {
-            "some-key": {
-                "type": "vault",
-                "key": "foo"
-            }
-        }
-    },
-    "method": []
+    "secrets": {"k8s": {"some-key": {"type": "vault", "key": "foo"}}},
+    "method": [],
 }
 
 
@@ -218,26 +172,17 @@ Experiment = {
         "probes": [
             PythonModuleProbeWithBoolTolerance,
             PythonModuleProbeWithHTTPStatusTolerance,
-            PythonModuleProbeWithExternalTolerance
-        ]
+            PythonModuleProbeWithExternalTolerance,
+        ],
     },
-    "method": [
-        PythonModuleProbe, BackgroundPythonModuleProbe
-    ],
-    "rollbacks": [
-        {
-            "ref": PythonModuleProbe["name"]
-        }
-    ]
+    "method": [PythonModuleProbe, BackgroundPythonModuleProbe],
+    "rollbacks": [{"ref": PythonModuleProbe["name"]}],
 }
 
 
 ExperimentWithConfigurationCallingMissingEnvKey = Experiment.copy()
 ExperimentWithConfigurationCallingMissingEnvKey["configuration"] = {
-    "mykey": {
-        "type": "env",
-        "key": "DOES_NOT_EXIST"
-    }
+    "mykey": {"type": "env", "key": "DOES_NOT_EXIST"}
 }
 
 
@@ -253,13 +198,11 @@ ExperimentWithVariousTolerances = {
             PythonModuleProbeWithHTTPBodyTolerance,
             PythonModuleProbeWithProcessStatusTolerance,
             PythonModuleProbeWithProcessFailedStatusTolerance,
-            PythonModuleProbeWithProcesStdoutTolerance
-        ]
+            PythonModuleProbeWithProcesStdoutTolerance,
+        ],
     },
-    "method": [
-        PythonModuleProbe
-    ],
-    "rollbacks": []
+    "method": [PythonModuleProbe],
+    "rollbacks": [],
 }
 
 
@@ -268,16 +211,10 @@ ExperimentNoControls = {
     "description": "an experiment of importance",
     "steady-state-hypothesis": {
         "title": "hello",
-        "probes": [
-            deepcopy(PythonModuleProbeWithBoolTolerance)
-        ]
+        "probes": [deepcopy(PythonModuleProbeWithBoolTolerance)],
     },
-    "method": [
-        deepcopy(PythonModuleProbe)
-    ],
-    "rollbacks": [
-        deepcopy(PythonModuleProbeWithBoolTolerance)
-    ]
+    "method": [deepcopy(PythonModuleProbe)],
+    "rollbacks": [deepcopy(PythonModuleProbeWithBoolTolerance)],
 }
 
 
@@ -286,16 +223,10 @@ ExperimentNoControlsWithDeviation = {
     "description": "an experiment of importance",
     "steady-state-hypothesis": {
         "title": "hello",
-        "probes": [
-            deepcopy(PythonModuleProbeWithHTTPStatusToleranceDeviation)
-        ]
+        "probes": [deepcopy(PythonModuleProbeWithHTTPStatusToleranceDeviation)],
     },
-    "method": [
-        deepcopy(PythonModuleProbe)
-    ],
-    "rollbacks": [
-        deepcopy(PythonModuleProbeWithBoolTolerance)
-    ]
+    "method": [deepcopy(PythonModuleProbe)],
+    "rollbacks": [deepcopy(PythonModuleProbeWithBoolTolerance)],
 }
 
 
@@ -303,10 +234,7 @@ ExperimentWithControls = deepcopy(ExperimentNoControls)
 ExperimentWithControls["controls"] = [
     {
         "name": "dummy",
-        "provider": {
-            "type": "python",
-            "module": "fixtures.controls.dummy"
-        }
+        "provider": {"type": "python", "module": "fixtures.controls.dummy"},
     }
 ]
 
@@ -316,55 +244,53 @@ ExperimentWithDecoratedControls["controls"] = [
         "name": "dummy",
         "provider": {
             "type": "python",
-            "module": "fixtures.controls.dummy_with_decorated_control"
-        }
+            "module": "fixtures.controls.dummy_with_decorated_control",
+        },
     }
 ]
 
 ExperimentWithControlsRequiringSecrets = deepcopy(ExperimentWithControls)
 ExperimentWithControlsRequiringSecrets["secrets"] = {
-    "mystuff": {
-        "somesecret": "somevalue"
-    }
+    "mystuff": {"somesecret": "somevalue"}
 }
-ExperimentWithControlsRequiringSecrets["controls"][0]["provider"]["module"] = "fixtures.controls.dummy_with_secrets"
-ExperimentWithControlsRequiringSecrets["controls"][0]["provider"]["secrets"] = ["mystuff"]
+ExperimentWithControlsRequiringSecrets["controls"][0]["provider"][
+    "module"
+] = "fixtures.controls.dummy_with_secrets"
+ExperimentWithControlsRequiringSecrets["controls"][0]["provider"]["secrets"] = [
+    "mystuff"
+]
 
 ExperimentWithControlsThatUpdatedConfiguration = deepcopy(ExperimentNoControls)
-ExperimentWithControlsThatUpdatedConfiguration["configuration"] = {
-    "my_token": "UNSET"
-}
+ExperimentWithControlsThatUpdatedConfiguration["configuration"] = {"my_token": "UNSET"}
 ExperimentWithControlsThatUpdatedConfiguration["method"] = [
     deepcopy(GenerateSecretTokenProbe),
-    deepcopy(ReadSecretTokenProbe)
+    deepcopy(ReadSecretTokenProbe),
 ]
 ExperimentWithControlsThatUpdatedConfiguration["controls"] = [
     {
         "name": "dummy",
         "provider": {
             "type": "python",
-            "module": "fixtures.controls.dummy_changed_configuration"
-        }
+            "module": "fixtures.controls.dummy_changed_configuration",
+        },
     }
 ]
 
 ExperimentWithControlsThatUpdatedSecrets = deepcopy(ExperimentNoControls)
 ExperimentWithControlsThatUpdatedSecrets["secrets"] = {
-    "mytokens": {
-        "my_token": "UNSET"
-    }
+    "mytokens": {"my_token": "UNSET"}
 }
 ExperimentWithControlsThatUpdatedSecrets["method"] = [
     deepcopy(GenerateSecretTokenProbe),
-    deepcopy(ReadSecretTokenFromSecretsProbe)
+    deepcopy(ReadSecretTokenFromSecretsProbe),
 ]
 ExperimentWithControlsThatUpdatedSecrets["controls"] = [
     {
         "name": "dummy",
         "provider": {
             "type": "python",
-            "module": "fixtures.controls.dummy_changed_secrets"
-        }
+            "module": "fixtures.controls.dummy_changed_secrets",
+        },
     }
 ]
 
@@ -375,10 +301,8 @@ ExperimentWithArgumentsControls["controls"] = [
         "provider": {
             "type": "python",
             "module": "fixtures.controls.dummy_args_in_control_init",
-            "arguments": {
-                "joke": "onyou"
-            }
-        }
+            "arguments": {"joke": "onyou"},
+        },
     }
 ]
 
@@ -390,55 +314,44 @@ ExperimentWithUnexpectedArgumentsControls["controls"] = [
         "provider": {
             "type": "python",
             "module": "fixtures.controls.dummy",
-            "arguments": {
-                "joke": "onyou"
-            }
-        }
+            "arguments": {"joke": "onyou"},
+        },
     }
 ]
 
 ExperimentUsingConfigToConfigureControls = deepcopy(ExperimentNoControls)
-ExperimentUsingConfigToConfigureControls["configuration"] = {
-    "dummy-key": "blah blah"
-}
+ExperimentUsingConfigToConfigureControls["configuration"] = {"dummy-key": "blah blah"}
 
 
 ExperimentWithControlsAtVariousLevels = deepcopy(ExperimentWithControls)
 ExperimentWithControlsAtVariousLevels["method"][0]["controls"] = [
-        {
-            "name": "dummy-two",
-            "provider": {
-                "type": "python",
-                "module": "fixtures.controls.dummy"
-            }
-        }
-    ]
+    {
+        "name": "dummy-two",
+        "provider": {"type": "python", "module": "fixtures.controls.dummy"},
+    }
+]
 
 
 ExperimentWithControlNotAtTopLevel = deepcopy(ExperimentWithControls)
 ExperimentWithControlNotAtTopLevel.pop("controls")
 ExperimentWithControlNotAtTopLevel["method"][0]["controls"] = [
-        {
-            "name": "dummy",
-            "provider": {
-                "type": "python",
-                "module": "fixtures.controls.dummy"
-            }
-        }
-    ]
+    {
+        "name": "dummy",
+        "provider": {"type": "python", "module": "fixtures.controls.dummy"},
+    }
+]
 
 
 ExperimentWithControlAccessingExperiment = deepcopy(ExperimentWithControls)
-ExperimentWithControlAccessingExperiment["controls"][0]["provider"]["module"] = "fixtures.controls.dummy_with_experiment"
+ExperimentWithControlAccessingExperiment["controls"][0]["provider"][
+    "module"
+] = "fixtures.controls.dummy_with_experiment"
 
 ExperimentCanBeInterruptedByControl = deepcopy(ExperimentWithControls)
 ExperimentCanBeInterruptedByControl["controls"] = [
     {
         "name": "aborter",
-        "provider": {
-            "type": "python",
-            "module": "fixtures.controls.interrupter"
-        }
+        "provider": {"type": "python", "module": "fixtures.controls.interrupter"},
     }
 ]
 
@@ -448,16 +361,10 @@ ExperimentWithoutControls = {
     "description": "an experiment of importance",
     "steady-state-hypothesis": {
         "title": "hello",
-        "probes": [
-        deepcopy(PythonModuleProbeWithBoolTolerance)
-        ]
+        "probes": [deepcopy(PythonModuleProbeWithBoolTolerance)],
     },
-    "method": [
-        deepcopy(PythonModuleProbe)
-    ],
-    "rollbacks": [
-        deepcopy(PythonModuleProbeWithBoolTolerance)
-    ]
+    "method": [deepcopy(PythonModuleProbe)],
+    "rollbacks": [deepcopy(PythonModuleProbeWithBoolTolerance)],
 }
 
 # we should be conservative about reading experiments
@@ -482,7 +389,9 @@ method:
     arguments:
       path: {}
     timeout: 30
-""".format(os.path.abspath(__file__))
+""".format(
+    os.path.abspath(__file__)
+)
 
 
 SimpleExperiment = {
@@ -495,28 +404,18 @@ SimpleExperiment = {
                 "type": "probe",
                 "name": "has-world",
                 "tolerance": 0,
-                "provider": {
-                "type": "process",
-                "path": "echo",
-                    "arguments": "hello"
-                }
+                "provider": {"type": "process", "path": "echo", "arguments": "hello"},
             }
-        ]
+        ],
     },
     "method": [
         {
             "type": "action",
             "name": "say-hello",
-            "provider": {
-                "type": "process",
-                "path": "echo",
-                "arguments": "world"
-            },
-            "pauses": {
-                "after": 1
-            }
+            "provider": {"type": "process", "path": "echo", "arguments": "world"},
+            "pauses": {"after": 1},
         }
-    ]
+    ],
 }
 
 
@@ -527,10 +426,8 @@ SimpleExperimentWithInterruption["controls"] = [
         "provider": {
             "type": "python",
             "module": "fixtures.controls.dummy_with_interrupted_activity",
-            "arguments": {
-                "target_activity_name": "say-hello"
-            }
-        }
+            "arguments": {"target_activity_name": "say-hello"},
+        },
     }
 ]
 
@@ -542,10 +439,8 @@ SimpleExperimentWithExit["controls"] = [
         "provider": {
             "type": "python",
             "module": "fixtures.controls.dummy_with_exited_activity",
-            "arguments": {
-                "target_activity_name": "say-hello"
-            }
-        }
+            "arguments": {"target_activity_name": "say-hello"},
+        },
     }
 ]
 
@@ -558,8 +453,8 @@ SimpleExperimentWithException["method"].append(
         "provider": {
             "type": "python",
             "module": "fixtures.badstuff",
-            "func": "raise_exception"
-        }
+            "func": "raise_exception",
+        },
     }
 )
 
@@ -570,37 +465,29 @@ SimpleExperimentWithSSHFailingAtSomePoint["method"].append(
     {
         "type": "action",
         "name": "say-hello-in-french",
-        "provider": {
-            "type": "process",
-            "path": "echo",
-            "arguments": "bonjour"
-        },
-        "pauses": {
-            "before": 1
-        }
+        "provider": {"type": "process", "path": "echo", "arguments": "bonjour"},
+        "pauses": {"before": 1},
     }
 )
 SimpleExperimentWithSSHFailingAtSomePoint["steady-state-hypothesis"]["probes"].append(
     {
         "type": "probe",
         "name": "fail-at-somepoint",
-        "tolerance":  {
+        "tolerance": {
             "type": "probe",
             "name": "check-lower-than",
             "provider": {
                 "type": "python",
                 "module": "fixtures.badstuff",
                 "func": "check_under_treshold",
-                "arguments": {
-                    "target": 2
-                }
-            }
+                "arguments": {"target": 2},
+            },
         },
         "provider": {
             "type": "python",
             "module": "fixtures.badstuff",
-            "func": "count_generator"
-        }
+            "func": "count_generator",
+        },
     }
 )
 SimpleExperimentWithSSHFailingAtSomePoint["rollbacks"] = [
@@ -610,85 +497,59 @@ SimpleExperimentWithSSHFailingAtSomePoint["rollbacks"] = [
         "provider": {
             "type": "python",
             "module": "fixtures.badstuff",
-            "func": "cleanup_counter"
-        }
+            "func": "cleanup_counter",
+        },
     }
 ]
 
 SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity = deepcopy(
     SimpleExperimentWithSSHFailingAtSomePoint
 )
-SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity["method"][0]["background"] = True
-SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity["method"][0]["pauses"]["after"] = 2
+SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity["method"][0][
+    "background"
+] = True
+SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity["method"][0]["pauses"][
+    "after"
+] = 2
 
 ExperimentWithRegularRollback = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",
-    "steady-state-hypothesis": {
-        "title": "hello"
-    },
-    "method": [
-        EchoAction
-    ],
-    "rollbacks": [
-        EchoAction
-    ]
+    "steady-state-hypothesis": {"title": "hello"},
+    "method": [EchoAction],
+    "rollbacks": [EchoAction],
 }
 
 
 ExperimentWithFailedActionInMethodAndARollback = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",
-    "steady-state-hypothesis": {
-        "title": "hello"
-    },
-    "method": [
-        FailAction
-    ],
-    "rollbacks": [
-        EchoAction
-    ]
+    "steady-state-hypothesis": {"title": "hello"},
+    "method": [FailAction],
+    "rollbacks": [EchoAction],
 }
 
 
 ExperimentWithFailedActionInSSHAndARollback = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",
-    "steady-state-hypothesis": {
-        "title": "hello",
-        "probes": [
-            FailProbe
-        ]
-    },
-    "method": [
-        DoNothingAction
-    ],
-    "rollbacks": [
-        EchoAction
-    ]
+    "steady-state-hypothesis": {"title": "hello", "probes": [FailProbe]},
+    "method": [DoNothingAction],
+    "rollbacks": [EchoAction],
 }
 
 
 ExperimentWithInterruptedExperimentAndARollback = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",
-    "steady-state-hypothesis": {
-        "title": "hello"
-    },
-    "method": [
-        deepcopy(EchoAction)
-    ],
-    "rollbacks": [
-        EchoAction
-    ]
+    "steady-state-hypothesis": {"title": "hello"},
+    "method": [deepcopy(EchoAction)],
+    "rollbacks": [EchoAction],
 }
 ExperimentWithInterruptedExperimentAndARollback["method"][0]["controls"] = [
     {
         "name": "dummy",
-        "provider": {
-            "type": "python",
-            "module": "fixtures.interruptexperiment"
-        }
+        "provider": {"type": "python", "module": "fixtures.interruptexperiment"},
     }
 ]
 
@@ -704,8 +565,8 @@ ExperimentGracefulExitLongHTTPCall = {
             "provider": {
                 "type": "python",
                 "module": "fixtures.longpythonfunc",
-                "func": "be_long"
-            }
+                "func": "be_long",
+            },
         },
         {
             "type": "probe",
@@ -714,29 +575,22 @@ ExperimentGracefulExitLongHTTPCall = {
             "provider": {
                 "type": "python",
                 "module": "fixtures.interrupter",
-                "func": "interrupt_gracefully_in"
-            }
+                "func": "interrupt_gracefully_in",
+            },
         },
         {
             "type": "action",
             "name": "pretend-we-do-stuff",
-            "provider": {
-                "type": "http",
-                "url": "http://localhost:8700/"
-            }
-        }
+            "provider": {"type": "http", "url": "http://localhost:8700/"},
+        },
     ],
     "rollbacks": [
         {
             "type": "action",
             "name": "echo-rollback-is-done",
-            "provider": {
-                "type": "process",
-                "path": "echo",
-                "arguments": "done!!"
-            }
+            "provider": {"type": "process", "path": "echo", "arguments": "done!!"},
         }
-    ]
+    ],
 }
 
 
@@ -751,30 +605,22 @@ ExperimentGracefulExitLongProcessCall = {
             "provider": {
                 "type": "python",
                 "module": "fixtures.interrupter",
-                "func": "interrupt_gracefully_in"
-            }
+                "func": "interrupt_gracefully_in",
+            },
         },
         {
             "type": "action",
             "name": "pretend-we-do-stuff",
-            "provider": {
-                "type": "process",
-                "path": "cat",
-                "arguments": "-"
-            }
-        }
+            "provider": {"type": "process", "path": "cat", "arguments": "-"},
+        },
     ],
     "rollbacks": [
         {
             "type": "action",
             "name": "echo-rollback-is-done",
-            "provider": {
-                "type": "process",
-                "path": "echo",
-                "arguments": "done!!"
-            }
+            "provider": {"type": "process", "path": "echo", "arguments": "done!!"},
         }
-    ]
+    ],
 }
 
 
@@ -789,8 +635,8 @@ ExperimentGracefulExitLongPythonCall = {
             "provider": {
                 "type": "python",
                 "module": "fixtures.interrupter",
-                "func": "interrupt_gracefully_in"
-            }
+                "func": "interrupt_gracefully_in",
+            },
         },
         {
             "type": "action",
@@ -798,21 +644,17 @@ ExperimentGracefulExitLongPythonCall = {
             "provider": {
                 "type": "python",
                 "module": "fixtures.longpythonfunc",
-                "func": "be_long"
-            }
-        }
+                "func": "be_long",
+            },
+        },
     ],
     "rollbacks": [
         {
             "type": "action",
             "name": "echo-rollback-is-done",
-            "provider": {
-                "type": "process",
-                "path": "echo",
-                "arguments": "done!!"
-            }
+            "provider": {"type": "process", "path": "echo", "arguments": "done!!"},
         }
-    ]
+    ],
 }
 
 
@@ -827,8 +669,8 @@ ExperimentUngracefulExitLongHTTPCall = {
             "provider": {
                 "type": "python",
                 "module": "fixtures.longpythonfunc",
-                "func": "be_long"
-            }
+                "func": "be_long",
+            },
         },
         {
             "type": "probe",
@@ -837,29 +679,22 @@ ExperimentUngracefulExitLongHTTPCall = {
             "provider": {
                 "type": "python",
                 "module": "fixtures.interrupter",
-                "func": "interrupt_ungracefully_in"
-            }
+                "func": "interrupt_ungracefully_in",
+            },
         },
         {
             "type": "action",
             "name": "pretend-we-do-stuff",
-            "provider": {
-                "type": "http",
-                "url": "http://localhost:8700"
-            }
-        }
+            "provider": {"type": "http", "url": "http://localhost:8700"},
+        },
     ],
     "rollbacks": [
         {
             "type": "action",
             "name": "echo-rollback-is-done",
-            "provider": {
-                "type": "process",
-                "path": "echo",
-                "arguments": "done!!"
-            }
+            "provider": {"type": "process", "path": "echo", "arguments": "done!!"},
         }
-    ]
+    ],
 }
 
 
@@ -874,30 +709,22 @@ ExperimentUngracefulExitLongProcessCall = {
             "provider": {
                 "type": "python",
                 "module": "fixtures.interrupter",
-                "func": "interrupt_ungracefully_in"
-            }
+                "func": "interrupt_ungracefully_in",
+            },
         },
         {
             "type": "action",
             "name": "pretend-we-do-stuff",
-            "provider": {
-                "type": "process",
-                "path": "cat",
-                "arguments": "-"
-            }
-        }
+            "provider": {"type": "process", "path": "cat", "arguments": "-"},
+        },
     ],
     "rollbacks": [
         {
             "type": "action",
             "name": "echo-rollback-is-done",
-            "provider": {
-                "type": "process",
-                "path": "echo",
-                "arguments": "done!!"
-            }
+            "provider": {"type": "process", "path": "echo", "arguments": "done!!"},
         }
-    ]
+    ],
 }
 
 
@@ -912,8 +739,8 @@ ExperimentUngracefulExitLongPythonCall = {
             "provider": {
                 "type": "python",
                 "module": "fixtures.interrupter",
-                "func": "interrupt_ungracefully_in"
-            }
+                "func": "interrupt_ungracefully_in",
+            },
         },
         {
             "type": "action",
@@ -921,21 +748,17 @@ ExperimentUngracefulExitLongPythonCall = {
             "provider": {
                 "type": "python",
                 "module": "fixtures.longpythonfunc",
-                "func": "be_long"
-            }
-        }
+                "func": "be_long",
+            },
+        },
     ],
     "rollbacks": [
         {
             "type": "action",
             "name": "echo-rollback-is-done",
-            "provider": {
-                "type": "process",
-                "path": "echo",
-                "arguments": "done!!"
-            }
+            "provider": {"type": "process", "path": "echo", "arguments": "done!!"},
         }
-    ]
+    ],
 }
 
 
@@ -949,28 +772,18 @@ SimpleExperimentWithFailingHypothesis = {
                 "type": "probe",
                 "name": "has-world",
                 "tolerance": 1,
-                "provider": {
-                "type": "process",
-                "path": "echo",
-                    "arguments": "hello"
-                }
+                "provider": {"type": "process", "path": "echo", "arguments": "hello"},
             }
-        ]
+        ],
     },
     "method": [
         {
             "type": "action",
             "name": "say-hello",
-            "provider": {
-                "type": "process",
-                "path": "echo",
-                "arguments": "world"
-            },
-            "pauses": {
-                "after": 1
-            }
+            "provider": {"type": "process", "path": "echo", "arguments": "world"},
+            "pauses": {"after": 1},
         }
-    ]
+    ],
 }
 
 
@@ -986,10 +799,8 @@ SimpleExperimentWithBackgroundActivity = {
                 "type": "python",
                 "module": "fixtures.longpythonfunc",
                 "func": "be_long",
-                "arguments": {
-                    "howlong": 3
-                }
-            }
+                "arguments": {"howlong": 3},
+            },
         },
         {
             "type": "action",
@@ -998,12 +809,10 @@ SimpleExperimentWithBackgroundActivity = {
                 "type": "python",
                 "module": "fixtures.longpythonfunc",
                 "func": "be_long",
-                "arguments": {
-                    "howlong": 4
-                }
-            }
-        }
-    ]
+                "arguments": {"howlong": 4},
+            },
+        },
+    ],
 }
 
 ExperimentWithBypassedActivity = {
@@ -1014,13 +823,9 @@ ExperimentWithBypassedActivity = {
             "type": "action",
             "name": "say-hello",
             "dry": True,
-            "provider": {
-                "type": "process",
-                "path": "echo",
-                "arguments": "hello"
-            }
+            "provider": {"type": "process", "path": "echo", "arguments": "hello"},
         }
-    ]
+    ],
 }
 
 
@@ -1029,9 +834,6 @@ ExperimentWithInvalidControls["controls"] = [
     {
         "name": "dummy",
         "should-not-be-here": "boom",
-        "provider": {
-            "type": "python",
-            "module": "fixtures.controls.dummy_validator"
-        }
+        "provider": {"type": "python", "module": "fixtures.controls.dummy_validator"},
     }
 ]

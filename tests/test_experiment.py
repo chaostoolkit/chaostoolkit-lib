@@ -1,24 +1,30 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
 import json
 import os.path
 import signal
 import sys
 import tempfile
 import types
+from datetime import datetime
 
 import pytest
 import requests_mock
 import yaml
+from fixtures import config, experiments
 
 from chaoslib.activity import run_activities
-from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
-    InvalidExperiment, InterruptExecution
-from chaoslib.experiment import ensure_experiment_is_valid, load_experiment, \
-    run_experiment
+from chaoslib.exceptions import (
+    ActivityFailed,
+    InterruptExecution,
+    InvalidActivity,
+    InvalidExperiment,
+)
+from chaoslib.experiment import (
+    ensure_experiment_is_valid,
+    load_experiment,
+    run_experiment,
+)
 from chaoslib.provider.python import validate_python_activity
-
-from fixtures import config, experiments
 
 
 def test_empty_experiment_is_invalid():
@@ -29,9 +35,11 @@ def test_empty_experiment_is_invalid():
 
 def test_load_yaml():
     with tempfile.NamedTemporaryFile(suffix=".yaml") as f:
-        f.write(b"""---
+        f.write(
+            b"""---
 a: 12
-""")
+"""
+        )
         f.seek(0)
         doc = load_experiment(f.name)
         assert "a" in doc
@@ -40,9 +48,11 @@ a: 12
 
 def test_load_yml():
     with tempfile.NamedTemporaryFile(suffix=".yml") as f:
-        f.write(b"""---
+        f.write(
+            b"""---
 a: 12
-""")
+"""
+        )
         f.seek(0)
         doc = load_experiment(f.name)
         assert "a" in doc
@@ -51,7 +61,7 @@ a: 12
 
 def test_load_json():
     with tempfile.NamedTemporaryFile(suffix=".json") as f:
-        f.write(json.dumps({"a": 12}).encode('utf-8'))
+        f.write(json.dumps({"a": 12}).encode("utf-8"))
         f.seek(0)
         doc = load_experiment(f.name)
         assert "a" in doc
@@ -84,7 +94,9 @@ def test_experiment_must_have_a_title():
 def test_experiment_title_substitution():
     journal = run_experiment(experiments.ExperimentWithInterpolatedTitle)
 
-    assert journal["experiment"]["title"] in "Cats in space: do cats live in the Internet?"
+    assert (
+        journal["experiment"]["title"] in "Cats in space: do cats live in the Internet?"
+    )
 
 
 def test_experiment_must_have_a_description():
@@ -94,8 +106,7 @@ def test_experiment_must_have_a_description():
 
 
 def test_experiment_may_not_have_a_hypothesis():
-    assert ensure_experiment_is_valid(
-        experiments.MissingHypothesisExperiment) is None
+    assert ensure_experiment_is_valid(experiments.MissingHypothesisExperiment) is None
 
 
 def test_experiment_hypothesis_must_have_a_title():
@@ -116,7 +127,7 @@ def test_valid_experiment():
 
 def test_valid_experiment_from_json():
     with tempfile.NamedTemporaryFile(suffix=".json") as f:
-        f.write(json.dumps(experiments.Experiment).encode('utf-8'))
+        f.write(json.dumps(experiments.Experiment).encode("utf-8"))
         f.seek(0)
         doc = load_experiment(f.name)
         assert ensure_experiment_is_valid(doc) is None
@@ -124,7 +135,7 @@ def test_valid_experiment_from_json():
 
 def test_valid_experiment_from_yaml():
     with tempfile.NamedTemporaryFile(suffix=".yaml") as f:
-        f.write(yaml.dump(experiments.Experiment).encode('utf-8'))
+        f.write(yaml.dump(experiments.Experiment).encode("utf-8"))
         f.seek(0)
         doc = load_experiment(f.name)
         assert ensure_experiment_is_valid(doc) is None
@@ -147,8 +158,8 @@ def test_can_run_experiment_with_activity_in_dry_mode():
 
 def test_can_iterate_over_activities():
     g = run_activities(
-        experiments.Experiment, configuration=None, secrets=None, pool=None,
-        dry=False)
+        experiments.Experiment, configuration=None, secrets=None, pool=None, dry=False
+    )
     assert isinstance(g, types.GeneratorType)
 
 
@@ -247,13 +258,13 @@ def test_probes_missing_ref_should_fail_the_experiment():
 
 def test_experiment_with_steady_state():
     with requests_mock.mock() as m:
-        m.get('http://example.com', status_code=200)
+        m.get("http://example.com", status_code=200)
         journal = run_experiment(experiments.HTTPToleranceExperiment)
         assert isinstance(journal, dict)
         assert journal["status"] == "completed"
 
     with requests_mock.mock() as m:
-        m.get('http://example.com', status_code=404)
+        m.get("http://example.com", status_code=404)
         journal = run_experiment(experiments.HTTPToleranceExperiment)
         assert isinstance(journal, dict)
         assert journal["status"] == "failed"
@@ -261,7 +272,7 @@ def test_experiment_with_steady_state():
 
 def test_experiment_with_failing_steady_state():
     with requests_mock.mock() as m:
-        m.get('http://example.com', status_code=500)
+        m.get("http://example.com", status_code=500)
         journal = run_experiment(experiments.Experiment)
         assert isinstance(journal, dict)
         assert journal["status"] == "failed"
@@ -282,8 +293,10 @@ def test_should_bail_experiment_when_env_was_not_found():
 
     with pytest.raises(InvalidExperiment) as x:
         run_experiment(experiment)
-    assert "Configuration makes reference to an environment key that does " \
-           "not exist" in str(x.value)
+    assert (
+        "Configuration makes reference to an environment key that does "
+        "not exist" in str(x.value)
+    )
 
 
 def test_validate_all_tolerance_probes():
@@ -323,14 +336,8 @@ def test_dry_run_should_not_pause_before():
 
 def test_rollback_default_strategy_does_not_run_on_failed_activity_in_ssh():
     experiment = experiments.ExperimentWithFailedActionInSSHAndARollback
-    #experiment["dry"] = True
-    settings = {
-        "runtime": {
-            "rollbacks": {
-                "strategy": "default"
-            }
-        }
-    }
+    # experiment["dry"] = True
+    settings = {"runtime": {"rollbacks": {"strategy": "default"}}}
 
     journal = run_experiment(experiment, settings)
     assert journal["status"] == "failed"
@@ -339,14 +346,8 @@ def test_rollback_default_strategy_does_not_run_on_failed_activity_in_ssh():
 
 def test_rollback_default_strategy_runs_on_failed_activity_in_method():
     experiment = experiments.ExperimentWithFailedActionInMethodAndARollback
-    #experiment["dry"] = True
-    settings = {
-        "runtime": {
-            "rollbacks": {
-                "strategy": "default"
-            }
-        }
-    }
+    # experiment["dry"] = True
+    settings = {"runtime": {"rollbacks": {"strategy": "default"}}}
 
     journal = run_experiment(experiment, settings)
     assert journal["status"] == "completed"
@@ -355,14 +356,8 @@ def test_rollback_default_strategy_runs_on_failed_activity_in_method():
 
 def test_rollback_default_strategy_does_not_run_on_interrupted_experiment_in_method():
     experiment = experiments.ExperimentWithInterruptedExperimentAndARollback
-    #experiment["dry"] = True
-    settings = {
-        "runtime": {
-            "rollbacks": {
-                "strategy": "always"
-            }
-        }
-    }
+    # experiment["dry"] = True
+    settings = {"runtime": {"rollbacks": {"strategy": "always"}}}
 
     journal = run_experiment(experiment, settings)
     assert journal["status"] == "interrupted"
@@ -371,14 +366,8 @@ def test_rollback_default_strategy_does_not_run_on_interrupted_experiment_in_met
 
 def test_rollback_always_strategy_runs_on_failed_activity_in_ssh():
     experiment = experiments.ExperimentWithFailedActionInSSHAndARollback
-    #experiment["dry"] = True
-    settings = {
-        "runtime": {
-            "rollbacks": {
-                "strategy": "always"
-            }
-        }
-    }
+    # experiment["dry"] = True
+    settings = {"runtime": {"rollbacks": {"strategy": "always"}}}
 
     journal = run_experiment(experiment, settings)
     assert journal["status"] == "failed"
@@ -387,14 +376,8 @@ def test_rollback_always_strategy_runs_on_failed_activity_in_ssh():
 
 def test_rollback_always_strategy_runs_on_interrupted_experiment_in_method():
     experiment = experiments.ExperimentWithInterruptedExperimentAndARollback
-    #experiment["dry"] = True
-    settings = {
-        "runtime": {
-            "rollbacks": {
-                "strategy": "always"
-            }
-        }
-    }
+    # experiment["dry"] = True
+    settings = {"runtime": {"rollbacks": {"strategy": "always"}}}
 
     journal = run_experiment(experiment, settings)
     assert journal["status"] == "interrupted"
@@ -403,14 +386,8 @@ def test_rollback_always_strategy_runs_on_interrupted_experiment_in_method():
 
 def test_rollback_always_strategy_runs_on_failed_activity_in_method():
     experiment = experiments.ExperimentWithFailedActionInMethodAndARollback
-    #experiment["dry"] = True
-    settings = {
-        "runtime": {
-            "rollbacks": {
-                "strategy": "always"
-            }
-        }
-    }
+    # experiment["dry"] = True
+    settings = {"runtime": {"rollbacks": {"strategy": "always"}}}
 
     journal = run_experiment(experiment, settings)
     assert journal["status"] == "completed"
@@ -419,14 +396,8 @@ def test_rollback_always_strategy_runs_on_failed_activity_in_method():
 
 def test_rollback_never_strategy_does_not_run_on_failed_activity_in_ssh():
     experiment = experiments.ExperimentWithFailedActionInSSHAndARollback
-    #experiment["dry"] = True
-    settings = {
-        "runtime": {
-            "rollbacks": {
-                "strategy": "never"
-            }
-        }
-    }
+    # experiment["dry"] = True
+    settings = {"runtime": {"rollbacks": {"strategy": "never"}}}
 
     journal = run_experiment(experiment, settings)
     assert journal["status"] == "failed"
@@ -435,14 +406,8 @@ def test_rollback_never_strategy_does_not_run_on_failed_activity_in_ssh():
 
 def test_rollback_never_strategy_does_not_run_on_interrupted_experiment_in_method():
     experiment = experiments.ExperimentWithInterruptedExperimentAndARollback
-    #experiment["dry"] = True
-    settings = {
-        "runtime": {
-            "rollbacks": {
-                "strategy": "never"
-            }
-        }
-    }
+    # experiment["dry"] = True
+    settings = {"runtime": {"rollbacks": {"strategy": "never"}}}
 
     journal = run_experiment(experiment, settings)
     assert journal["status"] == "interrupted"
@@ -453,14 +418,13 @@ def test_activity_name_is_logged_correctly_when_function_not_exposed_in_module()
     invalid_python_func_probe = {
         "name": "hello",
         "type": "probe",
-        "provider": {
-            "type": "python",
-            "module": "os",
-            "func": "whatever"
-        }
+        "provider": {"type": "python", "module": "os", "func": "whatever"},
     }
 
     with pytest.raises(InvalidActivity) as x:
         validate_python_activity(invalid_python_func_probe)
 
-    assert str(x.value) == "The python module 'os' does not expose a function called 'whatever' in probe 'hello'"
+    assert (
+        str(x.value)
+        == "The python module 'os' does not expose a function called 'whatever' in probe 'hello'"
+    )
