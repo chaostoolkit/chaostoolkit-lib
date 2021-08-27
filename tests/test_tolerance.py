@@ -485,7 +485,7 @@ def test_tolerance_regex_can_contain_variable_to_be_substituted():
 def test_tolerance_complex_regex_can_contain_variable_to_be_substituted():
     assert (
         within_tolerance(
-            {"type": "regex", "pattern": "^[0-9] \$\{level\} ${msg} - done$"},
+            {"type": "regex", "pattern": r"^[0-9] \$\{level\} ${msg} - done$"},
             value="1 ${level} hello - done",
             configuration={"msg": "hello"},
         )

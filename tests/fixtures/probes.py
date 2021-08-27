@@ -204,7 +204,7 @@ PythonModuleProbeWithProcesStdoutTolerance = {
     "tolerance": {
         "type": "regex",
         "target": "stdout",
-        "pattern": "Python [0-9]\.[0-9]\.[0-9]",
+        "pattern": r"Python [0-9]\.[0-9]\.[0-9]",
     },
     "provider": {
         "type": "process",
