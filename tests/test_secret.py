@@ -10,12 +10,23 @@ from chaoslib.exceptions import InvalidExperiment
 from chaoslib.secret import create_vault_client, load_secrets, load_secrets_from_vault
 
 
+@patch.dict(os.environ, {"KUBE_API_URL": "http://1.2.3.4"})
 def test_should_load_environment():
-    os.environ["KUBE_API_URL"] = "http://1.2.3.4"
+<<<<<<< HEAD
+    secrets = load_secrets({
+        "kubernetes": {
+            "api_server_url": {
+                "type": "env",
+                "key": "KUBE_API_URL"
+            }
+        }
+    }, config.EmptyConfig)
+=======
     secrets = load_secrets(
         {"kubernetes": {"api_server_url": {"type": "env", "key": "KUBE_API_URL"}}},
         config.EmptyConfig,
     )
+>>>>>>> 6e72734 (Resolves #210)
     assert secrets["kubernetes"]["api_server_url"] == "http://1.2.3.4"
 
 
@@ -25,10 +36,13 @@ def test_should_load_inline():
     )
     assert secrets["kubernetes"]["api_server_url"] == "http://1.2.3.4"
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> 6e72734 (Resolves #210)
+@patch.dict(os.environ, {"KUBE_API_URL": "http://1.2.3.4"})
 def test_should_merge_properly():
-    secrets = load_secrets(
-        {
+    secrets = load_secrets({
             "kubernetes": {
                 "username": "jane",
                 "address": {"host": "whatever", "port": 8090},
@@ -226,9 +240,12 @@ def test_read_secrets_from_vault_with_kv_version_2(hvac):
     secrets = load_secrets_from_vault(secrets_info, config)
     assert secrets["k8s"]["a-secret"] == "bar"
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> 6e72734 (Resolves #210)
+@patch.dict(os.environ, {"KUBE_API_URL": "http://1.2.3.4"})
 def test_override_load_environmen_with_var():
-    os.environ["KUBE_API_URL"] = "http://1.2.3.4"
     secrets = load_secrets(
         {"kubernetes": {"api_server_url": {"type": "env", "key": "KUBE_API_URL"}}},
         config.EmptyConfig,
