@@ -1,8 +1,29 @@
 # Changelog
 
 ## [Unreleased][]
+# Added 
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.19.0...HEAD
+* The new dry run with 4 options:
+  * --dry=activities run all activities as dry run. (same as the old flag)
+  * --dry=actions run all actions as dry run.
+  * --dry=probes run all probes as dry run.
+  * --dry=pause run all activities with no pausing.
+* Added tests
+
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.21.0...HEAD
+### Changed
+
+* Switched from pycodestyle/pylama to `black`, `flake8`, `isort`
+* Update CI builds to build, lint, and test
+
+### Added
+
+* Added `.github/workflows/check_pr.yaml` which checks if a PR has modified the
+CHANGELOG.md and if it changed/added tests
+
+## [1.21.0][] - 2021-08-23
+
+[1.21.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.20.0...1.21.0
 
 ### Changed
 
