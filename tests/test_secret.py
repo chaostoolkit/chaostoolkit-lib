@@ -7,7 +7,7 @@ from fixtures import config
 from hvac.exceptions import InvalidRequest
 
 from chaoslib.exceptions import InvalidExperiment
-from chaoslib.secret import create_vault_client, load_secrets, load_secrets_from_vault
+from chaoslib.secret import create_vault_client, load_secrets
 
 
 def test_should_load_environment():
