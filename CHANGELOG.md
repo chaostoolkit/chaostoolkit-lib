@@ -8,6 +8,8 @@
 
 * Switched from pycodestyle/pylama to `black`, `flake8`, `isort`
 * Update CI builds to build, lint, and test
+* Allow nesting of secrets
+* Secrets loaded from a vault can be overridden by variables
 
 ### Added
 
