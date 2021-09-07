@@ -89,7 +89,7 @@ def load_secrets(
                 secrets[key] = extra_vars.get(key)
 
             elif value.get("type") == "env":
-                secrets[key] = extra_vars or load_secret_from_env(value)
+                secrets[key] = load_secret_from_env(value)
 
             elif value.get("type") == "vault":
                 secrets[key] = load_secrets_from_vault(value, configuration)
