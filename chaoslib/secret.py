@@ -78,82 +78,55 @@ def load_secrets(
     """
     logger.debug("Loading secrets...")
 
-    loaders = (
-        load_inline_secrets,
-        load_secrets_from_env,
-        load_secrets_from_vault,
-    )
-
-    secrets = {}
     extra_vars = extra_vars or {}
-    for loader in loaders:
-        for key, value in loader(secrets_info, configuration, extra_vars).items():
-            if key not in secrets:
-                secrets[key] = {}
-            secrets[key].update(value)
 
-    logger.debug("Secrets loaded")
-
-    return secrets
-
-
-def load_inline_secrets(
-    secrets_info: Dict[str, Dict[str, str]],
-    configuration: Configuration = None,
-    extra_vars: Dict[str, Any] = None,
-) -> Secrets:
-    """
-    Load secrets that are inlined in the experiments.
-    """
     secrets = {}
 
-    for (target, keys) in secrets_info.items():
-        secrets[target] = {}
-        for (key, value) in keys.items():
-            if not isinstance(value, dict):
-                secrets[target][key] = extra_vars.get(target, {}).get(key, value)
-            elif value.get("type") not in ("env", "vault"):
-                secrets[target][key] = extra_vars.get(target, {}).get(key, value)
+    for (key, value) in secrets_info.items():
+        if isinstance(value, dict):
 
-        if not secrets[target]:
-            secrets.pop(target)
+            if extra_vars.get(key, None) is not None:
+                secrets[key] = extra_vars.get(key)
 
-    return secrets
+            elif value.get("type") == "env":
+                secrets[key] = load_secret_from_env(value)
 
+            elif value.get("type") == "vault":
+                secrets[key] = load_secrets_from_vault(value, configuration)
 
-def load_secrets_from_env(
-    secrets_info: Dict[str, Dict[str, str]],
-    configuration: Configuration = None,
-    extra_vars: Dict[str, Any] = None,
-) -> Secrets:
-    env = os.environ
-    secrets = {}
-
-    for (target, keys) in secrets_info.items():
-        secrets[target] = {}
-
-        for (key, value) in keys.items():
-            if isinstance(value, dict) and value.get("type") == "env":
-                env_key = value["key"]
-                if (env_key not in env) and (key not in extra_vars.get("target", {})):
-                    raise InvalidExperiment(
-                        "Secrets make reference to an environment key "
-                        "that does not exist: {}".format(env_key)
-                    )
-                secrets[target][key] = extra_vars.get(target, {}).get(
-                    key, env.get(env_key)
+            else:
+                secrets[key] = load_secrets(
+                    value, configuration, extra_vars.get(key, None)
                 )
 
-        if not secrets[target]:
-            secrets.pop(target)
+        else:
+            secrets[key] = value
+
+    logger.debug("Done loading secrets")
 
     return secrets
+
+
+def load_secret_from_env(secrets_info: Dict[str, Dict[str, str]]) -> Secrets:
+    env = os.environ
+
+    if isinstance(secrets_info, dict) and secrets_info.get("type") == "env":
+
+        env_key = secrets_info["key"]
+        if env_key not in env:
+            raise InvalidExperiment(
+                "Secrets make reference to an environment key "
+                "that does not exist: {}".format(env_key)
+            )
+        else:
+            secret = env[env_key]
+
+    return secret
 
 
 def load_secrets_from_vault(
     secrets_info: Dict[str, Dict[str, str]],  # noqa: C901
     configuration: Configuration = None,
-    extra_vars: Dict[str, Any] = None,
 ) -> Secrets:
     """
     Load secrets from Vault KV secrets store
@@ -200,73 +173,57 @@ def load_secrets_from_vault(
     In that case, `mykey` will be set to the value at `secret/foo/bar` under
     the Vault secret key `mypassword`.
     """
-    secrets = {}
+
+    secret = {}
 
     client = create_vault_client(configuration)
 
-    for (target, keys) in secrets_info.items():
-        secrets[target] = {}
+    if isinstance(secrets_info, dict) and secrets_info.get("type") == "vault":
 
-        for (key, value) in keys.items():
-            if isinstance(value, dict) and value.get("type") == "vault":
-                if not HAS_HVAC:
-                    logger.error(
-                        "Install the `hvac` package to fetch secrets "
-                        "from Vault: `pip install chaostoolkit-lib[vault]`."
-                    )
-                    return {}
+        if not HAS_HVAC:
+            logger.error(
+                "Install the `hvac` package to fetch secrets "
+                "from Vault: `pip install chaostoolkit-lib[vault]`."
+            )
+            return {}
 
-                path = value.get("path")
-                if path is None:
-                    logger.warning("Missing Vault secret path for '{}'".format(key))
-                    continue
+        vault_path = secrets_info.get("path")
 
-                # see https://github.com/chaostoolkit/chaostoolkit/issues/98
-                kv = client.secrets.kv
-                is_kv1 = kv.default_kv_version == "1"
-                if is_kv1:
-                    vault_payload = kv.v1.read_secret(
-                        path=path,
-                        mount_point=configuration.get(
-                            "vault_secrets_mount_point", "secret"
-                        ),
-                    )
-                else:
-                    vault_payload = kv.v2.read_secret_version(
-                        path=path,
-                        mount_point=configuration.get(
-                            "vault_secrets_mount_point", "secret"
-                        ),
-                    )
+        if vault_path is None:
+            logger.warning("Missing Vault secret path for '{}'".format(secrets_info))
+            return {}
 
-                if not vault_payload:
-                    logger.warning("No Vault secret found at path: {}".format(path))
-                    continue
+        # see https://github.com/chaostoolkit/chaostoolkit/issues/98
+        kv = client.secrets.kv
+        is_kv1 = kv.default_kv_version == "1"
+        if is_kv1:
+            vault_payload = kv.v1.read_secret(
+                path=vault_path,
+                mount_point=configuration.get("vault_secrets_mount_point", "secret"),
+            )
+        else:
+            vault_payload = kv.v2.read_secret_version(
+                path=vault_path,
+                mount_point=configuration.get("vault_secrets_mount_point", "secret"),
+            )
 
-                if is_kv1:
-                    data = vault_payload.get("data")
-                else:
-                    data = vault_payload.get("data", {}).get("data")
+        if not vault_payload:
+            logger.warning("No Vault secret found at path: {}".format(vault_path))
+            return {}
 
-                if "key" in value:
-                    vault_key = value["key"]
-                    if vault_key not in data:
-                        logger.warning(
-                            "No Vault key '{}' at secret path '{}'".format(
-                                vault_key, path
-                            )
-                        )
-                        continue
+        if is_kv1:
+            data = vault_payload.get("data")
+        else:
+            data = vault_payload.get("data", {}).get("data")
 
-                    secrets[target][key] = data.get(vault_key)
+        key = secrets_info.get("key")
 
-                else:
-                    secrets[target][key] = data
+        if key is not None:
+            secret = data[key]
+        else:
+            secret = data
 
-        if not secrets[target]:
-            secrets.pop(target)
-
-    return secrets
+        return secret
 
 
 ###############################################################################
