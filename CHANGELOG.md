@@ -10,6 +10,7 @@
 * Update CI builds to build, lint, and test
 * Allow nesting of secrets
 * Secrets loaded from a vault can be overridden by variables
+* In secrets testcases, change the os.environ to be a patch, not an assignment within the testcase.
 
 ### Added
 
