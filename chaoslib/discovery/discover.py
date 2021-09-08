@@ -185,9 +185,7 @@ def portable_type_name(python_type: Any) -> str:  # noqa: C901
     elif str(python_type).startswith("typing.Set"):
         return "set"
 
-    logger.debug(
-        f"'{str(python_type)}' could not be ported to something meaningful"
-    )
+    logger.debug(f"'{str(python_type)}' could not be ported to something meaningful")
 
     return "object"
 

@@ -127,54 +127,42 @@ class EventHandlerRegistry:
             try:
                 h.started(experiment, journal)
             except Exception:
-                logger.debug(
-                    f"Handler {h.__class__.__name__} failed", exc_info=True
-                )
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def finish(self, journal: Journal) -> None:
         for h in self.handlers:
             try:
                 h.finish(journal)
             except Exception:
-                logger.debug(
-                    f"Handler {h.__class__.__name__} failed", exc_info=True
-                )
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def interrupted(self, experiment: Experiment, journal: Journal) -> None:
         for h in self.handlers:
             try:
                 h.interrupted(experiment, journal)
             except Exception:
-                logger.debug(
-                    f"Handler {h.__class__.__name__} failed", exc_info=True
-                )
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def signal_exit(self) -> None:
         for h in self.handlers:
             try:
                 h.signal_exit()
             except Exception:
-                logger.debug(
-                    f"Handler {h.__class__.__name__} failed", exc_info=True
-                )
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def start_continuous_hypothesis(self, frequency: int) -> None:
         for h in self.handlers:
             try:
                 h.start_continuous_hypothesis(frequency)
             except Exception:
-                logger.debug(
-                    f"Handler {h.__class__.__name__} failed", exc_info=True
-                )
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def continuous_hypothesis_iteration(self, iteration_index: int, state: Any) -> None:
         for h in self.handlers:
             try:
                 h.continuous_hypothesis_iteration(iteration_index, state)
             except Exception:
-                logger.debug(
-                    f"Handler {h.__class__.__name__} failed", exc_info=True
-                )
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def continuous_hypothesis_completed(
         self, experiment: Experiment, journal: Journal, exception: Exception = None
@@ -183,18 +171,14 @@ class EventHandlerRegistry:
             try:
                 h.continuous_hypothesis_completed(experiment, journal, exception)
             except Exception:
-                logger.debug(
-                    f"Handler {h.__class__.__name__} failed", exc_info=True
-                )
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def start_hypothesis_before(self, experiment: Experiment) -> None:
         for h in self.handlers:
             try:
                 h.start_hypothesis_before(experiment)
             except Exception:
-                logger.debug(
-                    f"Handler {h.__class__.__name__} failed", exc_info=True
-                )
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def hypothesis_before_completed(
         self, experiment: Experiment, state: Dict[str, Any], journal: Journal
@@ -203,18 +187,14 @@ class EventHandlerRegistry:
             try:
                 h.hypothesis_before_completed(experiment, state, journal)
             except Exception:
-                logger.debug(
-                    f"Handler {h.__class__.__name__} failed", exc_info=True
-                )
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def start_hypothesis_after(self, experiment: Experiment) -> None:
         for h in self.handlers:
             try:
                 h.start_hypothesis_after(experiment)
             except Exception:
-                logger.debug(
-                    f"Handler {h.__class__.__name__} failed", exc_info=True
-                )
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def hypothesis_after_completed(
         self, experiment: Experiment, state: Dict[str, Any], journal: Journal
@@ -223,63 +203,49 @@ class EventHandlerRegistry:
             try:
                 h.hypothesis_after_completed(experiment, state, journal)
             except Exception:
-                logger.debug(
-                    f"Handler {h.__class__.__name__} failed", exc_info=True
-                )
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def start_method(self, experiment: Experiment) -> None:
         for h in self.handlers:
             try:
                 h.start_method(experiment)
             except Exception:
-                logger.debug(
-                    f"Handler {h.__class__.__name__} failed", exc_info=True
-                )
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def method_completed(self, experiment: Experiment, state: Any = None) -> None:
         for h in self.handlers:
             try:
                 h.method_completed(experiment, state)
             except Exception:
-                logger.debug(
-                    f"Handler {h.__class__.__name__} failed", exc_info=True
-                )
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def start_rollbacks(self, experiment: Experiment) -> None:
         for h in self.handlers:
             try:
                 h.start_rollbacks(experiment)
             except Exception:
-                logger.debug(
-                    f"Handler {h.__class__.__name__} failed", exc_info=True
-                )
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def rollbacks_completed(self, experiment: Experiment, journal: Journal) -> None:
         for h in self.handlers:
             try:
                 h.rollbacks_completed(experiment, journal)
             except Exception:
-                logger.debug(
-                    f"Handler {h.__class__.__name__} failed", exc_info=True
-                )
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def start_cooldown(self, duration: int) -> None:
         for h in self.handlers:
             try:
                 h.start_cooldown(duration)
             except Exception:
-                logger.debug(
-                    f"Handler {h.__class__.__name__} failed", exc_info=True
-                )
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def cooldown_completed(self) -> None:
         for h in self.handlers:
             try:
                 h.cooldown_completed()
             except Exception:
-                logger.debug(
-                    f"Handler {h.__class__.__name__} failed", exc_info=True
-                )
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
 
 class Runner:

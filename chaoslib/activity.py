@@ -50,9 +50,7 @@ def ensure_activity_is_valid(activity: Activity):  # noqa: C901
         raise InvalidActivity("an activity must have a type")
 
     if activity_type not in ("probe", "action"):
-        raise InvalidActivity(
-            f"'{activity_type}' is not a supported activity type"
-        )
+        raise InvalidActivity(f"'{activity_type}' is not a supported activity type")
 
     if not activity.get("name"):
         raise InvalidActivity("an activity must have a name")
@@ -66,9 +64,7 @@ def ensure_activity_is_valid(activity: Activity):  # noqa: C901
         raise InvalidActivity("a provider must have a type")
 
     if provider_type not in ("python", "process", "http"):
-        raise InvalidActivity(
-            f"unknown provider type '{provider_type}'"
-        )
+        raise InvalidActivity(f"unknown provider type '{provider_type}'")
 
     if not activity.get("name"):
         raise InvalidActivity("activity must have a name (cannot be empty)")
@@ -156,9 +152,7 @@ def execute_activity(
     if ref:
         activity = lookup_activity(ref)
         if not activity:
-            raise ActivityFailed(
-                f"could not find referenced activity '{ref}'"
-            )
+            raise ActivityFailed(f"could not find referenced activity '{ref}'")
 
     with controls(
         level="activity",
@@ -171,9 +165,7 @@ def execute_activity(
         pauses = activity.get("pauses", {})
         pause_before = pauses.get("before")
         if pause_before:
-            logger.info(
-                f"Pausing before next activity for {pause_before}s..."
-            )
+            logger.info(f"Pausing before next activity for {pause_before}s...")
             # only pause when not in dry-mode
             if not dry:
                 time.sleep(pause_before)

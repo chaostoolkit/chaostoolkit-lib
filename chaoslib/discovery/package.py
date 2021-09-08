@@ -19,9 +19,7 @@ def install(package_name: str):
     Use pip to download and install the `package_name` to the current Python
     environment. Pip can detect it is already installed.
     """
-    logger.info(
-        f"Attempting to download and install package '{package_name}'"
-    )
+    logger.info(f"Attempting to download and install package '{package_name}'")
 
     process = subprocess.run(
         ["pip", "install", "-U", package_name],

@@ -148,9 +148,7 @@ def decode_bytes(data: bytes, default_encoding: str = "utf-8") -> str:
     try:
         return data.decode(encoding)
     except UnicodeDecodeError:
-        raise ActivityFailed(
-            f"Failed to decode bytes using encoding '{encoding}'"
-        )
+        raise ActivityFailed(f"Failed to decode bytes using encoding '{encoding}'")
 
 
 def merge_vars(

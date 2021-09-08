@@ -87,9 +87,7 @@ def exit_signals():
 
         # On a system that doesn't support SIGUSR signals
         # not much we can do...
-        logger.debug(
-            f"System '{platform.platform()}' does not expose SIGUSR signals"
-        )
+        logger.debug(f"System '{platform.platform()}' does not expose SIGUSR signals")
         try:
             yield
         finally:

@@ -117,9 +117,7 @@ def validate_controls(experiment: Experiment):
 
         name = c["name"]
         if "provider" not in c:
-            raise InvalidControl(
-                f"Control '{name}' must have a `provider` property"
-            )
+            raise InvalidControl(f"Control '{name}' must have a `provider` property")
 
         scope = c.get("scope")
         if scope and scope not in ("before", "after"):
@@ -398,9 +396,7 @@ def apply_controls(
         if target_scope and target_scope != scope:
             continue
 
-        logger.debug(
-            f"Applying {scope}-control '{control_name}' on '{level}'"
-        )
+        logger.debug(f"Applying {scope}-control '{control_name}' on '{level}'")
         provider = control.get("provider", {})
         provider_type = provider.get("type")
 
