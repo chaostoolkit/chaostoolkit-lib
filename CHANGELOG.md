@@ -11,6 +11,9 @@
 * Allow nesting of secrets
 * Secrets loaded from a vault can be overridden by variables
 * In secrets testcases, change the os.environ to be a patch, not an assignment within the testcase.
+* Add `.github/workflows/close_stale_issues.yaml` to mark issues as `Stale`
+after 365 days of inactivity and to close them after 7 days of being marked
+`Stale`.
 
 ### Added
 
