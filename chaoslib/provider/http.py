@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from typing import Any
 
 import requests
@@ -94,7 +93,7 @@ def run_http_activity(
 
         return {"status": r.status_code, "headers": dict(**r.headers), "body": body}
     except requests.exceptions.ConnectionError as cex:
-        raise ActivityFailed("failed to connect to {u}: {x}".format(u=url, x=str(cex)))
+        raise ActivityFailed(f"failed to connect to {url}: {str(cex)}")
     except requests.exceptions.Timeout:
         raise ActivityFailed("activity took too long to complete")
 

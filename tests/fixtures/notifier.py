@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from logzero import logger
 
 __all__ = ["notify"]

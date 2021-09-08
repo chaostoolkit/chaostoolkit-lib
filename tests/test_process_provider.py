@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os.path
 import stat
 from unittest.mock import patch
@@ -52,8 +51,8 @@ def test_process_not_utf8_cannot_fail():
 
     # unfortunately, this doesn't seem to work well on mac
     if result["status"] == 0:
-        assert result["stderr"] == u""
-        assert result["stdout"] == u"é"
+        assert result["stderr"] == ""
+        assert result["stdout"] == "é"
 
 
 def test_process_homedir_relative_path():

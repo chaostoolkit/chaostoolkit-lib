@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import contextvars
 import os
 import os.path
@@ -40,7 +39,7 @@ def load_settings(settings_path: str = CHAOSTOOLKIT_CONFIG_PATH) -> Settings:
             loaded_settings.set(settings)
             return settings
         except yaml.YAMLError as ye:
-            logger.error("Failed parsing YAML settings: {}".format(str(ye)))
+            logger.error(f"Failed parsing YAML settings: {str(ye)}")
 
 
 def save_settings(settings: Settings, settings_path: str = CHAOSTOOLKIT_CONFIG_PATH):

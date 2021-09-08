@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import enum
 from typing import Any, Dict, List, Tuple, Union
 

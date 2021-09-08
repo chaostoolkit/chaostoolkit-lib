@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import io
 import os.path
 from urllib.parse import urlparse
@@ -27,14 +26,14 @@ def parse_experiment_from_file(path: str) -> Experiment:
     """
     Parse the given experiment from `path` and return it.
     """
-    with io.open(path) as f:
+    with open(path) as f:
         p, ext = os.path.splitext(path)
         if ext in (".yaml", ".yml"):
             try:
                 return yaml.safe_load(f)
             except yaml.YAMLError as ye:
                 raise InvalidSource(
-                    "Failed parsing YAML experiment: {}".format(str(ye))
+                    f"Failed parsing YAML experiment: {str(ye)}"
                 )
         elif ext == ".json":
             return json.load(f)
@@ -56,7 +55,7 @@ def parse_experiment_from_http(response: requests.Response) -> Experiment:
         try:
             return yaml.safe_load(response.text)
         except yaml.YAMLError as ye:
-            raise InvalidSource("Failed parsing YAML experiment: {}".format(str(ye)))
+            raise InvalidSource(f"Failed parsing YAML experiment: {str(ye)}")
     elif "text/plain" in content_type:
         content = response.text
         try:
@@ -107,11 +106,11 @@ def load_experiment(
 
         p = urlparse(experiment_source)
         if not p.scheme and not os.path.exists(p.path):
-            raise InvalidSource('Path "{}" does not exist.'.format(p.path))
+            raise InvalidSource(f'Path "{p.path}" does not exist.')
 
         if p.scheme not in ("http", "https"):
             raise InvalidSource(
-                "'{}' is not a supported source scheme.".format(p.scheme)
+                f"'{p.scheme}' is not a supported source scheme."
             )
 
         headers = {"Accept": "application/json, application/x-yaml"}
@@ -127,9 +126,9 @@ def load_experiment(
 
         r = requests.get(experiment_source, headers=headers, verify=verify_tls)
         if r.status_code != 200:
-            raise InvalidSource("Failed to fetch the experiment: {}".format(r.text))
+            raise InvalidSource(f"Failed to fetch the experiment: {r.text}")
 
-        logger.debug("Fetched experiment: \n{}".format(r.text))
+        logger.debug(f"Fetched experiment: \n{r.text}")
         parsed = parse_experiment_from_http(r)
         control.with_state(parsed)
         return parsed

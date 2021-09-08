@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os.path
 from collections import ChainMap
 from string import Template
@@ -150,7 +149,7 @@ def decode_bytes(data: bytes, default_encoding: str = "utf-8") -> str:
         return data.decode(encoding)
     except UnicodeDecodeError:
         raise ActivityFailed(
-            "Failed to decode bytes using encoding '{}'".format(encoding)
+            f"Failed to decode bytes using encoding '{encoding}'"
         )
 
 
@@ -182,10 +181,10 @@ def merge_vars(
 
     if var_files:
         for var_file in var_files:
-            logger.debug("Loading var from file '{}'".format(var_file))
+            logger.debug(f"Loading var from file '{var_file}'")
 
             if not os.path.isfile(var_file):
-                logger.error("Cannot read var file '{}'".format(var_file))
+                logger.error(f"Cannot read var file '{var_file}'")
                 continue
 
             content = None
@@ -193,7 +192,7 @@ def merge_vars(
                 content = f.read()
 
             if not content:
-                logger.debug("Var file '{}' is empty".format(var_file))
+                logger.debug(f"Var file '{var_file}' is empty")
                 continue
 
             data = None
@@ -233,13 +232,13 @@ def merge_vars(
                         "file '{}'".format(k, var_file)
                     )
             else:
-                logger.debug("Reading configuration/secrets from {}".format(f.name))
+                logger.debug(f"Reading configuration/secrets from {f.name}")
                 config_vars.update(data.get("configuration", {}))
                 secret_vars.update(data.get("secrets", {}))
 
     if var:
         for k in var:
-            logger.debug("Using configuration variable '{}'".format(k))
+            logger.debug(f"Using configuration variable '{k}'")
             config_vars[k] = var[k]
 
     return (config_vars, secret_vars)
