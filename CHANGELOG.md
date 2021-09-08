@@ -14,6 +14,7 @@
 * Add `.github/workflows/close_stale_issues.yaml` to mark issues as `Stale`
 after 365 days of inactivity and to close them after 7 days of being marked
 `Stale`.
+* Run `pyupgrade --py36-plus` across whole project
 
 ### Added
 
