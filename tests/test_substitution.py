@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from fixtures import config
 
 from chaoslib import substitute

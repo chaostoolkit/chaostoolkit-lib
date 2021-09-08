@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import importlib
 import inspect
 import platform
@@ -53,7 +52,7 @@ def initialize_discovery_result(
         "chaoslib_version": __version__,
         "id": str(uuid.uuid4()),
         "target": discovery_type,
-        "date": "{d}Z".format(d=datetime.utcnow().isoformat()),
+        "date": f"{datetime.utcnow().isoformat()}Z",
         "platform": {
             "system": plt.system,
             "node": plt.node,
@@ -76,7 +75,7 @@ def discover_actions(extension_mod_name: str) -> DiscoveredActivities:
     """
     Discover actions from the given extension named `extension_mod_name`.
     """
-    logger.info("Searching for actions in {n}".format(n=extension_mod_name))
+    logger.info(f"Searching for actions in {extension_mod_name}")
     return discover_activities(extension_mod_name, "action")
 
 
@@ -84,7 +83,7 @@ def discover_probes(extension_mod_name: str) -> DiscoveredActivities:
     """
     Discover probes from the given extension named `extension_mod_name`.
     """
-    logger.info("Searching for probes in {n}".format(n=extension_mod_name))
+    logger.info(f"Searching for probes in {extension_mod_name}")
     return discover_activities(extension_mod_name, "probe")
 
 
@@ -98,7 +97,7 @@ def discover_activities(
         mod = importlib.import_module(extension_mod_name)
     except ImportError:
         raise DiscoveryFailed(
-            "could not import extension module '{m}'".format(m=extension_mod_name)
+            f"could not import extension module '{extension_mod_name}'"
         )
 
     activities = []
@@ -186,9 +185,7 @@ def portable_type_name(python_type: Any) -> str:  # noqa: C901
     elif str(python_type).startswith("typing.Set"):
         return "set"
 
-    logger.debug(
-        "'{}' could not be ported to something meaningful".format(str(python_type))
-    )
+    logger.debug(f"'{str(python_type)}' could not be ported to something meaningful")
 
     return "object"
 

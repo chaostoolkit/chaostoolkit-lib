@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import itertools
 import os
 import os.path
@@ -41,16 +40,16 @@ def run_process_activity(
     path = shutil.which(os.path.expanduser(provider["path"]))
     if isinstance(arguments, str):
         shell = True
-        arguments = "{} {}".format(path, arguments)
+        arguments = f"{path} {arguments}"
     else:
         if isinstance(arguments, dict):
             arguments = itertools.chain.from_iterable(arguments.items())
 
-        arguments = list([str(p) for p in arguments if p not in (None, "")])
+        arguments = list(str(p) for p in arguments if p not in (None, ""))
         arguments.insert(0, path)
 
     try:
-        logger.debug("Running: {a}".format(a=str(arguments)))
+        logger.debug(f"Running: {str(arguments)}")
         proc = subprocess.run(
             arguments,
             timeout=timeout,

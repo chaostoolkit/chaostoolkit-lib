@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 import tempfile
 from copy import deepcopy
@@ -569,8 +568,8 @@ def test_secrets_are_passed_to_all_control_hookpoints():
         "after_activity_control",
     ):
         assert (
-            exp["{}_secrets".format(hookpoint)] == secrets
-        ), "{} was not provided the secrets".format(hookpoint)
+            exp[f"{hookpoint}_secrets"] == secrets
+        ), f"{hookpoint} was not provided the secrets"
 
 
 def test_control_can_be_decorated_functions():

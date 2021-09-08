@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Builds an in-memory cache of all declared activities so they can be
 # referenced from other places in the experiment
 import inspect
@@ -33,7 +32,7 @@ def cache_activities(experiment: Experiment) -> List[Activity]:
         if name:
             _cache[name] = activity
 
-    logger.debug("Cached {d} activities".format(d=len(_cache)))
+    logger.debug(f"Cached {len(_cache)} activities")
 
 
 def clear_cache():
@@ -89,5 +88,5 @@ def lookup_activity(ref: str) -> Union[Activity, None]:
     """
     activity = _cache.get(ref)
     if not activity:
-        logger.debug("cache miss for '{r}'".format(r=ref))
+        logger.debug(f"cache miss for '{ref}'")
     return activity

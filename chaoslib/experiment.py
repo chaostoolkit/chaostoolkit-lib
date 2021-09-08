@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, List
 

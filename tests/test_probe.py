@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 import socket
 import sys
@@ -224,7 +223,7 @@ def test_run_http_probe_can_retry():
 
     # change probe URL to call the selected port
     probe = probes.PythonModuleProbeWithHTTPMaxRetries.copy()
-    probe["provider"]["url"] = "http://localhost:{}".format(port)
+    probe["provider"]["url"] = f"http://localhost:{port}"
     try:
         run_activity(probe, config.EmptyConfig, experiments.Secrets)
     except ActivityFailed:

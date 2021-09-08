@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 from typing import Any, Dict
 
@@ -190,7 +189,7 @@ def load_secrets_from_vault(
         vault_path = secrets_info.get("path")
 
         if vault_path is None:
-            logger.warning("Missing Vault secret path for '{}'".format(secrets_info))
+            logger.warning(f"Missing Vault secret path for '{secrets_info}'")
             return {}
 
         # see https://github.com/chaostoolkit/chaostoolkit/issues/98
@@ -208,7 +207,7 @@ def load_secrets_from_vault(
             )
 
         if not vault_payload:
-            logger.warning("No Vault secret found at path: {}".format(vault_path))
+            logger.warning(f"No Vault secret found at path: {vault_path}")
             return {}
 
         if is_kv1:
@@ -257,7 +256,7 @@ def create_vault_client(configuration: Configuration = None):
                 app_role = client.auth_approle(role_id, role_secret)
             except Exception as ve:
                 raise InvalidExperiment(
-                    "Failed to connect to Vault with the AppRole: {}".format(str(ve))
+                    f"Failed to connect to Vault with the AppRole: {str(ve)}"
                 )
 
             client.token = app_role["auth"]["client_token"]
@@ -276,7 +275,7 @@ def create_vault_client(configuration: Configuration = None):
                     client.auth_kubernetes(
                         role=role, jwt=jwt, use_token=True, mount_point=mount_point
                     )
-            except IOError:
+            except OSError:
                 raise InvalidExperiment(
                     "Failed to get service account token at: {path}".format(
                         path=sa_token_path

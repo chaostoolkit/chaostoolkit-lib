@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from contextlib import contextmanager
 from copy import copy, deepcopy
 from typing import List, Union
@@ -56,7 +55,7 @@ def initialize_controls(
         if not name or name in seen:
             continue
         seen.append(name)
-        logger.debug("Initializing control '{}'".format(name))
+        logger.debug(f"Initializing control '{name}'")
 
         provider = control.get("provider")
         if provider and provider["type"] == "python":
@@ -89,7 +88,7 @@ def cleanup_controls(experiment: Experiment):
         if not name or name in seen:
             continue
         seen.append(name)
-        logger.debug("Cleaning up control '{}'".format(name))
+        logger.debug(f"Cleaning up control '{name}'")
 
         provider = control.get("provider")
         if provider and provider["type"] == "python":
@@ -118,9 +117,7 @@ def validate_controls(experiment: Experiment):
 
         name = c["name"]
         if "provider" not in c:
-            raise InvalidControl(
-                "Control '{}' must have a `provider` property".format(name)
-            )
+            raise InvalidControl(f"Control '{name}' must have a `provider` property")
 
         scope = c.get("scope")
         if scope and scope not in ("before", "after"):
@@ -149,7 +146,7 @@ def initialize_global_controls(
     controls = get_global_controls()[:]
     for control in get_global_controls():
         name = control["name"]
-        logger.debug("Initializing global control '{}'".format(name))
+        logger.debug(f"Initializing global control '{name}'")
 
         provider = control.get("provider")
         if provider and provider["type"] == "python":
@@ -183,7 +180,7 @@ def load_global_controls(settings: Settings):
     controls = []
     for name, control in settings.get("controls", {}).items():
         control["name"] = name
-        logger.debug("Loading global control '{}'".format(name))
+        logger.debug(f"Loading global control '{name}'")
 
         provider = control.get("provider")
         if provider and provider["type"] == "python":
@@ -204,7 +201,7 @@ def cleanup_global_controls():
 
     for control in controls:
         name = control["name"]
-        logger.debug("Cleaning up global control '{}'".format(name))
+        logger.debug(f"Cleaning up global control '{name}'")
 
         provider = control.get("provider")
         if provider and provider["type"] == "python":
@@ -389,7 +386,7 @@ def apply_controls(
     settings = get_loaded_settings() or None
     controls = get_context_controls(level, experiment, context)
     if not controls:
-        logger.debug("No controls to apply on '{}'".format(level))
+        logger.debug(f"No controls to apply on '{level}'")
         return
 
     for control in controls:
@@ -399,16 +396,14 @@ def apply_controls(
         if target_scope and target_scope != scope:
             continue
 
-        logger.debug(
-            "Applying {}-control '{}' on '{}'".format(scope, control_name, level)
-        )
+        logger.debug(f"Applying {scope}-control '{control_name}' on '{level}'")
         provider = control.get("provider", {})
         provider_type = provider.get("type")
 
         try:
             if provider_type == "python":
                 apply_python_control(
-                    level="{}-{}".format(level, scope),
+                    level=f"{level}-{scope}",
                     control=control,
                     context=context,
                     state=state,
@@ -427,6 +422,6 @@ def apply_controls(
             raise
         except Exception:
             logger.debug(
-                "{}-control '{}' failed".format(scope.title(), control_name),
+                f"{scope.title()}-control '{control_name}' failed",
                 exc_info=True,
             )

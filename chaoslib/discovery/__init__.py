@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from chaoslib.discovery.discover import (
     discover,
     discover_actions,
