@@ -10,8 +10,8 @@ from chaoslib.exceptions import InvalidExperiment
 from chaoslib.secret import create_vault_client, load_secrets
 
 
+@patch.dict(os.environ, {"KUBE_API_URL": "http://1.2.3.4"})
 def test_should_load_environment():
-    os.environ["KUBE_API_URL"] = "http://1.2.3.4"
     secrets = load_secrets(
         {"kubernetes": {"api_server_url": {"type": "env", "key": "KUBE_API_URL"}}},
         config.EmptyConfig,
@@ -46,6 +46,7 @@ def test_should_load_inline():
     assert secrets["kubernetes"]["api_server_url"] == "http://1.2.3.4"
 
 
+@patch.dict(os.environ, {"KUBE_API_URL": "http://1.2.3.4"})
 def test_should_merge_properly():
     secrets = load_secrets(
         {
@@ -247,8 +248,8 @@ def test_read_secrets_from_vault_with_kv_version_2(hvac):
     assert secrets["k8s"]["a-secret"] == "bar"
 
 
+@patch.dict(os.environ, {"KUBE_API_URL": "http://1.2.3.4"})
 def test_override_load_environmen_with_var():
-    os.environ["KUBE_API_URL"] = "http://1.2.3.4"
     secrets = load_secrets(
         {"kubernetes": {"api_server_url": {"type": "env", "key": "KUBE_API_URL"}}},
         config.EmptyConfig,
