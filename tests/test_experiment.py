@@ -16,6 +16,7 @@ from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
     InvalidExperiment, InterruptExecution
 from chaoslib.experiment import ensure_experiment_is_valid, load_experiment, \
     run_experiment
+from chaoslib.provider.python import validate_python_activity
 
 from fixtures import config, experiments
 
