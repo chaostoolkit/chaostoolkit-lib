@@ -1,35 +1,25 @@
+# -*- coding: utf-8 -*-
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, List
 
 from logzero import logger
 
 from chaoslib.activity import ensure_activity_is_valid
-from chaoslib.caching import lookup_activity, with_cache
-from chaoslib.configuration import load_configuration
+from chaoslib.caching import with_cache, lookup_activity
 from chaoslib.control import validate_controls
-from chaoslib.deprecation import (
-    warn_about_deprecated_features,
-    warn_about_moved_function,
-)
+from chaoslib.deprecation import warn_about_deprecated_features, \
+    warn_about_moved_function
 from chaoslib.exceptions import InvalidActivity, InvalidExperiment
 from chaoslib.extension import validate_extensions
+from chaoslib.configuration import load_configuration
 from chaoslib.hypothesis import ensure_hypothesis_is_valid
 from chaoslib.loader import load_experiment
-from chaoslib.run import RunEventHandler, Runner
-from chaoslib.run import apply_activities as apply_act
-from chaoslib.run import apply_rollbacks as apply_roll
-from chaoslib.run import initialize_run_journal as init_journal
+from chaoslib.run import Runner, RunEventHandler, \
+    initialize_run_journal as init_journal, apply_activities as apply_act, \
+    apply_rollbacks as apply_roll
 from chaoslib.secret import load_secrets
-from chaoslib.types import (
-    Configuration,
-    Experiment,
-    Journal,
-    Run,
-    Schedule,
-    Secrets,
-    Settings,
-    Strategy,
-)
+from chaoslib.types import Configuration, Experiment, Journal, Run, \
+    Schedule, Secrets, Settings, Strategy, Dry
 
 __all__ = ["ensure_experiment_is_valid", "load_experiment"]
 
@@ -68,7 +58,8 @@ def ensure_experiment_is_valid(experiment: Experiment):
     tags = experiment.get("tags")
     if tags:
         if list(filter(lambda t: t == "" or not isinstance(t, str), tags)):
-            raise InvalidExperiment("experiment tags must be a non-empty string")
+            raise InvalidExperiment(
+                "experiment tags must be a non-empty string")
 
     validate_extensions(experiment)
 
@@ -83,8 +74,7 @@ def ensure_experiment_is_valid(experiment: Experiment):
         # that the SSH will still be executed before & after the method block
         raise InvalidExperiment(
             "an experiment requires a method, "
-            "which can be empty for only checking steady state hypothesis "
-        )
+            "which can be empty for only checking steady state hypothesis ")
 
     for activity in method:
         ensure_activity_is_valid(activity)
@@ -92,10 +82,8 @@ def ensure_experiment_is_valid(experiment: Experiment):
         # let's see if a ref is indeed found in the experiment
         ref = activity.get("ref")
         if ref and not lookup_activity(ref):
-            raise InvalidActivity(
-                "referenced activity '{r}' could not be "
-                "found in the experiment".format(r=ref)
-            )
+            raise InvalidActivity("referenced activity '{r}' could not be "
+                                  "found in the experiment".format(r=ref))
 
     rollbacks = experiment.get("rollbacks", [])
     for activity in rollbacks:
@@ -109,26 +97,20 @@ def ensure_experiment_is_valid(experiment: Experiment):
 
 
 @with_cache
-def run_experiment(
-    experiment: Experiment,
-    settings: Settings = None,
-    experiment_vars: Dict[str, Any] = None,
-    strategy: Strategy = Strategy.DEFAULT,
-    schedule: Schedule = None,
-    event_handlers: List[RunEventHandler] = None,
-) -> Journal:
+def run_experiment(experiment: Experiment, settings: Settings = None,
+                   experiment_vars: Dict[str, Any] = None,
+                   strategy: Strategy = Strategy.DEFAULT,
+                   schedule: Schedule = None,
+                   event_handlers: List[RunEventHandler] = None) -> Journal:
     """
     Run the given `experiment` method step by step, in the following sequence:
     steady probe, action, close probe.
-
     Activities can be executed in background when they have the
     `"background"` property set to `true`. In that case, the activity is run in
     a thread. By the end of runs, those threads block until they are all
     complete.
-
-    If the experiment has the `"dry"` property set to `False`, the experiment
+    If the experiment has the `dry` property set to `activities`,the experiment
     runs without actually executing the activities.
-
     NOTE: Tricky to make a decision whether we should rollback when exiting
     abnormally (Ctrl-C, SIGTERM...). Afterall, there is a chance we actually
     cannot afford to rollback properly. Better bailing to a conservative
@@ -141,39 +123,32 @@ def run_experiment(
         if event_handlers:
             for h in event_handlers:
                 runner.register_event_handler(h)
-        return runner.run(experiment, settings, experiment_vars=experiment_vars)
+        return runner.run(
+            experiment, settings, experiment_vars=experiment_vars)
 
 
 def initialize_run_journal(experiment: Experiment) -> Journal:
     warn_about_moved_function(
         "The 'initialize_run_journal' function has now moved to the "
-        "'chaoslib.run' package"
-    )
+        "'chaoslib.run' package")
     return init_journal(experiment)
 
 
-def apply_activities(
-    experiment: Experiment,
-    configuration: Configuration,
-    secrets: Secrets,
-    pool: ThreadPoolExecutor,
-    journal: Journal,
-    dry: bool = False,
-) -> List[Run]:
+def apply_activities(experiment: Experiment, configuration: Configuration,
+                     secrets: Secrets, pool: ThreadPoolExecutor,
+                     journal: Journal, dry: Dry) -> List[Run]:
     warn_about_moved_function(
-        "The 'apply_activities' function has now moved to the " "'chaoslib.run' package"
-    )
-    return apply_act(experiment, configuration, secrets, pool, journal, dry)
+        "The 'apply_activities' function has now moved to the "
+        "'chaoslib.run' package")
+    return apply_act(
+        experiment, configuration, secrets, pool, journal, dry)
 
 
-def apply_rollbacks(
-    experiment: Experiment,
-    configuration: Configuration,
-    secrets: Secrets,
-    pool: ThreadPoolExecutor,
-    dry: bool = False,
-) -> List[Run]:
+def apply_rollbacks(experiment: Experiment, configuration: Configuration,
+                    secrets: Secrets, pool: ThreadPoolExecutor,
+                     dry: Dry) -> List[Run]:
     warn_about_moved_function(
-        "The 'apply_rollbacks' function has now moved to the " "'chaoslib.run' package"
-    )
-    return apply_roll(experiment, configuration, secrets, pool, dry)
+        "The 'apply_rollbacks' function has now moved to the "
+        "'chaoslib.run' package")
+    return apply_roll(
+        experiment, configuration, secrets, pool, dry)

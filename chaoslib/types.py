@@ -86,6 +86,28 @@ class Strategy(enum.Enum):
 
         raise ValueError("Unknown strategy")
 
+class Dry(enum.Enum):
+    PROBES = "probes"
+    ACTIONS = "actions"
+    ACTIVITIES = "activities"
+    PAUSE = "pause"
+
+    @staticmethod
+    def from_string(value: str) -> 'Dry':
+        if value == "probes":
+            return Dry.PROBES
+        elif value == "actions":
+            return Dry.ACTIONS
+        elif value == "activities":
+            return Dry.ACTIVITIES
+        elif value == "pause":
+            return Dry.PAUSE
+        elif not value:
+            return None
+
+
+        raise ValueError("Unknown dry")
+
 
 class Schedule:
     def __init__(

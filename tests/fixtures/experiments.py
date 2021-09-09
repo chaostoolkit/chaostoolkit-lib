@@ -1,28 +1,23 @@
+# -*- coding: utf-8 -*-
 import os
 from copy import deepcopy
 
-from fixtures.actions import DoNothingAction, EchoAction, FailAction
-from fixtures.probes import (
-    BackgroundPythonModuleProbe,
-    BackgroundPythonModuleProbeWithLongPause,
-    BackgroundPythonModuleProbeWithLongPauseBefore,
-    DeprecatedProcArgumentsProbe,
-    FailProbe,
-    GenerateSecretTokenProbe,
-    MissingFuncArgProbe,
-    PythonModuleProbe,
-    PythonModuleProbeWithBoolTolerance,
-    PythonModuleProbeWithExternalTolerance,
-    PythonModuleProbeWithHTTPBodyTolerance,
-    PythonModuleProbeWithHTTPStatusTolerance,
-    PythonModuleProbeWithHTTPStatusToleranceDeviation,
-    PythonModuleProbeWithLongPause,
-    PythonModuleProbeWithProcessFailedStatusTolerance,
-    PythonModuleProbeWithProcessStatusTolerance,
-    PythonModuleProbeWithProcesStdoutTolerance,
-    ReadSecretTokenFromSecretsProbe,
-    ReadSecretTokenProbe,
-)
+from fixtures.actions import DoNothingAction, EchoAction, FailAction, \
+    InterruptAction,\
+    PythonModuleActionWithLongAction
+from fixtures.probes import BackgroundPythonModuleProbe, MissingFuncArgProbe, \
+    PythonModuleProbe, PythonModuleProbeWithBoolTolerance, \
+    PythonModuleProbeWithExternalTolerance, PythonModuleProbeWithLongPause, \
+    BackgroundPythonModuleProbeWithLongPause, BackgroundPythonModuleProbeWithLongPauseBefore,\
+    PythonModuleProbeWithHTTPStatusTolerance, DeprecatedProcArgumentsProbe, \
+    PythonModuleProbeWithHTTPBodyTolerance, \
+    PythonModuleProbeWithProcessStatusTolerance, \
+    PythonModuleProbeWithProcessFailedStatusTolerance, \
+    PythonModuleProbeWithProcesStdoutTolerance, \
+    PythonModuleProbeWithHTTPStatusToleranceDeviation, FailProbe, \
+    GenerateSecretTokenProbe, ReadSecretTokenProbe, \
+    ReadSecretTokenFromSecretsProbe
+from chaoslib.types import Dry
 
 Secrets = {}
 
@@ -92,9 +87,24 @@ ExperimentWithLongPause = {
     "steady-state-hypothesis": {"title": "hello"},
     "method": [
         PythonModuleProbeWithLongPause,
-        BackgroundPythonModuleProbeWithLongPause,
+        BackgroundPythonModuleProbeWithLongPause
     ],
     "rollbacks": [BackgroundPythonModuleProbe],
+}
+
+ExperimentWithLongPauseAction = {
+    "title": "do cats live in the Internet?",
+    "description": "an experiment of importance",
+    "steady-state-hypothesis": {
+        "title": "hello"
+    },
+    "method": [
+        PythonModuleProbeWithLongPause,
+        PythonModuleActionWithLongAction,
+    ],
+    "rollbacks": [
+        PythonModuleActionWithLongAction
+    ]
 }
 
 ExperimentWithRollbackLongPause = {
@@ -394,6 +404,7 @@ method:
 
 
 SimpleExperiment = {
+    "version": "1.0.0",
     "title": "Hello world!",
     "description": "Say hello world.",
     "steady-state-hypothesis": {
@@ -554,6 +565,7 @@ ExperimentWithInterruptedExperimentAndARollback["method"][0]["controls"] = [
 
 
 ExperimentGracefulExitLongHTTPCall = {
+    "version": "1.0.0",
     "title": "Say hello and kaboom",
     "description": "n/a",
     "method": [
@@ -594,6 +606,7 @@ ExperimentGracefulExitLongHTTPCall = {
 
 
 ExperimentGracefulExitLongProcessCall = {
+    "version": "1.0.0",
     "title": "Say hello and kaboom",
     "description": "n/a",
     "method": [
@@ -624,6 +637,7 @@ ExperimentGracefulExitLongProcessCall = {
 
 
 ExperimentGracefulExitLongPythonCall = {
+    "version": "1.0.0",
     "title": "Say hello and kaboom",
     "description": "n/a",
     "method": [
@@ -658,6 +672,7 @@ ExperimentGracefulExitLongPythonCall = {
 
 
 ExperimentUngracefulExitLongHTTPCall = {
+    "version": "1.0.0",
     "title": "Say hello and kaboom",
     "description": "n/a",
     "method": [
@@ -698,6 +713,7 @@ ExperimentUngracefulExitLongHTTPCall = {
 
 
 ExperimentUngracefulExitLongProcessCall = {
+    "version": "1.0.0",
     "title": "Say hello and kaboom",
     "description": "n/a",
     "method": [
@@ -728,6 +744,7 @@ ExperimentUngracefulExitLongProcessCall = {
 
 
 ExperimentUngracefulExitLongPythonCall = {
+    "version": "1.0.0",
     "title": "Say hello and kaboom",
     "description": "n/a",
     "method": [
@@ -762,6 +779,7 @@ ExperimentUngracefulExitLongPythonCall = {
 
 
 SimpleExperimentWithFailingHypothesis = {
+    "version": "1.0.0",
     "title": "Hello world!",
     "description": "Say hello world.",
     "steady-state-hypothesis": {
@@ -787,6 +805,7 @@ SimpleExperimentWithFailingHypothesis = {
 
 
 SimpleExperimentWithBackgroundActivity = {
+    "version": "1.0.0",
     "title": "Hello world!",
     "description": "Say hello world.",
     "method": [
@@ -815,13 +834,14 @@ SimpleExperimentWithBackgroundActivity = {
 }
 
 ExperimentWithBypassedActivity = {
+    "version": "1.0.0",
     "title": "do stuff",
     "description": "n/a",
     "method": [
         {
             "type": "action",
             "name": "say-hello",
-            "dry": True,
+            "dry": Dry.ACTIVITIES,
             "provider": {"type": "process", "path": "echo", "arguments": "hello"},
         }
     ],

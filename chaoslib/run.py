@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError
 
 try:
@@ -35,16 +36,8 @@ from chaoslib.hypothesis import run_steady_state_hypothesis
 from chaoslib.rollback import run_rollbacks
 from chaoslib.secret import load_secrets
 from chaoslib.settings import get_loaded_settings
-from chaoslib.types import (
-    Configuration,
-    Experiment,
-    Journal,
-    Run,
-    Schedule,
-    Secrets,
-    Settings,
-    Strategy,
-)
+from chaoslib.types import Configuration, Experiment, Journal, Run, Secrets, \
+    Settings, Schedule, Strategy, Dry
 
 __all__ = ["Runner", "RunEventHandler"]
 
@@ -52,7 +45,6 @@ __all__ = ["Runner", "RunEventHandler"]
 class RunEventHandler:
     """
     Base class to react to certain, or all, events during an execution.
-
     This is mainly meant for reacting the execution's mainloop. Do not
     implement it as part of an extension, use the Control interface instead.
     """
@@ -73,7 +65,7 @@ class RunEventHandler:
         logger.debug("Steady state will run continuously now")
 
     def continuous_hypothesis_iteration(self, iteration_index: int, state: Any) -> None:
-        logger.debug(f"Steady state iteration {iteration_index}")
+        logger.debug("Steady state iteration {}".format(iteration_index))
 
     def continuous_hypothesis_completed(
         self, experiment: Experiment, journal: Journal, exception: Exception = None
@@ -127,42 +119,54 @@ class EventHandlerRegistry:
             try:
                 h.started(experiment, journal)
             except Exception:
-                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+                logger.debug(
+                    "Handler {} failed".format(h.__class__.__name__), exc_info=True
+                )
 
     def finish(self, journal: Journal) -> None:
         for h in self.handlers:
             try:
                 h.finish(journal)
             except Exception:
-                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+                logger.debug(
+                    "Handler {} failed".format(h.__class__.__name__), exc_info=True
+                )
 
     def interrupted(self, experiment: Experiment, journal: Journal) -> None:
         for h in self.handlers:
             try:
                 h.interrupted(experiment, journal)
             except Exception:
-                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+                logger.debug(
+                    "Handler {} failed".format(h.__class__.__name__), exc_info=True
+                )
 
     def signal_exit(self) -> None:
         for h in self.handlers:
             try:
                 h.signal_exit()
             except Exception:
-                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+                logger.debug(
+                    "Handler {} failed".format(h.__class__.__name__), exc_info=True
+                )
 
     def start_continuous_hypothesis(self, frequency: int) -> None:
         for h in self.handlers:
             try:
                 h.start_continuous_hypothesis(frequency)
             except Exception:
-                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+                logger.debug(
+                    "Handler {} failed".format(h.__class__.__name__), exc_info=True
+                )
 
     def continuous_hypothesis_iteration(self, iteration_index: int, state: Any) -> None:
         for h in self.handlers:
             try:
                 h.continuous_hypothesis_iteration(iteration_index, state)
             except Exception:
-                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+                logger.debug(
+                    "Handler {} failed".format(h.__class__.__name__), exc_info=True
+                )
 
     def continuous_hypothesis_completed(
         self, experiment: Experiment, journal: Journal, exception: Exception = None
@@ -171,14 +175,18 @@ class EventHandlerRegistry:
             try:
                 h.continuous_hypothesis_completed(experiment, journal, exception)
             except Exception:
-                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+                logger.debug(
+                    "Handler {} failed".format(h.__class__.__name__), exc_info=True
+                )
 
     def start_hypothesis_before(self, experiment: Experiment) -> None:
         for h in self.handlers:
             try:
                 h.start_hypothesis_before(experiment)
             except Exception:
-                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+                logger.debug(
+                    "Handler {} failed".format(h.__class__.__name__), exc_info=True
+                )
 
     def hypothesis_before_completed(
         self, experiment: Experiment, state: Dict[str, Any], journal: Journal
@@ -187,14 +195,18 @@ class EventHandlerRegistry:
             try:
                 h.hypothesis_before_completed(experiment, state, journal)
             except Exception:
-                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+                logger.debug(
+                    "Handler {} failed".format(h.__class__.__name__), exc_info=True
+                )
 
     def start_hypothesis_after(self, experiment: Experiment) -> None:
         for h in self.handlers:
             try:
                 h.start_hypothesis_after(experiment)
             except Exception:
-                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+                logger.debug(
+                    "Handler {} failed".format(h.__class__.__name__), exc_info=True
+                )
 
     def hypothesis_after_completed(
         self, experiment: Experiment, state: Dict[str, Any], journal: Journal
@@ -203,49 +215,63 @@ class EventHandlerRegistry:
             try:
                 h.hypothesis_after_completed(experiment, state, journal)
             except Exception:
-                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+                logger.debug(
+                    "Handler {} failed".format(h.__class__.__name__), exc_info=True
+                )
 
     def start_method(self, experiment: Experiment) -> None:
         for h in self.handlers:
             try:
                 h.start_method(experiment)
             except Exception:
-                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+                logger.debug(
+                    "Handler {} failed".format(h.__class__.__name__), exc_info=True
+                )
 
     def method_completed(self, experiment: Experiment, state: Any = None) -> None:
         for h in self.handlers:
             try:
                 h.method_completed(experiment, state)
             except Exception:
-                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+                logger.debug(
+                    "Handler {} failed".format(h.__class__.__name__), exc_info=True
+                )
 
     def start_rollbacks(self, experiment: Experiment) -> None:
         for h in self.handlers:
             try:
                 h.start_rollbacks(experiment)
             except Exception:
-                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+                logger.debug(
+                    "Handler {} failed".format(h.__class__.__name__), exc_info=True
+                )
 
     def rollbacks_completed(self, experiment: Experiment, journal: Journal) -> None:
         for h in self.handlers:
             try:
                 h.rollbacks_completed(experiment, journal)
             except Exception:
-                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+                logger.debug(
+                    "Handler {} failed".format(h.__class__.__name__), exc_info=True
+                )
 
     def start_cooldown(self, duration: int) -> None:
         for h in self.handlers:
             try:
                 h.start_cooldown(duration)
             except Exception:
-                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+                logger.debug(
+                    "Handler {} failed".format(h.__class__.__name__), exc_info=True
+                )
 
     def cooldown_completed(self) -> None:
         for h in self.handlers:
             try:
                 h.cooldown_completed()
             except Exception:
-                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+                logger.debug(
+                    "Handler {} failed".format(h.__class__.__name__), exc_info=True
+                )
 
 
 class Runner:
@@ -326,18 +352,28 @@ class Runner:
         hypo_pool = get_hypothesis_pool()
         continuous_hypo_event = threading.Event()
 
-        dry = experiment.get("dry", False)
-        if dry:
+        dry: Dry = experiment.get("dry", None)
+        if dry == Dry.ACTIVITIES:
             logger.warning("Dry mode enabled")
 
-        initialize_global_controls(experiment, configuration, secrets, settings)
+        elif dry == Dry.ACTIONS:
+            logger.warning("Actionless mode enabled")
+
+        elif dry == Dry.PROBES:
+            logger.warning("Probeless mode enabled")
+
+        elif dry == Dry.PAUSE:
+            logger.warning("Pauseless mode enabled")
+
+        initialize_global_controls(
+            experiment, configuration, secrets, settings)
         initialize_controls(experiment, configuration, secrets)
 
-        logger.info(f"Steady-state strategy: {strategy.value}")
+        logger.info("Steady-state strategy: {}".format(strategy.value))
         rollback_strategy = (
             settings.get("runtime", {}).get("rollbacks", {}).get("strategy", "default")
         )
-        logger.info(f"Rollbacks strategy: {rollback_strategy}")
+        logger.info("Rollbacks strategy: {}".format(rollback_strategy))
 
         exit_gracefully_with_rollbacks = True
         with_ssh = has_steady_state_hypothesis_with_probes(experiment)
@@ -409,7 +445,7 @@ class Runner:
                 event_registry.signal_exit()
             except SystemExit as x:
                 journal["status"] = "interrupted"
-                logger.warning(f"Received the exit signal: {x.code}")
+                logger.warning("Received the exit signal: {}".format(x.code))
 
                 exit_gracefully_with_rollbacks = x.code != 30
                 if not exit_gracefully_with_rollbacks:
@@ -447,7 +483,7 @@ class Runner:
 
             has_deviated = journal["deviated"]
             status = "deviated" if has_deviated else journal["status"]
-            logger.info(f"Experiment ended with status: {status}")
+            logger.info("Experiment ended with status: {s}".format(s=status))
             if has_deviated:
                 logger.info(
                     "The steady-state has deviated, a weakness may have been "
@@ -483,14 +519,10 @@ def should_run_during_method(strategy: Strategy) -> bool:
     return strategy in [Strategy.DURING_METHOD, Strategy.CONTINUOUS]
 
 
-def run_gate_hypothesis(
-    experiment: Experiment,
-    journal: Journal,
-    configuration: Configuration,
-    secrets: Secrets,
-    event_registry: EventHandlerRegistry,
-    dry: bool = False,
-) -> Dict[str, Any]:
+def run_gate_hypothesis(experiment: Experiment, journal: Journal,
+                        configuration: Configuration, secrets: Secrets,
+                        event_registry: EventHandlerRegistry,
+                         dry: Dry) -> Dict[str, Any]:
     """
     Run the hypothesis before the method and bail the execution if it did
     not pass.
@@ -513,14 +545,13 @@ def run_gate_hypothesis(
     return state
 
 
-def run_deviation_validation_hypothesis(
-    experiment: Experiment,
-    journal: Journal,
-    configuration: Configuration,
-    secrets: Secrets,
-    event_registry: EventHandlerRegistry,
-    dry: bool = False,
-) -> Dict[str, Any]:
+def run_deviation_validation_hypothesis(experiment: Experiment,
+                                        journal: Journal,
+                                        configuration: Configuration,
+                                        secrets: Secrets,
+                                        event_registry: EventHandlerRegistry,
+                                         dry: Dry) \
+                                            -> Dict[str, Any]:
     """
     Run the hypothesis after the method and report to the journal if the
     experiment has deviated.
@@ -542,18 +573,14 @@ def run_deviation_validation_hypothesis(
     return state
 
 
-def run_hypothesis_during_method(
-    hypo_pool: ThreadPoolExecutor,
-    continuous_hypo_event: threading.Event,
-    strategy: Strategy,
-    schedule: Schedule,
-    experiment: Experiment,
-    journal: Journal,
-    configuration: Configuration,
-    secrets: Secrets,
-    event_registry: EventHandlerRegistry,
-    dry: bool = False,
-) -> Future:
+def run_hypothesis_during_method(hypo_pool: ThreadPoolExecutor,
+                                 continuous_hypo_event: threading.Event,
+                                 strategy: Strategy, schedule: Schedule,
+                                 experiment: Experiment, journal: Journal,
+                                 configuration: Configuration,
+                                 secrets: Secrets,
+                                 event_registry: EventHandlerRegistry,
+                                  dry: Dry) -> Future:
     """
     Run the hypothesis continuously in a background thread and report the
     status in the journal when it raised an exception.
@@ -586,22 +613,17 @@ def run_hypothesis_during_method(
     return f
 
 
-def run_method(
-    strategy: Strategy,
-    activity_pool: ThreadPoolExecutor,
-    experiment: Experiment,
-    journal: Journal,
-    configuration: Configuration,
-    secrets: Secrets,
-    event_registry: EventHandlerRegistry,
-    dry: bool = False,
-) -> Optional[List[Run]]:
+def run_method(strategy: Strategy, activity_pool: ThreadPoolExecutor,
+               experiment: Experiment, journal: Journal,
+               configuration: Configuration, secrets: Secrets,
+               event_registry: EventHandlerRegistry,
+                dry: Dry) -> Optional[List[Run]]:
     logger.info("Playing your experiment's method now...")
     event_registry.start_method(experiment)
     try:
         state = apply_activities(
-            experiment, configuration, secrets, activity_pool, journal, dry
-        )
+            experiment, configuration, secrets, activity_pool,
+            journal, dry)
         event_registry.method_completed(experiment, state)
         return state
     except InterruptExecution:
@@ -611,21 +633,15 @@ def run_method(
         journal["status"] = "aborted"
         event_registry.method_completed(experiment)
         logger.fatal(
-            "Experiment ran into an un expected fatal error, " "aborting now.",
-            exc_info=True,
-        )
+            "Experiment ran into an un expected fatal error, "
+            "aborting now.", exc_info=True)
 
 
-def run_rollback(
-    rollback_strategy: str,
-    rollback_pool: ThreadPoolExecutor,
-    experiment: Experiment,
-    journal: Journal,
-    configuration: Configuration,
-    secrets: Secrets,
-    event_registry: EventHandlerRegistry,
-    dry: bool = False,
-) -> None:
+def run_rollback(rollback_strategy: str, rollback_pool: ThreadPoolExecutor,
+                 experiment: Experiment, journal: Journal,
+                 configuration: Configuration, secrets: Secrets,
+                 event_registry: EventHandlerRegistry,
+                  dry: Dry) -> None:
     has_deviated = journal["deviated"]
     journal_status = journal["status"]
     play_rollbacks = False
@@ -657,8 +673,8 @@ def run_rollback(
         event_registry.start_rollbacks(experiment)
         try:
             journal["rollbacks"] = apply_rollbacks(
-                experiment, configuration, secrets, rollback_pool, dry
-            )
+                experiment, configuration, secrets,
+                rollback_pool, dry)
         except InterruptExecution as i:
             journal["status"] = "interrupted"
             logger.fatal(str(i))
@@ -736,17 +752,13 @@ def get_hypothesis_pool() -> ThreadPoolExecutor:
     return ThreadPoolExecutor(max_workers=1)
 
 
-def run_hypothesis_continuously(
-    event: threading.Event,
-    schedule: Schedule,
-    experiment: Experiment,
-    journal: Journal,
-    configuration: Configuration,
-    secrets: Secrets,
-    event_registry: EventHandlerRegistry,
-    dry: bool = False,
-):
-    frequency = schedule.continuous_hypothesis_frequency
+def run_hypothesis_continuously(event: threading.Event, schedule: Schedule,
+                                experiment: Experiment, journal: Journal,
+                                configuration: Configuration,
+                                secrets: Secrets,
+                                event_registry: EventHandlerRegistry,
+                                 dry: Dry = Dry.NO_DRY):
+    frequency = schedule.continous_hypothesis_frequency
     fail_fast_ratio = schedule.fail_fast_ratio
 
     event_registry.start_continuous_hypothesis(frequency)
@@ -794,21 +806,12 @@ def run_hypothesis_continuously(
         event.wait(timeout=frequency)
 
 
-def apply_activities(
-    experiment: Experiment,
-    configuration: Configuration,
-    secrets: Secrets,
-    pool: ThreadPoolExecutor,
-    journal: Journal,
-    dry: bool = False,
-) -> List[Run]:
-    with controls(
-        level="method",
-        experiment=experiment,
-        context=experiment,
-        configuration=configuration,
-        secrets=secrets,
-    ) as control:
+def apply_activities(experiment: Experiment, configuration: Configuration,
+                     secrets: Secrets, pool: ThreadPoolExecutor,
+                     journal: Journal,
+                      dry: Dry) -> List[Run]:
+    with controls(level="method", experiment=experiment, context=experiment,
+                  configuration=configuration, secrets=secrets) as control:
         result = []
         runs = []
         method = experiment.get("method", [])
@@ -875,13 +878,9 @@ def apply_activities(
     return result
 
 
-def apply_rollbacks(
-    experiment: Experiment,
-    configuration: Configuration,
-    secrets: Secrets,
-    pool: ThreadPoolExecutor,
-    dry: bool = False,
-) -> List[Run]:
+def apply_rollbacks(experiment: Experiment, configuration: Configuration,
+                    secrets: Secrets, pool: ThreadPoolExecutor,
+                     dry: Dry) -> List[Run]:
     logger.info("Let's rollback...")
     with controls(
         level="rollback",

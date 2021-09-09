@@ -1,20 +1,20 @@
 # Changelog
 
 ## [Unreleased][]
+# Added 
+
+* The new dry run with 4 options:
+  * --dry=activities run all activities as dry run. (same as the old flag)
+  * --dry=actions run all actions as dry run.
+  * --dry=probes run all probes as dry run.
+  * --dry=pause run all activities with no pausing.
+* Added tests
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.21.0...HEAD
-
 ### Changed
 
 * Switched from pycodestyle/pylama to `black`, `flake8`, `isort`
 * Update CI builds to build, lint, and test
-* Allow nesting of secrets
-* Secrets loaded from a vault can be overridden by variables
-* In secrets testcases, change the os.environ to be a patch, not an assignment within the testcase.
-* Add `.github/workflows/close_stale_issues.yaml` to mark issues as `Stale`
-after 365 days of inactivity and to close them after 7 days of being marked
-`Stale`.
-* Run `pyupgrade --py36-plus` across whole project
 
 ### Added
 
@@ -85,6 +85,8 @@ Problem is that the chaostoolkit uses Signals in order to interrupt threads. Som
 Therefore the experiment continues to run. [#210][ctk210]
 
 [ctk210]: https://github.com/chaostoolkit/chaostoolkit/issues/210
+
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.19.0...HEAD
 
 ## [1.19.0][] - 2021-02-16
 
@@ -340,7 +342,7 @@ Therefore the experiment continues to run. [#210][ctk210]
   was interrupted from a control. With the strategies, you can now decide
   that they are always applied, never or only when the experiment deviated.
   This is a flag passed to the settings as follows:
-
+  
   ```
   runtime:
     rollbacks:
@@ -419,13 +421,13 @@ Therefore the experiment continues to run. [#210][ctk210]
 ### Added
 
 - Optional default value for environment variable in configuration
-- Warn the user for an action process returning a non-zero exit code
+- Warn the user for an action process returning a non-zero exit code 
 - Support for process path relative to homedir ~
 - Indicate path in validation when path is not found nor executable [#159][159]
 
 ### Changed
 
-- Changed the method's one-step minimum requirement.
+- Changed the method's one-step minimum requirement. 
   An experiment with an empty method (without any activities) is now valid.
 
 [159]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/159
@@ -537,7 +539,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 
 ### Changed
 
-- Fix to ensure a control's `configuration` parameter is populated when it the
+- Fix to ensure a control's `configuration` parameter is populated when it the 
   control is being `configured` [#114][114]
 - Load and apply global controls, those declared in the settings, from the
   `run_experiment` function rather than out of band [#116][116]
@@ -604,7 +606,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 #### Added
 
 - a new tolerance type called `range` to support scenarios such as:
-
+  
   value type is:
   ```
   {
@@ -665,7 +667,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 - Disallow empty JSON path [#68][68]
 - Pass the experiment to each control when requested via the `experiment`
   parameter of the Python function [#69][69]
-- Specify the [Vault KV secret][kvversion] default version to be used via the
+- Specify the [Vault KV secret][kvversion] default version to be used via the
   `"vault_kv_version"` configuration property, defaulting to v2
 - Support now [AppRole][approle] Vault authentication to access Vault secrets
   thanks to @AlexShemeshWix [#74][74]
@@ -969,7 +971,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 
 ### Changed
 
--   Log a message when loading the configuration
+-   Log a message when loading the configuration 
 -   Raise `InvalidExperiment` when a configuration or secret references a key
     in the environment and that key does not exist (it may not be set however)
     [#40][40]. This bails the experiment at validation time so before it runs.
@@ -1158,7 +1160,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 
 [0.8.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.7.0...0.8.0
 
-### Added
+### Added
 
 - Substitution from configuration and secrets so values can be dynamically set
 - The journal contains now a global status of the run
@@ -1258,7 +1260,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 -   Added support for background activities
 -   Dry mode support
 
-### Removed
+### Removed
 
 -   Unused layer module
 

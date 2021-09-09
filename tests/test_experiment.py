@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import json
 import signal
 import tempfile
@@ -10,13 +11,18 @@ import yaml
 from fixtures import experiments
 
 from chaoslib.activity import run_activities
-from chaoslib.exceptions import InterruptExecution, InvalidActivity, InvalidExperiment
+from chaoslib.exceptions import (
+    InterruptExecution,
+    InvalidActivity,
+    InvalidExperiment
+)
 from chaoslib.experiment import (
     ensure_experiment_is_valid,
     load_experiment,
     run_experiment,
 )
 from chaoslib.provider.python import validate_python_activity
+from chaoslib.types import Dry
 
 
 def test_empty_experiment_is_invalid():
@@ -133,24 +139,11 @@ def test_valid_experiment_from_yaml():
         assert ensure_experiment_is_valid(doc) is None
 
 
-def test_can_run_experiment_in_dry_mode():
-    experiment = experiments.Experiment.copy()
-    experiment["dry"] = True
-
-    journal = run_experiment(experiment)
-    assert isinstance(journal, dict)
-
-
-def test_can_run_experiment_with_activity_in_dry_mode():
-    experiment = experiments.ExperimentWithBypassedActivity.copy()
-    journal = run_experiment(experiment)
-    assert isinstance(journal, dict)
-    assert journal["run"][0]["output"] is None
 
 
 def test_can_iterate_over_activities():
     g = run_activities(
-        experiments.Experiment, configuration=None, secrets=None, pool=None, dry=False
+        experiments.Experiment, configuration=None, secrets=None, pool=None, dry = None
     )
     assert isinstance(g, types.GeneratorType)
 
@@ -232,8 +225,6 @@ def test_can_interrupt_rollbacks_on_SIGINT():
 
 def test_probes_can_reference_each_other():
     experiment = experiments.RefProbeExperiment.copy()
-    experiment["dry"] = True
-
     try:
         run_experiment(experiment)
     except Exception:
@@ -242,8 +233,6 @@ def test_probes_can_reference_each_other():
 
 def test_probes_missing_ref_should_fail_the_experiment():
     experiment = experiments.MissingRefProbeExperiment.copy()
-    experiment["dry"] = True
-
     journal = run_experiment(experiment)
     assert journal["status"] == "aborted"
 
@@ -274,8 +263,6 @@ def test_experiment_with_failing_steady_state():
 def test_experiment_may_run_without_steady_state():
     experiment = experiments.Experiment.copy()
     experiment.pop("steady-state-hypothesis")
-    experiment["dry"] = True
-
     journal = run_experiment(experiment)
     assert journal is not None
 
@@ -298,10 +285,146 @@ def test_validate_all_tolerance_probes():
         ensure_experiment_is_valid(experiments.ExperimentWithVariousTolerances)
 
 
+
+
+def test_rollback_default_strategy_does_not_run_on_failed_activity_in_ssh():
+    experiment = experiments.ExperimentWithFailedActionInSSHAndARollback
+    settings = {"runtime": {"rollbacks": {"strategy": "default"}}}
+
+    journal = run_experiment(experiment, settings)
+    assert journal["status"] == "failed"
+    assert len(journal["rollbacks"]) == 0
+
+
+def test_rollback_default_strategy_runs_on_failed_activity_in_method():
+    experiment = experiments.ExperimentWithFailedActionInMethodAndARollback
+    settings = {"runtime": {"rollbacks": {"strategy": "default"}}}
+
+    journal = run_experiment(experiment, settings)
+    assert journal["status"] == "completed"
+    assert len(journal["rollbacks"]) == 1
+
+
+def test_rollback_default_strategy_does_not_run_on_interrupted_experiment_in_method():
+    experiment = experiments.ExperimentWithInterruptedExperimentAndARollback
+    settings = {"runtime": {"rollbacks": {"strategy": "always"}}}
+
+    journal = run_experiment(experiment, settings)
+    assert journal["status"] == "interrupted"
+    assert len(journal["rollbacks"]) == 1
+
+
+def test_rollback_always_strategy_runs_on_failed_activity_in_ssh():
+    experiment = experiments.ExperimentWithFailedActionInSSHAndARollback
+    settings = {"runtime": {"rollbacks": {"strategy": "always"}}}
+
+    journal = run_experiment(experiment, settings)
+    assert journal["status"] == "failed"
+    assert len(journal["rollbacks"]) == 1
+
+
+def test_rollback_always_strategy_runs_on_interrupted_experiment_in_method():
+    experiment = experiments.ExperimentWithInterruptedExperimentAndARollback
+    settings = {"runtime": {"rollbacks": {"strategy": "always"}}}
+
+    journal = run_experiment(experiment, settings)
+    assert journal["status"] == "interrupted"
+    assert len(journal["rollbacks"]) == 1
+
+
+def test_rollback_always_strategy_runs_on_failed_activity_in_method():
+    experiment = experiments.ExperimentWithFailedActionInMethodAndARollback
+    settings = {"runtime": {"rollbacks": {"strategy": "always"}}}
+
+    journal = run_experiment(experiment, settings)
+    assert journal["status"] == "completed"
+    assert len(journal["rollbacks"]) == 1
+
+
+def test_rollback_never_strategy_does_not_run_on_failed_activity_in_ssh():
+    experiment = experiments.ExperimentWithFailedActionInSSHAndARollback
+    settings = {"runtime": {"rollbacks": {"strategy": "never"}}}
+
+    journal = run_experiment(experiment, settings)
+    assert journal["status"] == "failed"
+    assert len(journal["rollbacks"]) == 0
+
+
+def test_rollback_never_strategy_does_not_run_on_interrupted_experiment_in_method():
+    experiment = experiments.ExperimentWithInterruptedExperimentAndARollback
+    settings = {"runtime": {"rollbacks": {"strategy": "never"}}}
+
+    journal = run_experiment(experiment, settings)
+    assert journal["status"] == "interrupted"
+    assert len(journal["rollbacks"]) == 0
+
+def test_can_run_experiment_in_actionless_mode():
+    experiment = experiments.ExperimentWithLongPauseAction.copy()
+    experiment["dry"] = Dry.ACTIONS
+    journal = run_experiment(experiment)
+    assert isinstance(journal, dict)
+
+def test_can_run_experiment_in_probeless_mode():
+    experiment = experiments.Experiment.copy()
+    experiment["dry"] = Dry.PROBES
+    journal = run_experiment(experiment)
+    assert isinstance(journal, dict)
+
+def test_can_run_experiment_in_pauseless_mode():
+    experiment = experiments.ExperimentWithLongPause.copy()
+    experiment["dry"] = Dry.PAUSE
+    journal = run_experiment(experiment)
+    assert isinstance(journal, dict)
+
+
+def test_can_run_experiment_with_activity_in_dry_mode():
+    experiment = experiments.ExperimentWithBypassedActivity.copy()
+    experiment["dry"] = Dry.ACTIVITIES
+    journal = run_experiment(experiment)
+    assert isinstance(journal, dict)
+    assert journal["run"][0]["output"] is None
+
+
 def test_dry_run_should_not_pause_after():
     experiment = experiments.ExperimentWithLongPause.copy()
-    experiment["dry"] = True
+    experiment["dry"] = Dry.ACTIVITIES
+    start = datetime.utcnow()
+    run_experiment(experiment)
+    end = datetime.utcnow()
 
+    experiment_run_time = int((end - start).total_seconds())
+    pause_after_duration = int(experiment["method"][1]["pauses"]["after"])
+
+    assert experiment_run_time < pause_after_duration
+
+
+def test_actionless_run_should_not_pause_after():
+    experiment = experiments.ExperimentWithLongPauseAction.copy()
+    experiment["dry"] = Dry.ACTIONS
+    start = datetime.utcnow()
+    run_experiment(experiment)
+    end = datetime.utcnow()
+
+    experiment_run_time = int((end - start).total_seconds())
+    pause_after_duration = int(experiment["method"][1]["pauses"]["after"])
+
+    assert experiment_run_time < pause_after_duration
+
+def test_probeless_run_should_not_pause_after():
+    experiment = experiments.ExperimentWithLongPause.copy()
+    experiment["dry"] = Dry.PROBES
+    start = datetime.utcnow()
+    run_experiment(experiment)
+    end = datetime.utcnow()
+
+    experiment_run_time = int((end - start).total_seconds())
+    pause_after_duration = int(experiment["method"][1]["pauses"]["after"])
+
+    assert experiment_run_time < pause_after_duration
+
+def test_pauseless_run_should_not_pause_after():
+    experiment = experiments.ExperimentWithLongPause.copy()
+    experiment["dry"] = Dry.PAUSE
     start = datetime.utcnow()
     run_experiment(experiment)
     end = datetime.utcnow()
@@ -314,7 +437,33 @@ def test_dry_run_should_not_pause_after():
 
 def test_dry_run_should_not_pause_before():
     experiment = experiments.ExperimentWithLongPauseBefore.copy()
-    experiment["dry"] = True
+    experiment["dry"] = Dry.ACTIVITIES
+    start = datetime.utcnow()
+    run_experiment(experiment)
+    end = datetime.utcnow()
+
+    experiment_run_time = int((end - start).total_seconds())
+    pause_before_duration = int(experiment["method"][1]["pauses"]["before"])
+
+    assert experiment_run_time < pause_before_duration
+
+
+def test_actionless_run_should_not_pause_before():
+    experiment = experiments.ExperimentWithLongPauseAction.copy()
+    experiment["dry"] = Dry.ACTIONS
+
+    start = datetime.utcnow()
+    run_experiment(experiment)
+    end = datetime.utcnow()
+
+    experiment_run_time = int((end - start).total_seconds())
+    pause_before_duration = int(experiment["method"][1]["pauses"]["before"])
+
+    assert experiment_run_time < pause_before_duration
+
+def test_probeless_run_should_not_pause_before():
+    experiment = experiments.ExperimentWithLongPauseBefore.copy()
+    experiment["dry"] = Dry.PROBES
 
     start = datetime.utcnow()
     run_experiment(experiment)
@@ -326,97 +475,15 @@ def test_dry_run_should_not_pause_before():
     assert experiment_run_time < pause_before_duration
 
 
-def test_rollback_default_strategy_does_not_run_on_failed_activity_in_ssh():
-    experiment = experiments.ExperimentWithFailedActionInSSHAndARollback
-    # experiment["dry"] = True
-    settings = {"runtime": {"rollbacks": {"strategy": "default"}}}
+def test_pauseless_run_should_not_pause_before():
+    experiment = experiments.ExperimentWithLongPauseBefore.copy()
+    experiment["dry"] = Dry.PAUSE
 
-    journal = run_experiment(experiment, settings)
-    assert journal["status"] == "failed"
-    assert len(journal["rollbacks"]) == 0
+    start = datetime.utcnow()
+    run_experiment(experiment)
+    end = datetime.utcnow()
 
+    experiment_run_time = int((end - start).total_seconds())
+    pause_before_duration = int(experiment["method"][1]["pauses"]["before"])
 
-def test_rollback_default_strategy_runs_on_failed_activity_in_method():
-    experiment = experiments.ExperimentWithFailedActionInMethodAndARollback
-    # experiment["dry"] = True
-    settings = {"runtime": {"rollbacks": {"strategy": "default"}}}
-
-    journal = run_experiment(experiment, settings)
-    assert journal["status"] == "completed"
-    assert len(journal["rollbacks"]) == 1
-
-
-def test_rollback_default_strategy_does_not_run_on_interrupted_experiment_in_method():
-    experiment = experiments.ExperimentWithInterruptedExperimentAndARollback
-    # experiment["dry"] = True
-    settings = {"runtime": {"rollbacks": {"strategy": "always"}}}
-
-    journal = run_experiment(experiment, settings)
-    assert journal["status"] == "interrupted"
-    assert len(journal["rollbacks"]) == 1
-
-
-def test_rollback_always_strategy_runs_on_failed_activity_in_ssh():
-    experiment = experiments.ExperimentWithFailedActionInSSHAndARollback
-    # experiment["dry"] = True
-    settings = {"runtime": {"rollbacks": {"strategy": "always"}}}
-
-    journal = run_experiment(experiment, settings)
-    assert journal["status"] == "failed"
-    assert len(journal["rollbacks"]) == 1
-
-
-def test_rollback_always_strategy_runs_on_interrupted_experiment_in_method():
-    experiment = experiments.ExperimentWithInterruptedExperimentAndARollback
-    # experiment["dry"] = True
-    settings = {"runtime": {"rollbacks": {"strategy": "always"}}}
-
-    journal = run_experiment(experiment, settings)
-    assert journal["status"] == "interrupted"
-    assert len(journal["rollbacks"]) == 1
-
-
-def test_rollback_always_strategy_runs_on_failed_activity_in_method():
-    experiment = experiments.ExperimentWithFailedActionInMethodAndARollback
-    # experiment["dry"] = True
-    settings = {"runtime": {"rollbacks": {"strategy": "always"}}}
-
-    journal = run_experiment(experiment, settings)
-    assert journal["status"] == "completed"
-    assert len(journal["rollbacks"]) == 1
-
-
-def test_rollback_never_strategy_does_not_run_on_failed_activity_in_ssh():
-    experiment = experiments.ExperimentWithFailedActionInSSHAndARollback
-    # experiment["dry"] = True
-    settings = {"runtime": {"rollbacks": {"strategy": "never"}}}
-
-    journal = run_experiment(experiment, settings)
-    assert journal["status"] == "failed"
-    assert len(journal["rollbacks"]) == 0
-
-
-def test_rollback_never_strategy_does_not_run_on_interrupted_experiment_in_method():
-    experiment = experiments.ExperimentWithInterruptedExperimentAndARollback
-    # experiment["dry"] = True
-    settings = {"runtime": {"rollbacks": {"strategy": "never"}}}
-
-    journal = run_experiment(experiment, settings)
-    assert journal["status"] == "interrupted"
-    assert len(journal["rollbacks"]) == 0
-
-
-def test_activity_name_is_logged_correctly_when_function_not_exposed_in_module():
-    invalid_python_func_probe = {
-        "name": "hello",
-        "type": "probe",
-        "provider": {"type": "python", "module": "os", "func": "whatever"},
-    }
-
-    with pytest.raises(InvalidActivity) as x:
-        validate_python_activity(invalid_python_func_probe)
-
-    assert str(x.value) == (
-        "The python module 'os' does not expose a function called 'whatever' in probe"
-        " 'hello'"
-    )
+    assert experiment_run_time < pause_before_duration
