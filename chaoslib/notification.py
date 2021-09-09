@@ -1,17 +1,22 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime, timezone
-from enum import Enum
 import importlib
 import inspect
+from datetime import datetime, timezone
+from enum import Enum
 from typing import Any, Dict
 
-from logzero import logger
 import requests
+from logzero import logger
 
 from chaoslib.types import EventPayload, Settings
 
-__all__ = ["DiscoverFlowEvent", "InitFlowEvent", "RunFlowEvent",
-           "ValidateFlowEvent", "notify"]
+__all__ = [
+    "DiscoverFlowEvent",
+    "InitFlowEvent",
+    "RunFlowEvent",
+    "ValidateFlowEvent",
+    "notify",
+]
 
 
 class FlowEvent(Enum):
@@ -43,8 +48,12 @@ class ValidateFlowEvent(FlowEvent):
     ValidateCompleted = "validate-completed"
 
 
-def notify(settings: Settings, event: FlowEvent, payload: Any = None,  #noqa: C901
-           error: Any = None):
+def notify(
+    settings: Settings,
+    event: FlowEvent,
+    payload: Any = None,  # noqa: C901
+    error: Any = None,
+):
     """
     Go through all the notification channels declared in the settings and
     call them one by one. Only call those matching the current event.
@@ -114,7 +123,7 @@ def notify(settings: Settings, event: FlowEvent, payload: Any = None,  #noqa: C9
         "name": event.value,
         "payload": payload,
         "phase": "unknown",
-        "ts": datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
+        "ts": datetime.utcnow().replace(tzinfo=timezone.utc).timestamp(),
     }
 
     if error:
@@ -163,19 +172,25 @@ def notify_with_http(channel: Dict[str, str], payload: EventPayload):
         try:
             if forward_event_payload:
                 r = requests.post(
-                    url, headers=headers, verify=verify_tls, timeout=(2, 5),
-                    json=payload)
+                    url,
+                    headers=headers,
+                    verify=verify_tls,
+                    timeout=(2, 5),
+                    json=payload,
+                )
             else:
                 r = requests.get(
-                    url, headers=headers, verify=verify_tls, timeout=(2, 5))
+                    url, headers=headers, verify=verify_tls, timeout=(2, 5)
+                )
 
             if r.status_code > 399:
                 logger.debug(
                     "Notification sent to '{u}' failed with '{t}'".format(
-                        u=url, t=r.text))
+                        u=url, t=r.text
+                    )
+                )
         except requests.exceptions.RequestException as err:
-            logger.debug(
-                "failed calling notification endpoint", exc_info=err)
+            logger.debug("failed calling notification endpoint", exc_info=err)
     else:
         logger.debug("missing url in notification channel")
 
@@ -197,8 +212,10 @@ def notify_via_plugin(channel: Dict[str, str], payload: EventPayload):
     try:
         mod = importlib.import_module(mod_name)
     except ImportError:
-        logger.debug("could not find Python plugin '{mod}' "
-                     "for notification".format(mod=mod_name))
+        logger.debug(
+            "could not find Python plugin '{mod}' "
+            "for notification".format(mod=mod_name)
+        )
     else:
         funcs = inspect.getmembers(mod, inspect.isfunction)
         for (name, f) in funcs:
@@ -206,9 +223,10 @@ def notify_via_plugin(channel: Dict[str, str], payload: EventPayload):
                 try:
                     f(channel, payload)
                 except Exception as err:
-                    logger.debug(
-                        "failed calling notification plugin", exc_info=err)
+                    logger.debug("failed calling notification plugin", exc_info=err)
                 break
         else:
-            logger.debug("could not find function '{f}' in plugin '{mod}' "
-                         "for notification".format(mod=mod_name, f=func_name))
+            logger.debug(
+                "could not find function '{f}' in plugin '{mod}' "
+                "for notification".format(mod=mod_name, f=func_name)
+            )

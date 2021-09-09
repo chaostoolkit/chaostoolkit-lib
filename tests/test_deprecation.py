@@ -1,17 +1,20 @@
 # -*- coding: utf-8 -*-
-import sys
-from unittest.mock import patch
 import warnings
+from unittest.mock import patch
 
-import pytest
-
-from chaoslib import deprecation
-from chaoslib.deprecation import DeprecatedDictArgsMessage, \
-    DeprecatedVaultMissingPathMessage, warn_about_deprecated_features
-from chaoslib import experiment
-from chaoslib.experiment import initialize_run_journal, apply_activities, \
-    apply_rollbacks
 from fixtures import experiments
+
+from chaoslib import deprecation, experiment
+from chaoslib.deprecation import (
+    DeprecatedDictArgsMessage,
+    DeprecatedVaultMissingPathMessage,
+    warn_about_deprecated_features,
+)
+from chaoslib.experiment import (
+    apply_activities,
+    apply_rollbacks,
+    initialize_run_journal,
+)
 
 
 def test_run_dict_arguments_has_been_deprecated_in_favor_of_list():
@@ -19,10 +22,13 @@ def test_run_dict_arguments_has_been_deprecated_in_favor_of_list():
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("module")
         warn_about_deprecated_features(
-            experiments.ExperimentWithDeprecatedProcArgsProbe)
+            experiments.ExperimentWithDeprecatedProcArgsProbe
+        )
         for warning in w:
-            if issubclass(warning.category, DeprecationWarning) and \
-                warning.filename == deprecation.__file__:
+            if (
+                issubclass(warning.category, DeprecationWarning)
+                and warning.filename == deprecation.__file__
+            ):
                 assert DeprecatedDictArgsMessage in str(warning.message)
                 warn_counts = warn_counts + 1
 
@@ -33,13 +39,13 @@ def test_vault_secrets_require_path():
     warn_counts = 0
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("module")
-        warn_about_deprecated_features(
-            experiments.ExperimentWithDeprecatedVaultPayload)
+        warn_about_deprecated_features(experiments.ExperimentWithDeprecatedVaultPayload)
         for warning in w:
-            if issubclass(warning.category, DeprecationWarning) and \
-                warning.filename == deprecation.__file__:
-                assert DeprecatedVaultMissingPathMessage in str(
-                    warning.message)
+            if (
+                issubclass(warning.category, DeprecationWarning)
+                and warning.filename == deprecation.__file__
+            ):
+                assert DeprecatedVaultMissingPathMessage in str(warning.message)
                 warn_counts = warn_counts + 1
 
     assert warn_counts == 1

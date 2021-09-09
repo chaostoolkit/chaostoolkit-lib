@@ -1,9 +1,16 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ["ChaosException", "InvalidExperiment", "InvalidActivity",
-           "ActivityFailed", "DiscoveryFailed", "InvalidSource",
-           "InterruptExecution", "ControlPythonFunctionLoadingError",
-           "InvalidControl"]
+__all__ = [
+    "ChaosException",
+    "InvalidExperiment",
+    "InvalidActivity",
+    "ActivityFailed",
+    "DiscoveryFailed",
+    "InvalidSource",
+    "InterruptExecution",
+    "ControlPythonFunctionLoadingError",
+    "InvalidControl",
+]
 
 
 class ChaosException(Exception):
@@ -56,4 +63,5 @@ class ExperimentExitedException(ChaosException):
     really raise another exception again to let the Chaos Toolkit
     quickly terminate.
     """
+
     pass

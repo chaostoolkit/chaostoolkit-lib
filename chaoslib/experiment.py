@@ -5,18 +5,21 @@ from typing import Any, Dict, List
 from logzero import logger
 
 from chaoslib.activity import ensure_activity_is_valid
-from chaoslib.caching import with_cache, lookup_activity
+from chaoslib.caching import lookup_activity, with_cache
+from chaoslib.configuration import load_configuration
 from chaoslib.control import validate_controls
-from chaoslib.deprecation import warn_about_deprecated_features, \
-    warn_about_moved_function
+from chaoslib.deprecation import (
+    warn_about_deprecated_features,
+    warn_about_moved_function,
+)
 from chaoslib.exceptions import InvalidActivity, InvalidExperiment
 from chaoslib.extension import validate_extensions
-from chaoslib.configuration import load_configuration
 from chaoslib.hypothesis import ensure_hypothesis_is_valid
 from chaoslib.loader import load_experiment
-from chaoslib.run import Runner, RunEventHandler, \
-    initialize_run_journal as init_journal, apply_activities as apply_act, \
-    apply_rollbacks as apply_roll
+from chaoslib.run import RunEventHandler, Runner
+from chaoslib.run import apply_activities as apply_act
+from chaoslib.run import apply_rollbacks as apply_roll
+from chaoslib.run import initialize_run_journal as init_journal
 from chaoslib.secret import load_secrets
 from chaoslib.types import Configuration, Experiment, Journal, Run, \
     Schedule, Secrets, Settings, Strategy, Dry
@@ -57,9 +60,8 @@ def ensure_experiment_is_valid(experiment: Experiment):
 
     tags = experiment.get("tags")
     if tags:
-        if list(filter(lambda t: t == '' or not isinstance(t, str), tags)):
-            raise InvalidExperiment(
-                "experiment tags must be a non-empty string")
+        if list(filter(lambda t: t == "" or not isinstance(t, str), tags)):
+            raise InvalidExperiment("experiment tags must be a non-empty string")
 
     validate_extensions(experiment)
 
@@ -74,7 +76,8 @@ def ensure_experiment_is_valid(experiment: Experiment):
         # that the SSH will still be executed before & after the method block
         raise InvalidExperiment(
             "an experiment requires a method, "
-            "which can be empty for only checking steady state hypothesis ")
+            "which can be empty for only checking steady state hypothesis "
+        )
 
     for activity in method:
         ensure_activity_is_valid(activity)
@@ -82,8 +85,10 @@ def ensure_experiment_is_valid(experiment: Experiment):
         # let's see if a ref is indeed found in the experiment
         ref = activity.get("ref")
         if ref and not lookup_activity(ref):
-            raise InvalidActivity("referenced activity '{r}' could not be "
-                                  "found in the experiment".format(r=ref))
+            raise InvalidActivity(
+                "referenced activity '{r}' could not be "
+                "found in the experiment".format(r=ref)
+            )
 
     rollbacks = experiment.get("rollbacks", [])
     for activity in rollbacks:
@@ -97,11 +102,14 @@ def ensure_experiment_is_valid(experiment: Experiment):
 
 
 @with_cache
-def run_experiment(experiment: Experiment, settings: Settings = None,
-                   experiment_vars: Dict[str, Any] = None,
-                   strategy: Strategy = Strategy.DEFAULT,
-                   schedule: Schedule = None,
-                   event_handlers: List[RunEventHandler] = None) -> Journal:
+def run_experiment(
+    experiment: Experiment,
+    settings: Settings = None,
+    experiment_vars: Dict[str, Any] = None,
+    strategy: Strategy = Strategy.DEFAULT,
+    schedule: Schedule = None,
+    event_handlers: List[RunEventHandler] = None,
+) -> Journal:
     """
     Run the given `experiment` method step by step, in the following sequence:
     steady probe, action, close probe.
@@ -126,14 +134,14 @@ def run_experiment(experiment: Experiment, settings: Settings = None,
         if event_handlers:
             for h in event_handlers:
                 runner.register_event_handler(h)
-        return runner.run(
-            experiment, settings, experiment_vars=experiment_vars)
+        return runner.run(experiment, settings, experiment_vars=experiment_vars)
 
 
 def initialize_run_journal(experiment: Experiment) -> Journal:
     warn_about_moved_function(
         "The 'initialize_run_journal' function has now moved to the "
-        "'chaoslib.run' package")
+        "'chaoslib.run' package"
+    )
     return init_journal(experiment)
 
 
@@ -151,7 +159,6 @@ def apply_rollbacks(experiment: Experiment, configuration: Configuration,
                     secrets: Secrets, pool: ThreadPoolExecutor,
                      dry: Dry) -> List[Run]:
     warn_about_moved_function(
-        "The 'apply_rollbacks' function has now moved to the "
-        "'chaoslib.run' package")
-    return apply_roll(
-        experiment, configuration, secrets, pool, dry)
+        "The 'apply_rollbacks' function has now moved to the " "'chaoslib.run' package"
+    )
+    return apply_roll(experiment, configuration, secrets, pool, dry)

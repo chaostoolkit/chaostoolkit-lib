@@ -40,15 +40,16 @@ This will start your probe in the background.
 
 WARNING: Only available on Unix/Linux systems.
 """
-from chaoslib.exceptions import InterruptExecution
-from contextlib import contextmanager
 import inspect
 import os
 import platform
 import signal
+from contextlib import contextmanager
 from types import FrameType
 
 from logzero import logger
+
+from chaoslib.exceptions import InterruptExecution
 
 __all__ = ["exit_gracefully", "exit_ungracefully", "exit_signals"]
 
@@ -87,8 +88,8 @@ def exit_signals():
         # On a system that doesn't support SIGUSR signals
         # not much we can do...
         logger.debug(
-            "System '{}' does not expose SIGUSR signals".format(
-                platform.platform()))
+            "System '{}' does not expose SIGUSR signals".format(platform.platform())
+        )
         try:
             yield
         finally:
@@ -108,7 +109,8 @@ def exit_gracefully():
         logger.error(
             "Cannot call 'chaoslib.exit.exit_ungracefully() [{} - line {}] "
             "as it relies on the SIGUSR1 signal which is not available on "
-            "your platform".format(info.filename, info.lineno))
+            "your platform".format(info.filename, info.lineno)
+        )
         return
 
     os.kill(os.getpid(), signal.SIGUSR1)
@@ -130,7 +132,8 @@ def exit_ungracefully():
         logger.error(
             "Cannot call 'chaoslib.exit.exit_ungracefully() [{} - line {}] "
             "as it relies on the SIGUSR2 signal which is not available on "
-            "your platform".format(info.filename, info.lineno))
+            "your platform".format(info.filename, info.lineno)
+        )
         return
 
     os.kill(os.getpid(), signal.SIGUSR2)

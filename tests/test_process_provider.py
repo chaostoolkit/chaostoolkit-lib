@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 import os.path
-from unittest.mock import patch
 import stat
+from unittest.mock import patch
 
 from chaoslib.provider.process import run_process_activity
 
 settings_dir = os.path.join(os.path.dirname(__file__), "fixtures")
 
 # the script path shall be relative to chaostoolkit-lib folder
-dummy_script = './tests/dummy.sh'
+dummy_script = "./tests/dummy.sh"
 
 
 def setup_module(module):
@@ -17,10 +17,9 @@ def setup_module(module):
 
     - create the dummy script that can be used as process action
     """
-    path = './tests/script.sh'
-    with open(dummy_script, 'w') as f:
-        f.write('#!/bin/bash\n')
-        f.write('exit 0\n')
+    with open(dummy_script, "w") as f:
+        f.write("#!/bin/bash\n")
+        f.write("exit 0\n")
 
     # gives exec right on the script: chmod +x
     st = os.stat(dummy_script)
@@ -37,65 +36,73 @@ def teardown_module(module):
 
 
 def test_process_not_utf8_cannot_fail():
-    result = run_process_activity({
-        "provider": {
-            "type": "process",
-            "path": "python",
-            "arguments": '-c "import sys; sys.stdout.buffer.write(bytes(\'é\', \'latin-1\'))"'
-        }
-    }, None, None)
+    result = run_process_activity(
+        {
+            "provider": {
+                "type": "process",
+                "path": "python",
+                "arguments": (
+                    "-c \"import sys; sys.stdout.buffer.write(bytes('é', 'latin-1'))\""
+                ),
+            }
+        },
+        None,
+        None,
+    )
 
     # unfortunately, this doesn't seem to work well on mac
-    if result['status'] == 0:
-        assert result['stderr'] == u''
-        assert result['stdout'] == u'é'
+    if result["status"] == 0:
+        assert result["stderr"] == u""
+        assert result["stdout"] == u"é"
 
 
 def test_process_homedir_relative_path():
-    path = os.path.abspath(dummy_script).replace(
-        os.path.expanduser('~'), '~')
-    result = run_process_activity({
-        "provider": {
-            "type": "process",
-            "path": path,
-            "arguments": ''
-        }
-    }, None, None)
-    assert result['status'] == 0
+    path = os.path.abspath(dummy_script).replace(os.path.expanduser("~"), "~")
+    result = run_process_activity(
+        {"provider": {"type": "process", "path": path, "arguments": ""}}, None, None
+    )
+    assert result["status"] == 0
 
 
 def test_process_absolute_path():
-    result = run_process_activity({
-        "provider": {
-            "type": "process",
-            "path": os.path.abspath(dummy_script),
-            "arguments": ''
-        }
-    }, None, None)
-    assert result['status'] == 0
+    result = run_process_activity(
+        {
+            "provider": {
+                "type": "process",
+                "path": os.path.abspath(dummy_script),
+                "arguments": "",
+            }
+        },
+        None,
+        None,
+    )
+    assert result["status"] == 0
 
 
 def test_process_cwd_relative_path():
-    result = run_process_activity({
-        "provider": {
-            "type": "process",
-            "path": dummy_script,
-            "arguments": ''
-        }
-    }, None, None)
-    assert result['status'] == 0
+    result = run_process_activity(
+        {"provider": {"type": "process", "path": dummy_script, "arguments": ""}},
+        None,
+        None,
+    )
+    assert result["status"] == 0
 
 
-@patch('chaoslib.provider.process.logger')
+@patch("chaoslib.provider.process.logger")
 def test_process_non_exit_zero_warning(logger):
-    result = run_process_activity({
-        "provider": {
-            "type": "process",
-            "path": "python",
-            "arguments": '-c "import sys; sys.exit(1)"'
-        }
-    }, None, None)
+    run_process_activity(
+        {
+            "provider": {
+                "type": "process",
+                "path": "python",
+                "arguments": '-c "import sys; sys.exit(1)"',
+            }
+        },
+        None,
+        None,
+    )
 
     assert logger.warning.call_count == 1
-    assert 'This process returned a non-zero exit code.' in \
-           logger.warning.call_args[0][0]
+    assert (
+        "This process returned a non-zero exit code." in logger.warning.call_args[0][0]
+    )

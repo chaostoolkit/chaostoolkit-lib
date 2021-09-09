@@ -1,70 +1,45 @@
 # -*- coding: utf-8 -*-
-from copy import deepcopy
 import os.path
 import sys
+from copy import deepcopy
 from typing import Any
 
 from chaoslib.exceptions import ActivityFailed
 
-
 EmptyProbe = {}
 
-MissingTypeProbe = {
-    "name": "a name",
-    "provider": {
-        "module": "blah"
-    }
-}
+MissingTypeProbe = {"name": "a name", "provider": {"module": "blah"}}
 
 UnknownTypeProbe = {
     "type": "whatever",
     "name": "a name",
-    "provider": {
-        "type": "python"
-    }
+    "provider": {"type": "python"},
 }
 
 UnknownProviderTypeProbe = {
     "type": "probe",
     "name": "a name",
-    "provider": {
-        "type": "pizza"
-    }
+    "provider": {"type": "pizza"},
 }
 
-MissingModuleProbe = {
-    "type": "probe",
-    "name": "a name",
-    "provider": {
-        "type": "python"
-    }
-}
+MissingModuleProbe = {"type": "probe", "name": "a name", "provider": {"type": "python"}}
 
 NotImportableModuleProbe = {
     "type": "probe",
     "name": "a name",
-    "provider": {
-        "type": "python",
-        "module": "fake.module",
-        "func": "myfunc"
-    }
+    "provider": {"type": "python", "module": "fake.module", "func": "myfunc"},
 }
 
 MissingFunctionProbe = {
     "type": "probe",
-    "provider": {
-        "type": "python",
-        "module": "os.path"
-    },
-    "name": "a name"
+    "provider": {"type": "python", "module": "os.path"},
+    "name": "a name",
 }
 
 MissingProcessPathProbe = {
     "type": "probe",
-    "provider": {
-        "type": "process"
-    },
-    "name": "missing proc path"
+    "provider": {"type": "process"},
+    "name": "missing proc path",
 }
 
 ProcessPathDoesNotExistProbe = {
@@ -73,15 +48,13 @@ ProcessPathDoesNotExistProbe = {
         "type": "process",
         "path": "somewhere/not/here",
     },
-    "name": "invalid proc path"
+    "name": "invalid proc path",
 }
 
 MissingHTTPUrlProbe = {
     "type": "probe",
-    "provider": {
-        "type": "http"
-    },
-    "name": "A probe without url"
+    "provider": {"type": "http"},
+    "name": "A probe without url",
 }
 
 MissingFuncArgProbe = {
@@ -91,8 +64,8 @@ MissingFuncArgProbe = {
         "type": "python",
         "module": "os.path",
         "func": "exists",
-        "arguments": {}
-    }
+        "arguments": {},
+    },
 }
 
 TooManyFuncArgsProbe = {
@@ -102,20 +75,14 @@ TooManyFuncArgsProbe = {
         "type": "python",
         "module": "os.path",
         "func": "exists",
-        "arguments": {
-            "path": "/some/path",
-            "should_not_be_here": "indeed not"
-        }
-    }
+        "arguments": {"path": "/some/path", "should_not_be_here": "indeed not"},
+    },
 }
 
 PythonModuleProbe = {
     "type": "probe",
     "name": "path-must-exists",
-    "pauses": {
-        "before": 0,
-        "after": 0.1
-    },
+    "pauses": {"before": 0, "after": 0.1},
     "provider": {
         "type": "python",
         "module": "os.path",
@@ -123,17 +90,14 @@ PythonModuleProbe = {
         "arguments": {
             "path": os.path.abspath(__file__),
         },
-        "timeout": 30
-    }
+        "timeout": 30,
+    },
 }
 
 PythonModuleProbeWithLongPause = {
     "type": "probe",
     "name": "probe-with-long-pause",
-    "pauses": {
-        "before": 0,
-        "after": 5
-    },
+    "pauses": {"before": 0, "after": 5},
     "provider": {
         "type": "python",
         "module": "os.path",
@@ -141,18 +105,15 @@ PythonModuleProbeWithLongPause = {
         "arguments": {
             "path": os.path.abspath(__file__),
         },
-        "timeout": 30
-    }
+        "timeout": 30,
+    },
 }
 
 BackgroundPythonModuleProbeWithLongPause = {
     "type": "probe",
     "name": "background-probe-with-long-pause",
     "background": True,
-    "pauses": {
-        "before": 0,
-        "after": 5
-    },
+    "pauses": {"before": 0, "after": 5},
     "provider": {
         "type": "python",
         "module": "os.path",
@@ -160,21 +121,23 @@ BackgroundPythonModuleProbeWithLongPause = {
         "arguments": {
             "path": os.path.abspath(__file__),
         },
-        "timeout": 30
-    }
+        "timeout": 30,
+    },
 }
 
-BackgroundPythonModuleProbeWithLongPauseBefore = deepcopy(BackgroundPythonModuleProbeWithLongPause)
+BackgroundPythonModuleProbeWithLongPauseBefore = deepcopy(
+    BackgroundPythonModuleProbeWithLongPause
+)
 BackgroundPythonModuleProbeWithLongPauseBefore["pauses"]["after"] = 0
 BackgroundPythonModuleProbeWithLongPauseBefore["pauses"]["before"] = 5
 
 PythonModuleProbeWithBoolTolerance = PythonModuleProbe.copy()
-# tolerance can be a scalar, a range or a mapping with lower/upper keys
+# tolerance can be a scalar, a range or a mapping with lower/upper keys
 PythonModuleProbeWithBoolTolerance["tolerance"] = True
 PythonModuleProbeWithBoolTolerance["name"] = "boolean-probe"
 
 PythonModuleProbeWithExternalTolerance = PythonModuleProbe.copy()
-# tolerance can be a scalar, a range or a mapping with lower/upper keys
+# tolerance can be a scalar, a range or a mapping with lower/upper keys
 PythonModuleProbeWithExternalTolerance["tolerance"] = PythonModuleProbe.copy()
 PythonModuleProbeWithExternalTolerance["name"] = "external-probe"
 
@@ -182,37 +145,21 @@ PythonModuleProbeWithHTTPStatusTolerance = {
     "type": "probe",
     "name": "A dummy tolerance ready probe",
     "tolerance": [200, 301, 302],
-    "provider": {
-        "type": "http",
-        "url": "http://example.com",
-        "timeout": 30
-    }
+    "provider": {"type": "http", "url": "http://example.com", "timeout": 30},
 }
 
 PythonModuleProbeWithHTTPStatusToleranceDeviation = {
     "type": "probe",
     "name": "A dummy tolerance ready probe",
     "tolerance": [500],
-    "provider": {
-        "type": "http",
-        "url": "http://example.com",
-        "timeout": 30
-    }
+    "provider": {"type": "http", "url": "http://example.com", "timeout": 30},
 }
 
 PythonModuleProbeWithHTTPBodyTolerance = {
     "type": "probe",
     "name": "A dummy tolerance ready probe",
-    "tolerance": {
-        "type": "regex",
-        "target": "body",
-        "pattern": "[0-9]{2}"
-    },
-    "provider": {
-        "type": "http",
-        "url": "http://example.com",
-        "timeout": 30
-    }
+    "tolerance": {"type": "regex", "target": "body", "pattern": "[0-9]{2}"},
+    "provider": {"type": "http", "url": "http://example.com", "timeout": 30},
 }
 
 PythonModuleProbeWithHTTPMaxRetries = {
@@ -223,8 +170,8 @@ PythonModuleProbeWithHTTPMaxRetries = {
         "type": "http",
         "url": "http://localhost:{}",
         "timeout": 10,
-        "max_retries": 1
-    }
+        "max_retries": 1,
+    },
 }
 
 PythonModuleProbeWithProcessStatusTolerance = {
@@ -235,8 +182,8 @@ PythonModuleProbeWithProcessStatusTolerance = {
         "type": "process",
         "path": sys.executable,
         "arguments": ["-V"],
-        "timeout": 1
-    }
+        "timeout": 1,
+    },
 }
 
 PythonModuleProbeWithProcessFailedStatusTolerance = {
@@ -247,8 +194,8 @@ PythonModuleProbeWithProcessFailedStatusTolerance = {
         "type": "process",
         "path": sys.executable,
         "arguments": ["--burp"],
-        "timeout": 1
-    }
+        "timeout": 1,
+    },
 }
 
 PythonModuleProbeWithProcesStdoutTolerance = {
@@ -257,82 +204,81 @@ PythonModuleProbeWithProcesStdoutTolerance = {
     "tolerance": {
         "type": "regex",
         "target": "stdout",
-        "pattern": "Python [0-9]\.[0-9]\.[0-9]"
+        "pattern": r"Python [0-9]\.[0-9]\.[0-9]",
     },
     "provider": {
         "type": "process",
         "path": sys.executable,
         "arguments": ["-V"],
-        "timeout": 1
-    }
+        "timeout": 1,
+    },
 }
 
 ProcProbe = {
     "type": "probe",
     "name": "This probe is a process probe",
-    "pauses": {
-        "before": 0,
-        "after": 0.1
-    },
+    "pauses": {"before": 0, "after": 0.1},
     "provider": {
         "type": "process",
         "path": sys.executable,
         "arguments": ["-V"],
-        "timeout": 1
-    }
+        "timeout": 1,
+    },
 }
 
 DeprecatedProcArgumentsProbe = {
     "type": "probe",
     "name": "This probe is a process probe",
-    "pauses": {
-        "before": 0,
-        "after": 0.1
-    },
+    "pauses": {"before": 0, "after": 0.1},
     "provider": {
         "type": "process",
         "path": sys.executable,
-        "arguments": {
-            "-V": None
-        },
-        "timeout": 1
-    }
+        "arguments": {"-V": None},
+        "timeout": 1,
+    },
 }
 
 ProcEchoArrayProbe = {
     "type": "probe",
-    "name": "This probe is a process probe that simply echoes its arguments passed as an array",
-    "pauses": {
-        "before": 0,
-        "after": 0.1
-    },
+    "name": (
+        "This probe is a process probe that simply echoes its arguments passed"
+        " as an array"
+    ),
+    "pauses": {"before": 0, "after": 0.1},
     "provider": {
         "type": "process",
         "path": sys.executable,
         "arguments": [
-            "-c", "import sys; print(sys.argv)",
+            "-c",
+            "import sys; print(sys.argv)",
             "--empty",
-            "--number", 1,
-            "--string", "with spaces",
-            "--string", "a second string with the same option"
+            "--number",
+            1,
+            "--string",
+            "with spaces",
+            "--string",
+            "a second string with the same option",
         ],
-        "timeout": 1
-    }
+        "timeout": 1,
+    },
 }
 
 ProcEchoStrProbe = {
     "type": "probe",
-    "name": "This probe is a process probe that simply echoes its arguments passed as a string",
-    "pauses": {
-        "before": 0,
-        "after": 0.1
-    },
+    "name": (
+        "This probe is a process probe that simply echoes its arguments passed"
+        " as a string"
+    ),
+    "pauses": {"before": 0, "after": 0.1},
     "provider": {
         "type": "process",
         "path": sys.executable,
-        "arguments": "-c 'import sys; print(sys.argv)' --empty --number 1 --string 'with spaces' --string 'a second string with the same option'",
-        "timeout": 1
-    }
+        "arguments": (
+            "-c 'import sys; print(sys.argv)' --empty --number 1 --string 'with spaces'"
+            " --string 'a second string with the same option'"
+        ),
+        "timeout": 1,
+    },
 }
 
 HTTPProbe = {
@@ -345,12 +291,9 @@ HTTPProbe = {
         "arguments": {
             "q": "chaostoolkit",
         },
-        "timeout": 30
+        "timeout": 30,
     },
-    "pauses": {
-        "before": 0,
-        "after": 0.1
-    }
+    "pauses": {"before": 0, "after": 0.1},
 }
 
 BackgroundPythonModuleProbe = {
@@ -363,8 +306,8 @@ BackgroundPythonModuleProbe = {
         "func": "exists",
         "arguments": {
             "path": __file__,
-        }
-    }
+        },
+    },
 }
 
 
@@ -374,6 +317,7 @@ def must_be_in_range(a: int, b: int, value: Any = None) -> bool:
     else:
         return True
 
+
 FailProbe = {
     "name": "a name",
     "type": "probe",
@@ -381,8 +325,8 @@ FailProbe = {
     "provider": {
         "type": "python",
         "module": "fixtures.fakeext",
-        "func": "force_failed_activity"
-    }
+        "func": "force_failed_activity",
+    },
 }
 
 
@@ -393,10 +337,8 @@ GenerateSecretTokenProbe = {
         "type": "python",
         "module": "random",
         "func": "choice",
-        "arguments": {
-            "seq": ["RED", "BLUE", "YELLOW"]
-        }
-    }
+        "arguments": {"seq": ["RED", "BLUE", "YELLOW"]},
+    },
 }
 
 
@@ -407,10 +349,8 @@ ReadSecretTokenProbe = {
         "type": "python",
         "module": "pprint",
         "func": "pformat",
-        "arguments": {
-            "object": "${my_token}"
-        }
-    }
+        "arguments": {"object": "${my_token}"},
+    },
 }
 
 
@@ -422,8 +362,6 @@ ReadSecretTokenFromSecretsProbe = {
         "module": "pprint",
         "func": "pformat",
         "secrets": ["mytokens"],
-        "arguments": {
-            "object": "${my_token}"
-        }
-    }
+        "arguments": {"object": "${my_token}"},
+    },
 }

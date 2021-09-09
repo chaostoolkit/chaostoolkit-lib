@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
+import json
+import re
 from decimal import Decimal, InvalidOperation
 from functools import singledispatch
-import json
 from numbers import Number
-import re
 from typing import Any, Dict
 
 try:
     from jsonpath2.path import Path as JSONPath
+
     HAS_JSONPATH = True
 except ImportError:
     HAS_JSONPATH = False
@@ -15,8 +16,7 @@ except ImportError:
 from logzero import logger
 
 from chaoslib import substitute
-from chaoslib.activity import ensure_activity_is_valid, execute_activity, \
-    run_activity
+from chaoslib.activity import ensure_activity_is_valid, execute_activity, run_activity
 from chaoslib.control import controls
 from chaoslib.exceptions import ActivityFailed, InvalidActivity, \
     InvalidExperiment
@@ -45,8 +45,7 @@ def ensure_hypothesis_is_valid(experiment: Experiment):
             ensure_activity_is_valid(probe)
 
             if "tolerance" not in probe:
-                raise InvalidActivity(
-                    "hypothesis probe must have a tolerance entry")
+                raise InvalidActivity("hypothesis probe must have a tolerance entry")
 
             ensure_hypothesis_tolerance_is_valid(probe["tolerance"])
 
@@ -56,14 +55,14 @@ def ensure_hypothesis_tolerance_is_valid(tolerance: Tolerance):
     Validate the tolerance of the hypothesis probe and raises
     :exc:`InvalidActivity` if it isn't valid.
     """
-    if not isinstance(tolerance, (
-            bool, int, list, str, dict)):
+    if not isinstance(tolerance, (bool, int, list, str, dict)):
         raise InvalidActivity(
             "hypothesis probe tolerance must either be an integer, "
             "a string, a boolean or a pair of values for boundaries. "
             "It can also be a dictionary which is a probe activity "
             "definition that takes an argument called `value` with "
-            "the value of the probe itself to be validated")
+            "the value of the probe itself to be validated"
+        )
 
     if isinstance(tolerance, dict):
         tolerance_type = tolerance.get("type")
@@ -79,7 +78,9 @@ def ensure_hypothesis_tolerance_is_valid(tolerance: Tolerance):
         else:
             raise InvalidActivity(
                 "hypothesis probe tolerance type '{}' is unsupported".format(
-                    tolerance_type))
+                    tolerance_type
+                )
+            )
 
 
 def check_regex_pattern(tolerance: Tolerance):
@@ -90,19 +91,22 @@ def check_regex_pattern(tolerance: Tolerance):
     """
     if "pattern" not in tolerance:
         raise InvalidActivity(
-            "hypothesis regex probe tolerance must have a `pattern` key")
+            "hypothesis regex probe tolerance must have a `pattern` key"
+        )
 
     pattern = tolerance["pattern"]
     try:
         re.compile(pattern)
     except TypeError:
         raise InvalidActivity(
-            "hypothesis probe tolerance pattern {} has an invalid type".format(
-                pattern))
+            "hypothesis probe tolerance pattern {} has an invalid type".format(pattern)
+        )
     except re.error as e:
         raise InvalidActivity(
             "hypothesis probe tolerance pattern {} seems invalid: {}".format(
-                e.pattern, e.msg))
+                e.pattern, e.msg
+            )
+        )
 
 
 def check_json_path(tolerance: Tolerance):
@@ -115,26 +119,30 @@ def check_json_path(tolerance: Tolerance):
     if not HAS_JSONPATH:
         raise InvalidActivity(
             "Install the `jsonpath2` package to use a JSON path tolerance: "
-            "`pip install chaostoolkit-lib[jsonpath]`.")
+            "`pip install chaostoolkit-lib[jsonpath]`."
+        )
 
     if "path" not in tolerance:
         raise InvalidActivity(
-            "hypothesis jsonpath probe tolerance must have a `path` key")
+            "hypothesis jsonpath probe tolerance must have a `path` key"
+        )
 
     try:
         path = tolerance.get("path", "").strip()
         if not path:
             raise InvalidActivity(
-                "hypothesis probe tolerance JSON path cannot be empty")
+                "hypothesis probe tolerance JSON path cannot be empty"
+            )
         JSONPath.parse_str(path)
     except ValueError:
         raise InvalidActivity(
-            "hypothesis probe tolerance JSON path {} is invalid".format(
-                path))
+            "hypothesis probe tolerance JSON path {} is invalid".format(path)
+        )
     except TypeError:
         raise InvalidActivity(
             "hypothesis probe tolerance JSON path {} has an invalid "
-            "type".format(path))
+            "type".format(path)
+        )
 
 
 def check_range(tolerance: Tolerance):
@@ -144,24 +152,21 @@ def check_range(tolerance: Tolerance):
     """
     if "range" not in tolerance:
         raise InvalidActivity(
-            "hypothesis range probe tolerance must have a `range` key")
+            "hypothesis range probe tolerance must have a `range` key"
+        )
 
     the_range = tolerance["range"]
     if not isinstance(the_range, list):
-        raise InvalidActivity(
-            "hypothesis range must be a sequence")
+        raise InvalidActivity("hypothesis range must be a sequence")
 
     if len(the_range) != 2:
-        raise InvalidActivity(
-            "hypothesis range sequence must be made of two values")
+        raise InvalidActivity("hypothesis range sequence must be made of two values")
 
     if not isinstance(the_range[0], Number):
-        raise InvalidActivity(
-            "hypothesis range lower boundary must be a number")
+        raise InvalidActivity("hypothesis range lower boundary must be a number")
 
     if not isinstance(the_range[1], Number):
-        raise InvalidActivity(
-            "hypothesis range upper boundary must be a number")
+        raise InvalidActivity("hypothesis range upper boundary must be a number")
 
 
 def run_steady_state_hypothesis(experiment: Experiment,
@@ -171,10 +176,7 @@ def run_steady_state_hypothesis(experiment: Experiment,
     Run all probes in the hypothesis and fail the experiment as soon as any of
     the probe fails or is outside the tolerance zone.
     """
-    state = {
-        "steady_state_met": None,
-        "probes": []
-    }
+    state = {"steady_state_met": None, "probes": []}
     hypo = experiment.get("steady-state-hypothesis")
     if not hypo:
         logger.debug("No hypothesis declared.")
@@ -182,23 +184,34 @@ def run_steady_state_hypothesis(experiment: Experiment,
 
     logger.info("Steady state hypothesis: {h}".format(h=hypo.get("title")))
 
-    with controls(level="hypothesis", experiment=experiment, context=hypo,
-                  configuration=configuration, secrets=secrets) as control:
+    with controls(
+        level="hypothesis",
+        experiment=experiment,
+        context=hypo,
+        configuration=configuration,
+        secrets=secrets,
+    ) as control:
         probes = hypo.get("probes", [])
         control.with_state(state)
 
         for activity in probes:
             run = execute_activity(
-                experiment=experiment, activity=activity,
-                configuration=configuration, secrets=secrets, dry=dry)
+                experiment=experiment,
+                activity=activity,
+                configuration=configuration,
+                secrets=secrets,
+                dry=dry,
+            )
 
             state["probes"].append(run)
 
             if run["status"] == "failed":
                 run["tolerance_met"] = False
                 state["steady_state_met"] = False
-                logger.warning("Probe terminated unexpectedly, "
-                               "so its tolerance could not be validated")
+                logger.warning(
+                    "Probe terminated unexpectedly, "
+                    "so its tolerance could not be validated"
+                )
                 return state
 
             run["tolerance_met"] = True
@@ -210,8 +223,8 @@ def run_steady_state_hypothesis(experiment: Experiment,
             tolerance = activity.get("tolerance")
             logger.debug("allowed tolerance is {t}".format(t=str(tolerance)))
             checked = within_tolerance(
-                tolerance, run["output"], configuration=configuration,
-                secrets=secrets)
+                tolerance, run["output"], configuration=configuration, secrets=secrets
+            )
             if not checked:
                 run["tolerance_met"] = False
                 state["steady_state_met"] = False
@@ -224,9 +237,12 @@ def run_steady_state_hypothesis(experiment: Experiment,
 
 
 @singledispatch
-def within_tolerance(tolerance: Any, value: Any,
-                     configuration: Configuration = None,
-                     secrets: Secrets = None) -> bool:
+def within_tolerance(
+    tolerance: Any,
+    value: Any,
+    configuration: Configuration = None,
+    secrets: Secrets = None,
+) -> bool:
     """
     Performs a quick validation of the probe's result `value` against the
     `tolerance` that was provided.
@@ -243,20 +259,32 @@ def within_tolerance(tolerance: Any, value: Any,
 
 
 @within_tolerance.register(bool)
-def _(tolerance: bool, value: bool, configuration: Configuration = None,
-      secrets: Secrets = None) -> bool:
+def _(
+    tolerance: bool,
+    value: bool,
+    configuration: Configuration = None,
+    secrets: Secrets = None,
+) -> bool:
     return value == tolerance
 
 
 @within_tolerance.register(str)
-def _(tolerance: str, value: str, configuration: Configuration = None,
-      secrets: Secrets = None) -> bool:
+def _(
+    tolerance: str,
+    value: str,
+    configuration: Configuration = None,
+    secrets: Secrets = None,
+) -> bool:
     return value == tolerance
 
 
 @within_tolerance.register(int)
-def _(tolerance: int, value: int, configuration: Configuration = None,
-      secrets: Secrets = None) -> bool:
+def _(
+    tolerance: int,
+    value: int,
+    configuration: Configuration = None,
+    secrets: Secrets = None,
+) -> bool:
     if isinstance(value, dict):
         if "status" in value:
             return value["status"] == tolerance
@@ -265,8 +293,12 @@ def _(tolerance: int, value: int, configuration: Configuration = None,
 
 
 @within_tolerance.register(list)
-def _(tolerance: list, value: Any, configuration: Configuration = None,
-      secrets: Secrets = None) -> bool:
+def _(
+    tolerance: list,
+    value: Any,
+    configuration: Configuration = None,
+    secrets: Secrets = None,
+) -> bool:
     if isinstance(value, dict):
         if "status" in value:
             return value["status"] in tolerance
@@ -277,9 +309,13 @@ def _(tolerance: list, value: Any, configuration: Configuration = None,
     return value in tolerance
 
 
-@within_tolerance.register(dict)  #noqa: C901
-def _(tolerance: dict, value: Any, configuration: Configuration = None,  #noqa: C901
-      secrets: Secrets = None) -> bool:
+@within_tolerance.register(dict)  # noqa: C901
+def _(
+    tolerance: dict,
+    value: Any,
+    configuration: Configuration = None,  # noqa: C901
+    secrets: Secrets = None,
+) -> bool:
     tolerance_type = tolerance.get("type")
 
     if tolerance_type == "probe":
@@ -314,7 +350,7 @@ def _(tolerance: dict, value: Any, configuration: Configuration = None,  #noqa: 
             value = value.get(target, value)
 
         if isinstance(value, bytes):
-            value = value.decode('utf-8')
+            value = value.decode("utf-8")
 
         if isinstance(value, str):
             try:
@@ -338,7 +374,9 @@ def _(tolerance: dict, value: Any, configuration: Configuration = None,  #noqa: 
             if "expect" in tolerance:
                 logger.debug(
                     "jsonpath found '{}' but expected '{}'".format(
-                        str(values), str(tolerance["expect"])))
+                        str(values), str(tolerance["expect"])
+                    )
+                )
             else:
                 logger.debug("jsonpath found '{}'".format(str(values)))
 

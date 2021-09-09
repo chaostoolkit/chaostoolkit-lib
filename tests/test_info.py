@@ -1,5 +1,6 @@
-from unittest.mock import patch
 from typing import List
+from unittest.mock import patch
+
 try:
     from importlib.metadata import Distribution
 except ImportError:
@@ -39,9 +40,7 @@ def test_list_none_when_none_installed(distros: List[Distribution]):
 
 @patch("chaoslib.info.importlib_metadata.distributions")
 def test_list_one_installed(distros: List[Distribution]):
-    distros.return_value = [
-        InMemoryDistribution(PGK_META)
-    ]
+    distros.return_value = [InMemoryDistribution(PGK_META)]
 
     extensions = list_extensions()
     assert len(extensions) == 1
@@ -54,9 +53,7 @@ def test_list_one_installed(distros: List[Distribution]):
 @patch("chaoslib.info.importlib_metadata.distributions")
 def test_list_excludes_ctklib(distros: List[Distribution]):
     metadata = """Name: chaostoolkit-lib"""
-    distros.return_value = [
-        InMemoryDistribution(metadata)
-    ]
+    distros.return_value = [InMemoryDistribution(metadata)]
 
     extensions = list_extensions()
     assert len(extensions) == 0

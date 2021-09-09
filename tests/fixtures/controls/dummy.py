@@ -1,11 +1,23 @@
 from typing import Any, Dict, List
 
-from chaoslib.types import Activity, Configuration, \
-    Experiment, Hypothesis, Journal, Run, Secrets, Settings
+from chaoslib.types import (
+    Activity,
+    Configuration,
+    Experiment,
+    Hypothesis,
+    Journal,
+    Run,
+    Secrets,
+    Settings,
+)
 
 
-def configure_control(experiment: Experiment, configuration: Configuration,
-                      secrets: Secrets, settings: Settings):
+def configure_control(
+    experiment: Experiment,
+    configuration: Configuration,
+    secrets: Secrets,
+    settings: Settings,
+):
     if configuration:
         experiment["control-value"] = configuration.get("dummy-key", "default")
     elif settings:
@@ -29,8 +41,7 @@ def before_hypothesis_control(context: Hypothesis, **kwargs):
     context["before_hypothesis_control"] = True
 
 
-def after_hypothesis_control(context: Hypothesis,
-                             state: Dict[str, Any], **kwargs):
+def after_hypothesis_control(context: Hypothesis, state: Dict[str, Any], **kwargs):
     context["after_hypothesis_control"] = True
     state["after_hypothesis_control"] = True
 

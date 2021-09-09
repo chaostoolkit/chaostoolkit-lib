@@ -2,12 +2,33 @@
 import enum
 from typing import Any, Dict, List, Tuple, Union
 
-__all__ = ["MicroservicesStatus", "Probe", "Action", "Experiment", "Layer",
-           "TargetLayers", "Activity", "Journal", "Run", "Secrets", "Step",
-           "Configuration", "Discovery", "DiscoveredActivities", "Extension",
-           "DiscoveredSystemInfo", "Settings", "EventPayload", "Tolerance",
-           "Hypothesis", "Control", "Strategy", "Schedule",
-           "ConfigVars", "SecretVars"]
+__all__ = [
+    "MicroservicesStatus",
+    "Probe",
+    "Action",
+    "Experiment",
+    "Layer",
+    "TargetLayers",
+    "Activity",
+    "Journal",
+    "Run",
+    "Secrets",
+    "Step",
+    "Configuration",
+    "Discovery",
+    "DiscoveredActivities",
+    "Extension",
+    "DiscoveredSystemInfo",
+    "Settings",
+    "EventPayload",
+    "Tolerance",
+    "Hypothesis",
+    "Control",
+    "Strategy",
+    "Schedule",
+    "ConfigVars",
+    "SecretVars",
+]
 
 
 Action = Dict[str, Any]
@@ -52,7 +73,7 @@ class Strategy(enum.Enum):
     CONTINUOUS = "continuous"
 
     @staticmethod
-    def from_string(value: str) -> 'Strategy':
+    def from_string(value: str) -> "Strategy":
         if value == "default":
             return Strategy.DEFAULT
         elif value == "before-method-only":
@@ -89,8 +110,12 @@ class Dry(enum.Enum):
 
 
 class Schedule:
-    def __init__(self, continuous_hypothesis_frequency: float = 1.0,
-                 fail_fast: bool = False, fail_fast_ratio: float = 0):
+    def __init__(
+        self,
+        continuous_hypothesis_frequency: float = 1.0,
+        fail_fast: bool = False,
+        fail_fast_ratio: float = 0,
+    ):
         self.continuous_hypothesis_frequency = continuous_hypothesis_frequency
         self.fail_fast = fail_fast
         self.fail_fast_ratio = fail_fast_ratio

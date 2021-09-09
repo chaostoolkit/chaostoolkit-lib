@@ -7,7 +7,6 @@ from logzero import logger
 from chaoslib.activity import execute_activity
 from chaoslib.types import Configuration, Experiment, Run, Secrets, Dry
 
-
 __all__ = ["run_rollbacks"]
 
 
@@ -29,10 +28,19 @@ def run_rollbacks(experiment: Experiment, configuration: Configuration,
 
         if activity.get("background"):
             logger.debug("rollback activity will run in the background")
-            yield pool.submit(execute_activity, experiment=experiment,
-                              activity=activity, configuration=configuration,
-                              secrets=secrets, dry=dry)
+            yield pool.submit(
+                execute_activity,
+                experiment=experiment,
+                activity=activity,
+                configuration=configuration,
+                secrets=secrets,
+                dry=dry,
+            )
         else:
-            yield execute_activity(experiment, activity,
-                                   configuration=configuration,
-                                   secrets=secrets, dry=dry)
+            yield execute_activity(
+                experiment,
+                activity,
+                configuration=configuration,
+                secrets=secrets,
+                dry=dry,
+            )

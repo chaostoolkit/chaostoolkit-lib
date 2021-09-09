@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
 import numbers
 import time
 import traceback
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime
 from typing import Any, Iterator, List
 
 from logzero import logger
@@ -18,9 +18,11 @@ from chaoslib.provider.process import run_process_activity, \
     validate_process_activity
 from chaoslib.types import Activity, Configuration, Experiment, Run, Secrets, Dry
 
-
-__all__ = ["ensure_activity_is_valid", "get_all_activities_in_experiment",
-           "run_activities"]
+__all__ = [
+    "ensure_activity_is_valid",
+    "get_all_activities_in_experiment",
+    "run_activities",
+]
 
 
 def ensure_activity_is_valid(activity: Activity):  # noqa: C901
@@ -42,9 +44,8 @@ def ensure_activity_is_valid(activity: Activity):  # noqa: C901
     # when the activity is just a ref, there is little to validate
     ref = activity.get("ref")
     if ref is not None:
-        if not isinstance(ref, str) or ref == '':
-            raise InvalidActivity(
-                "reference to activity must be non-empty strings")
+        if not isinstance(ref, str) or ref == "":
+            raise InvalidActivity("reference to activity must be non-empty strings")
         return
 
     activity_type = activity.get("type")
@@ -53,7 +54,8 @@ def ensure_activity_is_valid(activity: Activity):  # noqa: C901
 
     if activity_type not in ("probe", "action"):
         raise InvalidActivity(
-            "'{t}' is not a supported activity type".format(t=activity_type))
+            "'{t}' is not a supported activity type".format(t=activity_type)
+        )
 
     if not activity.get("name"):
         raise InvalidActivity("an activity must have a name")
@@ -68,7 +70,8 @@ def ensure_activity_is_valid(activity: Activity):  # noqa: C901
 
     if provider_type not in ("python", "process", "http"):
         raise InvalidActivity(
-            "unknown provider type '{type}'".format(type=provider_type))
+            "unknown provider type '{type}'".format(type=provider_type)
+        )
 
     if not activity.get("name"):
         raise InvalidActivity("activity must have a name (cannot be empty)")
@@ -116,8 +119,13 @@ def run_activities(experiment: Experiment, configuration: Configuration,
         if activity.get("background"):
             logger.debug("activity will run in the background")
             yield pool.submit(
-                execute_activity, experiment=experiment, activity=activity,
-                configuration=configuration, secrets=secrets, dry=dry)
+                execute_activity,
+                experiment=experiment,
+                activity=activity,
+                configuration=configuration,
+                secrets=secrets,
+                dry=dry,
+            )
         else:
             yield execute_activity(
                 experiment=experiment, activity=activity,
@@ -140,10 +148,16 @@ def execute_activity(experiment: Experiment,activity: Activity,
         activity = lookup_activity(ref)
         if not activity:
             raise ActivityFailed(
-                "could not find referenced activity '{r}'".format(r=ref))
+                "could not find referenced activity '{r}'".format(r=ref)
+            )
 
-    with controls(level="activity", experiment=experiment, context=activity,
-                  configuration=configuration, secrets=secrets) as control:
+    with controls(
+        level="activity",
+        experiment=experiment,
+        context=activity,
+        configuration=configuration,
+        secrets=secrets,
+    ) as control:
         dry = activity.get("dry", dry)
         pauses = activity.get("pauses", {})
         pause_before = pauses.get("before")
@@ -166,18 +180,19 @@ def execute_activity(experiment: Experiment,activity: Activity,
                 time.sleep(pause_before)
 
         if activity.get("background"):
-            logger.info("{t}: {n} [in background]".format(
-                t=activity["type"].title(), n=activity.get("name")))
+            logger.info(
+                "{t}: {n} [in background]".format(
+                    t=activity["type"].title(), n=activity.get("name")
+                )
+            )
         else:
-            logger.info("{t}: {n}".format(
-                t=activity["type"].title(), n=activity.get("name")))
+            logger.info(
+                "{t}: {n}".format(t=activity["type"].title(), n=activity.get("name"))
+            )
 
         start = datetime.utcnow()
 
-        run = {
-            "activity": activity.copy(),
-            "output": None
-        }
+        run = {"activity": activity.copy(), "output": None}
 
         result = None
         interrupted = False
@@ -217,8 +232,9 @@ def execute_activity(experiment: Experiment,activity: Activity,
     return run
 
 
-def run_activity(activity: Activity, configuration: Configuration,
-                 secrets: Secrets) -> Any:
+def run_activity(
+    activity: Activity, configuration: Configuration, secrets: Secrets
+) -> Any:
     """
     Run the given activity and return its result. If the activity defines a
     `timeout` this function raises :exc:`ActivityFailed`.
