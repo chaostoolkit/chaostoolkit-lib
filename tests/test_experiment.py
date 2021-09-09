@@ -139,36 +139,6 @@ def test_valid_experiment_from_yaml():
         assert ensure_experiment_is_valid(doc) is None
 
 
-def test_can_run_experiment_in_dry_mode():
-    experiment = experiments.Experiment.copy()
-    experiment["dry"] = Dry.ACTIVITIES
-    journal = run_experiment(experiment)
-    assert isinstance(journal, dict)
-    
-def test_can_run_experiment_in_actionless_mode():
-    experiment = experiments.ExperimentWithLongPauseAction.copy()
-    experiment["dry"] = Dry.ACTIONS
-    journal = run_experiment(experiment)
-    assert isinstance(journal, dict)
-
-def test_can_run_experiment_in_probeless_mode():
-    experiment = experiments.Experiment.copy()
-    experiment["dry"] = Dry.Probes
-    journal = run_experiment(experiment)
-    assert isinstance(journal, dict)
-
-def test_can_run_experiment_in_pauseless_mode():
-    experiment = experiments.Experiment.copy()
-    experiment["dry"] = Dry.Probes
-    journal = run_experiment(experiment)
-    assert isinstance(journal, dict)
-
-
-def test_can_run_experiment_with_activity_in_dry_mode():
-    experiment = experiments.ExperimentWithBypassedActivity.copy()
-    journal = run_experiment(experiment)
-    assert isinstance(journal, dict)
-    assert journal["run"][0]["output"] is None
 
 
 def test_can_iterate_over_activities():
@@ -315,57 +285,6 @@ def test_validate_all_tolerance_probes():
         ensure_experiment_is_valid(experiments.ExperimentWithVariousTolerances)
 
 
-def test_dry_run_should_not_pause_after():
-    experiment = experiments.ExperimentWithLongPause.copy()
-    experiment["dry"] = Dry.ACTIVITIES
-    start = datetime.utcnow()
-    run_experiment(experiment)
-    end = datetime.utcnow()
-
-    experiment_run_time = int((end - start).total_seconds())
-    pause_after_duration = int(experiment["method"][1]["pauses"]["after"])
-
-    assert experiment_run_time < pause_after_duration
-
-
-def test_actionless_run_should_not_pause_after():
-    experiment = experiments.ExperimentWithLongPauseAction.copy()
-    experiment["dry"] = Dry.ACTIONS
-    start = datetime.utcnow()
-    run_experiment(experiment)
-    end = datetime.utcnow()
-
-    experiment_run_time = int((end - start).total_seconds())
-    pause_after_duration = int(experiment["method"][1]["pauses"]["after"])
-
-    assert experiment_run_time < pause_after_duration
-
-
-def test_dry_run_should_not_pause_before():
-    experiment = experiments.ExperimentWithLongPauseBefore.copy()
-    experiment["dry"] = Dry.ACTIVITIES
-    start = datetime.utcnow()
-    run_experiment(experiment)
-    end = datetime.utcnow()
-
-    experiment_run_time = int((end - start).total_seconds())
-    pause_before_duration = int(experiment["method"][1]["pauses"]["before"])
-
-    assert experiment_run_time < pause_before_duration
-
-
-def test_actionless_run_should_not_pause_before():
-    experiment = experiments.ExperimentWithLongPauseAction.copy()
-    experiment["dry"] = Dry.ACTIONS
-
-    start = datetime.utcnow()
-    run_experiment(experiment)
-    end = datetime.utcnow()
-
-    experiment_run_time = int((end - start).total_seconds())
-    pause_before_duration = int(experiment["method"][1]["pauses"]["before"])
-
-    assert experiment_run_time < pause_before_duration
 
 
 def test_rollback_default_strategy_does_not_run_on_failed_activity_in_ssh():
@@ -446,4 +365,4 @@ def test_can_run_experiment_in_actionless_mode():
     assert isinstance(journal, dict)
     
 if __name__ == "__main__":
-    test_can_run_experiment_in_dry_mode()
+    test_pauseless_run_should_not_pause_after()
