@@ -363,6 +363,127 @@ def test_can_run_experiment_in_actionless_mode():
     experiment["dry"] = Dry.ACTIONS
     journal = run_experiment(experiment)
     assert isinstance(journal, dict)
-    
-if __name__ == "__main__":
-    test_pauseless_run_should_not_pause_after()
+
+def test_can_run_experiment_in_probeless_mode():
+    experiment = experiments.Experiment.copy()
+    experiment["dry"] = Dry.PROBES
+    journal = run_experiment(experiment)
+    assert isinstance(journal, dict)
+
+def test_can_run_experiment_in_pauseless_mode():
+    experiment = experiments.ExperimentWithLongPause.copy()
+    experiment["dry"] = Dry.PAUSE
+    journal = run_experiment(experiment)
+    assert isinstance(journal, dict)
+
+
+def test_can_run_experiment_with_activity_in_dry_mode():
+    experiment = experiments.ExperimentWithBypassedActivity.copy()
+    experiment["dry"] = Dry.ACTIVITIES
+    journal = run_experiment(experiment)
+    assert isinstance(journal, dict)
+    assert journal["run"][0]["output"] is None
+
+
+def test_dry_run_should_not_pause_after():
+    experiment = experiments.ExperimentWithLongPause.copy()
+    experiment["dry"] = Dry.ACTIVITIES
+    start = datetime.utcnow()
+    run_experiment(experiment)
+    end = datetime.utcnow()
+
+    experiment_run_time = int((end - start).total_seconds())
+    pause_after_duration = int(experiment["method"][1]["pauses"]["after"])
+
+    assert experiment_run_time < pause_after_duration
+
+
+def test_actionless_run_should_not_pause_after():
+    experiment = experiments.ExperimentWithLongPauseAction.copy()
+    experiment["dry"] = Dry.ACTIONS
+    start = datetime.utcnow()
+    run_experiment(experiment)
+    end = datetime.utcnow()
+
+    experiment_run_time = int((end - start).total_seconds())
+    pause_after_duration = int(experiment["method"][1]["pauses"]["after"])
+
+    assert experiment_run_time < pause_after_duration
+
+def test_probeless_run_should_not_pause_after():
+    experiment = experiments.ExperimentWithLongPause.copy()
+    experiment["dry"] = Dry.PROBES
+    start = datetime.utcnow()
+    run_experiment(experiment)
+    end = datetime.utcnow()
+
+    experiment_run_time = int((end - start).total_seconds())
+    pause_after_duration = int(experiment["method"][1]["pauses"]["after"])
+
+    assert experiment_run_time < pause_after_duration
+
+def test_pauseless_run_should_not_pause_after():
+    experiment = experiments.ExperimentWithLongPause.copy()
+    experiment["dry"] = Dry.PAUSE
+    start = datetime.utcnow()
+    run_experiment(experiment)
+    end = datetime.utcnow()
+
+    experiment_run_time = int((end - start).total_seconds())
+    pause_after_duration = int(experiment["method"][1]["pauses"]["after"])
+
+    assert experiment_run_time < pause_after_duration
+
+
+def test_dry_run_should_not_pause_before():
+    experiment = experiments.ExperimentWithLongPauseBefore.copy()
+    experiment["dry"] = Dry.ACTIVITIES
+    start = datetime.utcnow()
+    run_experiment(experiment)
+    end = datetime.utcnow()
+
+    experiment_run_time = int((end - start).total_seconds())
+    pause_before_duration = int(experiment["method"][1]["pauses"]["before"])
+
+    assert experiment_run_time < pause_before_duration
+
+
+def test_actionless_run_should_not_pause_before():
+    experiment = experiments.ExperimentWithLongPauseAction.copy()
+    experiment["dry"] = Dry.ACTIONS
+
+    start = datetime.utcnow()
+    run_experiment(experiment)
+    end = datetime.utcnow()
+
+    experiment_run_time = int((end - start).total_seconds())
+    pause_before_duration = int(experiment["method"][1]["pauses"]["before"])
+
+    assert experiment_run_time < pause_before_duration
+
+def test_probeless_run_should_not_pause_before():
+    experiment = experiments.ExperimentWithLongPauseBefore.copy()
+    experiment["dry"] = Dry.PROBES
+
+    start = datetime.utcnow()
+    run_experiment(experiment)
+    end = datetime.utcnow()
+
+    experiment_run_time = int((end - start).total_seconds())
+    pause_before_duration = int(experiment["method"][1]["pauses"]["before"])
+
+    assert experiment_run_time < pause_before_duration
+
+
+def test_pauseless_run_should_not_pause_before():
+    experiment = experiments.ExperimentWithLongPauseBefore.copy()
+    experiment["dry"] = Dry.PAUSE
+
+    start = datetime.utcnow()
+    run_experiment(experiment)
+    end = datetime.utcnow()
+
+    experiment_run_time = int((end - start).total_seconds())
+    pause_before_duration = int(experiment["method"][1]["pauses"]["before"])
+
+    assert experiment_run_time < pause_before_duration
