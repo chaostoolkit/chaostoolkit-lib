@@ -49,7 +49,7 @@ class Strategy(enum.Enum):
     AFTER_METHOD = "after-method-only"
     DURING_METHOD = "during-method-only"
     DEFAULT = "default"
-    CONTINOUS = "continous"
+    CONTINUOUS = "continuous"
 
     @staticmethod
     def from_string(value: str) -> 'Strategy':
@@ -61,10 +61,8 @@ class Strategy(enum.Enum):
             return Strategy.AFTER_METHOD
         elif value == "during-method-only":
             return Strategy.DURING_METHOD
-        elif value == "continously":
-            return Strategy.CONTINOUS
-        elif value == "continously-fail-fast":
-            return Strategy.CONTINOUS
+        elif value == "continuously":
+            return Strategy.CONTINUOUS
 
         raise ValueError("Unknown strategy")
 class Dry(enum.Enum):

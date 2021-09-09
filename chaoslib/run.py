@@ -51,18 +51,17 @@ class RunEventHandler:
     def signal_exit(self) -> None:
         logger.debug("Experiment execution caught a system signal")
 
-    def start_continous_hypothesis(self, frequency: int) -> None:
-        logger.debug("Steady state will run continously now")
+    def start_continuous_hypothesis(self, frequency: int) -> None:
+        logger.debug("Steady state will run continuously now")
 
-    def continous_hypothesis_iteration(self, iteration_index: int,
-                                       state: Any) -> None:
+    def continuous_hypothesis_iteration(self, iteration_index: int,
+                                        state: Any) -> None:
         logger.debug("Steady state iteration {}".format(iteration_index))
 
-    def continous_hypothesis_completed(self, experiment: Experiment,
-                                       journal: Journal,
-                                       exception: Exception = None) \
-                                           -> None:
-        logger.debug("Continous steady state is now complete")
+    def continuous_hypothesis_completed(self, experiment: Experiment,
+                                        journal: Journal,
+                                        exception: Exception = None) -> None:
+        logger.debug("Continuous steady state is now complete")
 
     def start_hypothesis_before(self, experiment: Experiment) -> None:
         logger.debug("Steady state hypothesis is now running before method")
@@ -144,32 +143,31 @@ class EventHandlerRegistry:
                     "Handler {} failed".format(
                         h.__class__.__name__), exc_info=True)
 
-    def start_continous_hypothesis(self, frequency: int) -> None:
+    def start_continuous_hypothesis(self, frequency: int) -> None:
         for h in self.handlers:
             try:
-                h.start_continous_hypothesis(frequency)
+                h.start_continuous_hypothesis(frequency)
             except Exception:
                 logger.debug(
                     "Handler {} failed".format(
                         h.__class__.__name__), exc_info=True)
 
-    def continous_hypothesis_iteration(self, iteration_index: int,
-                                       state: Any) -> None:
+    def continuous_hypothesis_iteration(self, iteration_index: int,
+                                        state: Any) -> None:
         for h in self.handlers:
             try:
-                h.continous_hypothesis_iteration(iteration_index, state)
+                h.continuous_hypothesis_iteration(iteration_index, state)
             except Exception:
                 logger.debug(
                     "Handler {} failed".format(
                         h.__class__.__name__), exc_info=True)
 
-    def continous_hypothesis_completed(self, experiment: Experiment,
-                                       journal: Journal,
-                                       exception: Exception = None) \
-                                           -> None:
+    def continuous_hypothesis_completed(self, experiment: Experiment,
+                                        journal: Journal,
+                                        exception: Exception = None) -> None:
         for h in self.handlers:
             try:
-                h.continous_hypothesis_completed(
+                h.continuous_hypothesis_completed(
                     experiment, journal, exception)
             except Exception:
                 logger.debug(
@@ -329,7 +327,7 @@ class Runner:
         control = Control()
         activity_pool, rollback_pool = get_background_pools(experiment)
         hypo_pool = get_hypothesis_pool()
-        continous_hypo_event = threading.Event()
+        continuous_hypo_event = threading.Event()
 
         dry:Dry = experiment.get("dry", None)
         if dry == Dry.ACTIVITIES:
@@ -375,7 +373,7 @@ class Runner:
                 if state is not None:
                     if with_ssh and should_run_during_method(strategy):
                         run_hypothesis_during_method(
-                            hypo_pool, continous_hypo_event, strategy,
+                            hypo_pool, continuous_hypo_event, strategy,
                             schedule, experiment, journal, configuration,
                             secrets, event_registry, dry)
 
@@ -383,7 +381,7 @@ class Runner:
                             strategy, activity_pool, experiment, journal,
                             configuration, secrets, event_registry, dry)
 
-                    continous_hypo_event.set()
+                    continuous_hypo_event.set()
                     if journal["status"] not in ["interrupted", "aborted"]:
                         if with_ssh and (state is not None) and \
                                 should_run_after_method(strategy):
@@ -452,16 +450,16 @@ class Runner:
 
 def should_run_before_method(strategy: Strategy) -> bool:
     return strategy in [
-        Strategy.BEFORE_METHOD, Strategy.DEFAULT, Strategy.CONTINOUS]
+        Strategy.BEFORE_METHOD, Strategy.DEFAULT, Strategy.CONTINUOUS]
 
 
 def should_run_after_method(strategy: Strategy) -> bool:
     return strategy in [
-        Strategy.AFTER_METHOD, Strategy.DEFAULT, Strategy.CONTINOUS]
+        Strategy.AFTER_METHOD, Strategy.DEFAULT, Strategy.CONTINUOUS]
 
 
 def should_run_during_method(strategy: Strategy) -> bool:
-    return strategy in [Strategy.DURING_METHOD, Strategy.CONTINOUS]
+    return strategy in [Strategy.DURING_METHOD, Strategy.CONTINUOUS]
 
 
 def run_gate_hypothesis(experiment: Experiment, journal: Journal,
@@ -522,7 +520,7 @@ def run_deviation_validation_hypothesis(experiment: Experiment,
 
 
 def run_hypothesis_during_method(hypo_pool: ThreadPoolExecutor,
-                                 continous_hypo_event: threading.Event,
+                                 continuous_hypo_event: threading.Event,
                                  strategy: Strategy, schedule: Schedule,
                                  experiment: Experiment, journal: Journal,
                                  configuration: Configuration,
@@ -530,12 +528,12 @@ def run_hypothesis_during_method(hypo_pool: ThreadPoolExecutor,
                                  event_registry: EventHandlerRegistry,
                                   dry: Dry = Dry.NO_DRY) -> Future:
     """
-    Run the hypothesis continously in a background thead and report the
+    Run the hypothesis continuously in a background thread and report the
     status in the journal when it raised an exception.
     """
     def completed(f: Future):
         exc = f.exception()
-        event_registry.continous_hypothesis_completed(
+        event_registry.continuous_hypothesis_completed(
             experiment, journal, exc)
         if exc is not None:
             if isinstance(exc, InterruptExecution):
@@ -544,10 +542,10 @@ def run_hypothesis_during_method(hypo_pool: ThreadPoolExecutor,
             elif isinstance(exc, Exception):
                 journal["status"] = "aborted"
                 logger.fatal(str(exc))
-        logger.info("Continous steady state hypothesis terminated")
+        logger.info("Continuous steady state hypothesis terminated")
 
     f = hypo_pool.submit(
-        run_hypothesis_continuously, continous_hypo_event,
+        run_hypothesis_continuously, continuous_hypo_event,
         schedule, experiment, journal, configuration, secrets,
         event_registry, dry=dry)
     f.add_done_callback(completed)
@@ -605,7 +603,7 @@ def run_rollback(rollback_strategy: str, rollback_pool: ThreadPoolExecutor,
             play_rollbacks = True
         else:
             logger.warning(
-                "Rollbacks werre explicitely requested to be played "
+                "Rollbacks were explicitely requested to be played "
                 "only if the experiment deviated. Since this is not "
                 "the case, we will not play them.")
 
@@ -700,9 +698,9 @@ def run_hypothesis_continuously(event: threading.Event, schedule: Schedule,
     frequency = schedule.continous_hypothesis_frequency
     fail_fast_ratio = schedule.fail_fast_ratio
 
-    event_registry.start_continous_hypothesis(frequency)
+    event_registry.start_continuous_hypothesis(frequency)
     logger.info(
-        "Executing the steady-state hypothesis continously "
+        "Executing the steady-state hypothesis continuously "
         "every {} seconds".format(frequency))
 
     failed_iteration = 0
@@ -716,19 +714,19 @@ def run_hypothesis_continuously(event: threading.Event, schedule: Schedule,
         state = run_steady_state_hypothesis(
             experiment, configuration, secrets, dry=dry)
         journal["steady_states"]["during"].append(state)
-        event_registry.continous_hypothesis_iteration(iteration, state)
+        event_registry.continuous_hypothesis_iteration(iteration, state)
 
         if state is not None and not state["steady_state_met"]:
             failed_iteration += 1
             failed_ratio = (failed_iteration * 100) / iteration
             p = state["probes"][-1]
             logger.warning(
-                "Continous steady state probe '{p}' is not in the given "
+                "Continuous steady state probe '{p}' is not in the given "
                 "tolerance".format(p=p["activity"]["name"]))
 
             if schedule.fail_fast:
                 if failed_ratio >= fail_fast_ratio:
-                    m = "Terminating immediatly the experiment"
+                    m = "Terminating immediately the experiment"
                     if failed_ratio != 0.0:
                         m = "{} after {:.1f}% hypothesis deviated".format(
                             m, failed_ratio
@@ -856,7 +854,7 @@ def harshly_terminate_pending_background_activities(
     """
     Ugly hack to try to force background activities to terminate now.
 
-    This cano only have an impact over functions that are still in the Python
+    This can only have an impact over functions that are still in the Python
     land. Any code outside of the Python VM (say calling a C function, even
     time.sleep()) will not be impacted and therefore will continue hanging
     until it does complete of its own accord.

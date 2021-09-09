@@ -46,18 +46,18 @@ def test_run_ssh_during_method_only():
     assert journal["steady_states"]["during"] is not None
 
 
-def test_run_ssh_continous():
+def test_run_ssh_continuous():
     experiment = experiments.SimpleExperiment.copy()
     journal = run_experiment(
-        experiment, strategy=Strategy.CONTINOUS,
-        schedule=Schedule(continous_hypothesis_frequency=0.1))
+        experiment, strategy=Strategy.CONTINUOUS,
+        schedule=Schedule(continuous_hypothesis_frequency=0.1))
     assert journal is not None
     assert journal["steady_states"]["before"] is not None
     assert journal["steady_states"]["after"] is not None
     assert journal["steady_states"]["during"] is not None
 
 
-def test_exit_continous_ssh_continous_when_experiment_is_interrupted():
+def test_exit_continuous_ssh_continuous_when_experiment_is_interrupted():
     handlers_called = []
     class Handler(RunEventHandler):
         def started(self, experiment: Experiment,
@@ -70,8 +70,8 @@ def test_exit_continous_ssh_continous_when_experiment_is_interrupted():
 
     experiment = experiments.SimpleExperimentWithInterruption.copy()
     journal = run_experiment(
-        experiment, strategy=Strategy.CONTINOUS,
-        schedule=Schedule(continous_hypothesis_frequency=0.1),
+        experiment, strategy=Strategy.CONTINUOUS,
+        schedule=Schedule(continuous_hypothesis_frequency=0.1),
         event_handlers=[Handler()])
     assert journal is not None
     assert journal["steady_states"]["before"] is not None
@@ -82,7 +82,7 @@ def test_exit_continous_ssh_continous_when_experiment_is_interrupted():
     assert sorted(handlers_called) == ["interrupted", "started"]
 
 
-def test_exit_continous_ssh_continous_when_experiment_is_exited():
+def test_exit_continuous_ssh_continuous_when_experiment_is_exited():
     handlers_called = []
     class Handler(RunEventHandler):
         def started(self, experiment: Experiment,
@@ -95,8 +95,8 @@ def test_exit_continous_ssh_continous_when_experiment_is_exited():
 
     experiment = experiments.SimpleExperimentWithExit.copy()
     journal = run_experiment(
-        experiment, strategy=Strategy.CONTINOUS,
-        schedule=Schedule(continous_hypothesis_frequency=0.1),
+        experiment, strategy=Strategy.CONTINUOUS,
+        schedule=Schedule(continuous_hypothesis_frequency=0.1),
         event_handlers=[Handler()])
     assert journal is not None
     assert journal["steady_states"]["before"] is not None
@@ -108,11 +108,11 @@ def test_exit_continous_ssh_continous_when_experiment_is_exited():
 
 
 
-def test_exit_continous_ssh_continous_when_activity_raises_unknown_exception():
+def test_exit_continuous_ssh_continuous_when_activity_raises_unknown_exception():
     experiment = experiments.SimpleExperimentWithException.copy()
     journal = run_experiment(
-        experiment, strategy=Strategy.CONTINOUS,
-        schedule=Schedule(continous_hypothesis_frequency=0.1),
+        experiment, strategy=Strategy.CONTINUOUS,
+        schedule=Schedule(continuous_hypothesis_frequency=0.1),
         settings={"runtime": {"rollbacks": {"strategy": "always"}}})
     assert journal is not None
     assert journal["steady_states"]["before"] is not None
@@ -125,11 +125,11 @@ def test_exit_continous_ssh_continous_when_activity_raises_unknown_exception():
     assert "oops" in journal["run"][-1]["exception"][-1]
 
 
-def test_exit_immediatly_when_continous_ssh_fails_and_failfast():
+def test_exit_immediately_when_continuous_ssh_fails_and_failfast():
     experiment = experiments.SimpleExperimentWithSSHFailingAtSomePoint.copy()
     journal = run_experiment(
-        experiment, strategy=Strategy.CONTINOUS,
-        schedule=Schedule(continous_hypothesis_frequency=0.1, fail_fast=True),
+        experiment, strategy=Strategy.CONTINUOUS,
+        schedule=Schedule(continuous_hypothesis_frequency=0.1, fail_fast=True),
         settings={"runtime": {"rollbacks": {"strategy": "always"}}})
     assert journal is not None
     assert journal["steady_states"]["before"] is not None
@@ -140,11 +140,11 @@ def test_exit_immediatly_when_continous_ssh_fails_and_failfast():
     assert len(journal["run"]) == 1
 
 
-def test_do_not_exit_when_continous_ssh_fails_and_no_failfast():
+def test_do_not_exit_when_continuous_ssh_fails_and_no_failfast():
     experiment = experiments.SimpleExperimentWithSSHFailingAtSomePoint.copy()
     journal = run_experiment(
-        experiment, strategy=Strategy.CONTINOUS,
-        schedule=Schedule(continous_hypothesis_frequency=0.1, fail_fast=False),
+        experiment, strategy=Strategy.CONTINUOUS,
+        schedule=Schedule(continuous_hypothesis_frequency=0.1, fail_fast=False),
         settings={"runtime": {"rollbacks": {"strategy": "always"}}})
     assert journal is not None
     assert journal["steady_states"]["before"] is not None
@@ -155,11 +155,11 @@ def test_do_not_exit_when_continous_ssh_fails_and_no_failfast():
     assert len(journal["run"]) == 2
 
 
-def test_exit_immediatly_when_continous_ssh_fails_and_failfast_when_background_activity():
+def test_exit_immediately_when_continuous_ssh_fails_and_failfast_when_background_activity():
     experiment = experiments.SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity.copy()
     journal = run_experiment(
-        experiment, strategy=Strategy.CONTINOUS,
-        schedule=Schedule(continous_hypothesis_frequency=0.1, fail_fast=True),
+        experiment, strategy=Strategy.CONTINUOUS,
+        schedule=Schedule(continuous_hypothesis_frequency=0.1, fail_fast=True),
         settings={"runtime": {"rollbacks": {"strategy": "always"}}})
     assert journal is not None
     assert journal["steady_states"]["before"] is not None
@@ -180,9 +180,9 @@ def test_run_handler_is_called_on_each_handler():
     registry.finish(None)
     registry.interrupted(None, None)
     registry.signal_exit()
-    registry.start_continous_hypothesis(0)
-    registry.continous_hypothesis_iteration(0, None)
-    registry.continous_hypothesis_completed(None, None)
+    registry.start_continuous_hypothesis(0)
+    registry.continuous_hypothesis_iteration(0, None)
+    registry.continuous_hypothesis_completed(None, None)
     registry.start_method(None)
     registry.method_completed(None, None)
     registry.start_rollbacks(None)
@@ -196,8 +196,8 @@ def test_run_handler_is_called_on_each_handler():
 
     assert h.calls == [
         "started", "finish", "interrupted", "signal_exit",
-        "start_continous_hypothesis", "continous_hypothesis_iteration",
-        "continous_hypothesis_completed", "start_method", "method_completed",
+        "start_continuous_hypothesis", "continuous_hypothesis_iteration",
+        "continuous_hypothesis_completed", "start_method", "method_completed",
         "start_rollbacks", "rollbacks_completed", "start_hypothesis_before",
         "hypothesis_before_completed", "start_hypothesis_after",
         "hypothesis_after_completed",
@@ -215,9 +215,9 @@ def test_exceptions_does_not_stop_handler_registry():
     registry.finish(None)
     registry.interrupted(None, None)
     registry.signal_exit()
-    registry.start_continous_hypothesis(0)
-    registry.continous_hypothesis_iteration(0, None)
-    registry.continous_hypothesis_completed(None, None)
+    registry.start_continuous_hypothesis(0)
+    registry.continuous_hypothesis_iteration(0, None)
+    registry.continuous_hypothesis_completed(None, None)
     registry.start_method(None)
     registry.method_completed(None, None)
     registry.start_rollbacks(None)
@@ -231,8 +231,8 @@ def test_exceptions_does_not_stop_handler_registry():
 
     assert h.calls == [
         "started", "finish", "interrupted", "signal_exit",
-        "start_continous_hypothesis", "continous_hypothesis_iteration",
-        "continous_hypothesis_completed", "start_method", "method_completed",
+        "start_continuous_hypothesis", "continuous_hypothesis_iteration",
+        "continuous_hypothesis_completed", "start_method", "method_completed",
         "start_rollbacks", "rollbacks_completed", "start_hypothesis_before",
         "hypothesis_before_completed", "start_hypothesis_after",
         "hypothesis_after_completed",
