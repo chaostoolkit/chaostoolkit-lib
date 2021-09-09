@@ -5,6 +5,7 @@ from copy import deepcopy
 from typing import Any
 
 from chaoslib.exceptions import ActivityFailed
+from chaoslib.types import Dry
 
 EmptyProbe = {}
 

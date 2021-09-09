@@ -65,7 +65,7 @@ def test_apply_activities_has_moved():
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("module")
         with patch("chaoslib.experiment.apply_act"):
-            apply_activities(None, None, None, None, None)
+            apply_activities(None, None, None, None, None, None)
             assert len(w) == 1
             assert w[0].filename == experiment.__file__
             assert "'apply_activities'" in str(w[0].message)
@@ -75,7 +75,7 @@ def test_apply_rollbacks_has_moved():
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("module")
         with patch("chaoslib.experiment.apply_roll"):
-            apply_rollbacks(None, None, None, None)
+            apply_rollbacks(None, None, None, None, None)
             assert len(w) == 1
             assert w[0].filename == experiment.__file__
             assert "'apply_rollbacks'" in str(w[0].message)

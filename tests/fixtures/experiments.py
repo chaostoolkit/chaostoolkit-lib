@@ -840,7 +840,7 @@ ExperimentWithBypassedActivity = {
         {
             "type": "action",
             "name": "say-hello",
-            "dry": True,
+            "dry": Dry.ACTIVITIES,
             "provider": {"type": "process", "path": "echo", "arguments": "hello"},
         }
     ],
