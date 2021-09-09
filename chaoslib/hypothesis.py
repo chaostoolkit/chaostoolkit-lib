@@ -166,7 +166,7 @@ def check_range(tolerance: Tolerance):
 
 def run_steady_state_hypothesis(experiment: Experiment,
                                 configuration: Configuration, secrets: Secrets,
-                                 dry: Dry = Dry.NO_DRY) -> Dict[str, Any]:
+                                 dry: Dry) -> Dict[str, Any]:
     """
     Run all probes in the hypothesis and fail the experiment as soon as any of
     the probe fails or is outside the tolerance zone.

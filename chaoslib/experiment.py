@@ -139,7 +139,7 @@ def initialize_run_journal(experiment: Experiment) -> Journal:
 
 def apply_activities(experiment: Experiment, configuration: Configuration,
                      secrets: Secrets, pool: ThreadPoolExecutor,
-                     journal: Journal, dry: Dry = Dry.NO_DRY) -> List[Run]:
+                     journal: Journal, dry: Dry) -> List[Run]:
     warn_about_moved_function(
         "The 'apply_activities' function has now moved to the "
         "'chaoslib.run' package")
@@ -149,7 +149,7 @@ def apply_activities(experiment: Experiment, configuration: Configuration,
 
 def apply_rollbacks(experiment: Experiment, configuration: Configuration,
                     secrets: Secrets, pool: ThreadPoolExecutor,
-                     dry: Dry = Dry.NO_DRY) -> List[Run]:
+                     dry: Dry) -> List[Run]:
     warn_about_moved_function(
         "The 'apply_rollbacks' function has now moved to the "
         "'chaoslib.run' package")

@@ -13,7 +13,7 @@ __all__ = ["run_rollbacks"]
 
 def run_rollbacks(experiment: Experiment, configuration: Configuration,
                   secrets: Secrets, pool: ThreadPoolExecutor,
-                   dry: Dry = Dry.NO_DRY) -> Iterator[Run]:
+                   dry: Dry) -> Iterator[Run]:
     """
     Run all rollbacks declared in the experiment in their order. Wait for
     each rollback activity to complete before to the next unless the activity

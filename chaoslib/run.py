@@ -465,7 +465,7 @@ def should_run_during_method(strategy: Strategy) -> bool:
 def run_gate_hypothesis(experiment: Experiment, journal: Journal,
                         configuration: Configuration, secrets: Secrets,
                         event_registry: EventHandlerRegistry,
-                         dry: Dry = Dry.NO_DRY) -> Dict[str, Any]:
+                         dry: Dry) -> Dict[str, Any]:
     """
     Run the hypothesis before the method and bail the execution if it did
     not pass.
@@ -494,7 +494,7 @@ def run_deviation_validation_hypothesis(experiment: Experiment,
                                         configuration: Configuration,
                                         secrets: Secrets,
                                         event_registry: EventHandlerRegistry,
-                                         dry: Dry = Dry.NO_DRY) \
+                                         dry: Dry) \
                                             -> Dict[str, Any]:
     """
     Run the hypothesis after the method and report to the journal if the
@@ -526,7 +526,7 @@ def run_hypothesis_during_method(hypo_pool: ThreadPoolExecutor,
                                  configuration: Configuration,
                                  secrets: Secrets,
                                  event_registry: EventHandlerRegistry,
-                                  dry: Dry = Dry.NO_DRY) -> Future:
+                                  dry: Dry) -> Future:
     """
     Run the hypothesis continuously in a background thread and report the
     status in the journal when it raised an exception.
@@ -556,7 +556,7 @@ def run_method(strategy: Strategy, activity_pool: ThreadPoolExecutor,
                experiment: Experiment, journal: Journal,
                configuration: Configuration, secrets: Secrets,
                event_registry: EventHandlerRegistry,
-                dry: str = Dry.NO_DRY) -> Optional[List[Run]]:
+                dry: Dry) -> Optional[List[Run]]:
     logger.info("Playing your experiment's method now...")
     event_registry.start_method(experiment)
     try:
@@ -580,7 +580,7 @@ def run_rollback(rollback_strategy: str, rollback_pool: ThreadPoolExecutor,
                  experiment: Experiment, journal: Journal,
                  configuration: Configuration, secrets: Secrets,
                  event_registry: EventHandlerRegistry,
-                  dry: Dry = Dry.NO_DRY) -> None:
+                  dry: Dry) -> None:
     has_deviated = journal["deviated"]
     journal_status = journal["status"]
     play_rollbacks = False
@@ -745,7 +745,7 @@ def run_hypothesis_continuously(event: threading.Event, schedule: Schedule,
 def apply_activities(experiment: Experiment, configuration: Configuration,
                      secrets: Secrets, pool: ThreadPoolExecutor,
                      journal: Journal,
-                      dry: Dry = Dry.NO_DRY) -> List[Run]:
+                      dry: Dry) -> List[Run]:
     with controls(level="method", experiment=experiment, context=experiment,
                   configuration=configuration, secrets=secrets) as control:
         result = []
@@ -815,7 +815,7 @@ def apply_activities(experiment: Experiment, configuration: Configuration,
 
 def apply_rollbacks(experiment: Experiment, configuration: Configuration,
                     secrets: Secrets, pool: ThreadPoolExecutor,
-                     dry: Dry = Dry.NO_DRY) -> List[Run]:
+                     dry: Dry) -> List[Run]:
     logger.info("Let's rollback...")
     with controls(level="rollback", experiment=experiment, context=experiment,
                   configuration=configuration, secrets=secrets) as control:

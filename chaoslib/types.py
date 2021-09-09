@@ -66,7 +66,6 @@ class Strategy(enum.Enum):
 
         raise ValueError("Unknown strategy")
 class Dry(enum.Enum):
-    NO_DRY = "no-dry"
     PROBES = "probes"
     ACTIONS = "actions"
     ACTIVITIES = "activities"
@@ -74,9 +73,7 @@ class Dry(enum.Enum):
 
     @staticmethod
     def from_string(value: str) -> 'Dry':
-        if value == "no-dry":
-            return Dry.NO_DRY
-        elif value == "probes":
+        if value == "probes":
             return Dry.PROBES
         elif value == "actions":
             return Dry.ACTIONS
@@ -84,6 +81,8 @@ class Dry(enum.Enum):
             return Dry.ACTIVITIES
         elif value == "pause":
             return Dry.PAUSE
+        elif not value:
+            return None
 
 
         raise ValueError("Unknown dry")

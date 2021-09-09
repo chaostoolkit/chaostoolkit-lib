@@ -101,7 +101,7 @@ def ensure_activity_is_valid(activity: Activity):  # noqa: C901
 
 def run_activities(experiment: Experiment, configuration: Configuration,
                    secrets: Secrets, pool: ThreadPoolExecutor,
-                   dry: Dry = Dry.NO_DRY) -> Iterator[Run]:
+                   dry: Dry) -> Iterator[Run]:
     """
     Internal generator that iterates over all activities and execute them.
     Yields either the result of the run or a :class:`concurrent.futures.Future`
@@ -129,7 +129,7 @@ def run_activities(experiment: Experiment, configuration: Configuration,
 ###############################################################################
 def execute_activity(experiment: Experiment,activity: Activity,
                      configuration: Configuration,
-                     secrets: Secrets, dry: Dry = Dry.NO_DRY) -> Iterator[Run]:
+                     secrets: Secrets, dry: Dry) -> Iterator[Run]:
     """
     Low-level wrapper around the actual activity provider call to collect
     some meta data (like duration, start/end time, exceptions...) during
