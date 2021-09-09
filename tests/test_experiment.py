@@ -434,7 +434,6 @@ def test_rollback_never_strategy_does_not_run_on_interrupted_experiment_in_metho
     assert journal["status"] == "interrupted"
     assert len(journal["rollbacks"]) == 0
 
-
 def test_can_run_experiment_in_actionless_mode():
     experiment = experiments.ExperimentWithLongPauseAction.copy()
     experiment["actionless"] = True

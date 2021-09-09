@@ -353,7 +353,7 @@ class Runner:
         hypo_pool = get_hypothesis_pool()
         continuous_hypo_event = threading.Event()
 
-        dry:Dry = experiment.get("dry", None)
+        dry: Dry = experiment.get("dry", None)
         if dry == Dry.ACTIVITIES:
             logger.warning("Dry mode enabled")
 
