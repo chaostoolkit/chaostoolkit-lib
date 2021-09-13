@@ -46,7 +46,7 @@ jobs:
           fi
           exit 0
   release-to-pypi:
-  needs: [check-release]
+    needs: [check-release]
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
