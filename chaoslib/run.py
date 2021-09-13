@@ -757,8 +757,8 @@ def run_hypothesis_continuously(event: threading.Event, schedule: Schedule,
                                 configuration: Configuration,
                                 secrets: Secrets,
                                 event_registry: EventHandlerRegistry,
-                                 dry: Dry = Dry.NO_DRY):
-    frequency = schedule.continous_hypothesis_frequency
+                                dry: Dry):
+    frequency = schedule.continuous_hypothesis_frequency
     fail_fast_ratio = schedule.fail_fast_ratio
 
     event_registry.start_continuous_hypothesis(frequency)
