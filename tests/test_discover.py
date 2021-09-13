@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import pytest
 
 from chaoslib.discovery.discover import discover_activities

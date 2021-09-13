@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import importlib
 import inspect
 from copy import deepcopy
@@ -108,7 +107,7 @@ def validate_python_control(control: Control):
     provider = control["provider"]
     mod_name = provider.get("module")
     if not mod_name:
-        raise InvalidActivity("Control '{}' must have a module path".format(name))
+        raise InvalidActivity(f"Control '{name}' must have a module path")
 
     try:
         importlib.import_module(mod_name)
@@ -186,15 +185,11 @@ def load_func(control: Control, func_name: str) -> Callable:
 
     func = getattr(mod, func_name, None)
     if not func:
-        logger.debug(
-            "Control module '{}' does not declare '{}'".format(mod.__file__, func_name)
-        )
+        logger.debug(f"Control module '{mod.__file__}' does not declare '{func_name}'")
         return
 
     try:
-        logger.debug(
-            "Control '{}' loaded from '{}'".format(func_name, inspect.getfile(func))
-        )
+        logger.debug(f"Control '{func_name}' loaded from '{inspect.getfile(func)}'")
     except TypeError:
         pass
 

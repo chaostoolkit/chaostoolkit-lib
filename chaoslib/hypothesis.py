@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 import re
 from decimal import Decimal, InvalidOperation
@@ -96,7 +95,7 @@ def check_regex_pattern(tolerance: Tolerance):
         re.compile(pattern)
     except TypeError:
         raise InvalidActivity(
-            "hypothesis probe tolerance pattern {} has an invalid type".format(pattern)
+            f"hypothesis probe tolerance pattern {pattern} has an invalid type"
         )
     except re.error as e:
         raise InvalidActivity(
@@ -132,9 +131,7 @@ def check_json_path(tolerance: Tolerance):
             )
         JSONPath.parse_str(path)
     except ValueError:
-        raise InvalidActivity(
-            "hypothesis probe tolerance JSON path {} is invalid".format(path)
-        )
+        raise InvalidActivity(f"hypothesis probe tolerance JSON path {path} is invalid")
     except TypeError:
         raise InvalidActivity(
             "hypothesis probe tolerance JSON path {} has an invalid "
@@ -221,7 +218,7 @@ def run_steady_state_hypothesis(
                 continue
 
             tolerance = activity.get("tolerance")
-            logger.debug("allowed tolerance is {t}".format(t=str(tolerance)))
+            logger.debug(f"allowed tolerance is {str(tolerance)}")
             checked = within_tolerance(
                 tolerance, run["output"], configuration=configuration, secrets=secrets
             )
@@ -332,7 +329,7 @@ def _(
         target = tolerance.get("target")
         pattern = tolerance.get("pattern")
         pattern = substitute(pattern, configuration, secrets)
-        logger.debug("Applied pattern is: {}".format(pattern))
+        logger.debug(f"Applied pattern is: {pattern}")
         rx = re.compile(pattern)
         if target:
             value = value.get(target, value)
@@ -342,7 +339,7 @@ def _(
         path = tolerance.get("path")
         count_value = tolerance.get("count", None)
         path = substitute(path, configuration, secrets)
-        logger.debug("Applied jsonpath is: {}".format(path))
+        logger.debug(f"Applied jsonpath is: {path}")
         px = JSONPath.parse_str(path)
 
         if target:
@@ -378,7 +375,7 @@ def _(
                     )
                 )
             else:
-                logger.debug("jsonpath found '{}'".format(str(values)))
+                logger.debug(f"jsonpath found '{str(values)}'")
 
         return result
     elif tolerance_type == "range":

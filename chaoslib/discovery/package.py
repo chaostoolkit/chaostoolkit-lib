@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import importlib
 import inspect
 import subprocess
@@ -20,9 +19,7 @@ def install(package_name: str):
     Use pip to download and install the `package_name` to the current Python
     environment. Pip can detect it is already installed.
     """
-    logger.info(
-        "Attempting to download and install package '{p}'".format(p=package_name)
-    )
+    logger.info(f"Attempting to download and install package '{package_name}'")
 
     process = subprocess.run(
         ["pip", "install", "-U", package_name],
@@ -35,7 +32,7 @@ def install(package_name: str):
     logger.debug(stdout)
 
     if process.returncode != 0:
-        msg = "failed to install `{p}`".format(p=package_name)
+        msg = f"failed to install `{package_name}`"
         logger.debug(
             msg
             + "\n=================\n{o}\n=================\n{e}\n".format(
@@ -55,7 +52,7 @@ def load_package(package_name: str) -> object:
     try:
         package = importlib.import_module(name)
     except ImportError:
-        raise DiscoveryFailed("could not load Python module '{name}'".format(name=name))
+        raise DiscoveryFailed(f"could not load Python module '{name}'")
 
     return package
 
@@ -107,7 +104,7 @@ def get_importname_from_package(package_name: str) -> str:
     try:
         dist = importlib_metadata.distribution(package_name)
     except importlib_metadata.PackageNotFoundError:
-        raise DiscoveryFailed("Package {p} not found ".format(p=package_name))
+        raise DiscoveryFailed(f"Package {package_name} not found ")
 
     try:
         packages = dist.top_level

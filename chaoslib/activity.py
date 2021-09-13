@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import numbers
 import time
 import traceback
@@ -51,9 +50,7 @@ def ensure_activity_is_valid(activity: Activity):  # noqa: C901
         raise InvalidActivity("an activity must have a type")
 
     if activity_type not in ("probe", "action"):
-        raise InvalidActivity(
-            "'{t}' is not a supported activity type".format(t=activity_type)
-        )
+        raise InvalidActivity(f"'{activity_type}' is not a supported activity type")
 
     if not activity.get("name"):
         raise InvalidActivity("an activity must have a name")
@@ -67,9 +64,7 @@ def ensure_activity_is_valid(activity: Activity):  # noqa: C901
         raise InvalidActivity("a provider must have a type")
 
     if provider_type not in ("python", "process", "http"):
-        raise InvalidActivity(
-            "unknown provider type '{type}'".format(type=provider_type)
-        )
+        raise InvalidActivity(f"unknown provider type '{provider_type}'")
 
     if not activity.get("name"):
         raise InvalidActivity("activity must have a name (cannot be empty)")
@@ -157,9 +152,7 @@ def execute_activity(
     if ref:
         activity = lookup_activity(ref)
         if not activity:
-            raise ActivityFailed(
-                "could not find referenced activity '{r}'".format(r=ref)
-            )
+            raise ActivityFailed(f"could not find referenced activity '{ref}'")
 
     with controls(
         level="activity",
@@ -172,9 +165,7 @@ def execute_activity(
         pauses = activity.get("pauses", {})
         pause_before = pauses.get("before")
         if pause_before:
-            logger.info(
-                "Pausing before next activity for {d}s...".format(d=pause_before)
-            )
+            logger.info(f"Pausing before next activity for {pause_before}s...")
             # only pause when not in dry-mode
             if not dry:
                 time.sleep(pause_before)
@@ -203,7 +194,7 @@ def execute_activity(
             run["output"] = result
             run["status"] = "succeeded"
             if result is not None:
-                logger.debug("  => succeeded with '{r}'".format(r=result))
+                logger.debug(f"  => succeeded with '{result}'")
             else:
                 logger.debug("  => succeeded without any result value")
         except ActivityFailed as x:
@@ -211,7 +202,7 @@ def execute_activity(
             run["status"] = "failed"
             run["output"] = result
             run["exception"] = traceback.format_exception(type(x), x, None)
-            logger.error("  => failed: {x}".format(x=error_msg))
+            logger.error(f"  => failed: {error_msg}")
         finally:
             # capture the end time before we pause
             end = datetime.utcnow()
@@ -221,7 +212,7 @@ def execute_activity(
 
             pause_after = pauses.get("after")
             if pause_after and not interrupted:
-                logger.info("Pausing after activity for {d}s...".format(d=pause_after))
+                logger.info(f"Pausing after activity for {pause_after}s...")
                 # only pause when not in dry-mode
                 if not dry:
                     time.sleep(pause_after)
