@@ -10,8 +10,44 @@ on:
       - '[0-9]+.[0-9]+.[0-9]+rc[0-9]+'
 
 jobs:
+check-release:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: Get changed files
+        uses: tj-actions/changed-files@v1.1.2
+        id: files
+      - name: Determine if files modified
+        run: |
+          init_modified=false
+          changelog_modified=false
+          for changed_file in ${{ steps.files.outputs.all_modified_files }}; do
+            if [[ ${changed_file} == "chaoslib/__init__.py" ]];
+            then
+              init_modified=true # __init__.py was modified
+            elif [[ ${changed_file} == "CHANGELOG.md" ]];
+            then
+              changelog_modified=true # CHANGELOG.md was modified
+            fi
+          done
+          if [[ ${init_modified} == false ]];
+          then
+            echo "__init__.py was not modified"
+          fi
+          if [[ ${changelog_modified} == false ]];
+          then
+            echo "CHANGELOG.md was not modified"
+          fi
+          if [[ ${init_modified} == false || ${changelog_modified} == false ]];
+          then
+            exit 1
+          fi
+          exit 0
   release-to-pypi:
-    runs-on: ubuntu-16.04
+  needs: [check-release]
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
