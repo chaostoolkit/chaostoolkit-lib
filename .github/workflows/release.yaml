@@ -10,7 +10,7 @@ on:
       - '[0-9]+.[0-9]+.[0-9]+rc[0-9]+'
 
 jobs:
-check-release:
+  check-release:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2

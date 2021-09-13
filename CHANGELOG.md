@@ -8,6 +8,9 @@
 
 * Switched from pycodestyle/pylama to `black`, `flake8`, `isort`
 * Update CI builds to build, lint, and test
+* Updated `.github/workflows/release.yaml` to check that both `CHANGELOG.md`
+and `chaoslib/__init__.py` get updated in line with a new version
+* Updated `Makefile` to specify `python3` instead of `python`
 
 ### Added
 
