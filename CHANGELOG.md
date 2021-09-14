@@ -15,6 +15,9 @@
 after 365 days of inactivity and to close them after 7 days of being marked
 `Stale`.
 * Run `pyupgrade --py36-plus` across whole project
+* Updated `.github/workflows/release.yaml` to check that both `CHANGELOG.md`
+and `chaoslib/__init__.py` get updated in line with a new version
+* Updated `Makefile` to specify `python3` instead of `python`
 
 ### Added
 
