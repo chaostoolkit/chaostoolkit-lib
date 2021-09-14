@@ -9,8 +9,6 @@
   * --dry=probes run all probes as dry run.
   * --dry=pause run all activities with no pausing.
 * Added tests
-
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.21.0...HEAD
 ### Changed
 
 * Switched from pycodestyle/pylama to `black`, `flake8`, `isort`
@@ -96,8 +94,6 @@ Problem is that the chaostoolkit uses Signals in order to interrupt threads. Som
 Therefore the experiment continues to run. [#210][ctk210]
 
 [ctk210]: https://github.com/chaostoolkit/chaostoolkit/issues/210
-
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.19.0...HEAD
 
 ## [1.19.0][] - 2021-02-16
 

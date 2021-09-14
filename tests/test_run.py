@@ -277,6 +277,3 @@ def test_do_not_ruin_method_on_failing_before_ssh():
     assert journal["status"] == "failed"
     assert journal["deviated"] is False
     assert len(journal["run"]) == 0
-
-if __name__ == "__main__":
-    test_run_ssh_continuous()
