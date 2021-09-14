@@ -15,6 +15,17 @@
 
 * Switched from pycodestyle/pylama to `black`, `flake8`, `isort`
 * Update CI builds to build, lint, and test
+* Allow nesting of secrets
+* Secrets loaded from a vault can be overridden by variables
+* In secrets testcases, change the os.environ to be a patch, not an assignment within the testcase.
+* Add `.github/workflows/close_stale_issues.yaml` to mark issues as `Stale`
+after 365 days of inactivity and to close them after 7 days of being marked
+`Stale`.
+* Run `pyupgrade --py36-plus` across whole project
+* Updated `.github/workflows/release.yaml` to check that both `CHANGELOG.md`
+and `chaoslib/__init__.py` get updated in line with a new version
+* Updated `Makefile` to specify `python3` instead of `python`
+
 
 ### Added
 
