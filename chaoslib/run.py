@@ -211,42 +211,42 @@ class EventHandlerRegistry:
             try:
                 h.start_method(experiment)
             except Exception:
-                logger.debug("Handler {} failed".format(h.__class__.__name__), exc_info=True)
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def method_completed(self, experiment: Experiment, state: Any = None) -> None:
         for h in self.handlers:
             try:
                 h.method_completed(experiment, state)
             except Exception:
-                logger.debug("Handler {} failed".format(h.__class__.__name__), exc_info=True)
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def start_rollbacks(self, experiment: Experiment) -> None:
         for h in self.handlers:
             try:
                 h.start_rollbacks(experiment)
             except Exception:
-                logger.debug("Handler {} failed".format(h.__class__.__name__), exc_info=True)
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def rollbacks_completed(self, experiment: Experiment, journal: Journal) -> None:
         for h in self.handlers:
             try:
                 h.rollbacks_completed(experiment, journal)
             except Exception:
-                logger.debug("Handler {} failed".format(h.__class__.__name__), exc_info=True)
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def start_cooldown(self, duration: int) -> None:
         for h in self.handlers:
             try:
                 h.start_cooldown(duration)
             except Exception:
-                logger.debug("Handler {} failed".format(h.__class__.__name__), exc_info=True)
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def cooldown_completed(self) -> None:
         for h in self.handlers:
             try:
                 h.cooldown_completed()
             except Exception:
-                logger.debug("Handler {} failed".format(h.__class__.__name__), exc_info=True)
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
 
 class Runner:
@@ -340,8 +340,7 @@ class Runner:
         elif dry == Dry.PAUSE:
             logger.warning("Pauseless mode enabled")
 
-        initialize_global_controls(
-            experiment, configuration, secrets, settings)
+        initialize_global_controls(experiment, configuration, secrets, settings)
         initialize_controls(experiment, configuration, secrets)
 
         logger.info(f"Steady-state strategy: {strategy.value}")

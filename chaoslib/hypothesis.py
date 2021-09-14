@@ -53,8 +53,7 @@ def ensure_hypothesis_tolerance_is_valid(tolerance: Tolerance):
     Validate the tolerance of the hypothesis probe and raises
     :exc:`InvalidActivity` if it isn't valid.
     """
-    if not isinstance(tolerance, (
-            bool, int, list, str, dict)):
+    if not isinstance(tolerance, (bool, int, list, str, dict)):
         raise InvalidActivity(
             "hypothesis probe tolerance must either be an integer, "
             "a string, a boolean or a pair of values for boundaries. "
@@ -371,7 +370,9 @@ def _(
             if "expect" in tolerance:
                 logger.debug(
                     "jsonpath found '{}' but expected '{}'".format(
-                        str(values), str(tolerance["expect"])))
+                        str(values), str(tolerance["expect"])
+                    )
+                )
             else:
                 logger.debug(f"jsonpath found '{str(values)}'")
 

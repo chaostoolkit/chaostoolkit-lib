@@ -150,8 +150,7 @@ def execute_activity(
     if ref:
         activity = lookup_activity(ref)
         if not activity:
-            raise ActivityFailed(
-                "could not find referenced activity '{r}'".format(r=ref))
+            raise ActivityFailed(f"could not find referenced activity '{ref}'")
 
     with controls(
         level="activity",
@@ -178,11 +177,15 @@ def execute_activity(
                 time.sleep(pause_before)
 
         if activity.get("background"):
-            logger.info("{t}: {n} [in background]".format(
-                t=activity["type"].title(), n=activity.get("name")))
+            logger.info(
+                "{t}: {n} [in background]".format(
+                    t=activity["type"].title(), n=activity.get("name")
+                )
+            )
         else:
-            logger.info("{t}: {n}".format(
-                t=activity["type"].title(), n=activity.get("name")))
+            logger.info(
+                "{t}: {n}".format(t=activity["type"].title(), n=activity.get("name"))
+            )
 
         start = datetime.utcnow()
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from typing import NoReturn
 
 from fixtures import experiments, run_handlers

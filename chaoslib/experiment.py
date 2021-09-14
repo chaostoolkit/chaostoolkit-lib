@@ -94,8 +94,9 @@ def ensure_experiment_is_valid(experiment: Experiment):
         # let's see if a ref is indeed found in the experiment
         ref = activity.get("ref")
         if ref and not lookup_activity(ref):
-            raise InvalidActivity("referenced activity '{r}' could not be "
-                                  "found in the experiment".format(r=ref)
+            raise InvalidActivity(
+                "referenced activity '{r}' could not be "
+                "found in the experiment".format(r=ref)
             )
 
     rollbacks = experiment.get("rollbacks", [])
