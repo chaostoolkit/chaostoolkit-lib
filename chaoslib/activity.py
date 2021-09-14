@@ -7,6 +7,8 @@ from datetime import datetime
 from typing import Any, Iterator, List
 
 from logzero import logger
+
+from chaoslib.caching import lookup_activity
 from chaoslib.control import controls
 from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.provider.http import run_http_activity, validate_http_activity
