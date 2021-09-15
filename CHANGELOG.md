@@ -547,7 +547,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 
 ### Changed
 
-- Fix to ensure a control's `configuration` parameter is populated when it the 
+- Fix to ensure a control's `configuration` parameter is populated when it the
   control is being `configured` [#114][114]
 - Load and apply global controls, those declared in the settings, from the
   `run_experiment` function rather than out of band [#116][116]
@@ -675,7 +675,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 - Disallow empty JSON path [#68][68]
 - Pass the experiment to each control when requested via the `experiment`
   parameter of the Python function [#69][69]
-- Specify the [Vault KV secret][kvversion]default version to be used via the
+- Specify the [Vault KV secret][kvversion] default version to be used via the
   `"vault_kv_version"` configuration property, defaulting to v2
 - Support now [AppRole][approle] Vault authentication to access Vault secrets
   thanks to @AlexShemeshWix [#74][74]
@@ -1168,7 +1168,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 
 [0.8.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/0.7.0...0.8.0
 
-### Added
+### Added
 
 - Substitution from configuration and secrets so values can be dynamically set
 - The journal contains now a global status of the run
