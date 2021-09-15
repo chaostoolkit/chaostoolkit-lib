@@ -9,6 +9,8 @@
   * --dry=probes run all probes as dry run.
   * --dry=pause run all activities with no pausing.
 * Added tests
+
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.21.0...HEAD
 ### Changed
 
 * Switched from pycodestyle/pylama to `black`, `flake8`, `isort`
@@ -23,7 +25,6 @@ after 365 days of inactivity and to close them after 7 days of being marked
 * Updated `.github/workflows/release.yaml` to check that both `CHANGELOG.md`
 and `chaoslib/__init__.py` get updated in line with a new version
 * Updated `Makefile` to specify `python3` instead of `python`
-
 
 ### Added
 
@@ -349,7 +350,7 @@ Therefore the experiment continues to run. [#210][ctk210]
   was interrupted from a control. With the strategies, you can now decide
   that they are always applied, never or only when the experiment deviated.
   This is a flag passed to the settings as follows:
-  
+
   ```
   runtime:
     rollbacks:
@@ -428,13 +429,13 @@ Therefore the experiment continues to run. [#210][ctk210]
 ### Added
 
 - Optional default value for environment variable in configuration
-- Warn the user for an action process returning a non-zero exit code 
+- Warn the user for an action process returning a non-zero exit code
 - Support for process path relative to homedir ~
 - Indicate path in validation when path is not found nor executable [#159][159]
 
 ### Changed
 
-- Changed the method's one-step minimum requirement. 
+- Changed the method's one-step minimum requirement.
   An experiment with an empty method (without any activities) is now valid.
 
 [159]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/159
@@ -613,7 +614,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 #### Added
 
 - a new tolerance type called `range` to support scenarios such as:
-  
+
   value type is:
   ```
   {
@@ -674,7 +675,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 - Disallow empty JSON path [#68][68]
 - Pass the experiment to each control when requested via the `experiment`
   parameter of the Python function [#69][69]
-- Specify the [Vault KV secret][kvversion] default version to be used via the
+- Specify the [Vault KV secret][kvversion]default version to be used via the
   `"vault_kv_version"` configuration property, defaulting to v2
 - Support now [AppRole][approle] Vault authentication to access Vault secrets
   thanks to @AlexShemeshWix [#74][74]
@@ -978,7 +979,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 
 ### Changed
 
--   Log a message when loading the configuration 
+-   Log a message when loading the configuration
 -   Raise `InvalidExperiment` when a configuration or secret references a key
     in the environment and that key does not exist (it may not be set however)
     [#40][40]. This bails the experiment at validation time so before it runs.

@@ -17,7 +17,7 @@ EchoAction = {
         "module": "fixtures.fakeext",
         "func": "echo_message",
         "arguments": {"message": "kaboom"},
-    }
+    },
 }
 
 

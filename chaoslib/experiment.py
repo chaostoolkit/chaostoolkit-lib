@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, List
 
@@ -23,14 +22,14 @@ from chaoslib.run import initialize_run_journal as init_journal
 from chaoslib.secret import load_secrets
 from chaoslib.types import (
     Configuration,
+    Dry,
     Experiment,
     Journal,
     Run,
     Schedule,
     Secrets,
     Settings,
-    Strategy,
-    Dry
+    Strategy
 )
 
 __all__ = ["ensure_experiment_is_valid", "load_experiment"]
@@ -122,12 +121,15 @@ def run_experiment(
     """
     Run the given `experiment` method step by step, in the following sequence:
     steady probe, action, close probe.
+
     Activities can be executed in background when they have the
     `"background"` property set to `true`. In that case, the activity is run in
     a thread. By the end of runs, those threads block until they are all
     complete.
-    If the experiment has the `dry` property set to `activities`,the experiment
+
+    If the experiment has the `"dry"` property set to `activities`,the experiment
     runs without actually executing the activities.
+
     NOTE: Tricky to make a decision whether we should rollback when exiting
     abnormally (Ctrl-C, SIGTERM...). Afterall, there is a chance we actually
     cannot afford to rollback properly. Better bailing to a conservative

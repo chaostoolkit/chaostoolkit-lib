@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import os
 from copy import deepcopy
 
@@ -100,7 +99,7 @@ ExperimentWithLongPause = {
     "steady-state-hypothesis": {"title": "hello"},
     "method": [
         PythonModuleProbeWithLongPause,
-        BackgroundPythonModuleProbeWithLongPause
+        BackgroundPythonModuleProbeWithLongPause,
     ],
     "rollbacks": [BackgroundPythonModuleProbe],
 }

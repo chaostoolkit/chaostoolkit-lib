@@ -1,5 +1,5 @@
 import enum
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 __all__ = [
     "MicroservicesStatus",
@@ -93,7 +93,7 @@ class Dry(enum.Enum):
     PAUSE = "pause"
 
     @staticmethod
-    def from_string(value: str) -> 'Dry':
+    def from_string(value: str) -> Optional['Dry']:
         if value == "probes":
             return Dry.PROBES
         elif value == "actions":

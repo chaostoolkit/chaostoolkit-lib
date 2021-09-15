@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError
 
 try:
@@ -38,14 +37,14 @@ from chaoslib.secret import load_secrets
 from chaoslib.settings import get_loaded_settings
 from chaoslib.types import (
     Configuration,
+    Dry,
     Experiment,
     Journal,
     Run,
     Schedule,
     Secrets,
     Settings,
-    Strategy,
-    Dry
+    Strategy
 )
 
 __all__ = ["Runner", "RunEventHandler"]
@@ -54,6 +53,7 @@ __all__ = ["Runner", "RunEventHandler"]
 class RunEventHandler:
     """
     Base class to react to certain, or all, events during an execution.
+
     This is mainly meant for reacting the execution's mainloop. Do not
     implement it as part of an extension, use the Control interface instead.
     """
@@ -328,18 +328,8 @@ class Runner:
         continuous_hypo_event = threading.Event()
 
         dry: Dry = experiment.get("dry", None)
-        if dry == Dry.ACTIVITIES:
-            logger.warning("Dry mode enabled")
-
-        elif dry == Dry.ACTIONS:
-            logger.warning("Actionless mode enabled")
-
-        elif dry == Dry.PROBES:
-            logger.warning("Probeless mode enabled")
-
-        elif dry == Dry.PAUSE:
-            logger.warning("Pauseless mode enabled")
-
+        if dry:
+            logger.warning(f"Running experiment with dry {dry.value}")
         initialize_global_controls(experiment, configuration, secrets, settings)
         initialize_controls(experiment, configuration, secrets)
 

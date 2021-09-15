@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 import re
 from decimal import Decimal, InvalidOperation
@@ -19,8 +18,7 @@ from chaoslib import substitute
 from chaoslib.activity import ensure_activity_is_valid, execute_activity, run_activity
 from chaoslib.control import controls
 from chaoslib.exceptions import ActivityFailed, InvalidActivity, InvalidExperiment
-from chaoslib.types import Configuration, Experiment, Secrets, Tolerance, Dry
-
+from chaoslib.types import Configuration, Dry, Experiment, Secrets, Tolerance
 
 __all__ = ["ensure_hypothesis_is_valid", "run_steady_state_hypothesis"]
 
@@ -111,6 +109,7 @@ def check_json_path(tolerance: Tolerance):
     """
     Check the JSON path of a tolerance and raise :exc:`InvalidActivity`
     when the path is missing or invalid.
+
     See: https://github.com/h2non/jsonpath-ng
     """
     if not HAS_JSONPATH:
@@ -244,8 +243,10 @@ def within_tolerance(
     """
     Performs a quick validation of the probe's result `value` against the
     `tolerance` that was provided.
+
     The tolerance is typed and is therefore dispatched to the right function
     at runtime based on the `tolerance` type.
+
     Note that the `tolerance` maybe a dictionary, in which case it should
     follow the activity provider specification so that it can be called with
     the probe's result `value` as an argument, returning a success when the

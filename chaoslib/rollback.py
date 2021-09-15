@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
 from concurrent.futures import ThreadPoolExecutor
 from typing import Iterator
 
 from logzero import logger
 
 from chaoslib.activity import execute_activity
-from chaoslib.types import Configuration, Experiment, Run, Secrets, Dry
-
+from chaoslib.types import Configuration, Dry, Experiment, Run, Secrets
 
 __all__ = ["run_rollbacks"]
 

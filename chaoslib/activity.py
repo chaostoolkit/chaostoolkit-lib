@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import numbers
 import time
 import traceback
@@ -14,7 +13,7 @@ from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.provider.http import run_http_activity, validate_http_activity
 from chaoslib.provider.process import run_process_activity, validate_process_activity
 from chaoslib.provider.python import run_python_activity, validate_python_activity
-from chaoslib.types import Activity, Configuration, Experiment, Run, Secrets, Dry
+from chaoslib.types import Activity, Configuration, Dry, Experiment, Run, Secrets
 
 __all__ = [
     "ensure_activity_is_valid",
@@ -30,10 +29,10 @@ def ensure_activity_is_valid(activity: Activity):  # noqa: C901
 
     An activity must at least take the following key:
 
-        * `"type"` the kind of activity, one of `"python"`, `"process"` or `"http"`
+    * `"type"` the kind of activity, one of `"python"`, `"process"` or `"http"`
 
     Depending on the type, an activity requires a variety of other keys.
-    
+
     In all failing cases, raises :exc:`InvalidActivity`.
     """
     if not activity:
@@ -101,7 +100,7 @@ def run_activities(
     configuration: Configuration,
     secrets: Secrets,
     pool: ThreadPoolExecutor,
-    dry: Dry,
+    dry: Dry = None,
 ) -> Iterator[Run]:
     """
     Internal generator that iterates over all activities and execute them.
@@ -132,7 +131,6 @@ def run_activities(
                 secrets=secrets,
                 dry=dry,
             )
-
 ###############################################################################
 # Internal functions
 ###############################################################################
@@ -202,7 +200,7 @@ def execute_activity(
             run["output"] = result
             run["status"] = "succeeded"
             if result is not None:
-                logger.debug(f" => succeeded with '{result}'")
+                logger.debug(f"  => succeeded with '{result}'")
             else:
                 logger.debug("  => succeeded without any result value")
         except ActivityFailed as x:
@@ -210,7 +208,7 @@ def execute_activity(
             run["status"] = "failed"
             run["output"] = result
             run["exception"] = traceback.format_exception(type(x), x, None)
-            logger.error(f" => failed: {error_msg}")
+            logger.error(f"  => failed: {error_msg}")
         finally:
             # capture the end time before we pause
             end = datetime.utcnow()
