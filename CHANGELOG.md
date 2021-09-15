@@ -1268,7 +1268,7 @@ Therefore the experiment continues to run. [#210][ctk210]
 -   Added support for background activities
 -   Dry mode support
 
-### Removed
+### Removed
 
 -   Unused layer module
 
