@@ -133,8 +133,6 @@ def test_valid_experiment_from_yaml():
         assert ensure_experiment_is_valid(doc) is None
 
 
-
-
 def test_can_iterate_over_activities():
     g = run_activities(
         experiments.Experiment, configuration=None, secrets=None, pool=None, dry=None
