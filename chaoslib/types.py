@@ -86,6 +86,7 @@ class Strategy(enum.Enum):
 
         raise ValueError("Unknown strategy")
 
+
 class Dry(enum.Enum):
     PROBES = "probes"
     ACTIONS = "actions"
@@ -104,7 +105,6 @@ class Dry(enum.Enum):
             return Dry.PAUSE
         elif not value:
             return None
-
 
         raise ValueError("Unknown dry")
 

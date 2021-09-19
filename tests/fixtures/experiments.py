@@ -5,7 +5,6 @@ from fixtures.actions import (
     DoNothingAction,
     EchoAction,
     FailAction,
-    InterruptAction,
     PythonModuleActionWithLongAction
 )
 from fixtures.probes import (

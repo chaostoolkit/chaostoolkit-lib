@@ -16,7 +16,6 @@ from chaoslib.experiment import (
     load_experiment,
     run_experiment,
 )
-from chaoslib.provider.python import validate_python_activity
 from chaoslib.types import Dry
 
 
@@ -138,7 +137,7 @@ def test_valid_experiment_from_yaml():
 
 def test_can_iterate_over_activities():
     g = run_activities(
-        experiments.Experiment, configuration=None, secrets=None, pool=None, dry = None
+        experiments.Experiment, configuration=None, secrets=None, pool=None, dry=None
     )
     assert isinstance(g, types.GeneratorType)
 
@@ -280,8 +279,6 @@ def test_validate_all_tolerance_probes():
         ensure_experiment_is_valid(experiments.ExperimentWithVariousTolerances)
 
 
-
-
 def test_rollback_default_strategy_does_not_run_on_failed_activity_in_ssh():
     experiment = experiments.ExperimentWithFailedActionInSSHAndARollback
     settings = {"runtime": {"rollbacks": {"strategy": "default"}}}
@@ -353,17 +350,20 @@ def test_rollback_never_strategy_does_not_run_on_interrupted_experiment_in_metho
     assert journal["status"] == "interrupted"
     assert len(journal["rollbacks"]) == 0
 
+
 def test_can_run_experiment_in_actionless_mode():
     experiment = experiments.ExperimentWithLongPauseAction.copy()
     experiment["dry"] = Dry.ACTIONS
     journal = run_experiment(experiment)
     assert isinstance(journal, dict)
 
+
 def test_can_run_experiment_in_probeless_mode():
     experiment = experiments.Experiment.copy()
     experiment["dry"] = Dry.PROBES
     journal = run_experiment(experiment)
     assert isinstance(journal, dict)
+
 
 def test_can_run_experiment_in_pauseless_mode():
     experiment = experiments.ExperimentWithLongPause.copy()
@@ -405,6 +405,7 @@ def test_actionless_run_should_not_pause_after():
 
     assert experiment_run_time < pause_after_duration
 
+
 def test_probeless_run_should_not_pause_after():
     experiment = experiments.ExperimentWithLongPause.copy()
     experiment["dry"] = Dry.PROBES
@@ -416,6 +417,7 @@ def test_probeless_run_should_not_pause_after():
     pause_after_duration = int(experiment["method"][1]["pauses"]["after"])
 
     assert experiment_run_time < pause_after_duration
+
 
 def test_pauseless_run_should_not_pause_after():
     experiment = experiments.ExperimentWithLongPause.copy()
@@ -455,6 +457,7 @@ def test_actionless_run_should_not_pause_before():
     pause_before_duration = int(experiment["method"][1]["pauses"]["before"])
 
     assert experiment_run_time < pause_before_duration
+
 
 def test_probeless_run_should_not_pause_before():
     experiment = experiments.ExperimentWithLongPauseBefore.copy()
