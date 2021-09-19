@@ -94,7 +94,7 @@ class Dry(enum.Enum):
     PAUSE = "pause"
 
     @staticmethod
-    def from_string(value: str) -> Optional['Dry']:
+    def from_string(value: str) -> Optional["Dry"]:
         if value == "probes":
             return Dry.PROBES
         elif value == "actions":

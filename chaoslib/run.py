@@ -44,7 +44,7 @@ from chaoslib.types import (
     Schedule,
     Secrets,
     Settings,
-    Strategy
+    Strategy,
 )
 
 __all__ = ["Runner", "RunEventHandler"]

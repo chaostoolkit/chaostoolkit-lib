@@ -29,7 +29,7 @@ from chaoslib.types import (
     Schedule,
     Secrets,
     Settings,
-    Strategy
+    Strategy,
 )
 
 __all__ = ["ensure_experiment_is_valid", "load_experiment"]

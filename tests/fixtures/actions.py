@@ -1,5 +1,6 @@
-from copy import deepcopy
 import os
+from copy import deepcopy
+
 EmptyAction = {}
 
 
@@ -7,7 +8,7 @@ DoNothingAction = {
     "name": "a name",
     "type": "action",
     "provider": {"type": "python", "module": "fixtures.fakeext", "func": "do_nothing"},
-    }
+}
 
 EchoAction = {
     "name": "a name",
@@ -38,17 +39,14 @@ InterruptAction = {
     "provider": {
         "type": "python",
         "module": "fixtures.fakeext",
-        "func": "force_interrupting_experiment"
-    }
+        "func": "force_interrupting_experiment",
+    },
 }
 
 PythonModuleActionWithLongPause = {
     "type": "action",
     "name": "action-with-long-pause",
-    "pauses": {
-        "before": 30,
-        "after": 5
-    },
+    "pauses": {"before": 30, "after": 5},
     "provider": {
         "type": "python",
         "module": "os.path",
@@ -56,8 +54,8 @@ PythonModuleActionWithLongPause = {
         "arguments": {
             "path": os.path.abspath(__file__),
         },
-        "timeout": 40
-    }
+        "timeout": 40,
+    },
 }
 
 PythonModuleActionWithLongAction = deepcopy(PythonModuleActionWithLongPause)

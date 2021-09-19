@@ -5,7 +5,7 @@ from fixtures.actions import (
     DoNothingAction,
     EchoAction,
     FailAction,
-    PythonModuleActionWithLongAction
+    PythonModuleActionWithLongAction,
 )
 from fixtures.probes import (
     BackgroundPythonModuleProbe,
@@ -28,6 +28,7 @@ from fixtures.probes import (
     ReadSecretTokenFromSecretsProbe,
     ReadSecretTokenProbe,
 )
+
 from chaoslib.types import Dry
 
 Secrets = {}
@@ -106,16 +107,12 @@ ExperimentWithLongPause = {
 ExperimentWithLongPauseAction = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",
-    "steady-state-hypothesis": {
-        "title": "hello"
-    },
+    "steady-state-hypothesis": {"title": "hello"},
     "method": [
         PythonModuleProbeWithLongPause,
         PythonModuleActionWithLongAction,
     ],
-    "rollbacks": [
-        PythonModuleActionWithLongAction
-    ]
+    "rollbacks": [PythonModuleActionWithLongAction],
 }
 
 ExperimentWithRollbackLongPause = {
