@@ -1,5 +1,3 @@
-from typing import NoReturn
-
 from fixtures import experiments, run_handlers
 
 from chaoslib.experiment import run_experiment
@@ -57,10 +55,10 @@ def test_exit_continuous_ssh_continuous_when_experiment_is_interrupted() -> None
     handlers_called = []
 
     class Handler(RunEventHandler):
-        def started(self, experiment: Experiment, journal: Journal) -> NoReturn:
+        def started(self, experiment: Experiment, journal: Journal) -> None:
             handlers_called.append("started")
 
-        def interrupted(self, experiment: Experiment, journal: Journal) -> NoReturn:
+        def interrupted(self, experiment: Experiment, journal: Journal) -> None:
             handlers_called.append("interrupted")
 
     experiment = experiments.SimpleExperimentWithInterruption.copy()
@@ -83,10 +81,10 @@ def test_exit_continuous_ssh_continuous_when_experiment_is_exited() -> None:
     handlers_called = []
 
     class Handler(RunEventHandler):
-        def started(self, experiment: Experiment, journal: Journal) -> NoReturn:
+        def started(self, experiment: Experiment, journal: Journal) -> None:
             handlers_called.append("started")
 
-        def interrupted(self, experiment: Experiment, journal: Journal) -> NoReturn:
+        def interrupted(self, experiment: Experiment, journal: Journal) -> None:
             handlers_called.append("interrupted")
 
     experiment = experiments.SimpleExperimentWithExit.copy()
