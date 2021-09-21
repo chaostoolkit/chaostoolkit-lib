@@ -1,4 +1,5 @@
 import os.path
+from typing import Any, Dict, cast
 
 from chaoslib.settings import (
     get_loaded_settings,
@@ -109,7 +110,10 @@ def test_locate_dotted_key_from_indexed_entry() -> None:
     parent, entry, k, i = locate_settings_entry(
         settings, "auths.chaos\\.example\\.com.headers[1].name"
     )
-    assert parent == settings["auths"]["chaos.example.com"]["headers"][1]
+    assert (
+        parent
+        == cast(Dict[str, Any], settings["auths"])["chaos.example.com"]["headers"][1]
+    )
     assert entry == "X-For"
     assert k == "name"
     assert i is None

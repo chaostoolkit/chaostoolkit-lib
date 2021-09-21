@@ -1,5 +1,6 @@
 import os
 from copy import deepcopy
+from typing import Any, Dict, cast
 
 from fixtures.actions import DoNothingAction, EchoAction, FailAction
 from fixtures.probes import (
@@ -252,12 +253,12 @@ ExperimentWithControlsRequiringSecrets = deepcopy(ExperimentWithControls)
 ExperimentWithControlsRequiringSecrets["secrets"] = {
     "mystuff": {"somesecret": "somevalue"}
 }
-ExperimentWithControlsRequiringSecrets["controls"][0]["provider"][
+cast(Dict[str, Any], ExperimentWithControlsRequiringSecrets["controls"])[0]["provider"][
     "module"
 ] = "fixtures.controls.dummy_with_secrets"
-ExperimentWithControlsRequiringSecrets["controls"][0]["provider"]["secrets"] = [
-    "mystuff"
-]
+cast(Dict[str, Any], ExperimentWithControlsRequiringSecrets["controls"])[0]["provider"][
+    "secrets"
+] = ["mystuff"]
 
 ExperimentWithControlsThatUpdatedConfiguration = deepcopy(ExperimentNoControls)
 ExperimentWithControlsThatUpdatedConfiguration["configuration"] = {"my_token": "UNSET"}
@@ -323,7 +324,7 @@ ExperimentUsingConfigToConfigureControls["configuration"] = {"dummy-key": "blah 
 
 
 ExperimentWithControlsAtVariousLevels = deepcopy(ExperimentWithControls)
-ExperimentWithControlsAtVariousLevels["method"][0]["controls"] = [
+cast(Dict[str, Any], ExperimentWithControlsAtVariousLevels["method"])[0]["controls"] = [
     {
         "name": "dummy-two",
         "provider": {"type": "python", "module": "fixtures.controls.dummy"},
@@ -333,7 +334,7 @@ ExperimentWithControlsAtVariousLevels["method"][0]["controls"] = [
 
 ExperimentWithControlNotAtTopLevel = deepcopy(ExperimentWithControls)
 ExperimentWithControlNotAtTopLevel.pop("controls")
-ExperimentWithControlNotAtTopLevel["method"][0]["controls"] = [
+cast(Dict[str, Any], ExperimentWithControlNotAtTopLevel["method"])[0]["controls"] = [
     {
         "name": "dummy",
         "provider": {"type": "python", "module": "fixtures.controls.dummy"},
@@ -342,9 +343,9 @@ ExperimentWithControlNotAtTopLevel["method"][0]["controls"] = [
 
 
 ExperimentWithControlAccessingExperiment = deepcopy(ExperimentWithControls)
-ExperimentWithControlAccessingExperiment["controls"][0]["provider"][
-    "module"
-] = "fixtures.controls.dummy_with_experiment"
+cast(Dict[str, Any], ExperimentWithControlAccessingExperiment["controls"])[0][
+    "provider"
+]["module"] = "fixtures.controls.dummy_with_experiment"
 
 ExperimentCanBeInterruptedByControl = deepcopy(ExperimentWithControls)
 ExperimentCanBeInterruptedByControl["controls"] = [
@@ -459,7 +460,9 @@ SimpleExperimentWithException["method"].append(
 
 
 SimpleExperimentWithSSHFailingAtSomePoint = deepcopy(SimpleExperiment)
-SimpleExperimentWithSSHFailingAtSomePoint["method"][0]["pauses"]["after"] = 2
+cast(Dict[str, Any], SimpleExperimentWithSSHFailingAtSomePoint["method"])[0]["pauses"][
+    "after"
+] = 2
 SimpleExperimentWithSSHFailingAtSomePoint["method"].append(
     {
         "type": "action",
@@ -468,7 +471,9 @@ SimpleExperimentWithSSHFailingAtSomePoint["method"].append(
         "pauses": {"before": 1},
     }
 )
-SimpleExperimentWithSSHFailingAtSomePoint["steady-state-hypothesis"]["probes"].append(
+cast(
+    Dict[str, Any], SimpleExperimentWithSSHFailingAtSomePoint["steady-state-hypothesis"]
+)["probes"].append(
     {
         "type": "probe",
         "name": "fail-at-somepoint",
@@ -504,12 +509,14 @@ SimpleExperimentWithSSHFailingAtSomePoint["rollbacks"] = [
 SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity = deepcopy(
     SimpleExperimentWithSSHFailingAtSomePoint
 )
-SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity["method"][0][
-    "background"
-] = True
-SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity["method"][0]["pauses"][
-    "after"
-] = 2
+cast(
+    Dict[str, Any],
+    SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity["method"],
+)[0]["background"] = True
+cast(
+    Dict[str, Any],
+    SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity["method"],
+)[0]["pauses"]["after"] = 2
 
 ExperimentWithRegularRollback = {
     "title": "do cats live in the Internet?",
@@ -545,7 +552,9 @@ ExperimentWithInterruptedExperimentAndARollback = {
     "method": [deepcopy(EchoAction)],
     "rollbacks": [EchoAction],
 }
-ExperimentWithInterruptedExperimentAndARollback["method"][0]["controls"] = [
+cast(Dict[str, Any], ExperimentWithInterruptedExperimentAndARollback["method"])[0][
+    "controls"
+] = [
     {
         "name": "dummy",
         "provider": {"type": "python", "module": "fixtures.interruptexperiment"},
