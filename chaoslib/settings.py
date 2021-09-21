@@ -67,7 +67,9 @@ def get_loaded_settings() -> Settings:
 
 def locate_settings_entry(
     settings: Settings, key: str
-) -> Optional[Tuple[Union[Dict[str, Any], List], Any, Optional[str], Optional[int]]]:
+) -> Optional[
+    Tuple[Union[Dict[str, Any], List[Any]], Any, Optional[str], Optional[int]]
+]:
     """
     Lookup the entry at the given dotted key in the provided settings and
     return a a tuple as follows:

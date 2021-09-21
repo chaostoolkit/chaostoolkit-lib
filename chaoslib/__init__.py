@@ -31,7 +31,7 @@ __version__ = "1.21.0"
 
 
 def substitute(
-    data: Union[None, str, Dict[str, Any], List],
+    data: Union[None, str, Dict[str, Any], List[Any]],
     configuration: Configuration,
     secrets: Secrets,
 ) -> Dict[str, Any]:

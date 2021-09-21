@@ -178,7 +178,7 @@ def apply_python_control(
 ###############################################################################
 # Internals
 ###############################################################################
-def load_func(control: Control, func_name: str) -> Callable:
+def load_func(control: Control, func_name: str) -> Callable[[Any], Any]:
     mod = import_control(control)
     if not mod:
         return

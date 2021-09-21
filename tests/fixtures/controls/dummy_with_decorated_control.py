@@ -9,7 +9,7 @@ from chaoslib.types import Journal
 counter = None
 
 
-def initcounter(f: Callable) -> Callable:
+def initcounter(f: Callable[[Any], Any]) -> Callable[[Any], Any]:
     @wraps(f)
     def wrapped(*args: Any, **kwargs: Any) -> None:
         global counter
@@ -19,7 +19,7 @@ def initcounter(f: Callable) -> Callable:
     return wrapped
 
 
-def keepcount(f: Callable) -> Callable:
+def keepcount(f: Callable[[Any], Any]) -> Callable[[Any], Any]:
     @wraps(f)
     def wrapped(*args: Any, **kwargs: Any) -> None:
         next(counter)
