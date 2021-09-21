@@ -11,20 +11,20 @@ from chaoslib.loader import load_experiment, parse_experiment_from_file
 from chaoslib.types import Settings
 
 
-def test_load_from_file(generic_experiment: str):
+def test_load_from_file(generic_experiment: str) -> None:
     try:
         load_experiment(generic_experiment)
     except InvalidSource as x:
         pytest.fail(str(x))
 
 
-def test_load_invalid_filepath(generic_experiment: str):
+def test_load_invalid_filepath(generic_experiment: str) -> None:
     with pytest.raises(InvalidSource) as x:
         load_experiment("/tmp/xyuzye.txt")
     assert 'Path "/tmp/xyuzye.txt" does not exist.' in str(x.value)
 
 
-def test_load_from_http_without_auth(generic_experiment: str):
+def test_load_from_http_without_auth(generic_experiment: str) -> None:
     with requests_mock.mock() as m:
         m.get(
             "http://example.com/experiment.json",
@@ -38,14 +38,14 @@ def test_load_from_http_without_auth(generic_experiment: str):
             pytest.fail(str(x))
 
 
-def test_load_from_http_with_missing_auth(generic_experiment: str):
+def test_load_from_http_with_missing_auth(generic_experiment: str) -> None:
     with requests_mock.mock() as m:
         m.get("http://example.com/experiment.json", status_code=401)
         with pytest.raises(InvalidSource):
             load_experiment("http://example.com/experiment.json")
 
 
-def test_load_from_http_with_auth(settings: Settings, generic_experiment: str):
+def test_load_from_http_with_auth(settings: Settings, generic_experiment: str) -> None:
     with requests_mock.mock() as m:
         settings["auths"] = {"example.com": {"type": "bearer", "value": "XYZ"}}
         m.get(
@@ -64,7 +64,7 @@ def test_load_from_http_with_auth(settings: Settings, generic_experiment: str):
             pytest.fail(str(x))
 
 
-def test_yaml_safe_load_from_file():
+def test_yaml_safe_load_from_file() -> None:
     with tempfile.NamedTemporaryFile(suffix=".yaml") as f:
         f.write(experiments.UnsafeYamlExperiment.encode("utf-8"))
         f.seek(0)
@@ -73,7 +73,7 @@ def test_yaml_safe_load_from_file():
             parse_experiment_from_file(f.name)
 
 
-def test_yaml_safe_load_from_http():
+def test_yaml_safe_load_from_http() -> None:
     with requests_mock.mock() as m:
         m.get(
             "http://example.com/experiment.yaml",
@@ -85,7 +85,7 @@ def test_yaml_safe_load_from_http():
             load_experiment("http://example.com/experiment.yaml")
 
 
-def test_can_load_json_from_plain_text_http():
+def test_can_load_json_from_plain_text_http() -> None:
     with requests_mock.mock() as m:
         m.get(
             "http://example.com/experiment.yaml",
@@ -99,7 +99,7 @@ def test_can_load_json_from_plain_text_http():
             pytest.fail(str(x))
 
 
-def test_can_load_yaml_from_plain_text_http(generic_experiment: str):
+def test_can_load_yaml_from_plain_text_http(generic_experiment: str) -> None:
     with requests_mock.mock() as m:
         m.get(
             "http://example.com/experiment.json",
@@ -113,7 +113,7 @@ def test_can_load_yaml_from_plain_text_http(generic_experiment: str):
             pytest.fail(str(x))
 
 
-def test_http_loads_fails_when_known_type():
+def test_http_loads_fails_when_known_type() -> None:
     with requests_mock.mock() as m:
         m.get(
             "http://example.com/experiment.yaml",
@@ -125,7 +125,7 @@ def test_http_loads_fails_when_known_type():
             load_experiment("http://example.com/experiment.yaml")
 
 
-def test_https_no_verification():
+def test_https_no_verification() -> None:
     with requests_mock.mock() as m:
         m.get(
             "https://example.com/experiment.yaml",
@@ -137,7 +137,7 @@ def test_https_no_verification():
             load_experiment("https://example.com/experiment.yaml", verify_tls=False)
 
 
-def test_https_with_verification():
+def test_https_with_verification() -> None:
     with requests_mock.mock() as m:
         m.get("https://example.com/experiment.yaml", exc=requests.exceptions.SSLError)
         with pytest.raises(requests.exceptions.SSLError):

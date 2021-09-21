@@ -10,7 +10,7 @@ from chaoslib.secret import create_vault_client, load_secrets
 
 
 @patch.dict(os.environ, {"KUBE_API_URL": "http://1.2.3.4"})
-def test_should_load_environment():
+def test_should_load_environment() -> None:
     secrets = load_secrets(
         {"kubernetes": {"api_server_url": {"type": "env", "key": "KUBE_API_URL"}}},
         config.EmptyConfig,
@@ -19,7 +19,7 @@ def test_should_load_environment():
 
 
 @patch.dict(os.environ, {"KUBE_API_URL": "http://1.2.3.4"})
-def test_should_load_nested_environment():
+def test_should_load_nested_environment() -> None:
     secrets = load_secrets(
         {
             "kubernetes": {
@@ -38,7 +38,7 @@ def test_should_load_nested_environment():
     assert secrets["kubernetes"]["env1"]["api_server_url"] == "http://1.2.3.4"
 
 
-def test_should_load_inline():
+def test_should_load_inline() -> None:
     secrets = load_secrets(
         {"kubernetes": {"api_server_url": "http://1.2.3.4"}}, config.EmptyConfig
     )
@@ -46,7 +46,7 @@ def test_should_load_inline():
 
 
 @patch.dict(os.environ, {"KUBE_API_URL": "http://1.2.3.4"})
-def test_should_merge_properly():
+def test_should_merge_properly() -> None:
     secrets = load_secrets(
         {
             "kubernetes": {
@@ -64,7 +64,7 @@ def test_should_merge_properly():
 
 
 @patch("chaoslib.secret.hvac")
-def test_should_auth_with_approle(hvac):
+def test_should_auth_with_approle(hvac) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_role_id": "mighty_id",
@@ -86,7 +86,7 @@ def test_should_auth_with_approle(hvac):
 
 
 @patch("chaoslib.secret.hvac")
-def test_should_catch_approle_invalid_secret_id_abort_the_run(hvac):
+def test_should_catch_approle_invalid_secret_id_abort_the_run(hvac) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_role_id": "mighty_id",
@@ -102,7 +102,7 @@ def test_should_catch_approle_invalid_secret_id_abort_the_run(hvac):
 
 
 @patch("chaoslib.secret.hvac")
-def test_should_auth_with_token(hvac):
+def test_should_auth_with_token(hvac) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_token": "not_awesome_token",
@@ -119,7 +119,7 @@ def test_should_auth_with_token(hvac):
 
 
 @patch("chaoslib.secret.hvac", autospec=True)
-def test_should_auth_with_service_account(hvac):
+def test_should_auth_with_service_account(hvac) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_sa_role": "some_role",
@@ -142,7 +142,7 @@ def test_should_auth_with_service_account(hvac):
 
 
 @patch("chaoslib.secret.hvac")
-def test_should_catch_service_account_invalid_abort_the_run(hvac):
+def test_should_catch_service_account_invalid_abort_the_run(hvac) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_sa_role": "invalid",
@@ -158,7 +158,7 @@ def test_should_catch_service_account_invalid_abort_the_run(hvac):
 
 
 @patch("chaoslib.secret.hvac")
-def test_read_secrets_from_vault_with_kv_version_1(hvac):
+def test_read_secrets_from_vault_with_kv_version_1(hvac) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_token": "not_awesome_token",
@@ -201,7 +201,7 @@ def test_read_secrets_from_vault_with_kv_version_1(hvac):
 
 
 @patch("chaoslib.secret.hvac")
-def test_read_secrets_from_vault_with_kv_version_2(hvac):
+def test_read_secrets_from_vault_with_kv_version_2(hvac) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_token": "not_awesome_token",
@@ -248,7 +248,7 @@ def test_read_secrets_from_vault_with_kv_version_2(hvac):
 
 
 @patch.dict(os.environ, {"KUBE_API_URL": "http://1.2.3.4"})
-def test_override_load_environmen_with_var():
+def test_override_load_environmen_with_var() -> None:
     secrets = load_secrets(
         {"kubernetes": {"api_server_url": {"type": "env", "key": "KUBE_API_URL"}}},
         config.EmptyConfig,
@@ -257,7 +257,7 @@ def test_override_load_environmen_with_var():
     assert secrets["kubernetes"]["api_server_url"] == "http://elsewhere"
 
 
-def test_should_override_load_inline_with_var():
+def test_should_override_load_inline_with_var() -> None:
     secrets = load_secrets(
         {"kubernetes": {"api_server_url": "http://1.2.3.4"}},
         config.EmptyConfig,
@@ -267,7 +267,7 @@ def test_should_override_load_inline_with_var():
 
 
 @patch("chaoslib.secret.hvac")
-def test_vault_add_subkeys(hvac):
+def test_vault_add_subkeys(hvac) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_token": "not_awesome_token",
@@ -298,7 +298,7 @@ def test_vault_add_subkeys(hvac):
 
 
 @patch("chaoslib.secret.hvac")
-def test_vault_replace_entire_declare(hvac):
+def test_vault_replace_entire_declare(hvac) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_token": "not_awesome_token",
@@ -333,7 +333,7 @@ def test_vault_replace_entire_declare(hvac):
 
 
 @patch("chaoslib.secret.hvac")
-def test_override_vault_with_vars(hvac):
+def test_override_vault_with_vars(hvac) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_token": "not_awesome_token",

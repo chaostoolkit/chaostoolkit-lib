@@ -10,7 +10,7 @@ from chaoslib.configuration import load_configuration
 from chaoslib.exceptions import InvalidExperiment
 
 
-def test_should_load_configuration():
+def test_should_load_configuration() -> None:
     os.environ["KUBE_TOKEN"] = "value2"
     config = load_configuration(
         {
@@ -25,7 +25,7 @@ def test_should_load_configuration():
     assert config["token3"] == "value3"
 
 
-def test_should_load_configuration_with_empty_string_as_default():
+def test_should_load_configuration_with_empty_string_as_default() -> None:
     os.environ.clear()
     os.environ["KUBE_TOKEN"] = "value2"
     config = load_configuration(
@@ -41,7 +41,7 @@ def test_should_load_configuration_with_empty_string_as_default():
     assert config["token3"] == ""
 
 
-def test_should_load_configuration_with_empty_string_as_input():
+def test_should_load_configuration_with_empty_string_as_input() -> None:
     os.environ.clear()
     os.environ["KUBE_TOKEN"] = ""
     config = load_configuration(
@@ -57,7 +57,7 @@ def test_should_load_configuration_with_empty_string_as_input():
     assert config["token3"] == "value3"
 
 
-def test_should_load_configuration_with_empty_string_as_input_while_default_is_define():
+def test_should_load_configuration_with_empty_string_as_input_while_default_is_define() -> None:
     os.environ.clear()
     os.environ["KUBE_TOKEN"] = ""
     config = load_configuration(
@@ -73,7 +73,7 @@ def test_should_load_configuration_with_empty_string_as_input_while_default_is_d
     assert config["token3"] == "value3"
 
 
-def test_load_configuration_should_raise_exception():
+def test_load_configuration_should_raise_exception() -> None:
     os.environ.clear()
     with pytest.raises(InvalidExperiment) as x:
         load_configuration(
@@ -90,7 +90,7 @@ def test_load_configuration_should_raise_exception():
     )
 
 
-def test_can_override_experiment_inline_config_keys():
+def test_can_override_experiment_inline_config_keys() -> None:
     os.environ["KUBE_TOKEN"] = "value2"
     config = load_configuration(
         {
@@ -106,7 +106,7 @@ def test_can_override_experiment_inline_config_keys():
     assert config["token3"] == "value3"
 
 
-def test_default_value_is_overriden_in_inline_config_keys():
+def test_default_value_is_overriden_in_inline_config_keys() -> None:
     os.environ["KUBE_TOKEN"] = "value2"
     config = load_configuration(
         {
@@ -122,11 +122,11 @@ def test_default_value_is_overriden_in_inline_config_keys():
     assert config["token3"] == "extravalue"
 
 
-def test_merge_vars_from_keys_only_for_configs():
+def test_merge_vars_from_keys_only_for_configs() -> None:
     assert merge_vars({"stuff": "todo"}) == ({"stuff": "todo"}, {})
 
 
-def test_merge_config_vars_from_json_file():
+def test_merge_config_vars_from_json_file() -> None:
     with tempfile.NamedTemporaryFile(suffix=".json") as f:
         f.write(
             json.dumps({"configuration": {"otherstuff": "tobedone"}}).encode("utf-8")
@@ -138,14 +138,14 @@ def test_merge_config_vars_from_json_file():
         )
 
 
-def test_merge_config_vars_from_cli_override_from_file():
+def test_merge_config_vars_from_cli_override_from_file() -> None:
     with tempfile.NamedTemporaryFile(suffix=".json") as f:
         f.write(json.dumps({"configuration": {"stuff": "tobedone"}}).encode("utf-8"))
         f.seek(0)
         assert merge_vars({"stuff": "todo"}, [f.name]) == ({"stuff": "todo"}, {})
 
 
-def test_merge_secret_vars_from_json_file():
+def test_merge_secret_vars_from_json_file() -> None:
     with tempfile.NamedTemporaryFile(suffix=".json") as f:
         f.write(json.dumps({"secrets": {"otherstuff": "tobedone"}}).encode("utf-8"))
         f.seek(0)
@@ -155,7 +155,7 @@ def test_merge_secret_vars_from_json_file():
         )
 
 
-def test_merge_config_vars_from_yaml_file():
+def test_merge_config_vars_from_yaml_file() -> None:
     with tempfile.NamedTemporaryFile(suffix=".yaml") as f:
         f.write(
             yaml.dump({"configuration": {"otherstuff": "tobedone"}}).encode("utf-8")
@@ -167,7 +167,7 @@ def test_merge_config_vars_from_yaml_file():
         )
 
 
-def test_merge_secret_vars_from_yaml_file():
+def test_merge_secret_vars_from_yaml_file() -> None:
     with tempfile.NamedTemporaryFile(suffix=".yaml") as f:
         f.write(yaml.dump({"secrets": {"otherstuff": "tobedone"}}).encode("utf-8"))
         f.seek(0)
@@ -177,7 +177,7 @@ def test_merge_secret_vars_from_yaml_file():
         )
 
 
-def test_read_env_from_env_file():
+def test_read_env_from_env_file() -> None:
     assert "STUFF" not in os.environ
     with tempfile.NamedTemporaryFile(suffix=".env") as f:
         f.write(b"STUFF=todo")
@@ -187,37 +187,37 @@ def test_read_env_from_env_file():
         os.environ.clear()
 
 
-def test_convert_int_var():
+def test_convert_int_var() -> None:
     assert convert_vars(["age:int=45"]) == {"age": 45}
 
 
-def test_convert_float_var():
+def test_convert_float_var() -> None:
     assert convert_vars(["age:float=45"]) == {"age": 45.0}
 
 
-def test_convert_bytes_var():
+def test_convert_bytes_var() -> None:
     assert convert_vars(["todo:bytes=stuff"]) == {"todo": b"stuff"}
 
 
-def test_convert_str_var():
+def test_convert_str_var() -> None:
     assert convert_vars(["todo:str=stuff"]) == {"todo": "stuff"}
 
 
-def test_convert_default_to_str_var():
+def test_convert_default_to_str_var() -> None:
     assert convert_vars(["todo=stuff"]) == {"todo": "stuff"}
 
 
-def test_convert_invalid_format():
+def test_convert_invalid_format() -> None:
     with pytest.raises(ValueError):
         convert_vars(["todo/stuff"])
 
 
-def test_convert_invalid_type():
+def test_convert_invalid_type() -> None:
     with pytest.raises(ValueError):
         convert_vars(["todo:object=stuff"])
 
 
-def test_should_override_load_configuration_with_var():
+def test_should_override_load_configuration_with_var() -> None:
     os.environ["KUBE_TOKEN"] = "value2"
     config = load_configuration(
         {
@@ -234,7 +234,7 @@ def test_should_override_load_configuration_with_var():
 
 
 # see https://github.com/chaostoolkit/chaostoolkit-lib/issues/195
-def test_load_nested_object_configuration():
+def test_load_nested_object_configuration() -> None:
     os.environ.clear()
     config = load_configuration(
         {"nested": {"onea": "fdsfdsf", "lol": {"haha": [1, 2, 3]}}}

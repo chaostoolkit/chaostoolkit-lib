@@ -24,19 +24,19 @@ from chaoslib.experiment import ensure_experiment_is_valid, run_experiment
 from chaoslib.loader import load_experiment
 
 
-def test_initialize_controls_will_configure_a_control():
+def test_initialize_controls_will_configure_a_control() -> None:
     exp = deepcopy(experiments.ExperimentWithControls)
     initialize_controls(exp, configuration={"dummy-key": "dummy-value"})
     assert exp["control-value"] == "dummy-value"
     cleanup_controls(exp)
 
 
-def test_initialize_controls_will_cleanup_a_control():
+def test_initialize_controls_will_cleanup_a_control() -> None:
     exp = deepcopy(experiments.ExperimentWithControls)
     cleanup_controls(exp)
 
 
-def test_controls_are_applied_before_and_after_experiment():
+def test_controls_are_applied_before_and_after_experiment() -> None:
     exp = deepcopy(experiments.ExperimentWithControls)
     with controls("experiment", exp, context=exp):
         assert "before_experiment_control" in exp
@@ -50,7 +50,7 @@ def test_controls_are_applied_before_and_after_experiment():
     assert journal["after_experiment_control"] is True
 
 
-def test_controls_are_applied_before_and_but_not_after_experiment():
+def test_controls_are_applied_before_and_but_not_after_experiment() -> None:
     exp = deepcopy(experiments.ExperimentWithControls)
     exp["controls"][0]["scope"] = "before"
     with controls("experiment", exp, context=exp):
@@ -63,7 +63,7 @@ def test_controls_are_applied_before_and_but_not_after_experiment():
     assert "after_experiment_control" not in exp
 
 
-def test_controls_are_applied_not_before_and_but_after_experiment():
+def test_controls_are_applied_not_before_and_but_after_experiment() -> None:
     exp = deepcopy(experiments.ExperimentWithControls)
     exp["controls"][0]["scope"] = "after"
     with controls("experiment", exp, context=exp):
@@ -77,7 +77,7 @@ def test_controls_are_applied_not_before_and_but_after_experiment():
     assert journal["after_experiment_control"] is True
 
 
-def test_controls_may_interrupt_experiment():
+def test_controls_may_interrupt_experiment() -> None:
     exp = deepcopy(experiments.ExperimentCanBeInterruptedByControl)
     with controls("experiment", exp, context=exp):
         exp["dry"] = True
@@ -85,7 +85,7 @@ def test_controls_may_interrupt_experiment():
         assert journal["status"] == "interrupted"
 
 
-def test_controls_are_applied_before_and_after_hypothesis():
+def test_controls_are_applied_before_and_after_hypothesis() -> None:
     exp = deepcopy(experiments.ExperimentWithControls)
     hypo = exp["steady-state-hypothesis"]
     with controls("hypothesis", exp, context=hypo):
@@ -100,7 +100,7 @@ def test_controls_are_applied_before_and_after_hypothesis():
     assert journal["steady_states"]["before"]["after_hypothesis_control"] is True
 
 
-def test_controls_are_applied_before_and_after_method():
+def test_controls_are_applied_before_and_after_method() -> None:
     exp = deepcopy(experiments.ExperimentWithControls)
     with controls("method", exp, context=exp):
         assert "before_method_control" in exp
@@ -114,7 +114,7 @@ def test_controls_are_applied_before_and_after_method():
     assert "after_method_control" in journal["run"]
 
 
-def test_controls_are_applied_before_and_after_rollbacks():
+def test_controls_are_applied_before_and_after_rollbacks() -> None:
     exp = deepcopy(experiments.ExperimentWithControls)
     with controls("rollback", exp, context=exp):
         assert "before_rollback_control" in exp
@@ -128,7 +128,7 @@ def test_controls_are_applied_before_and_after_rollbacks():
     assert "after_rollback_control" in journal["rollbacks"]
 
 
-def test_controls_are_applied_before_and_after_activities():
+def test_controls_are_applied_before_and_after_activities() -> None:
     exp = deepcopy(experiments.ExperimentWithControls)
     exp["dry"] = True
 
@@ -144,7 +144,7 @@ def test_controls_are_applied_before_and_after_activities():
             assert run["after_activity_control"] is True
 
 
-def test_no_controls_get_applied_when_none_defined():
+def test_no_controls_get_applied_when_none_defined() -> None:
     exp = deepcopy(experiments.ExperimentWithoutControls)
     exp["dry"] = True
 
@@ -157,7 +157,7 @@ def test_no_controls_get_applied_when_none_defined():
     assert "after_experiment_control" not in exp
 
 
-def test_automatic_goes_deep_down_the_tree():
+def test_automatic_goes_deep_down_the_tree() -> None:
     exp = deepcopy(experiments.ExperimentWithControls)
 
     controls = get_context_controls("experiment", exp, exp)
@@ -177,7 +177,7 @@ def test_automatic_goes_deep_down_the_tree():
         assert len(controls) == 1
 
 
-def test_not_automatic_does_not_go_deep_down_the_tree():
+def test_not_automatic_does_not_go_deep_down_the_tree() -> None:
     exp = deepcopy(experiments.ExperimentWithControls)
     exp["controls"][0]["automatic"] = False
 
@@ -211,7 +211,7 @@ def test_not_automatic_does_not_go_deep_down_the_tree():
 
 
 @patch("chaoslib.control.python.logger", autospec=True)
-def test_validate_python_control_must_be_loadable(logger):
+def test_validate_python_control_must_be_loadable(logger) -> None:
     validate_python_control(
         {
             "name": "a-python-control",
@@ -226,14 +226,14 @@ def test_validate_python_control_must_be_loadable(logger):
     assert msg in args[0][0]
 
 
-def test_validate_python_control_needs_a_module():
+def test_validate_python_control_needs_a_module() -> None:
     with pytest.raises(InvalidActivity):
         validate_python_control(
             {"name": "a-python-control", "provider": {"type": "python"}}
         )
 
 
-def test_controls_can_access_experiment():
+def test_controls_can_access_experiment() -> None:
     exp = deepcopy(experiments.ExperimentWithControlAccessingExperiment)
     exp["dry"] = True
 
@@ -248,7 +248,7 @@ def test_controls_can_access_experiment():
         assert activity["has_experiment_after"] is True
 
 
-def test_controls_are_applied_at_various_levels():
+def test_controls_are_applied_at_various_levels() -> None:
     exp = deepcopy(experiments.ExperimentWithControlsAtVariousLevels)
     exp["dry"] = True
 
@@ -260,7 +260,7 @@ def test_controls_are_applied_at_various_levels():
             assert activity["after_activity_control"] is True
 
 
-def test_controls_are_applied_when_they_are_not_top_level():
+def test_controls_are_applied_when_they_are_not_top_level() -> None:
     exp = deepcopy(experiments.ExperimentWithControlNotAtTopLevel)
     exp["dry"] = True
 
@@ -272,7 +272,7 @@ def test_controls_are_applied_when_they_are_not_top_level():
             assert activity["after_activity_control"] is True
 
 
-def test_load_global_controls_from_settings():
+def test_load_global_controls_from_settings() -> None:
     exp = deepcopy(experiments.ExperimentNoControls)
     activities = get_all_activities(exp)
 
@@ -301,7 +301,7 @@ def test_load_global_controls_from_settings():
         assert activity["after_activity_control"] is True
 
 
-def test_get_globally_loaded_controls_from_settings():
+def test_get_globally_loaded_controls_from_settings() -> None:
     assert get_global_controls() == []
 
     settings = {
@@ -325,7 +325,7 @@ def test_get_globally_loaded_controls_from_settings():
         assert get_global_controls() == []
 
 
-def test_load_global_controls_from_settings_configured_via_exp_config():
+def test_load_global_controls_from_settings_configured_via_exp_config() -> None:
     exp = deepcopy(experiments.ExperimentUsingConfigToConfigureControls)
     activities = get_all_activities(exp)
 
@@ -353,7 +353,7 @@ def test_load_global_controls_from_settings_configured_via_exp_config():
         assert activity["after_activity_control"] is True
 
 
-def test_apply_controls_even_on_background_activity():
+def test_apply_controls_even_on_background_activity() -> None:
     exp = deepcopy(experiments.ExperimentNoControls)
     exp["method"][0]["background"] = True
     exp["method"][0]["pauses"] = {"after": 1}
@@ -384,7 +384,7 @@ def test_apply_controls_even_on_background_activity():
         assert activity["after_activity_control"] is True
 
 
-def test_control_cleanup_cannot_fail_the_experiment():
+def test_control_cleanup_cannot_fail_the_experiment() -> None:
     exp = deepcopy(experiments.ExperimentNoControls)
     try:
         run_experiment(
@@ -405,7 +405,7 @@ def test_control_cleanup_cannot_fail_the_experiment():
         pytest.fail("Failed to run experiment with a broken cleanup control")
 
 
-def test_control_initialization_cannot_fail_the_experiment():
+def test_control_initialization_cannot_fail_the_experiment() -> None:
     exp = deepcopy(experiments.ExperimentNoControls)
     try:
         run_experiment(
@@ -426,7 +426,7 @@ def test_control_initialization_cannot_fail_the_experiment():
         pytest.fail("Failed to run experiment with a broken init control")
 
 
-def test_control_failing_its_initialization_must_not_be_registered():
+def test_control_failing_its_initialization_must_not_be_registered() -> None:
     exp = deepcopy(experiments.ExperimentNoControls)
     settings = {
         "dummy-key": "hello there",
@@ -455,7 +455,7 @@ def test_control_failing_its_initialization_must_not_be_registered():
         assert activity["after_activity_control"] is True
 
 
-def test_control_must_not_rest_state_before_calling_the_after_side():
+def test_control_must_not_rest_state_before_calling_the_after_side() -> None:
     exp = deepcopy(experiments.ExperimentNoControlsWithDeviation)
     settings = {
         "controls": {
@@ -478,20 +478,20 @@ def test_control_must_not_rest_state_before_calling_the_after_side():
     assert journal["after_experiment_control"] is True
 
 
-def test_controls_can_take_arguments_at_initialization():
+def test_controls_can_take_arguments_at_initialization() -> None:
     exp = deepcopy(experiments.ExperimentWithArgumentsControls)
     initialize_controls(exp)
     assert exp["joke"] == "onyou"
 
 
-def test_controls_not_registered_when_passed_unexpected_args():
+def test_controls_not_registered_when_passed_unexpected_args() -> None:
     exp = deepcopy(experiments.ExperimentWithUnexpectedArgumentsControls)
     initialize_controls(exp)
 
     assert get_global_controls() == []
 
 
-def test_controls_on_loading_experiment():
+def test_controls_on_loading_experiment() -> None:
     settings = {
         "controls": {
             "dummy": {
@@ -513,7 +513,7 @@ def test_controls_on_loading_experiment():
             cleanup_global_controls()
 
 
-def test_controls_on_loaded_experiment():
+def test_controls_on_loaded_experiment() -> None:
     settings = {
         "controls": {
             "dummy": {
@@ -537,19 +537,19 @@ def test_controls_on_loaded_experiment():
             cleanup_global_controls()
 
 
-def test_control_can_update_configuration():
+def test_control_can_update_configuration() -> None:
     exp = deepcopy(experiments.ExperimentWithControlsThatUpdatedConfiguration)
     state = run_experiment(exp)
     assert state["run"][0]["output"] != "UNSET"
 
 
-def test_control_can_update_secrets():
+def test_control_can_update_secrets() -> None:
     exp = deepcopy(experiments.ExperimentWithControlsThatUpdatedSecrets)
     state = run_experiment(exp)
     assert state["run"][0]["output"] != "UNSET"
 
 
-def test_secrets_are_passed_to_all_control_hookpoints():
+def test_secrets_are_passed_to_all_control_hookpoints() -> None:
     exp = deepcopy(experiments.ExperimentWithControlsRequiringSecrets)
     run_experiment(exp)
 
@@ -572,13 +572,13 @@ def test_secrets_are_passed_to_all_control_hookpoints():
         ), f"{hookpoint} was not provided the secrets"
 
 
-def test_control_can_be_decorated_functions():
+def test_control_can_be_decorated_functions() -> None:
     exp = deepcopy(experiments.ExperimentWithDecoratedControls)
     state = run_experiment(exp)
     assert state["counted_activities"] == 4
 
 
-def test_control_can_validate_itself():
+def test_control_can_validate_itself() -> None:
     exp = deepcopy(experiments.ExperimentWithInvalidControls)
 
     with pytest.raises(InvalidActivity):

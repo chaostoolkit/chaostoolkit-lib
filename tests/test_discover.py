@@ -4,18 +4,18 @@ from chaoslib.discovery.discover import discover_activities
 from chaoslib.exceptions import DiscoveryFailed
 
 
-def test_fail_discovery_when_module_cannot_be_loaded():
+def test_fail_discovery_when_module_cannot_be_loaded() -> None:
     with pytest.raises(DiscoveryFailed) as exc:
         discover_activities("fixtures.burp", "probe")
     assert "could not import extension module" in str(exc.value)
 
 
-def test_do_not_fail_when_extension_mod_has_not_all():
+def test_do_not_fail_when_extension_mod_has_not_all() -> None:
     activities = discover_activities("fixtures.keepempty", "probe")
     assert len(activities) == 0
 
 
-def test_discover_all_activities():
+def test_discover_all_activities() -> None:
     mod = "fixtures.fakeext"
     activities = discover_activities(mod, "probe")
     assert len(activities) == 8

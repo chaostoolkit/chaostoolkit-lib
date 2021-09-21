@@ -4,13 +4,13 @@ from chaoslib import substitute
 from chaoslib.configuration import load_configuration
 
 
-def test_substitute_strings_from_configuration():
+def test_substitute_strings_from_configuration() -> None:
     new_args = substitute("hello ${name}", config.SomeConfig, None)
 
     assert new_args == "hello Jane"
 
 
-def test_substitute_from_configuration():
+def test_substitute_from_configuration() -> None:
     args = {"message": "hello ${name}"}
 
     new_args = substitute(args, config.SomeConfig, None)
@@ -18,7 +18,7 @@ def test_substitute_from_configuration():
     assert new_args["message"] == "hello Jane"
 
 
-def test_substitute_from_secrets():
+def test_substitute_from_secrets() -> None:
     args = {"message": "hello ${name}"}
 
     new_args = substitute(args, None, {"ident": {"name": "Joe"}})
@@ -26,7 +26,7 @@ def test_substitute_from_secrets():
     assert new_args["message"] == "hello Joe"
 
 
-def test_substitute_from_config_and_secrets_with_priority_to_config():
+def test_substitute_from_config_and_secrets_with_priority_to_config() -> None:
     args = {"message": "hello ${name}"}
 
     new_args = substitute(args, config.SomeConfig, {"ident": {"name": "Joe"}})
@@ -34,7 +34,7 @@ def test_substitute_from_config_and_secrets_with_priority_to_config():
     assert new_args["message"] == "hello Jane"
 
 
-def test_do_not_fail_when_key_is_missing():
+def test_do_not_fail_when_key_is_missing() -> None:
     args = {"message": "hello ${firstname}"}
 
     new_args = substitute(args, config.SomeConfig, None)
@@ -43,7 +43,7 @@ def test_do_not_fail_when_key_is_missing():
 
 
 # see https://github.com/chaostoolkit/chaostoolkit-lib/issues/195
-def test_use_nested_object_as_substitution():
+def test_use_nested_object_as_substitution() -> None:
     config = load_configuration(
         {"nested": {"onea": "fdsfdsf", "lol": {"haha": [1, 2, 3]}}}
     )
@@ -54,7 +54,7 @@ def test_use_nested_object_as_substitution():
 
 
 # see https://github.com/chaostoolkit/chaostoolkit-lib/issues/180
-def test_use_integer_as_substitution():
+def test_use_integer_as_substitution() -> None:
     config = load_configuration({"value": 8})
 
     result = substitute("${value}", configuration=config, secrets=None)
@@ -62,7 +62,7 @@ def test_use_integer_as_substitution():
     assert result == 8
 
 
-def test_always_return_to_string_when_pattern_is_not_alone():
+def test_always_return_to_string_when_pattern_is_not_alone() -> None:
     config = load_configuration({"value": 8})
 
     result = substitute("hello ${value}", configuration=config, secrets=None)

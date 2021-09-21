@@ -34,7 +34,7 @@ def teardown_module(module):
     os.remove(dummy_script)
 
 
-def test_process_not_utf8_cannot_fail():
+def test_process_not_utf8_cannot_fail() -> None:
     result = run_process_activity(
         {
             "provider": {
@@ -55,7 +55,7 @@ def test_process_not_utf8_cannot_fail():
         assert result["stdout"] == "é"
 
 
-def test_process_homedir_relative_path():
+def test_process_homedir_relative_path() -> None:
     path = os.path.abspath(dummy_script).replace(os.path.expanduser("~"), "~")
     result = run_process_activity(
         {"provider": {"type": "process", "path": path, "arguments": ""}}, None, None
@@ -63,7 +63,7 @@ def test_process_homedir_relative_path():
     assert result["status"] == 0
 
 
-def test_process_absolute_path():
+def test_process_absolute_path() -> None:
     result = run_process_activity(
         {
             "provider": {
@@ -78,7 +78,7 @@ def test_process_absolute_path():
     assert result["status"] == 0
 
 
-def test_process_cwd_relative_path():
+def test_process_cwd_relative_path() -> None:
     result = run_process_activity(
         {"provider": {"type": "process", "path": dummy_script, "arguments": ""}},
         None,
@@ -88,7 +88,7 @@ def test_process_cwd_relative_path():
 
 
 @patch("chaoslib.provider.process.logger")
-def test_process_non_exit_zero_warning(logger):
+def test_process_non_exit_zero_warning(logger) -> None:
     run_process_activity(
         {
             "provider": {

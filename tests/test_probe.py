@@ -12,55 +12,55 @@ from chaoslib.activity import ensure_activity_is_valid, run_activity
 from chaoslib.exceptions import ActivityFailed, InvalidActivity
 
 
-def test_empty_probe_is_invalid():
+def test_empty_probe_is_invalid() -> None:
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.EmptyProbe)
     assert "empty activity is no activity" in str(exc.value)
 
 
-def test_probe_must_have_a_type():
+def test_probe_must_have_a_type() -> None:
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.MissingTypeProbe)
     assert "an activity must have a type" in str(exc.value)
 
 
-def test_probe_must_have_a_known_type():
+def test_probe_must_have_a_known_type() -> None:
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.UnknownTypeProbe)
     assert "'whatever' is not a supported activity type" in str(exc.value)
 
 
-def test_probe_provider_must_have_a_known_type():
+def test_probe_provider_must_have_a_known_type() -> None:
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.UnknownProviderTypeProbe)
     assert "unknown provider type 'pizza'" in str(exc.value)
 
 
-def test_python_probe_must_have_a_module_path():
+def test_python_probe_must_have_a_module_path() -> None:
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.MissingModuleProbe)
     assert "a Python activity must have a module path" in str(exc.value)
 
 
-def test_python_probe_must_have_a_function_name():
+def test_python_probe_must_have_a_function_name() -> None:
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.MissingFunctionProbe)
     assert "a Python activity must have a function name" in str(exc.value)
 
 
-def test_python_probe_must_be_importable():
+def test_python_probe_must_be_importable() -> None:
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.NotImportableModuleProbe)
     assert "could not find Python module 'fake.module'" in str(exc.value)
 
 
-def test_python_probe_func_must_have_enough_args():
+def test_python_probe_func_must_have_enough_args() -> None:
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.MissingFuncArgProbe)
     assert "required argument 'path' is missing" in str(exc.value)
 
 
-def test_python_probe_func_cannot_have_too_many_args():
+def test_python_probe_func_cannot_have_too_many_args() -> None:
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.TooManyFuncArgsProbe)
     assert (
@@ -69,25 +69,25 @@ def test_python_probe_func_cannot_have_too_many_args():
     )
 
 
-def test_process_probe_have_a_path():
+def test_process_probe_have_a_path() -> None:
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.MissingProcessPathProbe)
     assert "a process activity must have a path" in str(exc.value)
 
 
-def test_process_probe_path_must_exist():
+def test_process_probe_path_must_exist() -> None:
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.ProcessPathDoesNotExistProbe)
     assert "path 'somewhere/not/here' cannot be found, in activity" in str(exc.value)
 
 
-def test_http_probe_must_have_a_url():
+def test_http_probe_must_have_a_url() -> None:
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.MissingHTTPUrlProbe)
     assert "a HTTP activity must have a URL" in str(exc.value)
 
 
-def test_run_python_probe_should_return_raw_value():
+def test_run_python_probe_should_return_raw_value() -> None:
     # our probe checks a file exists
     assert (
         run_activity(probes.PythonModuleProbe, config.EmptyConfig, experiments.Secrets)
@@ -95,7 +95,7 @@ def test_run_python_probe_should_return_raw_value():
     )
 
 
-def test_run_process_probe_should_return_raw_value():
+def test_run_process_probe_should_return_raw_value() -> None:
     v = "Python {v}\n".format(v=sys.version.split(" ")[0])
 
     result = run_activity(probes.ProcProbe, config.EmptyConfig, experiments.Secrets)
@@ -105,7 +105,7 @@ def test_run_process_probe_should_return_raw_value():
     assert result["stderr"] == ""
 
 
-def test_run_process_probe_should_pass_arguments_in_array():
+def test_run_process_probe_should_pass_arguments_in_array() -> None:
     args = (
         "['-c', '--empty', '--number', '1', '--string', 'with spaces', '--string',"
         " 'a second string with the same option']\n"
@@ -120,7 +120,7 @@ def test_run_process_probe_should_pass_arguments_in_array():
     assert result["stderr"] == ""
 
 
-def test_run_process_probe_can_pass_arguments_as_string():
+def test_run_process_probe_can_pass_arguments_as_string() -> None:
     args = (
         "['-c', '--empty', '--number', '1', '--string', 'with spaces', "
         "'--string', 'a second string with the same option']\n"
@@ -135,7 +135,7 @@ def test_run_process_probe_can_pass_arguments_as_string():
     assert result["stderr"] == ""
 
 
-def test_run_process_probe_can_timeout():
+def test_run_process_probe_can_timeout() -> None:
     probe = probes.ProcProbe
     probe["provider"]["timeout"] = 0.0001
 
@@ -146,7 +146,7 @@ def test_run_process_probe_can_timeout():
     assert "activity took too long to complete" in str(exc.value)
 
 
-def test_run_http_probe_should_return_parsed_json_value():
+def test_run_http_probe_should_return_parsed_json_value() -> None:
     with requests_mock.mock() as m:
         headers = {"Content-Type": "application/json"}
         m.post("http://example.com", json=["well done"], headers=headers)
@@ -154,7 +154,7 @@ def test_run_http_probe_should_return_parsed_json_value():
         assert result["body"] == ["well done"]
 
 
-def test_run_http_probe_must_be_serializable_to_json():
+def test_run_http_probe_must_be_serializable_to_json() -> None:
     with requests_mock.mock() as m:
         headers = {"Content-Type": "application/json"}
         m.post("http://example.com", json=["well done"], headers=headers)
@@ -162,14 +162,14 @@ def test_run_http_probe_must_be_serializable_to_json():
         assert json.dumps(result) is not None
 
 
-def test_run_http_probe_should_return_raw_text_value():
+def test_run_http_probe_should_return_raw_text_value() -> None:
     with requests_mock.mock() as m:
         m.post("http://example.com", text="['well done']")
         result = run_activity(probes.HTTPProbe, config.EmptyConfig, experiments.Secrets)
         assert result["body"] == "['well done']"
 
 
-def test_run_http_probe_can_expect_failure():
+def test_run_http_probe_can_expect_failure() -> None:
     with requests_mock.mock() as m:
         m.post("http://example.com", status_code=404, text="Not found!")
 
@@ -182,7 +182,7 @@ def test_run_http_probe_can_expect_failure():
             pytest.fail("activity should not have failed")
 
 
-def test_run_http_probe_can_retry():
+def test_run_http_probe_can_retry() -> None:
     """
     this test embeds a fake HTTP server to test the retry part
     it can't be easily tested with libraries like requests_mock or responses

@@ -16,7 +16,7 @@ from chaoslib.experiment import (
 )
 
 
-def test_run_dict_arguments_has_been_deprecated_in_favor_of_list():
+def test_run_dict_arguments_has_been_deprecated_in_favor_of_list() -> None:
     warn_counts = 0
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("module")
@@ -34,7 +34,7 @@ def test_run_dict_arguments_has_been_deprecated_in_favor_of_list():
     assert warn_counts == 1
 
 
-def test_vault_secrets_require_path():
+def test_vault_secrets_require_path() -> None:
     warn_counts = 0
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("module")
@@ -50,7 +50,7 @@ def test_vault_secrets_require_path():
     assert warn_counts == 1
 
 
-def test_initialize_run_journal_has_moved():
+def test_initialize_run_journal_has_moved() -> None:
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("module")
         with patch("chaoslib.experiment.init_journal"):
@@ -60,7 +60,7 @@ def test_initialize_run_journal_has_moved():
             assert "'initialize_run_journal'" in str(w[0].message)
 
 
-def test_apply_activities_has_moved():
+def test_apply_activities_has_moved() -> None:
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("module")
         with patch("chaoslib.experiment.apply_act"):
@@ -70,7 +70,7 @@ def test_apply_activities_has_moved():
             assert "'apply_activities'" in str(w[0].message)
 
 
-def test_apply_rollbacks_has_moved():
+def test_apply_rollbacks_has_moved() -> None:
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("module")
         with patch("chaoslib.experiment.apply_roll"):

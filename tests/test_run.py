@@ -7,7 +7,7 @@ from chaoslib.run import EventHandlerRegistry, RunEventHandler, Schedule, Strate
 from chaoslib.types import Experiment, Journal
 
 
-def test_run_ssh_before_method_only():
+def test_run_ssh_before_method_only() -> None:
     experiment = experiments.SimpleExperiment.copy()
     journal = run_experiment(experiment, strategy=Strategy.BEFORE_METHOD)
     assert journal is not None
@@ -15,7 +15,7 @@ def test_run_ssh_before_method_only():
     assert journal["steady_states"]["after"] is None
 
 
-def test_run_ssh_after_method_only():
+def test_run_ssh_after_method_only() -> None:
     experiment = experiments.SimpleExperiment.copy()
     journal = run_experiment(experiment, strategy=Strategy.AFTER_METHOD)
     assert journal is not None
@@ -23,7 +23,7 @@ def test_run_ssh_after_method_only():
     assert journal["steady_states"]["after"] is not None
 
 
-def test_run_ssh_default_strategy():
+def test_run_ssh_default_strategy() -> None:
     experiment = experiments.SimpleExperiment.copy()
     journal = run_experiment(experiment, strategy=Strategy.DEFAULT)
     assert journal is not None
@@ -31,7 +31,7 @@ def test_run_ssh_default_strategy():
     assert journal["steady_states"]["after"] is not None
 
 
-def test_run_ssh_during_method_only():
+def test_run_ssh_during_method_only() -> None:
     experiment = experiments.SimpleExperiment.copy()
     journal = run_experiment(experiment, strategy=Strategy.DURING_METHOD)
     assert journal is not None
@@ -40,7 +40,7 @@ def test_run_ssh_during_method_only():
     assert journal["steady_states"]["during"] is not None
 
 
-def test_run_ssh_continuous():
+def test_run_ssh_continuous() -> None:
     experiment = experiments.SimpleExperiment.copy()
     journal = run_experiment(
         experiment,
@@ -53,7 +53,7 @@ def test_run_ssh_continuous():
     assert journal["steady_states"]["during"] is not None
 
 
-def test_exit_continuous_ssh_continuous_when_experiment_is_interrupted():
+def test_exit_continuous_ssh_continuous_when_experiment_is_interrupted() -> None:
     handlers_called = []
 
     class Handler(RunEventHandler):
@@ -79,7 +79,7 @@ def test_exit_continuous_ssh_continuous_when_experiment_is_interrupted():
     assert sorted(handlers_called) == ["interrupted", "started"]
 
 
-def test_exit_continuous_ssh_continuous_when_experiment_is_exited():
+def test_exit_continuous_ssh_continuous_when_experiment_is_exited() -> None:
     handlers_called = []
 
     class Handler(RunEventHandler):
@@ -105,7 +105,7 @@ def test_exit_continuous_ssh_continuous_when_experiment_is_exited():
     assert sorted(handlers_called) == ["started"]
 
 
-def test_exit_continuous_ssh_continuous_when_activity_raises_unknown_exception():
+def test_exit_continuous_ssh_continuous_when_activity_raises_unknown_exception() -> None:
     experiment = experiments.SimpleExperimentWithException.copy()
     journal = run_experiment(
         experiment,
@@ -124,7 +124,7 @@ def test_exit_continuous_ssh_continuous_when_activity_raises_unknown_exception()
     assert "oops" in journal["run"][-1]["exception"][-1]
 
 
-def test_exit_immediately_when_continuous_ssh_fails_and_failfast():
+def test_exit_immediately_when_continuous_ssh_fails_and_failfast() -> None:
     experiment = experiments.SimpleExperimentWithSSHFailingAtSomePoint.copy()
     journal = run_experiment(
         experiment,
@@ -141,7 +141,7 @@ def test_exit_immediately_when_continuous_ssh_fails_and_failfast():
     assert len(journal["run"]) == 1
 
 
-def test_do_not_exit_when_continuous_ssh_fails_and_no_failfast():
+def test_do_not_exit_when_continuous_ssh_fails_and_no_failfast() -> None:
     experiment = experiments.SimpleExperimentWithSSHFailingAtSomePoint.copy()
     journal = run_experiment(
         experiment,
@@ -158,7 +158,7 @@ def test_do_not_exit_when_continuous_ssh_fails_and_no_failfast():
     assert len(journal["run"]) == 2
 
 
-def test_exit_immediately_when_continuous_ssh_fails_and_failfast_when_background_activity():  # noqa E501
+def test_exit_immediately_when_continuous_ssh_fails_and_failfast_when_background_activity() -> None:  # noqa E501
     experiment = (
         experiments.SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity.copy()  # noqa E501
     )
@@ -177,7 +177,7 @@ def test_exit_immediately_when_continuous_ssh_fails_and_failfast_when_background
     assert len(journal["run"]) == 2
 
 
-def test_run_handler_is_called_on_each_handler():
+def test_run_handler_is_called_on_each_handler() -> None:
     registry = EventHandlerRegistry()
     h = run_handlers.FullRunEventHandler()
     registry.register(h)
@@ -221,7 +221,7 @@ def test_run_handler_is_called_on_each_handler():
     ]
 
 
-def test_exceptions_does_not_stop_handler_registry():
+def test_exceptions_does_not_stop_handler_registry() -> None:
     registry = EventHandlerRegistry()
     registry.register(run_handlers.FullExceptionRunEventHandler())
     h = run_handlers.FullRunEventHandler()
@@ -266,7 +266,7 @@ def test_exceptions_does_not_stop_handler_registry():
     ]
 
 
-def test_do_not_ruin_method_on_failing_before_ssh():
+def test_do_not_ruin_method_on_failing_before_ssh() -> None:
     experiment = experiments.SimpleExperimentWithFailingHypothesis.copy()
     journal = run_experiment(experiment, strategy=Strategy.DEFAULT)
     assert journal is not None

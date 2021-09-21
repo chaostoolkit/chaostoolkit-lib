@@ -11,24 +11,24 @@ from chaoslib.extension import (
 )
 
 
-def test_extensions_must_have_name():
+def test_extensions_must_have_name() -> None:
     with pytest.raises(InvalidExperiment):
         exp = experiments.Experiment.copy()
         set_extension(exp, {"somekey": "blah"})
         validate_extensions(exp)
 
 
-def test_get_extension_returns_nothing_when_not_extensions_block():
+def test_get_extension_returns_nothing_when_not_extensions_block() -> None:
     assert get_extension(experiments.Experiment, "myext") is None
 
 
-def test_get_extension_returns_nothing_when_missing():
+def test_get_extension_returns_nothing_when_missing() -> None:
     ext = experiments.Experiment.copy()
     set_extension(ext, {"name": "myotherext", "somekey": "blah"})
     assert get_extension(ext, "myext") is None
 
 
-def test_get_extension():
+def test_get_extension() -> None:
     exp = experiments.Experiment.copy()
     set_extension(exp, {"name": "myext", "somekey": "blah"})
 
@@ -37,7 +37,7 @@ def test_get_extension():
     assert ext["somekey"] == "blah"
 
 
-def test_remove_extension():
+def test_remove_extension() -> None:
     exp = experiments.Experiment.copy()
     set_extension(exp, {"name": "myext", "somekey": "blah"})
 
@@ -46,7 +46,7 @@ def test_remove_extension():
     assert get_extension(exp, "myext") is None
 
 
-def test_merge_extension():
+def test_merge_extension() -> None:
     exp = experiments.Experiment.copy()
     set_extension(exp, {"name": "myext", "somekey": "blah"})
 

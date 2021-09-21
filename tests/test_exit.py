@@ -31,7 +31,7 @@ def run_http_server_in_background():
     httpd.handle_request()
 
 
-def test_play_rollbacks_on_graceful_exit_with_http_action():
+def test_play_rollbacks_on_graceful_exit_with_http_action() -> None:
     server = threading.Thread(target=run_http_server_in_background)
     server.start()
 
@@ -47,7 +47,7 @@ def test_play_rollbacks_on_graceful_exit_with_http_action():
     server.join()
 
 
-def test_do_not_play_rollbacks_on_graceful_exit_with_http_action():
+def test_do_not_play_rollbacks_on_graceful_exit_with_http_action() -> None:
     server = threading.Thread(target=run_http_server_in_background)
     server.start()
 
@@ -63,7 +63,7 @@ def test_do_not_play_rollbacks_on_graceful_exit_with_http_action():
     server.join()
 
 
-def test_play_rollbacks_on_graceful_exit_with_process_action():
+def test_play_rollbacks_on_graceful_exit_with_process_action() -> None:
     x = deepcopy(experiments.ExperimentGracefulExitLongProcessCall)
     with Runner(Strategy.DEFAULT) as runner:
         journal = runner.run(
@@ -74,7 +74,7 @@ def test_play_rollbacks_on_graceful_exit_with_process_action():
         assert len(journal["rollbacks"]) == 1
 
 
-def test_do_not_play_rollbacks_on_graceful_exit_with_process_action():
+def test_do_not_play_rollbacks_on_graceful_exit_with_process_action() -> None:
     x = deepcopy(experiments.ExperimentUngracefulExitLongProcessCall)
     with Runner(Strategy.DEFAULT) as runner:
         journal = runner.run(
@@ -85,7 +85,7 @@ def test_do_not_play_rollbacks_on_graceful_exit_with_process_action():
         assert len(journal["rollbacks"]) == 0
 
 
-def test_play_rollbacks_on_graceful_exit_with_python_action():
+def test_play_rollbacks_on_graceful_exit_with_python_action() -> None:
     x = deepcopy(experiments.ExperimentGracefulExitLongPythonCall)
     with Runner(Strategy.DEFAULT) as runner:
         journal = runner.run(
@@ -96,7 +96,7 @@ def test_play_rollbacks_on_graceful_exit_with_python_action():
         assert len(journal["rollbacks"]) == 1
 
 
-def test_do_not_play_rollbacks_on_graceful_exit_with_python_action():
+def test_do_not_play_rollbacks_on_graceful_exit_with_python_action() -> None:
     server = threading.Thread(target=run_http_server_in_background)
     server.start()
 
@@ -112,7 +112,7 @@ def test_do_not_play_rollbacks_on_graceful_exit_with_python_action():
     server.join()
 
 
-def test_wait_for_background_activity_on_graceful_exit():
+def test_wait_for_background_activity_on_graceful_exit() -> None:
     server = threading.Thread(target=run_http_server_in_background)
     server.start()
 
@@ -126,7 +126,7 @@ def test_wait_for_background_activity_on_graceful_exit():
     server.join()
 
 
-def test_do_not_wait_for_background_activity_on_ungraceful_exit():
+def test_do_not_wait_for_background_activity_on_ungraceful_exit() -> None:
     def _exit_soon():
         time.sleep(1.5)
         exit_ungracefully()
@@ -142,7 +142,7 @@ def test_do_not_wait_for_background_activity_on_ungraceful_exit():
         assert "ExperimentExitedException" in journal["run"][0]["exception"][-1]
 
 
-def test_wait_for_background_activity_to_finish_on_graceful_exit():
+def test_wait_for_background_activity_to_finish_on_graceful_exit() -> None:
     def _exit_soon():
         time.sleep(1.5)
         exit_gracefully()

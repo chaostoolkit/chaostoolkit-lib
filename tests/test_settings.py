@@ -10,16 +10,16 @@ from chaoslib.settings import (
 settings_dir = os.path.join(os.path.dirname(__file__), "fixtures")
 
 
-def test_do_not_fail_when_settings_do_not_exist():
+def test_do_not_fail_when_settings_do_not_exist() -> None:
     assert load_settings(os.path.join(settings_dir, "no_settings.yaml")) is None
 
 
-def test_load_settings():
+def test_load_settings() -> None:
     settings = load_settings(os.path.join(settings_dir, "settings.yaml"))
     assert "notifications" in settings
 
 
-def test_save_settings():
+def test_save_settings() -> None:
     settings = load_settings(os.path.join(settings_dir, "settings.yaml"))
     new_settings_location = os.path.join(settings_dir, "new_settings.yaml")
     try:
@@ -32,12 +32,12 @@ def test_save_settings():
     os.remove(new_settings_location)
 
 
-def test_load_unsafe_settings():
+def test_load_unsafe_settings() -> None:
     settings = load_settings(os.path.join(settings_dir, "unsafe-settings.yaml"))
     assert settings is None
 
 
-def test_create_settings_file_on_save():
+def test_create_settings_file_on_save() -> None:
     ghost = os.path.abspath(os.path.join(settings_dir, "bah", "ghost.yaml"))
     assert not os.path.exists(ghost)
     try:
@@ -50,12 +50,12 @@ def test_create_settings_file_on_save():
             pass
 
 
-def test_get_loaded_settings():
+def test_get_loaded_settings() -> None:
     settings = load_settings(os.path.join(settings_dir, "settings.yaml"))
     assert get_loaded_settings() is settings
 
 
-def test_locate_root_level_entry():
+def test_locate_root_level_entry() -> None:
     settings = {"auths": {"chaos.example.com": {"type": "bearer"}}}
     parent, entry, k, i = locate_settings_entry(settings, "auths")
     assert parent == settings
@@ -64,7 +64,7 @@ def test_locate_root_level_entry():
     assert i is None
 
 
-def test_locate_dotted_entry():
+def test_locate_dotted_entry() -> None:
     settings = {"auths": {"chaos.example.com": {"type": "bearer"}}}
     parent, entry, k, i = locate_settings_entry(settings, "auths.chaos\\.example\\.com")
     assert parent == settings["auths"]
@@ -73,7 +73,7 @@ def test_locate_dotted_entry():
     assert i is None
 
 
-def test_locate_indexed_entry():
+def test_locate_indexed_entry() -> None:
     settings = {
         "auths": {
             "chaos.example.com": {
@@ -94,7 +94,7 @@ def test_locate_indexed_entry():
     assert i == 1
 
 
-def test_locate_dotted_key_from_indexed_entry():
+def test_locate_dotted_key_from_indexed_entry() -> None:
     settings = {
         "auths": {
             "chaos.example.com": {
@@ -115,6 +115,6 @@ def test_locate_dotted_key_from_indexed_entry():
     assert i is None
 
 
-def test_cannot_locate_dotted_entry():
+def test_cannot_locate_dotted_entry() -> None:
     settings = {"auths": {"chaos.example.com": {"type": "bearer"}}}
     assert locate_settings_entry(settings, "auths.chaos.example.com") is None

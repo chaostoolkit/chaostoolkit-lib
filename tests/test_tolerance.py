@@ -4,63 +4,63 @@ from chaoslib.exceptions import InvalidActivity
 from chaoslib.hypothesis import ensure_hypothesis_tolerance_is_valid, within_tolerance
 
 
-def test_tolerance_int():
+def test_tolerance_int() -> None:
     assert within_tolerance(6, value=6) is True
 
 
-def test_tolerance_int_returns_false_when_different():
+def test_tolerance_int_returns_false_when_different() -> None:
     assert within_tolerance(6, value=7) is False
 
 
-def test_tolerance_int_from_process_status():
+def test_tolerance_int_from_process_status() -> None:
     assert within_tolerance(6, value={"status": 6}) is True
 
 
-def test_tolerance_int_from_process_status_returns_false_when_different():
+def test_tolerance_int_from_process_status_returns_false_when_different() -> None:
     assert within_tolerance(6, value={"status": 7}) is False
 
 
-def test_tolerance_int_from_http_status():
+def test_tolerance_int_from_http_status() -> None:
     assert within_tolerance(6, value={"status": 6}) is True
 
 
-def test_tolerance_int_from_http_status_returns_false_when_different():
+def test_tolerance_int_from_http_status_returns_false_when_different() -> None:
     assert within_tolerance(6, value={"status": 7}) is False
 
 
-def test_tolerance_list_int_from_process_status():
+def test_tolerance_list_int_from_process_status() -> None:
     assert within_tolerance([5, 6], value={"status": 6}) is True
 
 
-def test_tolerance_list_int_from_process_status_returns_false_when_different():
+def test_tolerance_list_int_from_process_status_returns_false_when_different() -> None:
     assert within_tolerance([5, 7], value={"status": 6}) is False
 
 
-def test_tolerance_list_int_from_http_status():
+def test_tolerance_list_int_from_http_status() -> None:
     assert within_tolerance([5, 6], value={"status": 6}) is True
 
 
-def test_tolerance_list_int_from_http_status_returns_false_when_different():
+def test_tolerance_list_int_from_http_status_returns_false_when_different() -> None:
     assert within_tolerance([5, 7], value={"status": 6}) is False
 
 
-def test_tolerance_bool():
+def test_tolerance_bool() -> None:
     assert within_tolerance(True, value=True) is True
 
 
-def test_tolerance_bool_returns_false_when_different():
+def test_tolerance_bool_returns_false_when_different() -> None:
     assert within_tolerance(True, value=False) is False
 
 
-def test_tolerance_string():
+def test_tolerance_string() -> None:
     assert within_tolerance("hello", value="hello") is True
 
 
-def test_tolerance_string_returns_false_when_different():
+def test_tolerance_string_returns_false_when_different() -> None:
     assert within_tolerance("hello", value="not hello") is False
 
 
-def test_tolerance_regex_true():
+def test_tolerance_regex_true() -> None:
     assert (
         within_tolerance(
             {"type": "regex", "pattern": "[0-9]{2}"}, value="you are number 87"
@@ -69,25 +69,25 @@ def test_tolerance_regex_true():
     )
 
 
-def test_tolerance_regex_false():
+def test_tolerance_regex_false() -> None:
     t = {"type": "regex", "pattern": "[0-9]{2}"}
     ensure_hypothesis_tolerance_is_valid(t)
     assert within_tolerance(t, value="you are number 8") is False
 
 
-def test_tolerance_jsonpath_from_dict():
+def test_tolerance_jsonpath_from_dict() -> None:
     t = {"type": "jsonpath", "path": "$.foo.*[?(@.baz)]"}
     ensure_hypothesis_tolerance_is_valid(t)
     assert within_tolerance(t, value={"foo": [{"baz": 1}, {"baz": 2}]}) is True
 
 
-def test_tolerance_jsonpath_must_find_items_to_succeed():
+def test_tolerance_jsonpath_must_find_items_to_succeed() -> None:
     t = {"type": "jsonpath", "path": "$.notsofoo.*[?(@.baz)].baz"}
     ensure_hypothesis_tolerance_is_valid(t)
     assert within_tolerance(t, value={"foo": [{"baz": 1}, {"baz": 2}]}) is False
 
 
-def test_tolerance_jsonpath_must_match_expected_value():
+def test_tolerance_jsonpath_must_match_expected_value() -> None:
     t = {"type": "jsonpath", "path": "$.foo[?(@.baz)].baz", "expect": "hello"}
     ensure_hypothesis_tolerance_is_valid(t)
     assert within_tolerance(t, value={"foo": {"baz": "hello"}}) is True
@@ -113,7 +113,7 @@ def test_tolerance_jsonpath_must_match_expected_value():
     assert within_tolerance(t, value={"foo": {"jon": "boom"}}) is True
 
 
-def test_tolerance_jsonpath_can_be_filter_by_value():
+def test_tolerance_jsonpath_can_be_filter_by_value() -> None:
     t = {"type": "jsonpath", "path": '$.foo[?(@.baz="hello")]', "count": 1}
     ensure_hypothesis_tolerance_is_valid(t)
     assert within_tolerance(t, value={"foo": {"baz": "hello"}}) is True
@@ -123,7 +123,7 @@ def test_tolerance_jsonpath_can_be_filter_by_value():
     assert within_tolerance(t, value={"foo": {"baz": "hello"}}) is False
 
 
-def test_tolerance_jsonpath_must_match_expected_values():
+def test_tolerance_jsonpath_must_match_expected_values() -> None:
     t = {
         "type": "jsonpath",
         "path": "$.foo.*[?(@.baz)].baz",
@@ -139,7 +139,7 @@ def test_tolerance_jsonpath_must_match_expected_values():
     )
 
 
-def test_tolerance_jsonpath_must_find_items_with_a_given_value_to_succeed():
+def test_tolerance_jsonpath_must_find_items_with_a_given_value_to_succeed() -> None:
     t = {"type": "jsonpath", "path": "$.foo.*[?(@.baz=2)]", "count": 1}
     ensure_hypothesis_tolerance_is_valid(t)
     assert within_tolerance(t, value={"foo": [{"baz": 1}, {"baz": 2}]}) is True
@@ -153,26 +153,26 @@ def test_tolerance_jsonpath_must_find_items_with_a_given_value_to_succeed():
     assert within_tolerance(t, value={"foo": [{"baz": 4}, {"baz": 4}]}) is True
 
 
-def test_tolerance_jsonpath_from_jsonstring():
+def test_tolerance_jsonpath_from_jsonstring() -> None:
     t = {"type": "jsonpath", "path": "$.foo[*].baz"}
     ensure_hypothesis_tolerance_is_valid(t)
     assert within_tolerance(t, value='{"foo": [{"baz": 1}, {"baz": 2}]}') is True
 
 
-def test_tolerance_jsonpath_from_bytes():
+def test_tolerance_jsonpath_from_bytes() -> None:
     t = {"type": "jsonpath", "path": "$.foo[*].baz"}
     ensure_hypothesis_tolerance_is_valid(t)
     assert within_tolerance(t, value=b'{"foo": [{"baz": 1}, {"baz": 2}]}') is True
 
 
-def test_tolerance_jsonpath_cannot_be_empty():
+def test_tolerance_jsonpath_cannot_be_empty() -> None:
     t = {"type": "jsonpath", "path": ""}
 
     with pytest.raises(InvalidActivity):
         ensure_hypothesis_tolerance_is_valid(t)
 
 
-def test_tolerance_regex_stdout_process():
+def test_tolerance_regex_stdout_process() -> None:
     t = {"type": "regex", "target": "stdout", "pattern": "[0-9]{2}"}
     ensure_hypothesis_tolerance_is_valid(t)
     assert (
@@ -183,7 +183,7 @@ def test_tolerance_regex_stdout_process():
     )
 
 
-def test_tolerance_regex_stdout_process_needs_to_match():
+def test_tolerance_regex_stdout_process_needs_to_match() -> None:
     t = {"type": "regex", "target": "stdout", "pattern": "[0-9]{2}"}
     ensure_hypothesis_tolerance_is_valid(t)
     assert (
@@ -194,7 +194,7 @@ def test_tolerance_regex_stdout_process_needs_to_match():
     )
 
 
-def test_tolerance_regex_stderr_process():
+def test_tolerance_regex_stderr_process() -> None:
     t = {"type": "regex", "target": "stderr", "pattern": "[0-9]{2}"}
     ensure_hypothesis_tolerance_is_valid(t)
     assert (
@@ -205,7 +205,7 @@ def test_tolerance_regex_stderr_process():
     )
 
 
-def test_tolerance_regex_stderr_process_needs_to_match():
+def test_tolerance_regex_stderr_process_needs_to_match() -> None:
     t = {"type": "regex", "target": "stderr", "pattern": "[0-9]{2}"}
     ensure_hypothesis_tolerance_is_valid(t)
     assert (
@@ -216,7 +216,7 @@ def test_tolerance_regex_stderr_process_needs_to_match():
     )
 
 
-def test_tolerance_regex_process_only_match_stdout_or_stderr():
+def test_tolerance_regex_process_only_match_stdout_or_stderr() -> None:
     t = {"type": "regex", "target": "stdout", "pattern": "[0-9]{2}"}
     ensure_hypothesis_tolerance_is_valid(t)
     assert (
@@ -232,7 +232,7 @@ def test_tolerance_regex_process_only_match_stdout_or_stderr():
     )
 
 
-def test_tolerance_regex_body_http():
+def test_tolerance_regex_body_http() -> None:
     t = {"type": "regex", "target": "body", "pattern": "[0-9]{2}"}
     ensure_hypothesis_tolerance_is_valid(t)
     assert (
@@ -248,13 +248,13 @@ def test_tolerance_regex_body_http():
     )
 
 
-def test_tolerance_regex_must_have_a_pattern():
+def test_tolerance_regex_must_have_a_pattern() -> None:
     with pytest.raises(InvalidActivity) as e:
         ensure_hypothesis_tolerance_is_valid({"type": "regex", "target": "stdout"})
     assert "tolerance must have a `pattern` key" in str(e.value)
 
 
-def test_tolerance_regex_must_have_a_valid_pattern_type():
+def test_tolerance_regex_must_have_a_valid_pattern_type() -> None:
     with pytest.raises(InvalidActivity) as e:
         ensure_hypothesis_tolerance_is_valid(
             {"type": "regex", "target": "stdout", "pattern": None}
@@ -262,7 +262,7 @@ def test_tolerance_regex_must_have_a_valid_pattern_type():
     assert "tolerance pattern None has an invalid type" in str(e.value)
 
 
-def test_tolerance_regex_must_have_a_valid_pattern():
+def test_tolerance_regex_must_have_a_valid_pattern() -> None:
     with pytest.raises(InvalidActivity) as e:
         ensure_hypothesis_tolerance_is_valid(
             {"type": "regex", "target": "stdout", "pattern": "[0-9"}
@@ -270,13 +270,13 @@ def test_tolerance_regex_must_have_a_valid_pattern():
     assert "pattern [0-9 seems invalid" in str(e.value)
 
 
-def test_tolerance_unsupported_type():
+def test_tolerance_unsupported_type() -> None:
     with pytest.raises(InvalidActivity) as e:
         ensure_hypothesis_tolerance_is_valid({"type": "boom"})
     assert "tolerance type 'boom' is unsupported" in str(e.value)
 
 
-def test_tolerance_missing_jsonpath_backend():
+def test_tolerance_missing_jsonpath_backend() -> None:
     from chaoslib import hypothesis
 
     hypothesis.HAS_JSONPATH = False
@@ -286,7 +286,7 @@ def test_tolerance_missing_jsonpath_backend():
     assert "Install the `jsonpath2` package to use a JSON path" in str(e.value)
 
 
-def test_tolerance_range_integer():
+def test_tolerance_range_integer() -> None:
     t = {"type": "range", "target": "body", "range": [10, 800]}
     ensure_hypothesis_tolerance_is_valid(t)
     assert (
@@ -316,7 +316,7 @@ def test_tolerance_range_integer():
     )
 
 
-def test_tolerance_range_float():
+def test_tolerance_range_float() -> None:
     t = {"type": "range", "target": "body", "range": [10.5, 800.89]}
     ensure_hypothesis_tolerance_is_valid(t)
     assert (
@@ -346,7 +346,7 @@ def test_tolerance_range_float():
     )
 
 
-def test_tolerance_range_mix_integer_and_float():
+def test_tolerance_range_mix_integer_and_float() -> None:
     t = {"type": "range", "target": "body", "range": [10, 800.8]}
     ensure_hypothesis_tolerance_is_valid(t)
     assert (
@@ -376,19 +376,19 @@ def test_tolerance_range_mix_integer_and_float():
     )
 
 
-def test_tolerance_range_lower_boundary_must_be_a_number():
+def test_tolerance_range_lower_boundary_must_be_a_number() -> None:
     t = {"type": "range", "target": "body", "range": ["a", 6]}
     with pytest.raises(InvalidActivity):
         ensure_hypothesis_tolerance_is_valid(t)
 
 
-def test_tolerance_range_upper_boundary_must_be_a_number():
+def test_tolerance_range_upper_boundary_must_be_a_number() -> None:
     t = {"type": "range", "target": "body", "range": [6, "b"]}
     with pytest.raises(InvalidActivity):
         ensure_hypothesis_tolerance_is_valid(t)
 
 
-def test_tolerance_range_checked_value_must_be_a_number():
+def test_tolerance_range_checked_value_must_be_a_number() -> None:
     t = {"type": "range", "target": "body", "range": [6, 8]}
     ensure_hypothesis_tolerance_is_valid(t)
     assert (
@@ -404,7 +404,7 @@ def test_tolerance_range_checked_value_must_be_a_number():
     )
 
 
-def test_tolerance_with_a_probe():
+def test_tolerance_with_a_probe() -> None:
     t = {
         "type": "probe",
         "name": "must-be-in-range",
@@ -441,7 +441,7 @@ def test_tolerance_with_a_probe():
     )
 
 
-def test_tolerance_jsonpath_can_contain_variable_to_be_substituted():
+def test_tolerance_jsonpath_can_contain_variable_to_be_substituted() -> None:
     t = {"type": "jsonpath", "path": '$.foo[?(@.baz="${msg}")]', "count": 1}
     ensure_hypothesis_tolerance_is_valid(t)
     assert (
@@ -461,7 +461,7 @@ def test_tolerance_jsonpath_can_contain_variable_to_be_substituted():
     )
 
 
-def test_tolerance_regex_can_contain_variable_to_be_substituted():
+def test_tolerance_regex_can_contain_variable_to_be_substituted() -> None:
     assert (
         within_tolerance(
             {"type": "regex", "pattern": "${msg}"},
@@ -481,7 +481,7 @@ def test_tolerance_regex_can_contain_variable_to_be_substituted():
     )
 
 
-def test_tolerance_complex_regex_can_contain_variable_to_be_substituted():
+def test_tolerance_complex_regex_can_contain_variable_to_be_substituted() -> None:
     assert (
         within_tolerance(
             {"type": "regex", "pattern": r"^[0-9] \$\{level\} ${msg} - done$"},

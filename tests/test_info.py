@@ -32,14 +32,14 @@ class InMemoryDistribution(Distribution):
 
 
 @patch("chaoslib.info.importlib_metadata.distributions")
-def test_list_none_when_none_installed(distros: List[Distribution]):
+def test_list_none_when_none_installed(distros: List[Distribution]) -> None:
     distros.return_value = []
     extensions = list_extensions()
     assert extensions == []
 
 
 @patch("chaoslib.info.importlib_metadata.distributions")
-def test_list_one_installed(distros: List[Distribution]):
+def test_list_one_installed(distros: List[Distribution]) -> None:
     distros.return_value = [InMemoryDistribution(PGK_META)]
 
     extensions = list_extensions()
@@ -51,7 +51,7 @@ def test_list_one_installed(distros: List[Distribution]):
 
 
 @patch("chaoslib.info.importlib_metadata.distributions")
-def test_list_excludes_ctklib(distros: List[Distribution]):
+def test_list_excludes_ctklib(distros: List[Distribution]) -> None:
     metadata = """Name: chaostoolkit-lib"""
     distros.return_value = [InMemoryDistribution(metadata)]
 
@@ -60,7 +60,7 @@ def test_list_excludes_ctklib(distros: List[Distribution]):
 
 
 @patch("chaoslib.info.importlib_metadata.distributions")
-def test_list_skip_duplicates(distros: List[Distribution]):
+def test_list_skip_duplicates(distros: List[Distribution]) -> None:
     distros.return_value = [
         InMemoryDistribution(PGK_META),
         InMemoryDistribution(PGK_META),
