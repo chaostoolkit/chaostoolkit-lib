@@ -25,18 +25,20 @@ def cleanup_control() -> None:
     pass
 
 
-def before_experiment_control(context: Experiment, secrets: Secrets, **kwargs) -> None:
+def before_experiment_control(
+    context: Experiment, secrets: Secrets, **kwargs: Any
+) -> None:
     context["before_experiment_control_secrets"] = secrets
 
 
 def after_experiment_control(
-    context: Experiment, state: Journal, secrets: Secrets, **kwargs
+    context: Experiment, state: Journal, secrets: Secrets, **kwargs: Any
 ) -> None:
     context["after_experiment_control_secrets"] = secrets
 
 
 def before_hypothesis_control(
-    context: Hypothesis, experiment: Experiment, secrets: Secrets, **kwargs
+    context: Hypothesis, experiment: Experiment, secrets: Secrets, **kwargs: Any
 ) -> None:
     experiment["before_hypothesis_control_secrets"] = secrets
 
@@ -46,38 +48,44 @@ def after_hypothesis_control(
     experiment: Experiment,
     state: Dict[str, Any],
     secrets: Secrets,
-    **kwargs
+    **kwargs: Any
 ) -> None:
     experiment["after_hypothesis_control_secrets"] = secrets
 
 
-def before_method_control(context: Experiment, secrets: Secrets, **kwargs) -> None:
+def before_method_control(context: Experiment, secrets: Secrets, **kwargs: Any) -> None:
     context["before_method_control_secrets"] = secrets
 
 
 def after_method_control(
-    context: Experiment, state: List[Run], secrets: Secrets, **kwargs
+    context: Experiment, state: List[Run], secrets: Secrets, **kwargs: Any
 ) -> None:
     context["after_method_control_secrets"] = secrets
 
 
-def before_rollback_control(context: Experiment, secrets: Secrets, **kwargs) -> None:
+def before_rollback_control(
+    context: Experiment, secrets: Secrets, **kwargs: Any
+) -> None:
     context["before_rollback_control_secrets"] = secrets
 
 
 def after_rollback_control(
-    context: Experiment, state: List[Run], secrets: Secrets, **kwargs
+    context: Experiment, state: List[Run], secrets: Secrets, **kwargs: Any
 ) -> None:
     context["after_rollback_control_secrets"] = secrets
 
 
 def before_activity_control(
-    context: Activity, experiment: Experiment, secrets: Secrets, **kwargs
+    context: Activity, experiment: Experiment, secrets: Secrets, **kwargs: Any
 ) -> None:
     experiment["before_activity_control_secrets"] = secrets
 
 
 def after_activity_control(
-    context: Activity, experiment: Experiment, state: Run, secrets: Secrets, **kwargs
+    context: Activity,
+    experiment: Experiment,
+    state: Run,
+    secrets: Secrets,
+    **kwargs: Any
 ) -> None:
     experiment["after_activity_control_secrets"] = secrets

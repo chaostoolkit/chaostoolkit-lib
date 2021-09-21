@@ -64,7 +64,7 @@ def test_should_merge_properly() -> None:
 
 
 @patch("chaoslib.secret.hvac")
-def test_should_auth_with_approle(hvac) -> None:
+def test_should_auth_with_approle(hvac: MagicMock) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_role_id": "mighty_id",
@@ -86,7 +86,7 @@ def test_should_auth_with_approle(hvac) -> None:
 
 
 @patch("chaoslib.secret.hvac")
-def test_should_catch_approle_invalid_secret_id_abort_the_run(hvac) -> None:
+def test_should_catch_approle_invalid_secret_id_abort_the_run(hvac: MagicMock) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_role_id": "mighty_id",
@@ -102,7 +102,7 @@ def test_should_catch_approle_invalid_secret_id_abort_the_run(hvac) -> None:
 
 
 @patch("chaoslib.secret.hvac")
-def test_should_auth_with_token(hvac) -> None:
+def test_should_auth_with_token(hvac: MagicMock) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_token": "not_awesome_token",
@@ -119,7 +119,7 @@ def test_should_auth_with_token(hvac) -> None:
 
 
 @patch("chaoslib.secret.hvac", autospec=True)
-def test_should_auth_with_service_account(hvac) -> None:
+def test_should_auth_with_service_account(hvac: MagicMock) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_sa_role": "some_role",
@@ -142,7 +142,7 @@ def test_should_auth_with_service_account(hvac) -> None:
 
 
 @patch("chaoslib.secret.hvac")
-def test_should_catch_service_account_invalid_abort_the_run(hvac) -> None:
+def test_should_catch_service_account_invalid_abort_the_run(hvac: MagicMock) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_sa_role": "invalid",
@@ -158,7 +158,7 @@ def test_should_catch_service_account_invalid_abort_the_run(hvac) -> None:
 
 
 @patch("chaoslib.secret.hvac")
-def test_read_secrets_from_vault_with_kv_version_1(hvac) -> None:
+def test_read_secrets_from_vault_with_kv_version_1(hvac: MagicMock) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_token": "not_awesome_token",
@@ -201,7 +201,7 @@ def test_read_secrets_from_vault_with_kv_version_1(hvac) -> None:
 
 
 @patch("chaoslib.secret.hvac")
-def test_read_secrets_from_vault_with_kv_version_2(hvac) -> None:
+def test_read_secrets_from_vault_with_kv_version_2(hvac: MagicMock) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_token": "not_awesome_token",
@@ -267,7 +267,7 @@ def test_should_override_load_inline_with_var() -> None:
 
 
 @patch("chaoslib.secret.hvac")
-def test_vault_add_subkeys(hvac) -> None:
+def test_vault_add_subkeys(hvac: MagicMock) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_token": "not_awesome_token",
@@ -298,7 +298,7 @@ def test_vault_add_subkeys(hvac) -> None:
 
 
 @patch("chaoslib.secret.hvac")
-def test_vault_replace_entire_declare(hvac) -> None:
+def test_vault_replace_entire_declare(hvac: MagicMock) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_token": "not_awesome_token",
@@ -333,7 +333,7 @@ def test_vault_replace_entire_declare(hvac) -> None:
 
 
 @patch("chaoslib.secret.hvac")
-def test_override_vault_with_vars(hvac) -> None:
+def test_override_vault_with_vars(hvac: MagicMock) -> None:
     config = {
         "vault_addr": "http://someaddr.com",
         "vault_token": "not_awesome_token",

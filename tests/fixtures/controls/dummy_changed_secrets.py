@@ -1,3 +1,5 @@
+from typing import Any
+
 from chaoslib.types import Activity, Configuration, Run, Secrets
 
 
@@ -6,7 +8,7 @@ def after_activity_control(
     state: Run,
     configuration: Configuration = None,
     secrets: Secrets = None,
-    **kwargs
+    **kwargs: Any
 ) -> None:
     if context["name"] == "generate-token":
         secrets["mytokens"]["my_token"] = state["output"]

@@ -1,6 +1,6 @@
 from functools import wraps
 from itertools import count
-from typing import Callable
+from typing import Any, Callable
 
 from logzero import logger
 
@@ -11,7 +11,7 @@ counter = None
 
 def initcounter(f: Callable) -> Callable:
     @wraps(f)
-    def wrapped(*args, **kwargs) -> None:
+    def wrapped(*args: Any, **kwargs: Any) -> None:
         global counter
         counter = count()
         f(*args, **kwargs)
@@ -21,7 +21,7 @@ def initcounter(f: Callable) -> Callable:
 
 def keepcount(f: Callable) -> Callable:
     @wraps(f)
-    def wrapped(*args, **kwargs) -> None:
+    def wrapped(*args: Any, **kwargs: Any) -> None:
         next(counter)
         f(*args, **kwargs)
 
@@ -29,14 +29,14 @@ def keepcount(f: Callable) -> Callable:
 
 
 @keepcount
-def after_activity_control(**kwargs) -> None:
+def after_activity_control(**kwargs: Any) -> None:
     logger.info("Activity is called")
 
 
 @initcounter
-def configure_control(**kwargs) -> None:
+def configure_control(**kwargs: Any) -> None:
     logger.info("configure is called")
 
 
-def after_experiment_control(state: Journal, **kwargs) -> None:
+def after_experiment_control(state: Journal, **kwargs: Any) -> None:
     state["counted_activities"] = next(counter)

@@ -2,7 +2,7 @@ import os
 import threading
 import time
 from copy import deepcopy
-from typing import List
+from typing import Any, List
 from wsgiref.simple_server import WSGIRequestHandler, WSGIServer
 
 import pytest
@@ -16,14 +16,14 @@ pytestmark = pytest.mark.skipif(os.getenv("CI") is not None, reason="Skip CI")
 
 
 def run_http_server_in_background() -> None:
-    def slow_app(environ, start_response) -> List[bytes]:
+    def slow_app(environ: Any, start_response: Any) -> List[bytes]:
         time.sleep(5)
         status = "200 OK"
         headers = [("Content-type", "text/plain; charset=utf-8")]
         start_response(status, headers)
         return [b"Hello World"]
 
-    def make_server(host, port, app) -> WSGIServer:
+    def make_server(host: str, port: int, app: Any) -> WSGIServer:
         server = WSGIServer((host, port), WSGIRequestHandler)
         server.set_app(app)
         return server

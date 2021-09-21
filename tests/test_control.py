@@ -2,7 +2,7 @@ import json
 import tempfile
 from copy import deepcopy
 from typing import Any, Dict, cast
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 from fixtures import experiments
@@ -212,7 +212,7 @@ def test_not_automatic_does_not_go_deep_down_the_tree() -> None:
 
 
 @patch("chaoslib.control.python.logger", autospec=True)
-def test_validate_python_control_must_be_loadable(logger) -> None:
+def test_validate_python_control_must_be_loadable(logger: MagicMock) -> None:
     validate_python_control(
         {
             "name": "a-python-control",
@@ -240,7 +240,7 @@ def test_controls_can_access_experiment() -> None:
     )
     exp["dry"] = True
 
-    hypo = exp.get("steady-state-hypothesis")
+    hypo = exp["steady-state-hypothesis"]
     run_experiment(exp)
     assert hypo["has_experiment_before"] is True
     assert hypo["has_experiment_after"] is True

@@ -1,4 +1,4 @@
-from typing import List
+from typing import Any, List
 
 from chaoslib.exceptions import ActivityFailed, InterruptExecution
 
@@ -39,14 +39,14 @@ def one_arg_with_default(message: str = "hello") -> None:
     pass
 
 
-def one_untyped_arg(message) -> None:
+def one_untyped_arg(message) -> None:  # type: ignore[no-untyped-def]
     """
     One untyped argument.
     """
     pass
 
 
-def one_untyped_arg_with_default(message="hello") -> None:
+def one_untyped_arg_with_default(message="hello") -> None:  # type: ignore[no-untyped-def]  # Noqa
     """
     One untyped argument with a default value.
     """
@@ -71,7 +71,7 @@ def many_args_with_rich_types(
     count: int = 1,
     logit: bool = False,
     other: Whatever = None,
-    **kwargs
+    **kwargs: Any
 ) -> str:
     """
     Many arguments with rich types.

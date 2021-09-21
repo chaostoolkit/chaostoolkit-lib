@@ -1,5 +1,5 @@
 import time
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import requests
 import requests_mock
@@ -30,7 +30,7 @@ def test_notify_to_http_endpoint() -> None:
 
 
 @patch("chaoslib.notification.logger", autospec=True)
-def test_notify_to_http_endpoint_can_timeout(logger) -> None:
+def test_notify_to_http_endpoint_can_timeout(logger: MagicMock) -> None:
     url = "http://example.com"
 
     exc_mock = requests.exceptions.ConnectTimeout()
@@ -46,7 +46,7 @@ def test_notify_to_http_endpoint_can_timeout(logger) -> None:
 
 
 @patch("chaoslib.notification.logger", autospec=True)
-def test_notify_to_http_endpoint_requires_a_url(logger) -> None:
+def test_notify_to_http_endpoint_requires_a_url(logger: MagicMock) -> None:
     payload = {"msg": "hello", "ts": str(time.time())}
     event_payload = {"event": str(RunFlowEvent.RunStarted), "payload": payload}
     with requests_mock.mock() as m:
@@ -59,7 +59,7 @@ def test_notify_to_http_endpoint_requires_a_url(logger) -> None:
 
 
 @patch("chaoslib.notification.logger", autospec=True)
-def test_notify_to_http_endpoint_may_fail(logger) -> None:
+def test_notify_to_http_endpoint_may_fail(logger: MagicMock) -> None:
     url = "http://example.com"
     with requests_mock.mock() as m:
         m.post("http://example.com", status_code=404, text="boom")
@@ -73,7 +73,7 @@ def test_notify_to_http_endpoint_may_fail(logger) -> None:
 
 
 @patch("fixtures.notifier.logger", autospec=True)
-def test_notify_via_plugin(logger) -> None:
+def test_notify_via_plugin(logger: MagicMock) -> None:
     notify(
         {"notifications": [{"type": "plugin", "module": "fixtures.notifier"}]},
         RunFlowEvent.RunStarted,
@@ -82,7 +82,7 @@ def test_notify_via_plugin(logger) -> None:
 
 
 @patch("fixtures.notifier.logger", autospec=True)
-def test_notify_via_plugin_with_non_default_func_name(logger) -> None:
+def test_notify_via_plugin_with_non_default_func_name(logger: MagicMock) -> None:
     notify(
         {
             "notifications": [
@@ -99,7 +99,7 @@ def test_notify_via_plugin_with_non_default_func_name(logger) -> None:
 
 
 @patch("chaoslib.notification.logger", autospec=True)
-def test_notify_via_plugin_failed_to_import_plugin(logger) -> None:
+def test_notify_via_plugin_failed_to_import_plugin(logger: MagicMock) -> None:
     notify(
         {"notifications": [{"type": "plugin", "module": "fixtures.notifier___"}]},
         RunFlowEvent.RunStarted,
@@ -113,7 +113,7 @@ def test_notify_via_plugin_failed_to_import_plugin(logger) -> None:
 
 
 @patch("chaoslib.notification.logger", autospec=True)
-def test_notify_via_plugin_failed_to_import_func(logger) -> None:
+def test_notify_via_plugin_failed_to_import_func(logger: MagicMock) -> None:
     notify(
         {
             "notifications": [

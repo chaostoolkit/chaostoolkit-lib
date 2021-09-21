@@ -1,6 +1,6 @@
 import os.path
 import stat
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from chaoslib.provider.process import run_process_activity
 
@@ -88,7 +88,7 @@ def test_process_cwd_relative_path() -> None:
 
 
 @patch("chaoslib.provider.process.logger")
-def test_process_non_exit_zero_warning(logger) -> None:
+def test_process_non_exit_zero_warning(logger: MagicMock) -> None:
     run_process_activity(
         {
             "provider": {
