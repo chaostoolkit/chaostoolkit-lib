@@ -60,7 +60,7 @@ def run_python_activity(
         ).with_traceback(sys.exc_info()[2])
 
 
-def validate_python_activity(activity: Activity):  # noqa: C901
+def validate_python_activity(activity: Activity) -> None:  # noqa: C901
     """
     Validate a Python activity.
 

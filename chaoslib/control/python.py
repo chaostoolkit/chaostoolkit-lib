@@ -62,7 +62,7 @@ def initialize_control(
     configuration: Configuration,
     secrets: Secrets,
     settings: Settings = None,
-):
+) -> None:
     """
     Initialize a control by calling its `configure_control` function.
     """
@@ -89,7 +89,7 @@ def initialize_control(
     func(**arguments)
 
 
-def cleanup_control(control: Control):
+def cleanup_control(control: Control) -> None:
     """
     Cleanup a control by calling its `cleanup_control` function.
     """
@@ -99,7 +99,7 @@ def cleanup_control(control: Control):
     func()
 
 
-def validate_python_control(control: Control):
+def validate_python_control(control: Control) -> None:
     """
     Verify that a control block matches the specification
     """
@@ -137,7 +137,7 @@ def apply_python_control(
     configuration: Configuration = None,
     secrets: Secrets = None,
     settings: Settings = None,
-):
+) -> None:
     """
     Apply a control by calling a function matching the given level.
     """

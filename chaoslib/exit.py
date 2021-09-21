@@ -46,6 +46,7 @@ import platform
 import signal
 from contextlib import contextmanager
 from types import FrameType
+from typing import Generator
 
 from logzero import logger
 
@@ -55,7 +56,7 @@ __all__ = ["exit_gracefully", "exit_ungracefully", "exit_signals"]
 
 
 @contextmanager
-def exit_signals():
+def exit_signals() -> Generator[None, None, None]:
     """
     Register the handlers for SIGTERM, SIGUSR1 and SIGUSR2 signals.
     Puts back the original handlers when the call ends.

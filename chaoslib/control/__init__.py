@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from copy import copy, deepcopy
-from typing import List, Union
+from typing import Generator, List, Union
 
 from logzero import logger
 
@@ -36,7 +36,7 @@ global_controls = []
 
 def initialize_controls(
     experiment: Experiment, configuration: Configuration = None, secrets: Secrets = None
-):
+) -> None:
     """
     Initialize all declared controls in the experiment.
 
@@ -69,7 +69,7 @@ def initialize_controls(
                 )
 
 
-def cleanup_controls(experiment: Experiment):
+def cleanup_controls(experiment: Experiment) -> None:
     """
     Cleanup all declared controls in the experiment.
 
@@ -95,7 +95,7 @@ def cleanup_controls(experiment: Experiment):
             cleanup_control(control)
 
 
-def validate_controls(experiment: Experiment):
+def validate_controls(experiment: Experiment) -> None:
     """
     Validate that all declared controls respect the specification.
 
@@ -136,7 +136,7 @@ def initialize_global_controls(
     configuration: Configuration,
     secrets: Secrets,
     settings: Settings,
-):
+) -> None:
     """
     Load and initialize controls declared in the settings.
 
@@ -168,7 +168,7 @@ def initialize_global_controls(
     set_global_controls(controls)
 
 
-def load_global_controls(settings: Settings):
+def load_global_controls(settings: Settings) -> None:
     """
     Import all controls declared in the settings and global to all experiments.
 
@@ -228,7 +228,7 @@ class Control:
         context: Union[Activity, Hypothesis, Experiment],
         configuration: Configuration = None,
         secrets: Secrets = None,
-    ):
+    ) -> None:
         self.state = None
         apply_controls(
             level=level,
@@ -249,7 +249,7 @@ class Control:
         context: Union[Activity, Hypothesis, Experiment],
         configuration: Configuration = None,
         secrets: Secrets = None,
-    ):
+    ) -> None:
         state = self.state
         apply_controls(
             level=level,
@@ -270,7 +270,7 @@ def controls(
     context: Union[Activity, Hypothesis, Experiment, str] = None,
     configuration: Configuration = None,
     secrets: Secrets = None,
-):
+) -> Generator[Control, None, None]:
     """
     Context manager for a block that needs to be wrapped by controls.
     """
@@ -303,7 +303,7 @@ def get_controls(experiment: Experiment) -> List[Control]:
     return controls
 
 
-def set_global_controls(controls: List[ControlType]):
+def set_global_controls(controls: List[ControlType]) -> None:
     """
     Set the controls loaded from the settings.
     """
@@ -311,7 +311,7 @@ def set_global_controls(controls: List[ControlType]):
     global_controls.extend(controls)
 
 
-def reset_global_controls():
+def reset_global_controls() -> None:
     """
     Invalidate all loaded global controls.
     """
@@ -373,7 +373,7 @@ def apply_controls(
     state: Union[Journal, Run, List[Run]] = None,
     configuration: Configuration = None,
     secrets: Secrets = None,
-):
+) -> None:
     """
     Apply the controls at given level
 

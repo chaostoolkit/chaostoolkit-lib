@@ -35,7 +35,7 @@ __all__ = ["ensure_experiment_is_valid", "load_experiment"]
 
 
 @with_cache
-def ensure_experiment_is_valid(experiment: Experiment):
+def ensure_experiment_is_valid(experiment: Experiment) -> None:
     """
     A chaos experiment consists of a method made of activities to carry
     sequentially.

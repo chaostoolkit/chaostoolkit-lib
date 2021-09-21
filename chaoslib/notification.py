@@ -52,7 +52,7 @@ def notify(
     event: FlowEvent,
     payload: Any = None,  # noqa: C901
     error: Any = None,
-):
+) -> None:
     """
     Go through all the notification channels declared in the settings and
     call them one by one. Only call those matching the current event.
@@ -150,7 +150,7 @@ def notify(
             notify_via_plugin(channel, event_payload)
 
 
-def notify_with_http(channel: Dict[str, str], payload: EventPayload):
+def notify_with_http(channel: Dict[str, str], payload: EventPayload) -> None:
     """
     Call a notification endpoint over HTTP.
 
@@ -194,7 +194,7 @@ def notify_with_http(channel: Dict[str, str], payload: EventPayload):
         logger.debug("missing url in notification channel")
 
 
-def notify_via_plugin(channel: Dict[str, str], payload: EventPayload):
+def notify_via_plugin(channel: Dict[str, str], payload: EventPayload) -> None:
     """
     Call a notification plugin as a Python function.
 

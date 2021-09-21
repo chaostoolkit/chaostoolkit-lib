@@ -21,7 +21,7 @@ DeprecatedVaultMissingPathMessage = (
 )
 
 
-def warn_about_deprecated_features(experiment: Experiment):
+def warn_about_deprecated_features(experiment: Experiment) -> None:
     """
     Warn about deprecated features.
 
@@ -60,5 +60,5 @@ def warn_about_deprecated_features(experiment: Experiment):
                     logger.warning(DeprecatedVaultMissingPathMessage)
 
 
-def warn_about_moved_function(message: str):
+def warn_about_moved_function(message: str) -> None:
     warnings.warn(message, DeprecationWarning, stacklevel=2)

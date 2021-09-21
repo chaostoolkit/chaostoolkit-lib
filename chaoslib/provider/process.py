@@ -79,7 +79,7 @@ def run_process_activity(
     return {"status": proc.returncode, "stdout": stdout, "stderr": stderr}
 
 
-def validate_process_activity(activity: Activity):
+def validate_process_activity(activity: Activity) -> None:
     """
     Validate a process activity.
 

@@ -23,7 +23,7 @@ from chaoslib.types import Configuration, Experiment, Secrets, Tolerance
 __all__ = ["ensure_hypothesis_is_valid", "run_steady_state_hypothesis"]
 
 
-def ensure_hypothesis_is_valid(experiment: Experiment):
+def ensure_hypothesis_is_valid(experiment: Experiment) -> None:
     """
     Validates that the steady state hypothesis entry has the expected schema
     or raises :exc:`InvalidExperiment` or :exc:`InvalidActivity`.
@@ -46,7 +46,7 @@ def ensure_hypothesis_is_valid(experiment: Experiment):
             ensure_hypothesis_tolerance_is_valid(probe["tolerance"])
 
 
-def ensure_hypothesis_tolerance_is_valid(tolerance: Tolerance):
+def ensure_hypothesis_tolerance_is_valid(tolerance: Tolerance) -> None:
     """
     Validate the tolerance of the hypothesis probe and raises
     :exc:`InvalidActivity` if it isn't valid.
@@ -79,7 +79,7 @@ def ensure_hypothesis_tolerance_is_valid(tolerance: Tolerance):
             )
 
 
-def check_regex_pattern(tolerance: Tolerance):
+def check_regex_pattern(tolerance: Tolerance) -> None:
     """
     Check the regex pattern of a tolerance and raise :exc:`InvalidActivity`
     when the pattern is missing or invalid (meaning, cannot be compiled by
@@ -105,7 +105,7 @@ def check_regex_pattern(tolerance: Tolerance):
         )
 
 
-def check_json_path(tolerance: Tolerance):
+def check_json_path(tolerance: Tolerance) -> None:
     """
     Check the JSON path of a tolerance and raise :exc:`InvalidActivity`
     when the path is missing or invalid.
@@ -139,7 +139,7 @@ def check_json_path(tolerance: Tolerance):
         )
 
 
-def check_range(tolerance: Tolerance):
+def check_range(tolerance: Tolerance) -> None:
     """
     Check a value is within a given range. That range may be set to a min and
     max value or a sequence.

@@ -278,7 +278,7 @@ class Runner:
             experiment.get("secrets", {}), self.config, secret_vars
         )
 
-    def cleanup(self):
+    def cleanup(self) -> None:
         pass
 
     def run(
@@ -559,7 +559,7 @@ def run_hypothesis_during_method(
     status in the journal when it raised an exception.
     """
 
-    def completed(f: Future):
+    def completed(f: Future) -> None:
         exc = f.exception()
         event_registry.continuous_hypothesis_completed(experiment, journal, exc)
         if exc is not None:
@@ -745,7 +745,7 @@ def run_hypothesis_continuously(
     secrets: Secrets,
     event_registry: EventHandlerRegistry,
     dry: bool = False,
-):
+) -> None:
     frequency = schedule.continuous_hypothesis_frequency
     fail_fast_ratio = schedule.fail_fast_ratio
 

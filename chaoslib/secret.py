@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from logzero import logger
 
@@ -228,7 +228,7 @@ def load_secrets_from_vault(
 ###############################################################################
 # Internals
 ###############################################################################
-def create_vault_client(configuration: Configuration = None):
+def create_vault_client(configuration: Configuration = None) -> Optional[hvac.Client]:
     """
     Initialize a Vault client from either a token or an approle.
     """

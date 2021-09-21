@@ -98,7 +98,7 @@ def run_http_activity(
         raise ActivityFailed("activity took too long to complete")
 
 
-def validate_http_activity(activity: Activity):
+def validate_http_activity(activity: Activity) -> None:
     """
     Validate a HTTP activity.
 

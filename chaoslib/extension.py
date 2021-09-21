@@ -13,7 +13,7 @@ __all__ = [
 ]
 
 
-def validate_extensions(experiment: Experiment):
+def validate_extensions(experiment: Experiment) -> None:
     """
     Validate that extensions respect the specification.
     """
@@ -53,7 +53,7 @@ def has_extension(experiment: Experiment, name: str) -> bool:
     return get_extension(experiment, name) is not None
 
 
-def set_extension(experiment: Experiment, extension: Extension):
+def set_extension(experiment: Experiment, extension: Extension) -> None:
     """
     Set an extension in this experiment.
 
@@ -71,7 +71,7 @@ def set_extension(experiment: Experiment, extension: Extension):
     experiment["extensions"].append(extension)
 
 
-def remove_extension(experiment: Experiment, name: str):
+def remove_extension(experiment: Experiment, name: str) -> None:
     """
     Remove an extension from this experiment.
     """
@@ -85,7 +85,7 @@ def remove_extension(experiment: Experiment, name: str):
             break
 
 
-def merge_extension(experiment: Experiment, extension: Extension):
+def merge_extension(experiment: Experiment, extension: Extension) -> None:
     """
     Merge an extension in this experiment.
 

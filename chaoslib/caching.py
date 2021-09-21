@@ -35,7 +35,7 @@ def cache_activities(experiment: Experiment) -> List[Activity]:
     logger.debug(f"Cached {len(_cache)} activities")
 
 
-def clear_cache():
+def clear_cache() -> None:
     """
     Clear the cache
     """
@@ -43,7 +43,7 @@ def clear_cache():
     _cache.clear()
 
 
-def with_cache(f):
+def with_cache(f) -> Any:
     """
     Ensure the activities cache is populated before calling the wrapped
     function.
@@ -57,7 +57,7 @@ def with_cache(f):
         strategy: Strategy = Strategy.DEFAULT,
         schedule: Schedule = None,
         event_handlers: List[chaoslib.run.RunEventHandler] = None,
-    ):
+    ) -> Any:
         try:
             if experiment:
                 cache_activities(experiment)

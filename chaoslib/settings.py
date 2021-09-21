@@ -42,7 +42,9 @@ def load_settings(settings_path: str = CHAOSTOOLKIT_CONFIG_PATH) -> Settings:
             logger.error(f"Failed parsing YAML settings: {str(ye)}")
 
 
-def save_settings(settings: Settings, settings_path: str = CHAOSTOOLKIT_CONFIG_PATH):
+def save_settings(
+    settings: Settings, settings_path: str = CHAOSTOOLKIT_CONFIG_PATH
+) -> None:
     """
     Save chaostoolkit settings as a mapping of key/values, overwriting any file
     that may already be present.

@@ -22,7 +22,7 @@ __all__ = [
 ]
 
 
-def ensure_activity_is_valid(activity: Activity):  # noqa: C901
+def ensure_activity_is_valid(activity: Activity) -> None:  # noqa: C901
     """
     Goes through the activity and checks certain of its properties and raise
     :exc:`InvalidActivity` whenever one does not respect the expectations.

@@ -1,6 +1,7 @@
 import importlib
 import inspect
 import subprocess
+from typing import Any
 
 from logzero import logger
 
@@ -14,7 +15,7 @@ from chaoslib.exceptions import DiscoveryFailed
 __all__ = ["get_discover_function", "install", "load_package"]
 
 
-def install(package_name: str):
+def install(package_name: str) -> None:
     """
     Use pip to download and install the `package_name` to the current Python
     environment. Pip can detect it is already installed.
@@ -57,7 +58,7 @@ def load_package(package_name: str) -> object:
     return package
 
 
-def get_discover_function(package: object):
+def get_discover_function(package: object) -> Any:
     """
     Lookup the `discover` function from the given imported package.
     """
@@ -83,7 +84,7 @@ class PathDistribution(importlib_metadata.PathDistribution):
     """
 
     @property
-    def top_level(self):
+    def top_level(self) -> Any:
         text = self.read_text("top_level.txt")
         return text and text.splitlines()
 
