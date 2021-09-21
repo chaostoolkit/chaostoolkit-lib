@@ -15,7 +15,6 @@ requests-mock
 types-PyYAML
 types-chardet
 types-requests
-types-urllib3
 types-setuptools
 types-simplejson
 types-six
