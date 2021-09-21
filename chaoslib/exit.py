@@ -94,7 +94,7 @@ def exit_signals():
             signal.signal(signal.SIGTERM, sigterm_handler)
 
 
-def exit_gracefully():
+def exit_gracefully() -> None:
     """
     Sends a user signal to the chaostoolkit process which should terminate
     the current execution immediatly, but gracefully.
@@ -114,7 +114,7 @@ def exit_gracefully():
     os.kill(os.getpid(), signal.SIGUSR1)
 
 
-def exit_ungracefully():
+def exit_ungracefully() -> None:
     """
     Sends a user signal to the chaostoolkit process which should terminate
     the current execution immediatly, but not gracefully.

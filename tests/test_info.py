@@ -20,7 +20,7 @@ License: Apache License 2.0
 
 
 class InMemoryDistribution(Distribution):
-    def __init__(self, metadata, *args, **kwargs):  # type: ignore[no-untyped-def]
+    def __init__(self, metadata, *args, **kwargs) -> None:  # type: ignore[no-untyped-def]  # Noqa
         Distribution.__init__(self, *args, **kwargs)
         self._data = metadata
 

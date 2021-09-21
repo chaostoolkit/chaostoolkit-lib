@@ -116,7 +116,7 @@ class RunEventHandler:
 
 
 class EventHandlerRegistry:
-    def __init__(self):
+    def __init__(self) -> None:
         self.handlers = []
 
     def register(self, handler: RunEventHandler) -> None:
