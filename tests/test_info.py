@@ -20,14 +20,14 @@ License: Apache License 2.0
 
 
 class InMemoryDistribution(Distribution):
-    def __init__(self, metadata, *args, **kwargs):
+    def __init__(self, metadata, *args, **kwargs):  # type: ignore[no-untyped-def]
         Distribution.__init__(self, *args, **kwargs)
         self._data = metadata
 
-    def read_text(self, filename):
+    def read_text(self, filename):  # type: ignore[no-untyped-def]
         return self._data
 
-    def locate_file(self, path):
+    def locate_file(self, path):  # type: ignore[no-untyped-def]
         pass
 
 

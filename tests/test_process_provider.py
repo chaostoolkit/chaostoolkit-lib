@@ -2,6 +2,8 @@ import os.path
 import stat
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from chaoslib.provider.process import run_process_activity
 
 settings_dir = os.path.join(os.path.dirname(__file__), "fixtures")
@@ -10,7 +12,7 @@ settings_dir = os.path.join(os.path.dirname(__file__), "fixtures")
 dummy_script = "./tests/dummy.sh"
 
 
-def setup_module(module):
+def setup_module(module: pytest.Module) -> None:
     """
     setup any state specific to the execution of the given module.
 
@@ -25,7 +27,7 @@ def setup_module(module):
     os.chmod(dummy_script, st.st_mode | stat.S_IEXEC)
 
 
-def teardown_module(module):
+def teardown_module(module: pytest.Module) -> None:
     """
     teardown any state that was previously setup with a setup_module method.
 

@@ -3,6 +3,7 @@ import signal
 import tempfile
 import types
 from datetime import datetime
+from typing import Any
 
 import pytest
 import requests_mock
@@ -156,7 +157,7 @@ def test_can_iterate_over_activities() -> None:
 
 
 def test_no_rollback_even_on_SIGINT() -> None:
-    def handler(signum, frame):
+    def handler(signum: Any, frame: Any) -> None:
         raise KeyboardInterrupt()
 
     signal.signal(signal.SIGALRM, handler)
@@ -171,7 +172,7 @@ def test_no_rollback_even_on_SIGINT() -> None:
 
 
 def test_no_rollback_even_on_SystemExit() -> None:
-    def handler(signum, frame):
+    def handler(signum: Any, frame: Any) -> None:
         raise SystemExit()
 
     signal.signal(signal.SIGALRM, handler)
@@ -186,7 +187,7 @@ def test_no_rollback_even_on_SystemExit() -> None:
 
 
 def test_can_interrupt_rollbacks() -> None:
-    def handler(signum, frame):
+    def handler(signum: Any, frame: Any) -> None:
         raise InterruptExecution("boom")
 
     signal.signal(signal.SIGALRM, handler)
@@ -201,7 +202,7 @@ def test_can_interrupt_rollbacks() -> None:
 
 
 def test_can_interrupt_rollbacks_on_SystemExit() -> None:
-    def handler(signum, frame):
+    def handler(signum: Any, frame: Any) -> None:
         raise SystemExit()
 
     signal.signal(signal.SIGALRM, handler)
@@ -216,7 +217,7 @@ def test_can_interrupt_rollbacks_on_SystemExit() -> None:
 
 
 def test_can_interrupt_rollbacks_on_SIGINT() -> None:
-    def handler(signum, frame):
+    def handler(signum: Any, frame: Any) -> None:
         raise KeyboardInterrupt()
 
     signal.signal(signal.SIGALRM, handler)
