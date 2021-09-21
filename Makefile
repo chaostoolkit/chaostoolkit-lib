@@ -17,6 +17,7 @@ lint:
 	flake8 chaoslib/ tests/
 	isort --check-only --profile black chaoslib/ tests/
 	black --check --diff chaoslib/ tests/
+	mypy chaoslib/ tests/
 
 .PHONY: format
 format:
