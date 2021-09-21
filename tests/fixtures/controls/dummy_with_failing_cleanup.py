@@ -1,2 +1,2 @@
-def cleanup_control():
+def cleanup_control() -> None:
     raise RuntimeError("cleanup control")

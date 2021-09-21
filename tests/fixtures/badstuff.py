@@ -5,18 +5,18 @@ from chaoslib.exceptions import InterruptExecution
 __all__ = ["interrupt_me", "raise_exception", "check_under_treshold", "count_generator"]
 
 
-def interrupt_me():
+def interrupt_me() -> None:
     raise InterruptExecution()
 
 
-def raise_exception():
+def raise_exception() -> None:
     raise Exception("oops")
 
 
 g = None
 
 
-def count_generator():
+def count_generator() -> int:
     global g
     if g is None:
         g = count()
@@ -24,7 +24,7 @@ def count_generator():
     return next(g)
 
 
-def cleanup_counter():
+def cleanup_counter() -> None:
     global g
     g = None
 

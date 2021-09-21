@@ -2,6 +2,7 @@ import os
 import threading
 import time
 from copy import deepcopy
+from typing import List
 from wsgiref.simple_server import WSGIRequestHandler, WSGIServer
 
 import pytest
@@ -14,15 +15,15 @@ from chaoslib.types import Strategy
 pytestmark = pytest.mark.skipif(os.getenv("CI") is not None, reason="Skip CI")
 
 
-def run_http_server_in_background():
-    def slow_app(environ, start_response):
+def run_http_server_in_background() -> None:
+    def slow_app(environ, start_response) -> List[bytes]:
         time.sleep(5)
         status = "200 OK"
         headers = [("Content-type", "text/plain; charset=utf-8")]
         start_response(status, headers)
         return [b"Hello World"]
 
-    def make_server(host, port, app):
+    def make_server(host, port, app) -> WSGIServer:
         server = WSGIServer((host, port), WSGIRequestHandler)
         server.set_app(app)
         return server
@@ -127,7 +128,7 @@ def test_wait_for_background_activity_on_graceful_exit() -> None:
 
 
 def test_do_not_wait_for_background_activity_on_ungraceful_exit() -> None:
-    def _exit_soon():
+    def _exit_soon() -> None:
         time.sleep(1.5)
         exit_ungracefully()
 
@@ -143,7 +144,7 @@ def test_do_not_wait_for_background_activity_on_ungraceful_exit() -> None:
 
 
 def test_wait_for_background_activity_to_finish_on_graceful_exit() -> None:
-    def _exit_soon():
+    def _exit_soon() -> None:
         time.sleep(1.5)
         exit_gracefully()
 

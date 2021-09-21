@@ -1,5 +1,5 @@
 from chaoslib.types import Experiment
 
 
-def after_loading_experiment_control(context: str, state: Experiment):
+def after_loading_experiment_control(context: str, state: Experiment) -> None:
     state["title"] = "BOOM I changed it"

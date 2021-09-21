@@ -5,7 +5,7 @@ from chaoslib.types import Experiment, Journal
 
 
 class FullRunEventHandler(RunEventHandler):
-    def __init__(self):
+    def __init__(self) -> None:
         self.calls = []
 
     def started(self, experiment: Experiment, journal: Journal) -> None:
@@ -67,7 +67,7 @@ class FullRunEventHandler(RunEventHandler):
 
 
 class FullExceptionRunEventHandler(RunEventHandler):
-    def __init__(self):
+    def __init__(self) -> None:
         self.calls = []
 
     def started(self, experiment: Experiment, journal: Journal) -> None:

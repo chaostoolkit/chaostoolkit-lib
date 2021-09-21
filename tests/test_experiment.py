@@ -346,7 +346,7 @@ def test_rollback_default_strategy_runs_on_failed_activity_in_method() -> None:
     assert len(journal["rollbacks"]) == 1
 
 
-def test_rollback_default_strategy_does_not_run_on_interrupted_experiment_in_method() -> None:
+def test_rollback_default_strategy_does_not_run_on_interrupted_experiment_in_method() -> None:  # Noqa
     experiment = experiments.ExperimentWithInterruptedExperimentAndARollback
     # experiment["dry"] = True
     settings = {"runtime": {"rollbacks": {"strategy": "always"}}}
@@ -396,7 +396,7 @@ def test_rollback_never_strategy_does_not_run_on_failed_activity_in_ssh() -> Non
     assert len(journal["rollbacks"]) == 0
 
 
-def test_rollback_never_strategy_does_not_run_on_interrupted_experiment_in_method() -> None:
+def test_rollback_never_strategy_does_not_run_on_interrupted_experiment_in_method() -> None:  # Noqa
     experiment = experiments.ExperimentWithInterruptedExperimentAndARollback
     # experiment["dry"] = True
     settings = {"runtime": {"rollbacks": {"strategy": "never"}}}
@@ -406,7 +406,7 @@ def test_rollback_never_strategy_does_not_run_on_interrupted_experiment_in_metho
     assert len(journal["rollbacks"]) == 0
 
 
-def test_activity_name_is_logged_correctly_when_function_not_exposed_in_module() -> None:
+def test_activity_name_is_logged_correctly_when_function_not_exposed_in_module() -> None:  # Noqa
     invalid_python_func_probe = {
         "name": "hello",
         "type": "probe",

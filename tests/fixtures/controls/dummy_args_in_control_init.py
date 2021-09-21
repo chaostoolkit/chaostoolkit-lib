@@ -7,5 +7,5 @@ def configure_control(
     secrets: Secrets,
     settings: Settings,
     joke: str,
-):
+) -> None:
     experiment["joke"] = joke

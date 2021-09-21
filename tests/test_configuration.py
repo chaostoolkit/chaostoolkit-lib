@@ -57,7 +57,7 @@ def test_should_load_configuration_with_empty_string_as_input() -> None:
     assert config["token3"] == "value3"
 
 
-def test_should_load_configuration_with_empty_string_as_input_while_default_is_define() -> None:
+def test_should_load_configuration_with_empty_string_as_input_while_default_is_define() -> None:  # Noqa
     os.environ.clear()
     os.environ["KUBE_TOKEN"] = ""
     config = load_configuration(

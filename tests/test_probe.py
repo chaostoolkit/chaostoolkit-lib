@@ -201,7 +201,7 @@ def test_run_http_probe_can_retry() -> None:
 
         call_count = 0
 
-        def do_GET(self):
+        def do_GET(self) -> None:
             MockServerRequestHandler.call_count += 1
             if MockServerRequestHandler.call_count == 1:
                 raise ConnectionAbortedError

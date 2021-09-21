@@ -6,9 +6,9 @@ def configure_control(
     configuration: Configuration,
     secrets: Secrets,
     settings: Settings,
-):
+) -> None:
     raise RuntimeError("init control")
 
 
-def before_experiment_control(context: Experiment, **kwargs):
+def before_experiment_control(context: Experiment, **kwargs) -> None:
     context["should_never_been_called"] = True

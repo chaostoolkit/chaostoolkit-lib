@@ -105,7 +105,7 @@ def test_exit_continuous_ssh_continuous_when_experiment_is_exited() -> None:
     assert sorted(handlers_called) == ["started"]
 
 
-def test_exit_continuous_ssh_continuous_when_activity_raises_unknown_exception() -> None:
+def test_exit_continuous_ssh_continuous_when_activity_raises_unknown_exception() -> None:  # Noqa
     experiment = experiments.SimpleExperimentWithException.copy()
     journal = run_experiment(
         experiment,

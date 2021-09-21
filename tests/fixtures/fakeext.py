@@ -14,46 +14,46 @@ __all__ = [
 ]
 
 
-def no_args_docstring():
+def no_args_docstring() -> None:
     pass
 
 
-def no_args():
+def no_args() -> None:
     """
     No arguments.
     """
     pass
 
 
-def one_arg(message: str):
+def one_arg(message: str) -> None:
     """
     One typed argument.
     """
     pass
 
 
-def one_arg_with_default(message: str = "hello"):
+def one_arg_with_default(message: str = "hello") -> None:
     """
     One typed argument with a default value.
     """
     pass
 
 
-def one_untyped_arg(message):
+def one_untyped_arg(message) -> None:
     """
     One untyped argument.
     """
     pass
 
 
-def one_untyped_arg_with_default(message="hello"):
+def one_untyped_arg_with_default(message="hello") -> None:
     """
     One untyped argument with a default value.
     """
     pass
 
 
-def many_args(message: str, colour: str = "blue"):
+def many_args(message: str, colour: str = "blue") -> None:
     """
     Many arguments.
     """
@@ -79,7 +79,7 @@ def many_args_with_rich_types(
     pass
 
 
-def do_nothing():
+def do_nothing() -> None:
     pass
 
 
@@ -88,9 +88,9 @@ def echo_message(message: str) -> str:
     return message
 
 
-def force_failed_activity():
+def force_failed_activity() -> None:
     raise ActivityFailed()
 
 
-def force_interrupting_experiment():
+def force_interrupting_experiment() -> None:
     raise InterruptExecution()

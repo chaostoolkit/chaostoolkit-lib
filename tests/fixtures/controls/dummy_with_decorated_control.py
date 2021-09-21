@@ -29,14 +29,14 @@ def keepcount(f: Callable) -> Callable:
 
 
 @keepcount
-def after_activity_control(**kwargs):
+def after_activity_control(**kwargs) -> None:
     logger.info("Activity is called")
 
 
 @initcounter
-def configure_control(**kwargs):
+def configure_control(**kwargs) -> None:
     logger.info("configure is called")
 
 
-def after_experiment_control(state: Journal, **kwargs):
+def after_experiment_control(state: Journal, **kwargs) -> None:
     state["counted_activities"] = next(counter)
