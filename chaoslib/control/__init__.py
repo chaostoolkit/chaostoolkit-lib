@@ -192,7 +192,7 @@ def load_global_controls(settings: Settings):
     set_global_controls(controls)
 
 
-def cleanup_global_controls():
+def cleanup_global_controls() -> None:
     """
     Unload and cleanup global controls
     """
