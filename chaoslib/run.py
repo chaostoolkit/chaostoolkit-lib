@@ -553,13 +553,13 @@ def run_hypothesis_during_method(
     secrets: Secrets,
     event_registry: EventHandlerRegistry,
     dry: bool = False,
-) -> 'Future[Any]':
+) -> "Future[Any]":
     """
     Run the hypothesis continuously in a background thread and report the
     status in the journal when it raised an exception.
     """
 
-    def completed(f: 'Future[Any]') -> None:
+    def completed(f: "Future[Any]") -> None:
         exc = f.exception()
         event_registry.continuous_hypothesis_completed(experiment, journal, exc)
         if exc is not None:

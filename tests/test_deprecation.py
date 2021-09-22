@@ -1,4 +1,5 @@
 import warnings
+from concurrent.futures.thread import ThreadPoolExecutor
 from unittest.mock import patch
 
 from fixtures import experiments
@@ -54,7 +55,7 @@ def test_initialize_run_journal_has_moved() -> None:
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("module")
         with patch("chaoslib.experiment.init_journal"):
-            initialize_run_journal(None)
+            initialize_run_journal({})
             assert len(w) == 1
             assert w[0].filename == experiment.__file__
             assert "'initialize_run_journal'" in str(w[0].message)
@@ -64,7 +65,7 @@ def test_apply_activities_has_moved() -> None:
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("module")
         with patch("chaoslib.experiment.apply_act"):
-            apply_activities(None, None, None, None, None)
+            apply_activities({}, {}, {}, ThreadPoolExecutor(), {})
             assert len(w) == 1
             assert w[0].filename == experiment.__file__
             assert "'apply_activities'" in str(w[0].message)
@@ -74,7 +75,7 @@ def test_apply_rollbacks_has_moved() -> None:
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("module")
         with patch("chaoslib.experiment.apply_roll"):
-            apply_rollbacks(None, None, None, None)
+            apply_rollbacks({}, {}, {}, ThreadPoolExecutor())
             assert len(w) == 1
             assert w[0].filename == experiment.__file__
             assert "'apply_rollbacks'" in str(w[0].message)

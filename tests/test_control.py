@@ -138,7 +138,7 @@ def test_controls_are_applied_before_and_after_activities() -> None:
         with controls("activity", exp, context=activity):
             assert activity["before_activity_control"] is True
 
-            run = execute_activity(exp, activity, None, None, dry=False)
+            run = execute_activity(exp, activity, {}, {}, dry=False)
 
             assert "after_activity_control" in activity
             assert activity["after_activity_control"] is True
@@ -165,7 +165,7 @@ def test_automatic_goes_deep_down_the_tree() -> None:
     assert len(controls) == 1
 
     exp = deepcopy(experiments.ExperimentWithControls)
-    hypo = exp["steady-state-hypothesis"]
+    hypo = cast(Dict[str, Any], exp["steady-state-hypothesis"])
     assert "controls" not in hypo
     controls = get_context_controls("hypothesis", exp, hypo)
     assert len(controls) == 1
