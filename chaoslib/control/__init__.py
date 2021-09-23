@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from copy import copy, deepcopy
-from typing import Generator, List, Union
+from typing import Any, Generator, List, Union
 
 from logzero import logger
 
@@ -239,7 +239,7 @@ class Control:
             secrets=secrets,
         )
 
-    def with_state(self, state):
+    def with_state(self, state: Any):
         self.state = state
 
     def end(

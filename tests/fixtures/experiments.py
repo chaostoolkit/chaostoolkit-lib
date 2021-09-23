@@ -87,7 +87,7 @@ ExperimentWithInterpolatedTitle = {
     "method": [PythonModuleProbe, {"ref": PythonModuleProbe["name"]}],
 }
 
-ExperimentWithLongPause = {
+ExperimentWithLongPause: Dict[str, Any] = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",
     "steady-state-hypothesis": {"title": "hello"},
@@ -123,7 +123,7 @@ RefProbeExperiment = {
     "method": [PythonModuleProbe, {"ref": PythonModuleProbe["name"]}],
 }
 
-MissingRefProbeExperiment = {
+MissingRefProbeExperiment: Dict[str, Any] = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",
     "steady-state-hypothesis": {
@@ -164,7 +164,7 @@ ExperimentWithDeprecatedVaultPayload = {
 }
 
 
-Experiment = {
+Experiment: Dict[str, Any] = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",
     "steady-state-hypothesis": {
@@ -206,7 +206,7 @@ ExperimentWithVariousTolerances = {
 }
 
 
-ExperimentNoControls = {
+ExperimentNoControls: Dict[str, Any] = {
     "title": "do cats live in the Internet?",
     "description": "an experiment of importance",
     "steady-state-hypothesis": {

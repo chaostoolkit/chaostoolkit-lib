@@ -1,8 +1,8 @@
 from fixtures import experiments, run_handlers
 
 from chaoslib.experiment import run_experiment
-from chaoslib.run import EventHandlerRegistry, RunEventHandler, Schedule, Strategy
-from chaoslib.types import Experiment, Journal
+from chaoslib.run import EventHandlerRegistry, RunEventHandler
+from chaoslib.types import Experiment, Journal, Schedule, Strategy
 
 
 def test_run_ssh_before_method_only() -> None:

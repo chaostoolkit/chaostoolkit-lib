@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from logzero import logger
 
@@ -111,11 +111,11 @@ def ensure_experiment_is_valid(experiment: Experiment) -> None:
 @with_cache
 def run_experiment(
     experiment: Experiment,
-    settings: Settings = None,
-    experiment_vars: Dict[str, Any] = None,
+    settings: Optional[Settings] = None,
+    experiment_vars: Optional[Dict[str, Any]] = None,
     strategy: Strategy = Strategy.DEFAULT,
-    schedule: Schedule = None,
-    event_handlers: List[RunEventHandler] = None,
+    schedule: Optional[Schedule] = None,
+    event_handlers: Optional[List[RunEventHandler]] = None,
 ) -> Journal:
     """
     Run the given `experiment` method step by step, in the following sequence:

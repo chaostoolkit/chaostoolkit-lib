@@ -59,8 +59,8 @@ def import_control(control: Control) -> Optional[Any]:
 def initialize_control(
     control: Control,
     experiment: Experiment,
-    configuration: Configuration,
-    secrets: Secrets,
+    configuration: Configuration = None,
+    secrets: Secrets = None,
     settings: Settings = None,
 ) -> None:
     """

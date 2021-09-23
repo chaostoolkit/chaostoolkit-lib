@@ -1,7 +1,7 @@
 import json
 import tempfile
 from copy import deepcopy
-from typing import Any, Dict, cast
+from typing import Any, Dict, List, cast
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -53,7 +53,7 @@ def test_controls_are_applied_before_and_after_experiment() -> None:
 
 def test_controls_are_applied_before_and_but_not_after_experiment() -> None:
     exp = deepcopy(experiments.ExperimentWithControls)
-    cast(Dict[str, Any], exp["controls"])[0]["scope"] = "before"
+    cast(List[Any], exp["controls"])[0]["scope"] = "before"
     with controls("experiment", exp, context=exp):
         assert "before_experiment_control" in exp
         assert exp["before_experiment_control"] is True
@@ -66,7 +66,7 @@ def test_controls_are_applied_before_and_but_not_after_experiment() -> None:
 
 def test_controls_are_applied_not_before_and_but_after_experiment() -> None:
     exp = deepcopy(experiments.ExperimentWithControls)
-    cast(Dict[str, Any], exp["controls"])[0]["scope"] = "after"
+    cast(List[Any], exp["controls"])[0]["scope"] = "after"
     with controls("experiment", exp, context=exp):
         assert "before_experiment_control" not in exp
 
@@ -87,7 +87,7 @@ def test_controls_may_interrupt_experiment() -> None:
 
 
 def test_controls_are_applied_before_and_after_hypothesis() -> None:
-    exp = cast(Dict[str, Any], deepcopy(experiments.ExperimentWithControls))
+    exp = deepcopy(experiments.ExperimentWithControls)
     hypo = exp["steady-state-hypothesis"]
     with controls("hypothesis", exp, context=hypo):
         assert "before_hypothesis_control" in hypo
@@ -138,7 +138,7 @@ def test_controls_are_applied_before_and_after_activities() -> None:
         with controls("activity", exp, context=activity):
             assert activity["before_activity_control"] is True
 
-            run = execute_activity(exp, activity, {}, {}, dry=False)
+            run = execute_activity(exp, activity, {"": ""}, {}, dry=False)
 
             assert "after_activity_control" in activity
             assert activity["after_activity_control"] is True
@@ -179,7 +179,7 @@ def test_automatic_goes_deep_down_the_tree() -> None:
 
 
 def test_not_automatic_does_not_go_deep_down_the_tree() -> None:
-    exp = cast(Dict[str, Any], deepcopy(experiments.ExperimentWithControls))
+    exp = deepcopy(experiments.ExperimentWithControls)
     exp["controls"][0]["automatic"] = False
 
     controls = get_context_controls("experiment", exp, exp)
@@ -235,9 +235,7 @@ def test_validate_python_control_needs_a_module() -> None:
 
 
 def test_controls_can_access_experiment() -> None:
-    exp = cast(
-        Dict[str, Any], deepcopy(experiments.ExperimentWithControlAccessingExperiment)
-    )
+    exp = deepcopy(experiments.ExperimentWithControlAccessingExperiment)
     exp["dry"] = True
 
     hypo = exp["steady-state-hypothesis"]
@@ -315,7 +313,7 @@ def test_get_globally_loaded_controls_from_settings() -> None:
         }
     }
     load_global_controls(settings)
-    initialize_global_controls({}, {}, {}, settings)
+    initialize_global_controls({}, {"": ""}, {}, settings)
 
     try:
         ctrls = get_global_controls()
@@ -357,7 +355,7 @@ def test_load_global_controls_from_settings_configured_via_exp_config() -> None:
 
 
 def test_apply_controls_even_on_background_activity() -> None:
-    exp = cast(Dict[str, Any], deepcopy(experiments.ExperimentNoControls))
+    exp = deepcopy(experiments.ExperimentNoControls)
     exp["method"][0]["background"] = True
     exp["method"][0]["pauses"] = {"after": 1}
     activities = get_all_activities(exp)
@@ -506,7 +504,7 @@ def test_controls_on_loading_experiment() -> None:
         }
     }
     load_global_controls(settings)
-    initialize_global_controls({}, {}, {}, settings)
+    initialize_global_controls({}, {"": ""}, {}, settings)
 
     with tempfile.NamedTemporaryFile(suffix=".json") as f:
         try:
@@ -528,7 +526,7 @@ def test_controls_on_loaded_experiment() -> None:
         }
     }
     load_global_controls(settings)
-    initialize_global_controls({}, {}, {}, settings)
+    initialize_global_controls({}, {"": ""}, {}, settings)
 
     with tempfile.NamedTemporaryFile(suffix=".json") as f:
         try:

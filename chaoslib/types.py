@@ -45,7 +45,7 @@ Run = Dict[str, Any]
 Step = Dict[str, Any]
 
 Secrets = Dict[str, Dict[str, str]]
-Configuration = Dict[str, Dict[str, str]]
+Configuration = Union[Dict[str, Dict[str, str]], Dict[str, str]]
 
 Discovery = Dict[str, Any]
 DiscoveredActivities = Dict[str, Any]

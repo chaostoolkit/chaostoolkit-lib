@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, List, Optional
 
 from chaoslib.run import RunEventHandler
 from chaoslib.types import Experiment, Journal
@@ -6,7 +6,7 @@ from chaoslib.types import Experiment, Journal
 
 class FullRunEventHandler(RunEventHandler):
     def __init__(self) -> None:
-        self.calls = []
+        self.calls: List[str] = []
 
     def started(self, experiment: Experiment, journal: Journal) -> None:
         self.calls.append("started")
@@ -27,7 +27,10 @@ class FullRunEventHandler(RunEventHandler):
         self.calls.append("continuous_hypothesis_iteration")
 
     def continuous_hypothesis_completed(
-        self, experiment: Experiment, journal: Journal, exception: Exception = None
+        self,
+        experiment: Experiment,
+        journal: Journal,
+        exception: Optional[Exception] = None,
     ) -> None:
         self.calls.append("continuous_hypothesis_completed")
 
@@ -68,7 +71,7 @@ class FullRunEventHandler(RunEventHandler):
 
 class FullExceptionRunEventHandler(RunEventHandler):
     def __init__(self) -> None:
-        self.calls = []
+        self.calls: List[Any] = []
 
     def started(self, experiment: Experiment, journal: Journal) -> None:
         raise Exception()
@@ -88,7 +91,12 @@ class FullExceptionRunEventHandler(RunEventHandler):
     def continuous_hypothesis_iteration(self, iteration_index: int, state: Any) -> None:
         raise Exception()
 
-    def continuous_hypothesis_completed(self) -> None:
+    def continuous_hypothesis_completed(
+        self,
+        experiment: Experiment,
+        journal: Journal,
+        exception: Optional[Exception] = None,
+    ) -> None:
         raise Exception()
 
     def start_rollbacks(self, experiment: Experiment) -> None:
@@ -113,10 +121,10 @@ class FullExceptionRunEventHandler(RunEventHandler):
     ) -> None:
         raise Exception()
 
-    def start_method(self, iteration_index: int = 0) -> None:
+    def start_method(self, experiment: Experiment) -> None:
         raise Exception()
 
-    def method_completed(self, state: Any, iteration_index: int = 0) -> None:
+    def method_completed(self, experiment: Experiment, state: Any) -> None:
         raise Exception()
 
     def start_cooldown(self, duration: int) -> None:

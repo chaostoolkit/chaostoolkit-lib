@@ -10,7 +10,7 @@ import platform
 import threading
 import time
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from logzero import logger
 
@@ -165,7 +165,10 @@ class EventHandlerRegistry:
                 logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
     def continuous_hypothesis_completed(
-        self, experiment: Experiment, journal: Journal, exception: Exception = None
+        self,
+        experiment: Experiment,
+        journal: Journal,
+        exception: Optional[Exception] = None,
     ) -> None:
         for h in self.handlers:
             try:
@@ -249,7 +252,7 @@ class EventHandlerRegistry:
 
 
 class Runner:
-    def __init__(self, strategy: Strategy, schedule: Schedule = None):
+    def __init__(self, strategy: Strategy, schedule: Optional[Schedule] = None):
         self.strategy = strategy
         self.schedule = schedule or Schedule()
         self.event_registry = EventHandlerRegistry()
@@ -266,8 +269,8 @@ class Runner:
     def configure(
         self,
         experiment: Experiment,
-        settings: Settings,
-        experiment_vars: Dict[str, Any],
+        settings: Optional[Settings],
+        experiment_vars: Optional[Dict[str, Any]],
     ) -> None:
         config_vars, secret_vars = experiment_vars or (None, None)
         self.settings = settings if settings is not None else get_loaded_settings()
@@ -284,8 +287,8 @@ class Runner:
     def run(
         self,
         experiment: Experiment,
-        settings: Settings = None,
-        experiment_vars: Dict[str, Any] = None,
+        settings: Optional[Settings] = None,
+        experiment_vars: Optional[Dict[str, Any]] = None,
         journal: Journal = None,
     ) -> Journal:
 
@@ -313,7 +316,7 @@ class Runner:
         secrets: Secrets,
         settings: Settings,
         event_registry: EventHandlerRegistry,
-    ) -> None:
+    ) -> Journal:
         experiment["title"] = substitute(experiment["title"], configuration, secrets)
         logger.info("Running experiment: {t}".format(t=experiment["title"]))
 
@@ -490,7 +493,7 @@ def run_gate_hypothesis(
     secrets: Secrets,
     event_registry: EventHandlerRegistry,
     dry: bool = False,
-) -> Dict[str, Any]:
+) -> Optional[Dict[str, Any]]:
     """
     Run the hypothesis before the method and bail the execution if it did
     not pass.
@@ -509,7 +512,7 @@ def run_gate_hypothesis(
             "Steady state probe '{p}' is not in the given "
             "tolerance so failing this experiment".format(p=p["activity"]["name"])
         )
-        return
+        return None
     return state
 
 
@@ -561,7 +564,9 @@ def run_hypothesis_during_method(
 
     def completed(f: "Future[Any]") -> None:
         exc = f.exception()
-        event_registry.continuous_hypothesis_completed(experiment, journal, exc)
+        event_registry.continuous_hypothesis_completed(
+            experiment, journal, Exception(exc)
+        )
         if exc is not None:
             if isinstance(exc, InterruptExecution):
                 journal["status"] = "interrupted"
@@ -614,11 +619,12 @@ def run_method(
             "Experiment ran into an un expected fatal error, " "aborting now.",
             exc_info=True,
         )
+        return None
 
 
 def run_rollback(
     rollback_strategy: str,
-    rollback_pool: ThreadPoolExecutor,
+    rollback_pool: Optional[ThreadPoolExecutor],
     experiment: Experiment,
     journal: Journal,
     configuration: Configuration,
@@ -688,7 +694,9 @@ def initialize_run_journal(experiment: Experiment) -> Journal:
     }
 
 
-def get_background_pools(experiment: Experiment) -> ThreadPoolExecutor:
+def get_background_pools(
+    experiment: Experiment,
+) -> Tuple[Optional[ThreadPoolExecutor], Optional[ThreadPoolExecutor]]:
     """
     Create a pool for background activities. The pool is as big as the number
     of declared background activities. If none are declared, returned `None`.
@@ -749,14 +757,14 @@ def run_hypothesis_continuously(
     frequency = schedule.continuous_hypothesis_frequency
     fail_fast_ratio = schedule.fail_fast_ratio
 
-    event_registry.start_continuous_hypothesis(frequency)
+    event_registry.start_continuous_hypothesis(int(frequency))
     logger.info(
         "Executing the steady-state hypothesis continuously "
         "every {} seconds".format(frequency)
     )
 
     failed_iteration = 0
-    failed_ratio = 0
+    failed_ratio = 0.0
     iteration = 1
     while not event.is_set():
         # already marked as terminated, let's exit now
@@ -945,7 +953,7 @@ def harshly_terminate_pending_background_activities(pool: ThreadPoolExecutor) ->
 
     # oh and of course we use private properties... might as well when trying
     # to be ugly
-    for thread in pool._threads:
+    for thread in pool._threads:  # type: ignore[attr-defined]
         tid = ctypes.c_long(thread.ident)
         try:
             gil = ctypes.pythonapi.PyGILState_Ensure()
