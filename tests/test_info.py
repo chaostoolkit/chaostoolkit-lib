@@ -1,10 +1,9 @@
-from typing import List
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 try:
     from importlib.metadata import Distribution
 except ImportError:
-    from importlib_metadata import Distribution
+    from importlib_metadata import Distribution  # type:ignore
 
 from chaoslib.info import list_extensions
 
@@ -21,7 +20,6 @@ License: Apache License 2.0
 
 class InMemoryDistribution(Distribution):
     def __init__(self, metadata, *args, **kwargs) -> None:  # type: ignore[no-untyped-def]  # Noqa
-        Distribution.__init__(self, *args, **kwargs)
         self._data = metadata
 
     def read_text(self, filename):  # type: ignore[no-untyped-def]
@@ -32,14 +30,14 @@ class InMemoryDistribution(Distribution):
 
 
 @patch("chaoslib.info.importlib_metadata.distributions")
-def test_list_none_when_none_installed(distros: List[Distribution]) -> None:
+def test_list_none_when_none_installed(distros: MagicMock) -> None:
     distros.return_value = []
     extensions = list_extensions()
     assert extensions == []
 
 
 @patch("chaoslib.info.importlib_metadata.distributions")
-def test_list_one_installed(distros: List[Distribution]) -> None:
+def test_list_one_installed(distros: MagicMock) -> None:
     distros.return_value = [InMemoryDistribution(PGK_META)]
 
     extensions = list_extensions()
@@ -51,7 +49,7 @@ def test_list_one_installed(distros: List[Distribution]) -> None:
 
 
 @patch("chaoslib.info.importlib_metadata.distributions")
-def test_list_excludes_ctklib(distros: List[Distribution]) -> None:
+def test_list_excludes_ctklib(distros: MagicMock) -> None:
     metadata = """Name: chaostoolkit-lib"""
     distros.return_value = [InMemoryDistribution(metadata)]
 
@@ -60,7 +58,7 @@ def test_list_excludes_ctklib(distros: List[Distribution]) -> None:
 
 
 @patch("chaoslib.info.importlib_metadata.distributions")
-def test_list_skip_duplicates(distros: List[Distribution]) -> None:
+def test_list_skip_duplicates(distros: MagicMock) -> None:
     distros.return_value = [
         InMemoryDistribution(PGK_META),
         InMemoryDistribution(PGK_META),

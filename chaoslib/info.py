@@ -1,5 +1,4 @@
-from collections import namedtuple
-from typing import List
+from typing import List, NamedTuple
 
 try:
     import importlib.metadata as importlib_metadata
@@ -9,11 +8,13 @@ except ImportError:
 __all__ = ["list_extensions"]
 
 
-info_fields = ["name", "version", "summary", "license", "author", "url"]
-
-
-class ExtensionInfo(namedtuple("ExtensionInfo", info_fields)):
-    __slots__ = ()
+class ExtensionInfo(NamedTuple):
+    name: str
+    version: str
+    summary: str
+    license: str
+    author: str
+    url: str
 
 
 def list_extensions() -> List[ExtensionInfo]:
