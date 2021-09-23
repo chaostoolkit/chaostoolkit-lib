@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 import pytest
 
 from chaoslib.exceptions import InvalidActivity
@@ -92,25 +94,31 @@ def test_tolerance_jsonpath_must_match_expected_value() -> None:
     ensure_hypothesis_tolerance_is_valid(t)
     assert within_tolerance(t, value={"foo": {"baz": "hello"}}) is True
 
-    t = {
+    t1: Dict[str, Any] = {
         "type": "jsonpath",
         "path": "$.foo[?(@.baz)].baz",
         "expect": [["hello", "bonjour"]],
     }
-    ensure_hypothesis_tolerance_is_valid(t)
-    assert within_tolerance(t, value={"foo": {"baz": ["hello", "bonjour"]}}) is True
+    ensure_hypothesis_tolerance_is_valid(t1)
+    assert within_tolerance(t1, value={"foo": {"baz": ["hello", "bonjour"]}}) is True
 
-    t = {
+    t2: Dict[str, Any] = {
         "type": "jsonpath",
         "path": "$.foo[?(@.baz)].baz",
         "expect": [[["hello"], ["bonjour"]]],
     }
-    ensure_hypothesis_tolerance_is_valid(t)
-    assert within_tolerance(t, value={"foo": {"baz": [["hello"], ["bonjour"]]}}) is True
+    ensure_hypothesis_tolerance_is_valid(t2)
+    assert (
+        within_tolerance(t2, value={"foo": {"baz": [["hello"], ["bonjour"]]}}) is True
+    )
 
-    t = {"type": "jsonpath", "path": "$.foo[?(@.baz)].baz", "expect": []}
-    ensure_hypothesis_tolerance_is_valid(t)
-    assert within_tolerance(t, value={"foo": {"jon": "boom"}}) is True
+    t3: Dict[str, Any] = {
+        "type": "jsonpath",
+        "path": "$.foo[?(@.baz)].baz",
+        "expect": [],
+    }
+    ensure_hypothesis_tolerance_is_valid(t3)
+    assert within_tolerance(t3, value={"foo": {"jon": "boom"}}) is True
 
 
 def test_tolerance_jsonpath_can_be_filter_by_value() -> None:
