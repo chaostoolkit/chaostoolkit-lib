@@ -90,7 +90,9 @@ def check_regex_pattern(tolerance: Tolerance) -> None:
             "hypothesis regex probe tolerance must have a `pattern` key"
         )
 
-    pattern = tolerance["pattern"]
+    if isinstance(tolerance, Dict):
+        pattern = tolerance["pattern"]
+
     try:
         re.compile(pattern)
     except TypeError:
@@ -149,7 +151,9 @@ def check_range(tolerance: Tolerance) -> None:
             "hypothesis range probe tolerance must have a `range` key"
         )
 
-    the_range = tolerance["range"]
+    if isinstance(tolerance, Dict):
+        the_range = tolerance["range"]
+
     if not isinstance(the_range, list):
         raise InvalidActivity("hypothesis range must be a sequence")
 
