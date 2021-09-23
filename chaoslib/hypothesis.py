@@ -255,7 +255,7 @@ def within_tolerance(
     pass
 
 
-@within_tolerance.register(bool)
+@within_tolerance.register(bool)  # type: ignore[no-redef]
 def _(
     tolerance: bool,
     value: bool,
@@ -265,7 +265,7 @@ def _(
     return value == tolerance
 
 
-@within_tolerance.register(str)
+@within_tolerance.register(str)  # type: ignore[no-redef]
 def _(
     tolerance: str,
     value: str,
@@ -275,7 +275,7 @@ def _(
     return value == tolerance
 
 
-@within_tolerance.register(int)
+@within_tolerance.register(int)  # type: ignore[no-redef]
 def _(
     tolerance: int,
     value: int,
@@ -289,7 +289,7 @@ def _(
     return value == tolerance
 
 
-@within_tolerance.register(list)
+@within_tolerance.register(list)  # type: ignore[no-redef]
 def _(
     tolerance: list,
     value: Any,
@@ -306,7 +306,7 @@ def _(
     return value in tolerance
 
 
-@within_tolerance.register(dict)  # noqa: C901
+@within_tolerance.register(dict)  # type: ignore[no-redef]  # noqa: C901
 def _(
     tolerance: dict,
     value: Any,
