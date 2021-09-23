@@ -34,7 +34,7 @@ def substitute(
     data: Union[None, str, Dict[str, Any], List[Any]],
     configuration: Configuration,
     secrets: Secrets,
-) -> Dict[str, Any]:
+) -> Union[str, Dict[str, Any]]:
     """
     Replace forms such as `${name}` with the first value found in either the
     `configuration` or `secrets` mappings within the given `data`.
