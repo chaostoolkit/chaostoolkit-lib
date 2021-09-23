@@ -1,7 +1,7 @@
 import os.path
 import sys
 from copy import deepcopy
-from typing import Any
+from typing import Any, Dict
 
 from chaoslib.exceptions import ActivityFailed
 
@@ -161,7 +161,7 @@ PythonModuleProbeWithHTTPBodyTolerance = {
     "provider": {"type": "http", "url": "http://example.com", "timeout": 30},
 }
 
-PythonModuleProbeWithHTTPMaxRetries = {
+PythonModuleProbeWithHTTPMaxRetries: Dict[str, Any] = {
     "type": "probe",
     "name": "A dummy tolerance ready probe",
     "tolerance": [200],
@@ -213,7 +213,7 @@ PythonModuleProbeWithProcesStdoutTolerance = {
     },
 }
 
-ProcProbe = {
+ProcProbe: Dict[str, Any] = {
     "type": "probe",
     "name": "This probe is a process probe",
     "pauses": {"before": 0, "after": 0.1},
@@ -280,7 +280,7 @@ ProcEchoStrProbe = {
     },
 }
 
-HTTPProbe = {
+HTTPProbe: Dict[str, Any] = {
     "type": "probe",
     "name": "This probe is a HTTP probe",
     "provider": {
