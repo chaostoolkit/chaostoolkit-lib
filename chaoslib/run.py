@@ -854,7 +854,7 @@ def apply_activities(
 
                 if isinstance(run, dict):
                     result.append(run)
-                else:
+                elif isinstance(run, Future):
                     try:
                         # background activities
                         result.append(run.result(timeout=background_activity_timeout))
@@ -910,7 +910,7 @@ def apply_rollbacks(
                 continue
             if isinstance(rollback, dict):
                 result.append(rollback)
-            else:
+            elif isinstance(rollback, Future):
                 result.append(rollback.result())
 
         control.with_state(result)
