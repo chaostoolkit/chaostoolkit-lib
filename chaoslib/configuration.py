@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 from logzero import logger
 
@@ -10,7 +10,7 @@ __all__ = ["load_configuration"]
 
 
 def load_configuration(
-    config_info: Dict[str, str], extra_vars: Dict[str, Any] = None
+    config_info: Dict[str, Union[str, Dict[str, Any]]], extra_vars: Dict[str, Any] = None
 ) -> Configuration:
     """
     Load the configuration. The `config_info` parameter is a mapping from

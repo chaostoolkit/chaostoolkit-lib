@@ -242,4 +242,4 @@ def test_load_nested_object_configuration() -> None:
 
     assert isinstance(config["nested"], dict)
     assert config["nested"]["onea"] == "fdsfdsf"
-    assert config["nested"]["lol"] == {"haha": [1, 2, 3]}
+    assert config["nested"]["lol"] == {"haha": [1, 2, 3]}  # type: ignore[comparison-overlap]  # Noqa
