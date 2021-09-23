@@ -12,7 +12,7 @@ def test_no_settings_is_okay() -> None:
 
 
 def test_no_notifications_in_settings_is_okay() -> None:
-    assert notify({}, DiscoverFlowEvent.DiscoverStarted) is None
+    assert notify({"hi": "hello"}, DiscoverFlowEvent.DiscoverStarted) is None
 
 
 def test_notify_to_http_endpoint() -> None:

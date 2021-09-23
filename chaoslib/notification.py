@@ -2,7 +2,7 @@ import importlib
 import inspect
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import requests
 from logzero import logger
@@ -48,11 +48,11 @@ class ValidateFlowEvent(FlowEvent):
 
 
 def notify(
-    settings: Settings,
+    settings: Optional[Settings],
     event: FlowEvent,
     payload: Any = None,  # noqa: C901
     error: Any = None,
-) -> None:
+):
     """
     Go through all the notification channels declared in the settings and
     call them one by one. Only call those matching the current event.
