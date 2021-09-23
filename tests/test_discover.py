@@ -18,11 +18,12 @@ def test_do_not_fail_when_extension_mod_has_not_all() -> None:
 def test_discover_all_activities() -> None:
     mod = "fixtures.fakeext"
     activities = discover_activities(mod, "probe")
+
     assert len(activities) == 8
 
-    activities = iter(activities)
+    activities_iter = iter(activities)
 
-    activity = next(activities)
+    activity = next(activities_iter)
     assert activity["name"] == "many_args"
     assert activity["type"] == "probe"
     assert activity["mod"] == mod
@@ -32,7 +33,7 @@ def test_discover_all_activities() -> None:
         {"name": "colour", "default": "blue", "type": "string"},
     ]
 
-    activity = next(activities)
+    activity = next(activities_iter)
     assert activity["name"] == "many_args_with_rich_types"
     assert activity["type"] == "probe"
     assert activity["mod"] == mod
@@ -46,28 +47,28 @@ def test_discover_all_activities() -> None:
         {"name": "other", "default": None, "type": "object"},
     ]
 
-    activity = next(activities)
+    activity = next(activities_iter)
     assert activity["name"] == "no_args"
     assert activity["type"] == "probe"
     assert activity["mod"] == mod
     assert activity["doc"] == "No arguments."
     assert activity["arguments"] == []
 
-    activity = next(activities)
+    activity = next(activities_iter)
     assert activity["name"] == "no_args_docstring"
     assert activity["type"] == "probe"
     assert activity["mod"] == mod
     assert activity["doc"] is None
     assert activity["arguments"] == []
 
-    activity = next(activities)
+    activity = next(activities_iter)
     assert activity["name"] == "one_arg"
     assert activity["type"] == "probe"
     assert activity["mod"] == mod
     assert activity["doc"] == "One typed argument."
     assert activity["arguments"] == [{"name": "message", "type": "string"}]
 
-    activity = next(activities)
+    activity = next(activities_iter)
     assert activity["name"] == "one_arg_with_default"
     assert activity["type"] == "probe"
     assert activity["mod"] == mod
@@ -76,14 +77,14 @@ def test_discover_all_activities() -> None:
         {"name": "message", "default": "hello", "type": "string"}
     ]
 
-    activity = next(activities)
+    activity = next(activities_iter)
     assert activity["name"] == "one_untyped_arg"
     assert activity["type"] == "probe"
     assert activity["mod"] == mod
     assert activity["doc"] == "One untyped argument."
     assert activity["arguments"] == [{"name": "message"}]
 
-    activity = next(activities)
+    activity = next(activities_iter)
     assert activity["name"] == "one_untyped_arg_with_default"
     assert activity["type"] == "probe"
     assert activity["mod"] == mod

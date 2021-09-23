@@ -48,7 +48,7 @@ Secrets = Dict[str, Dict[str, str]]
 Configuration = Union[Dict[str, Dict[str, str]], Dict[str, str]]
 
 Discovery = Dict[str, Any]
-DiscoveredActivities = Dict[str, Any]
+DiscoveredActivities = List[Dict[str, Any]]
 DiscoveredSystemInfo = Dict[str, Any]
 
 Settings = Dict[str, Any]
