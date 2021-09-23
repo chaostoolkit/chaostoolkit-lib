@@ -58,7 +58,9 @@ def test_get_loaded_settings() -> None:
 
 def test_locate_root_level_entry() -> None:
     settings = {"auths": {"chaos.example.com": {"type": "bearer"}}}
-    parent, entry, k, i = locate_settings_entry(settings, "auths")
+    entry_tuple = locate_settings_entry(settings, "auths")
+    assert entry_tuple
+    parent, entry, k, i = entry_tuple
     assert parent == settings
     assert entry == settings["auths"]
     assert k == "auths"
@@ -67,7 +69,9 @@ def test_locate_root_level_entry() -> None:
 
 def test_locate_dotted_entry() -> None:
     settings = {"auths": {"chaos.example.com": {"type": "bearer"}}}
-    parent, entry, k, i = locate_settings_entry(settings, "auths.chaos\\.example\\.com")
+    entry_tuple = locate_settings_entry(settings, "auths.chaos\\.example\\.com")
+    assert entry_tuple
+    parent, entry, k, i = entry_tuple
     assert parent == settings["auths"]
     assert entry == {"type": "bearer"}
     assert k == "chaos.example.com"
@@ -86,9 +90,11 @@ def test_locate_indexed_entry() -> None:
             }
         }
     }
-    parent, entry, k, i = locate_settings_entry(
+    entry_tuple = locate_settings_entry(
         settings, "auths.chaos\\.example\\.com.headers[1]"
     )
+    assert entry_tuple
+    parent, entry, k, i = entry_tuple
     assert parent == settings["auths"]["chaos.example.com"]["headers"]
     assert entry == {"name": "X-For", "value": "other"}
     assert k is None
@@ -107,9 +113,11 @@ def test_locate_dotted_key_from_indexed_entry() -> None:
             }
         }
     }
-    parent, entry, k, i = locate_settings_entry(
+    entry_tuple = locate_settings_entry(
         settings, "auths.chaos\\.example\\.com.headers[1].name"
     )
+    assert entry_tuple
+    parent, entry, k, i = entry_tuple
     assert (
         parent
         == cast(Dict[str, Any], settings["auths"])["chaos.example.com"]["headers"][1]
