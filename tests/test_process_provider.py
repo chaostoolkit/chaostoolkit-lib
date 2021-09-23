@@ -47,8 +47,8 @@ def test_process_not_utf8_cannot_fail() -> None:
                 ),
             }
         },
-        None,
-        None,
+        {"": ""},
+        {},
     )
 
     # unfortunately, this doesn't seem to work well on mac
@@ -60,7 +60,7 @@ def test_process_not_utf8_cannot_fail() -> None:
 def test_process_homedir_relative_path() -> None:
     path = os.path.abspath(dummy_script).replace(os.path.expanduser("~"), "~")
     result = run_process_activity(
-        {"provider": {"type": "process", "path": path, "arguments": ""}}, None, None
+        {"provider": {"type": "process", "path": path, "arguments": ""}}, {"": ""}, {}
     )
     assert result["status"] == 0
 
@@ -74,8 +74,8 @@ def test_process_absolute_path() -> None:
                 "arguments": "",
             }
         },
-        None,
-        None,
+        {"": ""},
+        {},
     )
     assert result["status"] == 0
 
@@ -83,8 +83,8 @@ def test_process_absolute_path() -> None:
 def test_process_cwd_relative_path() -> None:
     result = run_process_activity(
         {"provider": {"type": "process", "path": dummy_script, "arguments": ""}},
-        None,
-        None,
+        {"": ""},
+        {},
     )
     assert result["status"] == 0
 
@@ -99,8 +99,8 @@ def test_process_non_exit_zero_warning(logger: MagicMock) -> None:
                 "arguments": '-c "import sys; sys.exit(1)"',
             }
         },
-        None,
-        None,
+        {"": ""},
+        {},
     )
 
     assert logger.warning.call_count == 1
