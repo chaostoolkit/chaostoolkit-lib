@@ -79,6 +79,7 @@ def test_should_auth_with_approle(hvac: MagicMock) -> None:
 
     vault_client = create_vault_client(config)
 
+    assert vault_client
     assert vault_client.token == fake_auth_object["auth"]["client_token"]
     fake_client.auth_approle.assert_called_with(
         config["vault_role_id"], config["vault_role_secret"]
@@ -114,6 +115,7 @@ def test_should_auth_with_token(hvac: MagicMock) -> None:
 
     vault_client = create_vault_client(config)
 
+    assert vault_client
     assert vault_client.token == config["vault_token"]
     fake_client.auth_approle.assert_not_called()
 
@@ -132,6 +134,7 @@ def test_should_auth_with_service_account(hvac: MagicMock) -> None:
 
     with patch("chaoslib.secret.open", mock_open(read_data="fake_sa_token")):
         vault_client = create_vault_client(config)
+        assert vault_client
         vault_client.auth_approle.assert_not_called()
         vault_client.auth_kubernetes.assert_called_with(
             role=config["vault_sa_role"],

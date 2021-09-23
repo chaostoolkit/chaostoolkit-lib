@@ -17,7 +17,7 @@ __all__ = ["load_secrets", "create_vault_client"]
 
 
 def load_secrets(
-    secrets_info: Dict[str, Dict[str, str]],
+    secrets_info: Dict[str, Dict[str, Any]],
     configuration: Configuration = None,
     extra_vars: Dict[str, Any] = None,
 ) -> Secrets:
