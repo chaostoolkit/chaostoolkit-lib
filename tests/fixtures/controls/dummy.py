@@ -56,7 +56,7 @@ def before_method_control(context: Experiment, **kwargs: Any) -> None:
 
 def after_method_control(context: Experiment, state: List[Run], **kwargs: Any) -> None:
     context["after_method_control"] = True
-    state.append("after_method_control")
+    state.append({"activity": {"name": "after_method_control"}})
 
 
 def before_rollback_control(context: Experiment, **kwargs: Any) -> None:
@@ -67,7 +67,7 @@ def after_rollback_control(
     context: Experiment, state: List[Run], **kwargs: Any
 ) -> None:
     context["after_rollback_control"] = True
-    state.append("after_rollback_control")
+    state.append({"activity": {"name": "after_rollback_control"}})
 
 
 def before_activity_control(context: Activity, **kwargs: Any) -> None:

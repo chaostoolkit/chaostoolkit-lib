@@ -1,3 +1,4 @@
+from chaoslib.types import Run
 import json
 import tempfile
 from copy import deepcopy
@@ -103,30 +104,28 @@ def test_controls_are_applied_before_and_after_hypothesis() -> None:
 
 def test_controls_are_applied_before_and_after_method() -> None:
     exp = deepcopy(experiments.ExperimentWithControls)
-    with controls("method", exp, context=exp):
+    state = []
+    with controls("method", exp, context=exp) as control:
+        control.with_state(state)
         assert "before_method_control" in exp
         assert exp["before_method_control"] is True
 
-        exp["dry"] = True
-        journal = run_experiment(exp)
-
     assert "after_method_control" in exp
     assert exp["after_method_control"] is True
-    assert "after_method_control" in journal["run"]
+    assert state[0] == {"activity": {"name": "after_method_control"}}
 
 
 def test_controls_are_applied_before_and_after_rollbacks() -> None:
     exp = deepcopy(experiments.ExperimentWithControls)
-    with controls("rollback", exp, context=exp):
+    state = []
+    with controls("rollback", exp, context=exp) as control:
+        control.with_state(state)
         assert "before_rollback_control" in exp
         assert exp["before_rollback_control"] is True
 
-        exp["dry"] = True
-        journal = run_experiment(exp)
-
     assert "after_rollback_control" in exp
     assert exp["after_rollback_control"] is True
-    assert "after_rollback_control" in journal["rollbacks"]
+    assert state[0] == {"activity": {"name": "after_rollback_control"}}
 
 
 def test_controls_are_applied_before_and_after_activities() -> None:
