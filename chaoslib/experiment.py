@@ -22,6 +22,7 @@ from chaoslib.run import initialize_run_journal as init_journal
 from chaoslib.secret import load_secrets
 from chaoslib.types import (
     Configuration,
+    Dry,
     Experiment,
     Journal,
     Run,
@@ -126,7 +127,7 @@ def run_experiment(
     a thread. By the end of runs, those threads block until they are all
     complete.
 
-    If the experiment has the `"dry"` property set to `False`, the experiment
+    If the experiment has the `"dry"` property set to `activities`,the experiment
     runs without actually executing the activities.
 
     NOTE: Tricky to make a decision whether we should rollback when exiting
@@ -158,7 +159,7 @@ def apply_activities(
     secrets: Secrets,
     pool: ThreadPoolExecutor,
     journal: Journal,
-    dry: bool = False,
+    dry: Dry,
 ) -> List[Run]:
     warn_about_moved_function(
         "The 'apply_activities' function has now moved to the " "'chaoslib.run' package"
@@ -171,7 +172,7 @@ def apply_rollbacks(
     configuration: Configuration,
     secrets: Secrets,
     pool: ThreadPoolExecutor,
-    dry: bool = False,
+    dry: Dry,
 ) -> List[Run]:
     warn_about_moved_function(
         "The 'apply_rollbacks' function has now moved to the " "'chaoslib.run' package"

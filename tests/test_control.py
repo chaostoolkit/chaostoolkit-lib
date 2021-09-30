@@ -22,6 +22,7 @@ from chaoslib.control.python import validate_python_control
 from chaoslib.exceptions import InterruptExecution, InvalidActivity
 from chaoslib.experiment import ensure_experiment_is_valid, run_experiment
 from chaoslib.loader import load_experiment
+from chaoslib.types import Dry
 
 
 def test_initialize_controls_will_configure_a_control():
@@ -42,7 +43,7 @@ def test_controls_are_applied_before_and_after_experiment():
         assert "before_experiment_control" in exp
         assert exp["before_experiment_control"] is True
 
-        exp["dry"] = True
+        exp["dry"] = Dry.ACTIVITIES
         journal = run_experiment(exp)
 
     assert "after_experiment_control" in exp
@@ -57,7 +58,7 @@ def test_controls_are_applied_before_and_but_not_after_experiment():
         assert "before_experiment_control" in exp
         assert exp["before_experiment_control"] is True
 
-        exp["dry"] = True
+        exp["dry"] = Dry.ACTIVITIES
         run_experiment(exp)
 
     assert "after_experiment_control" not in exp
@@ -69,7 +70,7 @@ def test_controls_are_applied_not_before_and_but_after_experiment():
     with controls("experiment", exp, context=exp):
         assert "before_experiment_control" not in exp
 
-        exp["dry"] = True
+        exp["dry"] = Dry.ACTIVITIES
         journal = run_experiment(exp)
 
     assert "after_experiment_control" in exp
@@ -80,7 +81,7 @@ def test_controls_are_applied_not_before_and_but_after_experiment():
 def test_controls_may_interrupt_experiment():
     exp = deepcopy(experiments.ExperimentCanBeInterruptedByControl)
     with controls("experiment", exp, context=exp):
-        exp["dry"] = True
+        exp["dry"] = Dry.ACTIVITIES
         journal = run_experiment(exp)
         assert journal["status"] == "interrupted"
 
@@ -92,7 +93,7 @@ def test_controls_are_applied_before_and_after_hypothesis():
         assert "before_hypothesis_control" in hypo
         assert hypo["before_hypothesis_control"] is True
 
-        exp["dry"] = True
+        exp["dry"] = Dry.ACTIVITIES
         journal = run_experiment(exp)
 
     assert "after_hypothesis_control" in hypo
@@ -106,7 +107,7 @@ def test_controls_are_applied_before_and_after_method():
         assert "before_method_control" in exp
         assert exp["before_method_control"] is True
 
-        exp["dry"] = True
+        exp["dry"] = Dry.ACTIVITIES
         journal = run_experiment(exp)
 
     assert "after_method_control" in exp
@@ -120,7 +121,7 @@ def test_controls_are_applied_before_and_after_rollbacks():
         assert "before_rollback_control" in exp
         assert exp["before_rollback_control"] is True
 
-        exp["dry"] = True
+        exp["dry"] = Dry.ACTIVITIES
         journal = run_experiment(exp)
 
     assert "after_rollback_control" in exp
@@ -130,7 +131,7 @@ def test_controls_are_applied_before_and_after_rollbacks():
 
 def test_controls_are_applied_before_and_after_activities():
     exp = deepcopy(experiments.ExperimentWithControls)
-    exp["dry"] = True
+    exp["dry"] = Dry.ACTIVITIES
 
     activities = get_all_activities(exp)
     for activity in activities:
@@ -146,12 +147,12 @@ def test_controls_are_applied_before_and_after_activities():
 
 def test_no_controls_get_applied_when_none_defined():
     exp = deepcopy(experiments.ExperimentWithoutControls)
-    exp["dry"] = True
+    exp["dry"] = Dry.ACTIVITIES
 
     with controls("experiment", exp, context=exp):
         assert "before_experiment_control" not in exp
 
-        exp["dry"] = True
+        exp["dry"] = Dry.ACTIVITIES
         run_experiment(exp)
 
     assert "after_experiment_control" not in exp
@@ -235,7 +236,7 @@ def test_validate_python_control_needs_a_module():
 
 def test_controls_can_access_experiment():
     exp = deepcopy(experiments.ExperimentWithControlAccessingExperiment)
-    exp["dry"] = True
+    exp["dry"] = Dry.ACTIVITIES
 
     hypo = exp.get("steady-state-hypothesis")
     run_experiment(exp)
@@ -250,7 +251,7 @@ def test_controls_can_access_experiment():
 
 def test_controls_are_applied_at_various_levels():
     exp = deepcopy(experiments.ExperimentWithControlsAtVariousLevels)
-    exp["dry"] = True
+    exp["dry"] = Dry.ACTIVITIES
 
     run_experiment(exp)
     activities = get_all_activities(exp)
@@ -262,7 +263,7 @@ def test_controls_are_applied_at_various_levels():
 
 def test_controls_are_applied_when_they_are_not_top_level():
     exp = deepcopy(experiments.ExperimentWithControlNotAtTopLevel)
-    exp["dry"] = True
+    exp["dry"] = Dry.ACTIVITIES
 
     run_experiment(exp)
     activities = get_all_activities(exp)

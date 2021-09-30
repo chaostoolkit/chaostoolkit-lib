@@ -13,7 +13,7 @@ from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.provider.http import run_http_activity, validate_http_activity
 from chaoslib.provider.process import run_process_activity, validate_process_activity
 from chaoslib.provider.python import run_python_activity, validate_python_activity
-from chaoslib.types import Activity, Configuration, Experiment, Run, Secrets
+from chaoslib.types import Activity, Configuration, Dry, Experiment, Run, Secrets
 
 __all__ = [
     "ensure_activity_is_valid",
@@ -100,7 +100,7 @@ def run_activities(
     configuration: Configuration,
     secrets: Secrets,
     pool: ThreadPoolExecutor,
-    dry: bool = False,
+    dry: Dry = None,
 ) -> Iterator[Run]:
     """
     Internal generator that iterates over all activities and execute them.
@@ -141,7 +141,7 @@ def execute_activity(
     activity: Activity,
     configuration: Configuration,
     secrets: Secrets,
-    dry: bool = False,
+    dry: Dry,
 ) -> Run:
     """
     Low-level wrapper around the actual activity provider call to collect
@@ -164,10 +164,18 @@ def execute_activity(
         dry = activity.get("dry", dry)
         pauses = activity.get("pauses", {})
         pause_before = pauses.get("before")
+        is_dry = False
+        activity_type = activity["type"]
+        if dry == Dry.ACTIONS:
+            is_dry = activity_type == "action"
+        elif dry == Dry.PROBES:
+            is_dry = activity_type == "probe"
+        elif dry == Dry.ACTIVITIES:
+            is_dry = True
         if pause_before:
             logger.info(f"Pausing before next activity for {pause_before}s...")
-            # only pause when not in dry-mode
-            if not dry:
+            # pause when one of the dry flags are set
+            if dry != Dry.PAUSE and not is_dry:
                 time.sleep(pause_before)
 
         if activity.get("background"):
@@ -188,8 +196,8 @@ def execute_activity(
         result = None
         interrupted = False
         try:
-            # only run the activity itself when not in dry-mode
-            if not dry:
+            # pause when one of the dry flags are set
+            if not is_dry:
                 result = run_activity(activity, configuration, secrets)
             run["output"] = result
             run["status"] = "succeeded"
@@ -213,8 +221,8 @@ def execute_activity(
             pause_after = pauses.get("after")
             if pause_after and not interrupted:
                 logger.info(f"Pausing after activity for {pause_after}s...")
-                # only pause when not in dry-mode
-                if not dry:
+                # pause when one of the dry flags are set
+                if dry != Dry.PAUSE and not is_dry:
                     time.sleep(pause_after)
 
         control.with_state(run)

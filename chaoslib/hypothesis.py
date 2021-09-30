@@ -18,7 +18,7 @@ from chaoslib import substitute
 from chaoslib.activity import ensure_activity_is_valid, execute_activity, run_activity
 from chaoslib.control import controls
 from chaoslib.exceptions import ActivityFailed, InvalidActivity, InvalidExperiment
-from chaoslib.types import Configuration, Experiment, Secrets, Tolerance
+from chaoslib.types import Configuration, Dry, Experiment, Secrets, Tolerance
 
 __all__ = ["ensure_hypothesis_is_valid", "run_steady_state_hypothesis"]
 
@@ -167,7 +167,7 @@ def run_steady_state_hypothesis(
     experiment: Experiment,
     configuration: Configuration,
     secrets: Secrets,
-    dry: bool = False,
+    dry: Dry,
 ) -> Dict[str, Any]:
     """
     Run all probes in the hypothesis and fail the experiment as soon as any of
@@ -213,7 +213,7 @@ def run_steady_state_hypothesis(
 
             run["tolerance_met"] = True
 
-            if dry:
+            if dry in (Dry.PROBES, Dry.ACTIVITIES):
                 # do not check for tolerance when dry mode is on
                 continue
 

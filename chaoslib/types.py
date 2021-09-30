@@ -1,5 +1,5 @@
 import enum
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 __all__ = [
     "MicroservicesStatus",
@@ -85,6 +85,28 @@ class Strategy(enum.Enum):
             return Strategy.CONTINUOUS
 
         raise ValueError("Unknown strategy")
+
+
+class Dry(enum.Enum):
+    PROBES = "probes"
+    ACTIONS = "actions"
+    ACTIVITIES = "activities"
+    PAUSE = "pause"
+
+    @staticmethod
+    def from_string(value: str) -> Optional["Dry"]:
+        if value == "probes":
+            return Dry.PROBES
+        elif value == "actions":
+            return Dry.ACTIONS
+        elif value == "activities":
+            return Dry.ACTIVITIES
+        elif value == "pause":
+            return Dry.PAUSE
+        elif not value:
+            return None
+
+        raise ValueError("Unknown dry")
 
 
 class Schedule:

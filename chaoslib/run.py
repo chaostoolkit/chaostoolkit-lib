@@ -37,6 +37,7 @@ from chaoslib.secret import load_secrets
 from chaoslib.settings import get_loaded_settings
 from chaoslib.types import (
     Configuration,
+    Dry,
     Experiment,
     Journal,
     Run,
@@ -326,10 +327,9 @@ class Runner:
         hypo_pool = get_hypothesis_pool()
         continuous_hypo_event = threading.Event()
 
-        dry = experiment.get("dry", False)
+        dry: Dry = experiment.get("dry", None)
         if dry:
-            logger.warning("Dry mode enabled")
-
+            logger.warning(f"Running experiment with dry {dry.value}")
         initialize_global_controls(experiment, configuration, secrets, settings)
         initialize_controls(experiment, configuration, secrets)
 
@@ -489,7 +489,7 @@ def run_gate_hypothesis(
     configuration: Configuration,
     secrets: Secrets,
     event_registry: EventHandlerRegistry,
-    dry: bool = False,
+    dry: Dry,
 ) -> Dict[str, Any]:
     """
     Run the hypothesis before the method and bail the execution if it did
@@ -519,7 +519,7 @@ def run_deviation_validation_hypothesis(
     configuration: Configuration,
     secrets: Secrets,
     event_registry: EventHandlerRegistry,
-    dry: bool = False,
+    dry: Dry,
 ) -> Dict[str, Any]:
     """
     Run the hypothesis after the method and report to the journal if the
@@ -552,7 +552,7 @@ def run_hypothesis_during_method(
     configuration: Configuration,
     secrets: Secrets,
     event_registry: EventHandlerRegistry,
-    dry: bool = False,
+    dry: Dry,
 ) -> Future:
     """
     Run the hypothesis continuously in a background thread and report the
@@ -594,7 +594,7 @@ def run_method(
     configuration: Configuration,
     secrets: Secrets,
     event_registry: EventHandlerRegistry,
-    dry: bool = False,
+    dry: Dry,
 ) -> Optional[List[Run]]:
     logger.info("Playing your experiment's method now...")
     event_registry.start_method(experiment)
@@ -624,7 +624,7 @@ def run_rollback(
     configuration: Configuration,
     secrets: Secrets,
     event_registry: EventHandlerRegistry,
-    dry: bool = False,
+    dry: Dry,
 ) -> None:
     has_deviated = journal["deviated"]
     journal_status = journal["status"]
@@ -744,7 +744,7 @@ def run_hypothesis_continuously(
     configuration: Configuration,
     secrets: Secrets,
     event_registry: EventHandlerRegistry,
-    dry: bool = False,
+    dry: Dry,
 ):
     frequency = schedule.continuous_hypothesis_frequency
     fail_fast_ratio = schedule.fail_fast_ratio
@@ -800,7 +800,7 @@ def apply_activities(
     secrets: Secrets,
     pool: ThreadPoolExecutor,
     journal: Journal,
-    dry: bool = False,
+    dry: Dry,
 ) -> List[Run]:
     with controls(
         level="method",
@@ -880,7 +880,7 @@ def apply_rollbacks(
     configuration: Configuration,
     secrets: Secrets,
     pool: ThreadPoolExecutor,
-    dry: bool = False,
+    dry: Dry,
 ) -> List[Run]:
     logger.info("Let's rollback...")
     with controls(

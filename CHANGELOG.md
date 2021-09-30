@@ -24,7 +24,14 @@ and `chaoslib/__init__.py` get updated in line with a new version
 * Added `.github/workflows/check_pr.yaml` which checks if a PR has modified the
 CHANGELOG.md and if it changed/added tests
 
+* Added dry run options:
+  * `--dry=activities` runs all activities as dry run. (same as the old flag)
+  * `--dry=actions` runs all actions as dry run.
+  * `--dry=probes` runs all probes as dry run.
+  * `--dry=pause` runs all activities with no pausing.
+
 ## [1.21.0][] - 2021-08-23
+
 
 [1.21.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.20.0...1.21.0
 

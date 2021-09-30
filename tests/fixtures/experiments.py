@@ -1,7 +1,12 @@
 import os
 from copy import deepcopy
 
-from fixtures.actions import DoNothingAction, EchoAction, FailAction
+from fixtures.actions import (
+    DoNothingAction,
+    EchoAction,
+    FailAction,
+    PythonModuleActionWithLongAction,
+)
 from fixtures.probes import (
     BackgroundPythonModuleProbe,
     BackgroundPythonModuleProbeWithLongPause,
@@ -23,6 +28,8 @@ from fixtures.probes import (
     ReadSecretTokenFromSecretsProbe,
     ReadSecretTokenProbe,
 )
+
+from chaoslib.types import Dry
 
 Secrets = {}
 
@@ -95,6 +102,17 @@ ExperimentWithLongPause = {
         BackgroundPythonModuleProbeWithLongPause,
     ],
     "rollbacks": [BackgroundPythonModuleProbe],
+}
+
+ExperimentWithLongPauseAction = {
+    "title": "do cats live in the Internet?",
+    "description": "an experiment of importance",
+    "steady-state-hypothesis": {"title": "hello"},
+    "method": [
+        PythonModuleProbeWithLongPause,
+        PythonModuleActionWithLongAction,
+    ],
+    "rollbacks": [PythonModuleActionWithLongAction],
 }
 
 ExperimentWithRollbackLongPause = {
@@ -821,7 +839,7 @@ ExperimentWithBypassedActivity = {
         {
             "type": "action",
             "name": "say-hello",
-            "dry": True,
+            "dry": Dry.ACTIVITIES,
             "provider": {"type": "process", "path": "echo", "arguments": "hello"},
         }
     ],
