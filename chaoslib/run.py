@@ -327,8 +327,8 @@ class Runner:
         hypo_pool = get_hypothesis_pool()
         continuous_hypo_event = threading.Event()
 
-        dry: Dry = experiment.get("dry", None)
-        if dry:
+        dry = experiment.get("dry", None)
+        if dry and isinstance(dry, Dry):
             logger.warning(f"Running experiment with dry {dry.value}")
         initialize_global_controls(experiment, configuration, secrets, settings)
         initialize_controls(experiment, configuration, secrets)

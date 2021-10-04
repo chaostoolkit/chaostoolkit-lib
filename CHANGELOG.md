@@ -4,6 +4,11 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.22.0...HEAD
 
+### Changed
+
+* Only display `dry` flag value when new flag `Dry` was provided. Prevents
+  breaking environments where the cli was not updated yet
+
 ## [1.22.0][] - 2021-10-04
 
 
