@@ -4,6 +4,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.22.1...HEAD
 
+### Changed
+
+- Ensure controls are properly applied and none are missed [#242][242]
+
+[242]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/242
+
 ## [1.22.1][] - 2021-10-04
 
 
