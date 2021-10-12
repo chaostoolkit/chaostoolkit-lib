@@ -6,6 +6,7 @@ from typing import Any, Dict
 
 import requests
 from logzero import logger
+from requests.exceptions import HTTPError
 
 from chaoslib.types import EventPayload, Settings
 
@@ -170,7 +171,7 @@ def notify_with_http(channel: Dict[str, str], payload: EventPayload):
     if url:
         try:
             if forward_event_payload:
-                r = requests.post(
+                resp = requests.post(
                     url,
                     headers=headers,
                     verify=verify_tls,
@@ -178,18 +179,15 @@ def notify_with_http(channel: Dict[str, str], payload: EventPayload):
                     json=payload,
                 )
             else:
-                r = requests.get(
+                resp = requests.get(
                     url, headers=headers, verify=verify_tls, timeout=(2, 5)
                 )
 
-            if r.status_code > 399:
-                logger.debug(
-                    "Notification sent to '{u}' failed with '{t}'".format(
-                        u=url, t=r.text
-                    )
-                )
-        except requests.exceptions.RequestException as err:
-            logger.debug("failed calling notification endpoint", exc_info=err)
+            resp.raise_for_status()
+        except HTTPError as ex:
+            logger.debug(f"notification sent to {url} failed with: {ex}")
+        except Exception as ex:
+            logger.debug("failed calling notification endpoint", exc_info=ex)
     else:
         logger.debug("missing url in notification channel")
 
