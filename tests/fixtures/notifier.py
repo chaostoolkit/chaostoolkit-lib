@@ -1,6 +1,6 @@
 from logzero import logger
 
-__all__ = ["notify"]
+__all__ = ["notify", "notify_other", "notify_broken"]
 
 
 def notify(settings, event_payload):

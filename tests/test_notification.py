@@ -1,7 +1,9 @@
+import json
 from datetime import datetime, timezone
 from unittest.mock import MagicMock, patch
 
 import callee
+import pytest
 import requests
 import responses
 from freezegun import freeze_time
@@ -10,6 +12,7 @@ from chaoslib.exceptions import ChaosException
 from chaoslib.notification import (
     DiscoverFlowEvent,
     InitFlowEvent,
+    PayloadEncoder,
     RunFlowEvent,
     ValidateFlowEvent,
     notify,
@@ -354,3 +357,13 @@ def test_notify_via_plugin_gracefully_handles_failure_in_invoked_func(
     logger.debug.assert_called_with(
         "failed calling notification plugin", exc_info=callee.InstanceOf(Exception)
     )
+
+
+def test_payload_encoder_defaults_to_type_error_if_no_default():
+    class NonSerialisableObject:
+        def __init__(self, name):
+            self.name = name
+
+    obj = NonSerialisableObject(name="test-name")
+    with pytest.raises(TypeError):
+        json.dumps(obj, cls=PayloadEncoder)

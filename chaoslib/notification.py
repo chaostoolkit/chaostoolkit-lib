@@ -54,8 +54,9 @@ class PayloadEncoder(JSONEncoder):
     def default(self, obj) -> str:
         if isinstance(obj, datetime):
             return obj.isoformat()
-        elif isinstance(obj, Exception):
+        if isinstance(obj, Exception):
             return f"An exception was raised: {obj.__class__.__name__}('{str(obj)}')"
+        return JSONEncoder.default(self, obj)
 
 
 def notify(
