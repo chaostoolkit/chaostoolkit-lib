@@ -9,7 +9,9 @@ from freezegun import freeze_time
 from build.lib.chaoslib.exceptions import ChaosException
 from chaoslib.notification import (
     DiscoverFlowEvent,
+    InitFlowEvent,
     RunFlowEvent,
+    ValidateFlowEvent,
     notify,
     notify_with_http,
 )
@@ -173,6 +175,74 @@ def test_notify_with_http_handles_error_present_in_payload(
     )
     notify_with_http(channel={"type": "http", "url": test_url}, payload=test_payload)
     mock_logger.debug.assert_not_called()
+
+
+@freeze_time("2021-01-01 00:00")
+@patch("chaoslib.notification.notify_with_http")
+def test_notify_correctly_assigns_phase_from_event_class(
+    mock_notify_with_http: MagicMock,
+) -> None:
+    channel = {"type": "http", "url": "http://example.com"}
+    for phase, event_class in [
+        ("discovery", DiscoverFlowEvent.DiscoverStarted),
+        ("init", InitFlowEvent.InitStarted),
+        ("run", RunFlowEvent.RunStarted),
+        ("validate", ValidateFlowEvent.ValidateStarted),
+    ]:
+        mock_notify_with_http.reset_mock()
+        notify(settings={"notifications": [channel]}, event=event_class, payload=None)
+        mock_notify_with_http.assert_called_once_with(
+            channel,
+            {
+                "name": event_class.value,
+                "payload": None,
+                "phase": phase,
+                "ts": datetime.utcnow().replace(tzinfo=timezone.utc).timestamp(),
+            },
+        )
+
+
+@freeze_time("2021-01-01 00:00")
+@patch("chaoslib.notification.notify_with_http")
+def test_notify_appends_error_to_event_payload_if_provided(
+    mock_notify_with_http: MagicMock,
+) -> None:
+    channel = {"type": "http", "url": "http://example.com"}
+    exception = ChaosException("Something went wrong")
+    notify(
+        settings={"notifications": [channel]},
+        event=DiscoverFlowEvent.DiscoverStarted,
+        payload=None,
+        error=exception,
+    )
+    mock_notify_with_http.assert_called_once_with(
+        channel,
+        {
+            "name": DiscoverFlowEvent.DiscoverStarted.value,
+            "payload": None,
+            "phase": "discovery",
+            "ts": datetime.utcnow().replace(tzinfo=timezone.utc).timestamp(),
+            "error": exception,
+        },
+    )
+
+
+@freeze_time("2021-01-01 00:00")
+@patch("chaoslib.notification.notify_with_http")
+def test_notify_only_notifies_on_events_specified(
+    mock_notify_with_http: MagicMock,
+) -> None:
+    channel = {
+        "type": "http",
+        "url": "http://example.com",
+        "events": ["discover-started"],
+    }
+    notify(
+        settings={"notifications": [channel]},
+        event=RunFlowEvent.RunFailed,
+        payload=None,
+    )
+    mock_notify_with_http.assert_not_called()
 
 
 @freeze_time("2020-01-01 00:00")
