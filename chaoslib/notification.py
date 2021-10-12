@@ -1,7 +1,9 @@
 import importlib
 import inspect
+import json
 from datetime import datetime, timezone
 from enum import Enum
+from json.encoder import JSONEncoder
 from typing import Any, Dict
 
 import requests
@@ -46,6 +48,14 @@ class ValidateFlowEvent(FlowEvent):
     ValidateStarted = "validate-started"
     ValidateFailed = "validate-failed"
     ValidateCompleted = "validate-completed"
+
+
+class PayloadEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        elif isinstance(obj, Exception):
+            return f"An exception was raised: {obj.__class__.__name__}('{str(obj)}')"
 
 
 def notify(
@@ -171,12 +181,14 @@ def notify_with_http(channel: Dict[str, str], payload: EventPayload):
     if url:
         try:
             if forward_event_payload:
+                payload_encoded = json.loads(json.dumps(payload, cls=PayloadEncoder))
+
                 resp = requests.post(
                     url,
                     headers=headers,
                     verify=verify_tls,
                     timeout=(2, 5),
-                    json=payload,
+                    json=payload_encoded,
                 )
             else:
                 resp = requests.get(

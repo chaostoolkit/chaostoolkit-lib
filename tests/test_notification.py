@@ -6,6 +6,7 @@ import requests
 import responses
 from freezegun import freeze_time
 
+from build.lib.chaoslib.exceptions import ChaosException
 from chaoslib.notification import (
     DiscoverFlowEvent,
     RunFlowEvent,
@@ -19,7 +20,7 @@ def test_no_settings_is_okay():
 
 
 def test_no_notifications_in_settings_is_okay():
-    assert notify({}, DiscoverFlowEvent.DiscoverStarted) is None
+    assert notify({"things": "stuff"}, DiscoverFlowEvent.DiscoverStarted) is None
 
 
 @freeze_time("2020-01-01 00:00")
@@ -130,6 +131,47 @@ def test_notify_with_http_wont_forward_event_payload(mock_logger: MagicMock) -> 
         channel={"type": "http", "url": test_url, "forward_event_payload": False},
         payload=test_payload,
     )
+    mock_logger.debug.assert_not_called()
+
+
+@responses.activate
+@freeze_time("2021-01-01 00:00")
+@patch("chaoslib.notification.logger")
+def test_notify_with_http_handles_datetimes_present_in_payload(
+    mock_logger: MagicMock,
+) -> None:
+    test_url = "http://test-datetime-url.com"
+    now = datetime.now()
+    now_timestamp = now.isoformat()
+    test_payload = {"test-key": "test-val", "test-datetime": now}
+    test_json_payload = {"test-key": "test-val", "test-datetime": now_timestamp}
+    responses.add(
+        method=responses.POST,
+        url=test_url,
+        match=[responses.matchers.json_params_matcher(test_json_payload)],
+    )
+    notify_with_http(channel={"type": "http", "url": test_url}, payload=test_payload)
+    mock_logger.debug.assert_not_called()
+
+
+@responses.activate
+@patch("chaoslib.notification.logger")
+def test_notify_with_http_handles_error_present_in_payload(
+    mock_logger: MagicMock,
+) -> None:
+    test_url = "http://test-error-url.com"
+    exception = ChaosException("Something went wrong here")
+    test_payload = {"test-key": "test-val", "error": exception}
+    test_json_payload = {
+        "test-key": "test-val",
+        "error": "An exception was raised: ChaosException('Something went wrong here')",
+    }
+    responses.add(
+        method=responses.POST,
+        url=test_url,
+        match=[responses.matchers.json_params_matcher(test_json_payload)],
+    )
+    notify_with_http(channel={"type": "http", "url": test_url}, payload=test_payload)
     mock_logger.debug.assert_not_called()
 
 
