@@ -51,7 +51,7 @@ class ValidateFlowEvent(FlowEvent):
 
 
 class PayloadEncoder(JSONEncoder):
-    def default(self, obj):
+    def default(self, obj) -> str:
         if isinstance(obj, datetime):
             return obj.isoformat()
         elif isinstance(obj, Exception):

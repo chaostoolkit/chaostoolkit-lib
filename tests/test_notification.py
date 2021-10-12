@@ -17,11 +17,11 @@ from chaoslib.notification import (
 )
 
 
-def test_no_settings_is_okay():
+def test_no_settings_is_okay() -> None:
     assert notify(None, DiscoverFlowEvent.DiscoverStarted) is None
 
 
-def test_no_notifications_in_settings_is_okay():
+def test_no_notifications_in_settings_is_okay() -> None:
     assert notify({"things": "stuff"}, DiscoverFlowEvent.DiscoverStarted) is None
 
 
