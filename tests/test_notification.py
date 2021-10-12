@@ -6,7 +6,7 @@ import requests
 import responses
 from freezegun import freeze_time
 
-from build.lib.chaoslib.exceptions import ChaosException
+from chaoslib.exceptions import ChaosException
 from chaoslib.notification import (
     DiscoverFlowEvent,
     InitFlowEvent,
