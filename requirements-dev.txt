@@ -1,7 +1,9 @@
 black
+callee
 chardet
 coverage
 flake8
+freezegun
 hvac
 isort
 jsonpath2
@@ -11,3 +13,4 @@ pytest-sugar
 ply
 pyhcl
 requests-mock
+responses

@@ -1,5 +1,9 @@
+import decimal
 import os.path
+import uuid
 from collections import ChainMap
+from datetime import date, datetime
+from json.encoder import JSONEncoder
 from string import Template
 from typing import Any, Dict, List, Mapping, Tuple, Union
 
@@ -26,7 +30,14 @@ except ImportError:
     from json.decoder import JSONDecodeError
 
 
-__all__ = ["__version__", "decode_bytes", "substitute", "merge_vars", "convert_vars"]
+__all__ = [
+    "__version__",
+    "decode_bytes",
+    "substitute",
+    "merge_vars",
+    "convert_vars",
+    "PayloadEncoder",
+]
 __version__ = "1.22.1"
 
 
@@ -276,3 +287,27 @@ def convert_vars(value: List[str]) -> Dict[str, Any]:  # noqa: C901
             raise ValueError("var needs to be in the format name[:type]=value")
 
     return var
+
+
+class PayloadEncoder(JSONEncoder):
+    """
+    Extension of the base JSONEncoder to support serialising objects commonly passed
+    around in Chaos Toolkit function payloads
+
+    Currently supports:
+    - datetime/date objects
+    - UUID objects
+    - Decimal objects
+    - Exception objects
+    """
+
+    def default(self, obj) -> str:
+        if isinstance(obj, (datetime, date)):
+            return obj.isoformat()
+        elif isinstance(obj, uuid.UUID):
+            return str(obj)
+        elif isinstance(obj, decimal.Decimal):
+            return str(obj)
+        elif isinstance(obj, Exception):
+            return f"An exception was raised: {obj.__class__.__name__}('{str(obj)}')"
+        return JSONEncoder.default(self, obj)

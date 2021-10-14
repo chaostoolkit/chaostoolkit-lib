@@ -1,12 +1,15 @@
 import importlib
 import inspect
+import json
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict
 
 import requests
 from logzero import logger
+from requests.exceptions import HTTPError
 
+from chaoslib import PayloadEncoder
 from chaoslib.types import EventPayload, Settings
 
 __all__ = [
@@ -170,26 +173,25 @@ def notify_with_http(channel: Dict[str, str], payload: EventPayload):
     if url:
         try:
             if forward_event_payload:
-                r = requests.post(
+                payload_encoded = json.loads(json.dumps(payload, cls=PayloadEncoder))
+
+                resp = requests.post(
                     url,
                     headers=headers,
                     verify=verify_tls,
                     timeout=(2, 5),
-                    json=payload,
+                    json=payload_encoded,
                 )
             else:
-                r = requests.get(
+                resp = requests.get(
                     url, headers=headers, verify=verify_tls, timeout=(2, 5)
                 )
 
-            if r.status_code > 399:
-                logger.debug(
-                    "Notification sent to '{u}' failed with '{t}'".format(
-                        u=url, t=r.text
-                    )
-                )
-        except requests.exceptions.RequestException as err:
-            logger.debug("failed calling notification endpoint", exc_info=err)
+            resp.raise_for_status()
+        except HTTPError as ex:
+            logger.debug(f"notification sent to {url} failed with: {ex}")
+        except Exception as ex:
+            logger.debug("failed calling notification endpoint", exc_info=ex)
     else:
         logger.debug("missing url in notification channel")
 

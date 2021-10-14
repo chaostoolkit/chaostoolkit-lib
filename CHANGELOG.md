@@ -4,6 +4,27 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.22.1...HEAD
 
+### Fixed
+
+* `notifications.py` now uses PayloadEncoder to serialise `datetime` objects
+  and `Exception` objects for when using `notify_with_http`.
+
+### Changed
+
+* Updated `tests/test_notification.py` to provide more explicit coverage of
+  `notify`, `notify_via_plugin`, and `notify_with_http`
+
+### Added
+
+* Added `callee`, `freezegun`, and `responses` as `dev` requirements to make
+  testing `notification.py` easier
+* Added `chaoslib.PayloadEncoder` to correctly encode objects when serialising
+  them to JSON, currently supporting:
+  * date/datetimes
+  * UUIDs
+  * Decimals
+  * Exceptions
+
 ## [1.22.1][] - 2021-10-04
 
 
