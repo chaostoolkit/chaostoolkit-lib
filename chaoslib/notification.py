@@ -3,13 +3,13 @@ import inspect
 import json
 from datetime import datetime, timezone
 from enum import Enum
-from json.encoder import JSONEncoder
 from typing import Any, Dict
 
 import requests
 from logzero import logger
 from requests.exceptions import HTTPError
 
+from chaoslib import PayloadEncoder
 from chaoslib.types import EventPayload, Settings
 
 __all__ = [
@@ -48,15 +48,6 @@ class ValidateFlowEvent(FlowEvent):
     ValidateStarted = "validate-started"
     ValidateFailed = "validate-failed"
     ValidateCompleted = "validate-completed"
-
-
-class PayloadEncoder(JSONEncoder):
-    def default(self, obj) -> str:
-        if isinstance(obj, datetime):
-            return obj.isoformat()
-        if isinstance(obj, Exception):
-            return f"An exception was raised: {obj.__class__.__name__}('{str(obj)}')"
-        return JSONEncoder.default(self, obj)
 
 
 def notify(
