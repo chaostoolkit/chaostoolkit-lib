@@ -5,8 +5,8 @@ from datetime import date, datetime
 
 import pytest
 
-from build.lib.chaoslib.exceptions import ChaosException
 from chaoslib import PayloadEncoder
+from chaoslib.exceptions import ChaosException
 
 
 def test_that_payload_encoder_handles_datetime_objects():
