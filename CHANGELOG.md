@@ -8,6 +8,10 @@
 
 * `notifications.py` now uses PayloadEncoder to serialise `datetime` objects
   and `Exception` objects for when using `notify_with_http`.
+* `test/test_exit.py` was blocking on `server.join()`, this is now refactored
+  out into a lightweight FastAPI container which is spun up for the unit tests
+  so that we don't mess around with threading in test code. This now means we
+  can run `test_exit.py` in CI as well, where we were previously skipping it.
 
 ### Changed
 
@@ -24,6 +28,9 @@
   * UUIDs
   * Decimals
   * Exceptions
+* Added `pytest-docker` so that we can run containers during tests
+* Moved `tests/test_exit.py` to `tests/test_exit/test_exit.py` so that it is
+  separated from other test setup with its Dockerfile etc.
 
 ## [1.22.1][] - 2021-10-04
 
