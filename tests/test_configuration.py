@@ -1,6 +1,7 @@
 import json
 import os
 import tempfile
+from unittest.mock import patch
 
 import pytest
 import yaml
@@ -10,8 +11,8 @@ from chaoslib.configuration import load_configuration
 from chaoslib.exceptions import InvalidExperiment
 
 
+@patch.dict(os.environ, {"KUBE_TOKEN": "value2"})
 def test_should_load_configuration():
-    os.environ["KUBE_TOKEN"] = "value2"
     config = load_configuration(
         {
             "token1": "value1",
@@ -25,9 +26,8 @@ def test_should_load_configuration():
     assert config["token3"] == "value3"
 
 
+@patch.dict(os.environ, {"KUBE_TOKEN": "value2"})
 def test_should_load_configuration_with_empty_string_as_default():
-    os.environ.clear()
-    os.environ["KUBE_TOKEN"] = "value2"
     config = load_configuration(
         {
             "token1": "value1",
@@ -41,9 +41,8 @@ def test_should_load_configuration_with_empty_string_as_default():
     assert config["token3"] == ""
 
 
+@patch.dict(os.environ, {"KUBE_TOKEN": ""})
 def test_should_load_configuration_with_empty_string_as_input():
-    os.environ.clear()
-    os.environ["KUBE_TOKEN"] = ""
     config = load_configuration(
         {
             "token1": "value1",
@@ -57,9 +56,8 @@ def test_should_load_configuration_with_empty_string_as_input():
     assert config["token3"] == "value3"
 
 
+@patch.dict(os.environ, {"KUBE_TOKEN": ""})
 def test_should_load_configuration_with_empty_string_as_input_while_default_is_define():
-    os.environ.clear()
-    os.environ["KUBE_TOKEN"] = ""
     config = load_configuration(
         {
             "token1": "value1",
@@ -74,7 +72,6 @@ def test_should_load_configuration_with_empty_string_as_input_while_default_is_d
 
 
 def test_load_configuration_should_raise_exception():
-    os.environ.clear()
     with pytest.raises(InvalidExperiment) as x:
         load_configuration(
             {
@@ -90,8 +87,8 @@ def test_load_configuration_should_raise_exception():
     )
 
 
+@patch.dict(os.environ, {"KUBE_TOKEN": "value2"})
 def test_can_override_experiment_inline_config_keys():
-    os.environ["KUBE_TOKEN"] = "value2"
     config = load_configuration(
         {
             "token1": "value1",
@@ -106,8 +103,8 @@ def test_can_override_experiment_inline_config_keys():
     assert config["token3"] == "value3"
 
 
+@patch.dict(os.environ, {"KUBE_TOKEN": "value2"})
 def test_default_value_is_overriden_in_inline_config_keys():
-    os.environ["KUBE_TOKEN"] = "value2"
     config = load_configuration(
         {
             "token1": "value1",
@@ -184,7 +181,6 @@ def test_read_env_from_env_file():
         f.seek(0)
         merge_vars(var_files=[f.name])
         assert os.environ["STUFF"] == "todo"
-        os.environ.clear()
 
 
 def test_convert_int_var():
@@ -217,8 +213,8 @@ def test_convert_invalid_type():
         convert_vars(["todo:object=stuff"])
 
 
+@patch.dict(os.environ, {"KUBE_TOKEN": "value2"})
 def test_should_override_load_configuration_with_var():
-    os.environ["KUBE_TOKEN"] = "value2"
     config = load_configuration(
         {
             "token1": "value1",
@@ -235,7 +231,6 @@ def test_should_override_load_configuration_with_var():
 
 # see https://github.com/chaostoolkit/chaostoolkit-lib/issues/195
 def test_load_nested_object_configuration():
-    os.environ.clear()
     config = load_configuration(
         {"nested": {"onea": "fdsfdsf", "lol": {"haha": [1, 2, 3]}}}
     )
