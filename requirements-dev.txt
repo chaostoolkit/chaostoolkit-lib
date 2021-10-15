@@ -9,6 +9,7 @@ isort
 jsonpath2
 pytest~=6.2
 pytest-cov
+pytest-docker
 pytest-sugar
 ply
 pyhcl
