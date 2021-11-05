@@ -1,0 +1,6 @@
+version: "3.9"
+services:
+  web:
+    build: ./slow_service/
+    ports:
+      - "8700:80"

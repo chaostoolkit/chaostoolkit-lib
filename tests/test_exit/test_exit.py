@@ -1,8 +1,6 @@
-import os
 import threading
 import time
 from copy import deepcopy
-from wsgiref.simple_server import WSGIRequestHandler, WSGIServer
 
 import pytest
 from fixtures import experiments
@@ -11,30 +9,9 @@ from chaoslib.exit import exit_gracefully, exit_ungracefully
 from chaoslib.run import Runner
 from chaoslib.types import Strategy
 
-pytestmark = pytest.mark.skipif(os.getenv("CI") is not None, reason="Skip CI")
 
-
-def run_http_server_in_background():
-    def slow_app(environ, start_response):
-        time.sleep(5)
-        status = "200 OK"
-        headers = [("Content-type", "text/plain; charset=utf-8")]
-        start_response(status, headers)
-        return [b"Hello World"]
-
-    def make_server(host, port, app):
-        server = WSGIServer((host, port), WSGIRequestHandler)
-        server.set_app(app)
-        return server
-
-    httpd = make_server("", 8700, slow_app)
-    httpd.handle_request()
-
-
+@pytest.mark.usefixtures("slow_service")
 def test_play_rollbacks_on_graceful_exit_with_http_action():
-    server = threading.Thread(target=run_http_server_in_background)
-    server.start()
-
     x = deepcopy(experiments.ExperimentGracefulExitLongHTTPCall)
     with Runner(Strategy.DEFAULT) as runner:
         journal = runner.run(
@@ -44,13 +21,9 @@ def test_play_rollbacks_on_graceful_exit_with_http_action():
         assert journal["status"] == "interrupted"
         assert len(journal["rollbacks"]) == 1
 
-    server.join()
 
-
+@pytest.mark.usefixtures("slow_service")
 def test_do_not_play_rollbacks_on_graceful_exit_with_http_action():
-    server = threading.Thread(target=run_http_server_in_background)
-    server.start()
-
     x = deepcopy(experiments.ExperimentUngracefulExitLongHTTPCall)
     with Runner(Strategy.DEFAULT) as runner:
         journal = runner.run(
@@ -59,8 +32,6 @@ def test_do_not_play_rollbacks_on_graceful_exit_with_http_action():
 
         assert journal["status"] == "interrupted"
         assert len(journal["rollbacks"]) == 0
-
-    server.join()
 
 
 def test_play_rollbacks_on_graceful_exit_with_process_action():
@@ -96,10 +67,8 @@ def test_play_rollbacks_on_graceful_exit_with_python_action():
         assert len(journal["rollbacks"]) == 1
 
 
+@pytest.mark.usefixtures("slow_service")
 def test_do_not_play_rollbacks_on_graceful_exit_with_python_action():
-    server = threading.Thread(target=run_http_server_in_background)
-    server.start()
-
     x = deepcopy(experiments.ExperimentUngracefulExitLongHTTPCall)
     with Runner(Strategy.DEFAULT) as runner:
         journal = runner.run(
@@ -109,21 +78,15 @@ def test_do_not_play_rollbacks_on_graceful_exit_with_python_action():
         assert journal["status"] == "interrupted"
         assert len(journal["rollbacks"]) == 0
 
-    server.join()
 
-
+@pytest.mark.usefixtures("slow_service")
 def test_wait_for_background_activity_on_graceful_exit():
-    server = threading.Thread(target=run_http_server_in_background)
-    server.start()
-
     x = deepcopy(experiments.ExperimentGracefulExitLongHTTPCall)
     with Runner(Strategy.DEFAULT) as runner:
         journal = runner.run(x)
 
         assert journal["status"] == "interrupted"
         assert 3.0 < journal["run"][0]["duration"] < 3.2
-
-    server.join()
 
 
 def test_do_not_wait_for_background_activity_on_ungraceful_exit():
