@@ -13,6 +13,8 @@
 
 * Updated `tests/test_notification.py` to provide more explicit coverage of
   `notify`, `notify_via_plugin`, and `notify_with_http`
+* Pinned version of importlib-metadata for Python < 3.8 was too strict.
+  Relaxed a bit.
 
 ### Added
 
