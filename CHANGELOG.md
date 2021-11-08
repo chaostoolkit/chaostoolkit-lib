@@ -1,10 +1,10 @@
 # Changelog
 
 ## [Unreleased][]
+## [1.24.0][] - 2021-11-08
+
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.24.0...HEAD
-
-## [1.24.0][] - 2021-11-08
 
 ### Added
 
