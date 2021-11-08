@@ -1,10 +1,8 @@
 # Changelog
 
 ## [Unreleased][]
-## [1.24.0][] - 2021-11-08
 
-
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.24.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.23.0...HEAD
 
 ### Added
 
@@ -13,9 +11,6 @@
   If there's a use-case for setting a configuration dynamically right before the experiment is starting.
   It executes the probe,
   and then the return value of this probe will be the config you wish to set.
-
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.23.0...HEAD
-
 
 ## [1.23.0][] - 2021-11-05
 

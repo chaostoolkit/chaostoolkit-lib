@@ -91,12 +91,13 @@ def load_dynamic_configuration(
     dynamically right before the experiment is starting.
     It executes the probe,
     and then the return value of this probe will be the config you wish to set.
-    The dictionary needs to have a key named `type`
+    The dictionary needs to have a key named `type` and as a value `probe`,
     alongside the rest of the probe props.
     (No need for the `tolerance` key).
 
     For example:
 
+    ```
     "some_dynamic_config": {
       "name": "some config probe",
       "type": "probe",
@@ -109,19 +110,20 @@ def load_dynamic_configuration(
         }
       }
     }
+    ```
 
     some_dynamic_config will be set with the return value
     of the function config_probe.
 
     Side Note: the probe type can be the same as
-    a regular probe can be, python, os, etc...
+    a regular probe can be, python, process or http.
+    The config argument contains all the configurations of the experiment
+    including the raw config_probe configuration that can be dynamically injected.
 
-    The config argument is the configurations with all
-    the env vars configs that are already set.
-    (So basically we can use the configuration that
-    are injected from the environment in the config_probe arguments).
+    The configurations contain as well all the env vars
+    after they are set in load_configuration.
 
-    The secrets argument it's in case we need the secrets inside the config_probe.
+    The secrets argument contains all the secrets of the experiment.
     """
     conf = {}
 
