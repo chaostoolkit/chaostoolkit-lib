@@ -13,6 +13,9 @@
   If there's a use-case for seting a configuration dynamicly right before the experiment is starting.
   It's exceute the probe, and then the return value of this probe will be the config you wish to set.
 
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.23.0...HEAD
+
+
 ## [1.23.0][] - 2021-11-05
 
 
