@@ -278,9 +278,7 @@ class Runner:
         self.secrets = load_secrets(
             experiment.get("secrets", {}), self.config, secret_vars
         )
-        self.config = load_dynamic_configuration(
-            self.config, self.secrets
-        )
+        self.config = load_dynamic_configuration(self.config, self.secrets)
 
     def cleanup(self):
         pass
