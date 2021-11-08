@@ -10,8 +10,9 @@
 
 * `configuration.py` now have the ability to have load a dynamic configurations.
   The dynamic config is a regular activity (probe) in the configuration section.
-  If there's a use-case for seting a configuration dynamicly right before the experiment is starting.
-  It's exceute the probe, and then the return value of this probe will be the config you wish to set.
+  If there's a use-case for setting a configuration dynamically right before the experiment is starting.
+  It executes the probe,
+  and then the return value of this probe will be the config you wish to set.
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.23.0...HEAD
 
