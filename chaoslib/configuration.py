@@ -5,6 +5,8 @@ from logzero import logger
 
 from chaoslib.exceptions import InvalidExperiment
 from chaoslib.types import Configuration
+from chaoslib.activity import run_activity
+
 
 __all__ = ["load_configuration"]
 
@@ -71,7 +73,30 @@ def load_configuration(
                         " that does not exist: {}".format(env_key)
                     )
                 conf[key] = extra_vars.get(key, env.get(env_key, env_default))
+            else:
+                conf[key] = extra_vars.get(key, value)
+
         else:
             conf[key] = extra_vars.get(key, value)
+
+    return conf
+
+
+def load_dynamic_configuration(
+        config: Dict[str, Any], secrets: Dict[str, Dict[str, str]]
+) -> Configuration:
+    """
+
+    """
+    conf = {}
+
+    logger.debug("Loading dynamic configuration...")
+    for (key, value) in config.items():
+        if isinstance(value, dict) and "type" in value:
+            if value["type"] == "probe":
+                value["provider"]["secrets"] = secrets
+                conf[key] = run_activity(value, config, secrets)
+        else:
+            conf[key] = config.get(key, value)
 
     return conf
