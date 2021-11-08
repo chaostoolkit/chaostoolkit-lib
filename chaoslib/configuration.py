@@ -86,7 +86,36 @@ def load_dynamic_configuration(
         config: Dict[str, Any], secrets: Dict[str, Dict[str, str]]
 ) -> Configuration:
     """
+    This is for loading a dynamic config if exist.
+    The dynamic config is a regular activity (probe) in the configuration section.
+    If there's a use-case for seting a configuration dynamicly right before the experiment is starting.
+    It's exceute the probe, and then the return value of this probe will be the config you wish to set.
+    The dictionary need to have a key named `type` alongside the rest of the probe props.
+    (No need the `tolerance` key).
 
+    For example:
+
+    "some_dynamic_config": {
+      "name": "some config probe",
+      "type": "probe",
+      "provider": {
+        "type": "python",
+        "module": "src.probes",
+        "func": "config_probe",
+        "arguments": {
+            "arg1":"arg1"
+        }
+      }
+    }
+
+    some_dynamic_config will be set with the return value of the function config_probe.
+
+    Side Note: the probe type can be the same as a regular probe can be, python, os ect'..
+
+    The config argument is the configurations with all the env vars configs that are already set.
+    (So basicly we can use the configuration that are injected from the environment in the config_probe arguments).
+
+    The secrets argument it's in case we need the secrets inside the config_probe.
     """
     conf = {}
 
