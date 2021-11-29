@@ -4,6 +4,14 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.23.0...HEAD
 
+### Added
+
+* Configuration now supports providing a type to convert Environment Variables
+  to a provided type. Addressing the issue [here](https://github.com/chaostoolkit/chaostoolkit/issues/254#issue-1062797767)
+  To specifically convert an Environment Variable loaded into configuration to
+  a type, provide the `env_var_type` key in the same block as the "env" declaration.
+  Supported values are: `str, int, float, bytes`.
+
 ## [1.23.0][] - 2021-11-05
 
 
