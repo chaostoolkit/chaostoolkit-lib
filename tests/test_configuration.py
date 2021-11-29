@@ -240,3 +240,43 @@ def test_load_nested_object_configuration():
     assert isinstance(config["nested"], dict)
     assert config["nested"]["onea"] == "fdsfdsf"
     assert config["nested"]["lol"] == {"haha": [1, 2, 3]}
+
+
+@patch.dict(
+    "os.environ",
+    {
+        "TEST_ENV_VAR_NO_TYPE": "should_be_a_string",
+        "TEST_ENV_VAR_STRING": "should_also_be_a_string",
+        "TEST_ENV_VAR_INT": "1000",
+        "TEST_ENV_VAR_FLOAT": "30.54321",
+        "TEST_ENV_VAR_BYTES": "these_are_bytes",
+    },
+)
+def test_that_environment_variables_are_typed_correctly():
+    config = load_configuration(
+        {
+            "token1": {"type": "env", "key": "TEST_ENV_VAR_NO_TYPE"},
+            "token2": {
+                "type": "env",
+                "key": "TEST_ENV_VAR_STRING",
+                "env_var_type": "str",
+            },
+            "token3": {"type": "env", "key": "TEST_ENV_VAR_INT", "env_var_type": "int"},
+            "token4": {
+                "type": "env",
+                "key": "TEST_ENV_VAR_FLOAT",
+                "env_var_type": "float",
+            },
+            "token5": {
+                "type": "env",
+                "key": "TEST_ENV_VAR_BYTES",
+                "env_var_type": "bytes",
+            },
+        }
+    )
+
+    assert config["token1"] == "should_be_a_string"
+    assert config["token2"] == "should_also_be_a_string"
+    assert config["token3"] == int(1000)
+    assert config["token4"] == 30.54321
+    assert config["token5"] == b"these_are_bytes"

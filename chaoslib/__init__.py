@@ -268,16 +268,7 @@ def convert_vars(value: List[str]) -> Dict[str, Any]:  # noqa: C901
             if ":" in k:
                 k, typ = k.rsplit(":", 1)
                 try:
-                    if typ == "str":
-                        pass
-                    elif typ == "int":
-                        v = int(v)
-                    elif typ == "float":
-                        v = float(v)
-                    elif typ == "bytes":
-                        v = v.encode("utf-8")
-                    else:
-                        raise ValueError("var supports only: str, int, float and bytes")
+                    v = convert_to_type(typ, v)
                 except (TypeError, UnicodeEncodeError):
                     raise ValueError("var cannot convert value to required type")
             var[k] = v
@@ -287,6 +278,28 @@ def convert_vars(value: List[str]) -> Dict[str, Any]:  # noqa: C901
             raise ValueError("var needs to be in the format name[:type]=value")
 
     return var
+
+
+def convert_to_type(type: str, val: str) -> Union[str, int, float, bytes]:
+    """
+    Converts a value to a provided type. If `type` is None, then the original string is
+    returned, else the val is coerced into the provided type. An exception is thrown
+    if the type is not supported.
+
+    :param type: str representing what type to convert `val` to
+    :param val: str representing the variable loaded in to configuration
+    :returns: Union[str, int, float, bytes] representing the converted value
+    """
+    if type is None or type == "str":
+        return val
+    elif type == "int":
+        return int(val)
+    elif type == "float":
+        return float(val)
+    elif type == "bytes":
+        return val.encode("utf-8")
+    else:
+        raise ValueError("variables can only be: str, int, float, or bytes")
 
 
 class PayloadEncoder(JSONEncoder):
