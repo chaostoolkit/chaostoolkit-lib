@@ -3,6 +3,7 @@ from typing import Any, Dict
 
 from logzero import logger
 
+from chaoslib import convert_to_type
 from chaoslib.exceptions import InvalidExperiment
 from chaoslib.types import Configuration
 
@@ -35,6 +36,11 @@ def load_configuration(
             "type": "env",
             "key": "HOSTNAME",
             "default": "localhost"
+        },
+        "port": {
+            "type": "env",
+            "key": "SERVICE_PORT",
+            "env_var_type": "int"
         }
     }
     ```
@@ -43,7 +49,9 @@ def load_configuration(
     configuration key is dynamically fetched from the `MY_TOKEN` environment
     variable. The `host` configuration key is dynamically fetched from the
     `HOSTNAME` environment variable, but if not defined, the default value
-    `localhost` will be used instead.
+    `localhost` will be used instead. The `port` configuration key is dynamically
+    fetched from the `SERVICE_PORT` environment variable. It is coerced into an `int`
+    with the addition of the `env_var_type` key.
 
     When `extra_vars` is provided, it must be a dictionnary where keys map
     to configuration key. The values from `extra_vars` always override the
@@ -70,7 +78,11 @@ def load_configuration(
                         "Configuration makes reference to an environment key"
                         " that does not exist: {}".format(env_key)
                     )
-                conf[key] = extra_vars.get(key, env.get(env_key, env_default))
+                env_var_type = value.get("env_var_type")
+                env_var_value = convert_to_type(
+                    env_var_type, env.get(env_key, env_default)
+                )
+                conf[key] = extra_vars.get(key, env_var_value)
         else:
             conf[key] = extra_vars.get(key, value)
 
