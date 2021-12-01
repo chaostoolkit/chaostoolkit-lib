@@ -142,10 +142,9 @@ def load_dynamic_configuration(
 
     logger.debug("Loading dynamic configuration...")
     for (key, value) in config.items():
-        if isinstance(value, dict) and "type" in value:
-            if value["type"] == "probe":
-                value["provider"]["secrets"] = secrets
-                conf[key] = run_activity(value, config, secrets)
+        if isinstance(value, dict) and value.get("type") == "probe":
+            value["provider"]["secrets"] = secrets
+            conf[key] = run_activity(value, config, secrets)
         else:
             conf[key] = config.get(key, value)
 
