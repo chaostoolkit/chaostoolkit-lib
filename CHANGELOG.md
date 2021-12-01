@@ -11,6 +11,13 @@
   If there's a use-case for setting a configuration dynamically right before the experiment is starting.
   It executes the probe,
   and then the return value of this probe will be the config you wish to set.
+### Added
+
+* Configuration now supports providing a type to convert Environment Variables
+  to a provided type. Addressing the issue [here](https://github.com/chaostoolkit/chaostoolkit/issues/254#issue-1062797767)
+  To specifically convert an Environment Variable loaded into configuration to
+  a type, provide the `env_var_type` key in the same block as the "env" declaration.
+  Supported values are: `str, int, float, bytes`.
 
 ## [1.23.0][] - 2021-11-05
 
