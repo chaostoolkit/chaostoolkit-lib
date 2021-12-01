@@ -3,7 +3,6 @@ from typing import Any, Dict
 
 from logzero import logger
 
-from chaoslib.activity import run_activity
 from chaoslib import convert_to_type
 from chaoslib.exceptions import InvalidExperiment
 from chaoslib.types import Configuration
@@ -137,6 +136,8 @@ def load_dynamic_configuration(
 
     The secrets argument contains all the secrets of the experiment.
     """
+    from chaoslib.activity import run_activity
+
     conf = {}
 
     logger.debug("Loading dynamic configuration...")
