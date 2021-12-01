@@ -5,7 +5,7 @@ from logzero import logger
 
 from chaoslib import convert_to_type
 from chaoslib.exceptions import InvalidExperiment
-from chaoslib.types import Configuration
+from chaoslib.types import Configuration, Secrets
 
 __all__ = ["load_configuration", "load_dynamic_configuration"]
 
@@ -93,7 +93,7 @@ def load_configuration(
 
 
 def load_dynamic_configuration(
-    config: Dict[str, Any], secrets: Dict[str, Dict[str, str]]
+    config: Configuration, secrets: Secrets = {}
 ) -> Configuration:
     """
     This is for loading a dynamic configuration if exists.
