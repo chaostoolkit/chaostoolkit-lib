@@ -1,6 +1,7 @@
 import json
 import os
 import tempfile
+from unittest.mock import patch
 
 import pytest
 import yaml
@@ -10,8 +11,8 @@ from chaoslib.configuration import load_configuration
 from chaoslib.exceptions import InvalidExperiment
 
 
+@patch.dict("os.environ", {"KUBE_TOKEN": "value2"})
 def test_should_load_configuration():
-    os.environ["KUBE_TOKEN"] = "value2"
     config = load_configuration(
         {
             "token1": "value1",
@@ -25,9 +26,8 @@ def test_should_load_configuration():
     assert config["token3"] == "value3"
 
 
+@patch.dict("os.environ", {"KUBE_TOKEN": "value2"})
 def test_should_load_configuration_with_empty_string_as_default():
-    os.environ.clear()
-    os.environ["KUBE_TOKEN"] = "value2"
     config = load_configuration(
         {
             "token1": "value1",
@@ -41,9 +41,8 @@ def test_should_load_configuration_with_empty_string_as_default():
     assert config["token3"] == ""
 
 
+@patch.dict("os.environ", {"KUBE_TOKEN": ""})
 def test_should_load_configuration_with_empty_string_as_input():
-    os.environ.clear()
-    os.environ["KUBE_TOKEN"] = ""
     config = load_configuration(
         {
             "token1": "value1",
@@ -57,9 +56,8 @@ def test_should_load_configuration_with_empty_string_as_input():
     assert config["token3"] == "value3"
 
 
+@patch.dict("os.environ", {"KUBE_TOKEN": ""})
 def test_should_load_configuration_with_empty_string_as_input_while_default_is_define():
-    os.environ.clear()
-    os.environ["KUBE_TOKEN"] = ""
     config = load_configuration(
         {
             "token1": "value1",
@@ -73,8 +71,8 @@ def test_should_load_configuration_with_empty_string_as_input_while_default_is_d
     assert config["token3"] == "value3"
 
 
+@patch.dict("os.environ", {})
 def test_load_configuration_should_raise_exception():
-    os.environ.clear()
     with pytest.raises(InvalidExperiment) as x:
         load_configuration(
             {
@@ -90,8 +88,8 @@ def test_load_configuration_should_raise_exception():
     )
 
 
+@patch.dict("os.environ", {"KUBE_TOKEN": "value2"})
 def test_can_override_experiment_inline_config_keys():
-    os.environ["KUBE_TOKEN"] = "value2"
     config = load_configuration(
         {
             "token1": "value1",
@@ -106,8 +104,8 @@ def test_can_override_experiment_inline_config_keys():
     assert config["token3"] == "value3"
 
 
+@patch.dict("os.environ", {"KUBE_TOKEN": "value2"})
 def test_default_value_is_overriden_in_inline_config_keys():
-    os.environ["KUBE_TOKEN"] = "value2"
     config = load_configuration(
         {
             "token1": "value1",
@@ -217,8 +215,8 @@ def test_convert_invalid_type():
         convert_vars(["todo:object=stuff"])
 
 
+@patch.dict("os.environ", {"KUBE_TOKEN": "value2"})
 def test_should_override_load_configuration_with_var():
-    os.environ["KUBE_TOKEN"] = "value2"
     config = load_configuration(
         {
             "token1": "value1",
@@ -235,7 +233,6 @@ def test_should_override_load_configuration_with_var():
 
 # see https://github.com/chaostoolkit/chaostoolkit-lib/issues/195
 def test_load_nested_object_configuration():
-    os.environ.clear()
     config = load_configuration(
         {"nested": {"onea": "fdsfdsf", "lol": {"haha": [1, 2, 3]}}}
     )
@@ -243,3 +240,43 @@ def test_load_nested_object_configuration():
     assert isinstance(config["nested"], dict)
     assert config["nested"]["onea"] == "fdsfdsf"
     assert config["nested"]["lol"] == {"haha": [1, 2, 3]}
+
+
+@patch.dict(
+    "os.environ",
+    {
+        "TEST_ENV_VAR_NO_TYPE": "should_be_a_string",
+        "TEST_ENV_VAR_STRING": "should_also_be_a_string",
+        "TEST_ENV_VAR_INT": "1000",
+        "TEST_ENV_VAR_FLOAT": "30.54321",
+        "TEST_ENV_VAR_BYTES": "these_are_bytes",
+    },
+)
+def test_that_environment_variables_are_typed_correctly():
+    config = load_configuration(
+        {
+            "token1": {"type": "env", "key": "TEST_ENV_VAR_NO_TYPE"},
+            "token2": {
+                "type": "env",
+                "key": "TEST_ENV_VAR_STRING",
+                "env_var_type": "str",
+            },
+            "token3": {"type": "env", "key": "TEST_ENV_VAR_INT", "env_var_type": "int"},
+            "token4": {
+                "type": "env",
+                "key": "TEST_ENV_VAR_FLOAT",
+                "env_var_type": "float",
+            },
+            "token5": {
+                "type": "env",
+                "key": "TEST_ENV_VAR_BYTES",
+                "env_var_type": "bytes",
+            },
+        }
+    )
+
+    assert config["token1"] == "should_be_a_string"
+    assert config["token2"] == "should_also_be_a_string"
+    assert config["token3"] == int(1000)
+    assert config["token4"] == 30.54321
+    assert config["token5"] == b"these_are_bytes"
