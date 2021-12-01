@@ -7,7 +7,7 @@ from chaoslib.activity import run_activity
 from chaoslib.exceptions import InvalidExperiment
 from chaoslib.types import Configuration
 
-__all__ = ["load_configuration"]
+__all__ = ["load_configuration", "load_dynamic_configuration"]
 
 
 def load_configuration(
