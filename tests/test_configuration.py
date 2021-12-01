@@ -7,7 +7,7 @@ import pytest
 import yaml
 
 from chaoslib import convert_vars, merge_vars
-from chaoslib.configuration import load_configuration
+from chaoslib.configuration import load_configuration, load_dynamic_configuration
 from chaoslib.exceptions import InvalidExperiment
 
 
@@ -24,6 +24,29 @@ def test_should_load_configuration():
     assert config["token1"] == "value1"
     assert config["token2"] == "value2"
     assert config["token3"] == "value3"
+
+
+@patch("chaoslib.activity.run_activity")
+def test_should_load_dynamic_configuration(activity_mocked):
+    activity_mocked.return_value = "value2"
+    config = load_dynamic_configuration(
+        {
+            "token1": "value1",
+            "token2": {
+                "name": "some probe",
+                "type": "probe",
+                "provider": {
+                    "type": "python",
+                    "module": "tests.fixtures.configuration",
+                    "func": "dynamic_config",
+                    "arguments": {},
+                },
+            },
+        }
+    )
+
+    assert config["token1"] == "value1"
+    assert config["token2"] == "value2"
 
 
 @patch.dict("os.environ", {"KUBE_TOKEN": "value2"})
