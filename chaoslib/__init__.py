@@ -38,7 +38,7 @@ __all__ = [
     "convert_vars",
     "PayloadEncoder",
 ]
-__version__ = "1.23.0"
+__version__ = "1.23.1"
 
 
 def substitute(
