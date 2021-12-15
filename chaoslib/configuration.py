@@ -5,9 +5,9 @@ from logzero import logger
 
 from chaoslib import convert_to_type
 from chaoslib.exceptions import InvalidExperiment
-from chaoslib.types import Configuration
+from chaoslib.types import Configuration, Secrets
 
-__all__ = ["load_configuration"]
+__all__ = ["load_configuration", "load_dynamic_configuration"]
 
 
 def load_configuration(
@@ -83,7 +83,69 @@ def load_configuration(
                     env_var_type, env.get(env_key, env_default)
                 )
                 conf[key] = extra_vars.get(key, env_var_value)
+            else:
+                conf[key] = extra_vars.get(key, value)
+
         else:
             conf[key] = extra_vars.get(key, value)
+
+    return conf
+
+
+def load_dynamic_configuration(
+    config: Configuration, secrets: Secrets = {}
+) -> Configuration:
+    """
+    This is for loading a dynamic configuration if exists.
+    The dynamic config is a regular activity (probe) in the configuration section.
+    If there's a use-case for setting a configuration
+    dynamically right before the experiment is starting.
+    It executes the probe,
+    and then the return value of this probe will be the config you wish to set.
+    The dictionary needs to have a key named `type` and as a value `probe`,
+    alongside the rest of the probe props.
+    (No need for the `tolerance` key).
+
+    For example:
+
+    ```
+    "some_dynamic_config": {
+      "name": "some config probe",
+      "type": "probe",
+      "provider": {
+        "type": "python",
+        "module": "src.probes",
+        "func": "config_probe",
+        "arguments": {
+            "arg1":"arg1"
+        }
+      }
+    }
+    ```
+
+    some_dynamic_config will be set with the return value
+    of the function config_probe.
+
+    Side Note: the probe type can be the same as
+    a regular probe can be, python, process or http.
+    The config argument contains all the configurations of the experiment
+    including the raw config_probe configuration that can be dynamically injected.
+
+    The configurations contain as well all the env vars
+    after they are set in load_configuration.
+
+    The secrets argument contains all the secrets of the experiment.
+    """
+    from chaoslib.activity import run_activity
+
+    conf = {}
+
+    logger.debug("Loading dynamic configuration...")
+    for (key, value) in config.items():
+        if isinstance(value, dict) and value.get("type") == "probe":
+            value["provider"]["secrets"] = secrets
+            conf[key] = run_activity(value, config, secrets)
+        else:
+            conf[key] = config.get(key, value)
 
     return conf
