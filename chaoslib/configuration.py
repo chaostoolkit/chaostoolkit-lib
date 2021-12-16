@@ -1,4 +1,5 @@
 import os
+from copy import deepcopy
 from typing import Any, Dict
 
 from logzero import logger
@@ -49,9 +50,9 @@ def load_configuration(
     configuration key is dynamically fetched from the `MY_TOKEN` environment
     variable. The `host` configuration key is dynamically fetched from the
     `HOSTNAME` environment variable, but if not defined, the default value
-    `localhost` will be used instead. The `port` configuration key is dynamically
-    fetched from the `SERVICE_PORT` environment variable. It is coerced into an `int`
-    with the addition of the `env_var_type` key.
+    `localhost` will be used instead. The `port` configuration key is
+    dynamically fetched from the `SERVICE_PORT` environment variable. It is
+    coerced into an `int` with the addition of the `env_var_type` key.
 
     When `extra_vars` is provided, it must be a dictionnary where keys map
     to configuration key. The values from `extra_vars` always override the
@@ -93,14 +94,13 @@ def load_configuration(
 
 
 def load_dynamic_configuration(
-    config: Configuration, secrets: Secrets = {}
+    config: Configuration, secrets: Secrets = None
 ) -> Configuration:
     """
     This is for loading a dynamic configuration if exists.
-    The dynamic config is a regular activity (probe) in the configuration section.
-    If there's a use-case for setting a configuration
-    dynamically right before the experiment is starting.
-    It executes the probe,
+    The dynamic config is a regular activity (probe) in the configuration
+    section. If there's a use-case for setting a configuration dynamically
+    right before the experiment is starting. It executes the probe,
     and then the return value of this probe will be the config you wish to set.
     The dictionary needs to have a key named `type` and as a value `probe`,
     alongside the rest of the probe props.
@@ -108,7 +108,7 @@ def load_dynamic_configuration(
 
     For example:
 
-    ```
+    ```json
     "some_dynamic_config": {
       "name": "some config probe",
       "type": "probe",
@@ -123,29 +123,70 @@ def load_dynamic_configuration(
     }
     ```
 
-    some_dynamic_config will be set with the return value
+    `some_dynamic_config` will be set with the return value
     of the function config_probe.
 
-    Side Note: the probe type can be the same as
-    a regular probe can be, python, process or http.
-    The config argument contains all the configurations of the experiment
-    including the raw config_probe configuration that can be dynamically injected.
+    Side Note: the probe type can be the same as a regular probe can be,
+    python, process or http. The config argument contains all the
+    configurations of the experiment including the raw config_probe
+    configuration that can be dynamically injected.
 
-    The configurations contain as well all the env vars
-    after they are set in load_configuration.
+    The configurations contain as well all the env vars after they are set in
+    `load_configuration`.
 
-    The secrets argument contains all the secrets of the experiment.
+    The `secrets` argument contains all the secrets of the experiment.
+
+    For `process` probes, the stdout value (stripped of endlines)
+    is stored into the configuration.
+    For `http` probes, the `body` value is stored.
+    For `python` probes, the output of the function will be stored.
+
+    We do not stop on errors but log a debug message and do not include the
+    key into the result dictionary.
     """
+    # we delay this so that the configuration module can be imported leanly
+    # from elsewhere
     from chaoslib.activity import run_activity
 
     conf = {}
+    secrets = secrets or {}
 
+    had_errors = False
     logger.debug("Loading dynamic configuration...")
     for (key, value) in config.items():
-        if isinstance(value, dict) and value.get("type") == "probe":
-            value["provider"]["secrets"] = secrets
-            conf[key] = run_activity(value, config, secrets)
-        else:
+        if not (isinstance(value, dict) and value.get("type") == "probe"):
             conf[key] = config.get(key, value)
+            continue
+
+        # we have a dynamic config
+        name = value.get("name")
+        provider_type = value["provider"]["type"]
+        value["provider"]["secrets"] = deepcopy(secrets)
+        try:
+            output = run_activity(value, config, secrets)
+        except Exception:
+            had_errors = True
+            logger.debug(f"Failed to load configuration '{name}'", exc_info=True)
+            continue
+
+        if provider_type == "python":
+            conf[key] = output
+        elif provider_type == "process":
+            if output["status"] != 0:
+                had_errors = True
+                logger.debug(
+                    f"Failed to load configuration dynamically "
+                    f"from probe '{name}': {output['stderr']}"
+                )
+            else:
+                conf[key] = output.get("stdout", "").strip()
+        elif provider_type == "http":
+            conf[key] = output.get("body")
+
+    if had_errors:
+        logger.warning(
+            "Some of the dynamic configuration failed to be loaded."
+            "Please review the log file for understanding what happened."
+        )
 
     return conf

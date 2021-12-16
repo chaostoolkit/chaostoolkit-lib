@@ -303,3 +303,22 @@ def test_that_environment_variables_are_typed_correctly():
     assert config["token3"] == int(1000)
     assert config["token4"] == 30.54321
     assert config["token5"] == b"these_are_bytes"
+
+
+def test_dynamic_configuration_exception_means_output_is_missing():
+    config = load_dynamic_configuration(
+        {
+            "somekey": "hello world",
+            "token": {
+                "type": "probe",
+                "provider": {
+                    "type": "python",
+                    "module": "fixtures.configprobe",
+                    "func": "raise_exception",
+                },
+            },
+        }
+    )
+
+    assert config["somekey"] == "hello world"
+    assert "token" not in config
