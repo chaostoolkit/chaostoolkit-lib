@@ -2,11 +2,11 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.23.1...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.24.0...HEAD
 
-## [1.23.1][] - 2021-12-02
+## [1.24.0][] - 2021-12-20
 
-[1.23.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.23.0...1.23.1
+[1.24.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.23.1...1.24.0
 
 ### Added
 
@@ -15,6 +15,13 @@
   If there's a use-case for setting a configuration dynamically right before
   the experiment is starting. It executes the probe, and then the return value
   of this probe will be the config you wish to set.
+
+## [1.23.1][] - 2021-12-02
+
+[1.23.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.23.0...1.23.1
+
+### Added
+
 * Configuration now supports providing a type to convert environment variables
   to a provided type. Addressing this [issue][254]
 
