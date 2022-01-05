@@ -8,6 +8,11 @@
 
 * Requires Python 3.7 as a baseline as Python 3.6 is now EOL
 
+### Added
+
+* Added Python 3.10 support
+
+
 ## [1.24.0][] - 2021-12-20
 
 [1.24.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.23.1...1.24.0
