@@ -62,6 +62,7 @@ def initialize_control(
     configuration: Configuration,
     secrets: Secrets,
     settings: Settings = None,
+    event_registry: "EventHandlerRegistry" = None,  # noqa: F821
 ):
     """
     Initialize a control by calling its `configure_control` function.
@@ -85,6 +86,9 @@ def initialize_control(
 
     if "settings" in sig.parameters:
         arguments["settings"] = settings
+
+    if "event_registry" in sig.parameters:
+        arguments["event_registry"] = event_registry
 
     func(**arguments)
 

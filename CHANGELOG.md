@@ -4,6 +4,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.25.0...HEAD
 
+### Changed
+
+* Pass the event registry to the `configure_control` control if requested
+  through `event_registry` argument. This allows to add your own event handler
+  to the main registry. Mostly for quite advanced cases only.
+
 ## [1.25.0][] - 2022-01-05
 
 [1.25.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.24.0...1.25.0

@@ -331,8 +331,12 @@ class Runner:
         dry = experiment.get("dry", None)
         if dry and isinstance(dry, Dry):
             logger.warning(f"Running experiment with dry {dry.value}")
-        initialize_global_controls(experiment, configuration, secrets, settings)
-        initialize_controls(experiment, configuration, secrets)
+        initialize_global_controls(
+            experiment, configuration, secrets, settings, event_registry=event_registry
+        )
+        initialize_controls(
+            experiment, configuration, secrets, event_registry=event_registry
+        )
 
         logger.info(f"Steady-state strategy: {strategy.value}")
         rollback_strategy = (

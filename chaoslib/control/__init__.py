@@ -35,7 +35,10 @@ global_controls = []
 
 
 def initialize_controls(
-    experiment: Experiment, configuration: Configuration = None, secrets: Secrets = None
+    experiment: Experiment,
+    configuration: Configuration = None,
+    secrets: Secrets = None,
+    event_registry: "EventHandlerRegistry" = None,  # noqa: F821
 ):
     """
     Initialize all declared controls in the experiment.
@@ -60,7 +63,13 @@ def initialize_controls(
         provider = control.get("provider")
         if provider and provider["type"] == "python":
             try:
-                initialize_control(control, experiment, configuration, secrets)
+                initialize_control(
+                    control,
+                    experiment,
+                    configuration,
+                    secrets,
+                    event_registry=event_registry,
+                )
             except Exception:
                 logger.debug(
                     "Control initialization '{}' failed. "
@@ -136,6 +145,7 @@ def initialize_global_controls(
     configuration: Configuration,
     secrets: Secrets,
     settings: Settings,
+    event_registry: "EventHandlerRegistry" = None,  # noqa: F821
 ):
     """
     Load and initialize controls declared in the settings.
@@ -157,6 +167,7 @@ def initialize_global_controls(
                     configuration=configuration,
                     secrets=secrets,
                     settings=settings,
+                    event_registry=event_registry,
                 )
             except Exception:
                 logger.debug(
