@@ -4,6 +4,13 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.26.0...HEAD
 
+### Added
+
+- `chaoslib.canonical_json` that returns a fairly canoniocal view of the
+  experiment
+- `chaoslib.experiment_hash` which builds a hash of the experiment's canonical
+  json view
+
 ## [1.26.0][] - 2022-02-16
 
 [1.26.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.25.0...1.26.0

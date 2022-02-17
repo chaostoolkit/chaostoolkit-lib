@@ -1,4 +1,5 @@
 import decimal
+import hashlib
 import os.path
 import uuid
 from collections import ChainMap
@@ -11,7 +12,7 @@ import yaml
 from logzero import logger
 
 from chaoslib.exceptions import ActivityFailed
-from chaoslib.types import Configuration, ConfigVars, Secrets, SecretVars
+from chaoslib.types import Configuration, ConfigVars, Experiment, Secrets, SecretVars
 
 HAS_CHARDET = True
 try:
@@ -32,7 +33,9 @@ except ImportError:
 
 __all__ = [
     "__version__",
+    "canonical_json",
     "decode_bytes",
+    "experiment_hash",
     "substitute",
     "merge_vars",
     "convert_vars",
@@ -324,3 +327,36 @@ class PayloadEncoder(JSONEncoder):
         elif isinstance(obj, Exception):
             return f"An exception was raised: {obj.__class__.__name__}('{str(obj)}')"
         return JSONEncoder.default(self, obj)
+
+
+def canonical_json(experiment: Experiment) -> bytes:
+    """
+    Serialize and encode to utf-8 the experiment to a canonical view:
+
+    * no identation
+    * sorted keys
+    * keys of a non basic types skipped
+
+    This is mostly useful for hashing the experiment.
+    """
+    return json.dumps(experiment, skipkeys=True, sort_keys=True, indent=None).encode(
+        "utf-8"
+    )
+
+
+def experiment_hash(experiment: Experiment, hash_algo: str = None) -> str:
+    """
+    Create a hash (using the blake2b algorithm by default) of the
+    experiment's cnanonical view.
+
+    You may provide any other algorithms supported by `haslib` and available
+    to your platform
+
+    https://docs.python.org/3/library/hashlib.html#hashlib.algorithms_available
+    """
+    if hash_algo is not None:
+        if hash_algo not in hashlib.algorithms_available:
+            raise ValueError(f"Unsupported hashlib algorithm: '{hash_algo}'")
+        return hashlib.new(hash_algo, canonical_json(experiment)).hexdigest()
+
+    return hashlib.blake2b(canonical_json(experiment), digest_size=12).hexdigest()
