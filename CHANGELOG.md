@@ -14,6 +14,7 @@
   experiment
 - `chaoslib.experiment_hash` which builds a hash of the experiment's canonical
   json view
+- When no steady-state hypothesis strategy was provided, we use the default one
 
 ## [1.26.0][] - 2022-02-16
 

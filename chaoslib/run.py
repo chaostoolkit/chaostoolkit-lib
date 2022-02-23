@@ -338,6 +338,9 @@ class Runner:
             experiment, configuration, secrets, event_registry=event_registry
         )
 
+        if not strategy:
+            strategy = Strategy.DEFAULT
+
         logger.info(f"Steady-state strategy: {strategy.value}")
         rollback_strategy = (
             settings.get("runtime", {}).get("rollbacks", {}).get("strategy", "default")
