@@ -322,3 +322,31 @@ def test_dynamic_configuration_exception_means_output_is_missing():
 
     assert config["somekey"] == "hello world"
     assert "token" not in config
+
+
+def test_dynamic_configuration_can_be_used_next_key():
+    config = load_dynamic_configuration(
+        {
+            "capped": {
+                "type": "probe",
+                "provider": {
+                    "type": "python",
+                    "module": "string",
+                    "func": "capwords",
+                    "arguments": {"s": "hello world from earth"},
+                },
+            },
+            "shorten": {
+                "type": "probe",
+                "provider": {
+                    "type": "python",
+                    "module": "textwrap",
+                    "func": "shorten",
+                    "arguments": {"text": "${capped}", "width": 12},
+                },
+            },
+        }
+    )
+
+    assert config["capped"] == "Hello World From Earth"
+    assert config["shorten"] == "Hello [...]"

@@ -4,6 +4,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.27.0...HEAD
 
+### Changed
+
+- Ensure dynamic configuration can reference itself [#250][250]
+
+[250]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/250
+
 ## [1.27.0][] - 2022-02-17
 
 [1.27.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.26.0...1.27.0

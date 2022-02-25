@@ -163,7 +163,7 @@ def load_dynamic_configuration(
         provider_type = value["provider"]["type"]
         value["provider"]["secrets"] = deepcopy(secrets)
         try:
-            output = run_activity(value, config, secrets)
+            output = run_activity(value, conf, secrets)
         except Exception:
             had_errors = True
             logger.debug(f"Failed to load configuration '{name}'", exc_info=True)
