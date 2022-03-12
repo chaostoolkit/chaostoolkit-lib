@@ -77,6 +77,9 @@ def initialize_controls(
                     exc_info=True,
                 )
 
+    logger.debug(
+        "Controls have been loaded from the experiment: {}".format(controls))
+
 
 def cleanup_controls(experiment: Experiment):
     """
@@ -177,6 +180,10 @@ def initialize_global_controls(
                 )
                 controls.remove(control)
     set_global_controls(controls)
+
+    logger.debug(
+        "Global controls have been loaded from the experiment: {}".format(
+            controls))
 
 
 def load_global_controls(settings: Settings):
@@ -345,31 +352,50 @@ def get_context_controls(
     if not experiment:
         return glbl_controls
 
-    top_level_controls = experiment.get("controls", [])
+    experiment_top_level_controls = experiment.get("controls", [])
     controls = copy(context.get("controls", []))
     controls.extend(glbl_controls)
 
     # do we even have something at the top level to be merged?
-    if not top_level_controls:
+    if not experiment_top_level_controls:
+        # then return only any global controls
         return controls
 
-    if not controls:
-        return [deepcopy(c) for c in top_level_controls if c.get("automatic", True)]
-
+    # method and rollbacks are specials and they require we inject any controls
+    # automatically to them as they don't really have a structure where the
+    # user could have defined them
     if level in ["method", "rollback"]:
-        return [deepcopy(c) for c in top_level_controls if c.get("automatic", True)]
+        return [
+            deepcopy(c)
+            for c in experiment_top_level_controls if c.get("automatic", True)
+        ]
 
-    for c in controls:
+    # no global controls? let's return all experiment level controls directly
+    if not controls:
+        return [
+            deepcopy(c)
+            for c in experiment_top_level_controls if c.get("automatic", True)
+        ]
+
+    # At this stage, controls is made of the global controls and the
+    # current context's controls. When the current context is experiment,
+    # we shouldn't merge anything since they are already there.
+    if level == "experiment":
+        return [deepcopy(c) for c in controls]
+
+    # now we have global controls and experiment level controls while being
+    # at a more nested level like activity, hypothesis, etc...
+    # Let's merge them unless one of them automatic is set to False on one of
+    # the experiment top level control, indicating they should not be applied
+    # down the tree
+    for c in controls[:]:
         if "ref" in c:
-            for top_level_control in top_level_controls:
-                if c["ref"] == top_level_control["name"]:
-                    controls.append(deepcopy(top_level_control))
+            for tc in experiment_top_level_controls:
+                if c["ref"] == tc["name"]:
+                    controls.append(deepcopy(tc))
                     break
         else:
-            for tc in top_level_controls:
-                if c.get("name") == tc.get("name"):
-                    break
-            else:
+            for tc in experiment_top_level_controls:
                 if tc.get("automatic", True):
                     controls.append(deepcopy(tc))
 
