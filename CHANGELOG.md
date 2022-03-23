@@ -4,6 +4,13 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.27.1...HEAD
 
+### Changed
+
+- Ensure experiment level controls are applied to activity level controls
+  when activity declares a control too [#251][251]
+
+[251]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/251
+
 ## [1.27.1][] - 2022-02-25
 
 [1.27.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.27.0...1.27.1

@@ -359,19 +359,18 @@ def get_context_controls(
     if level in ["method", "rollback"]:
         return [deepcopy(c) for c in top_level_controls if c.get("automatic", True)]
 
-    for c in controls:
+    for c in controls[:]:
         if "ref" in c:
             for top_level_control in top_level_controls:
                 if c["ref"] == top_level_control["name"]:
                     controls.append(deepcopy(top_level_control))
                     break
         else:
-            for tc in top_level_controls:
+            for tc in reversed(top_level_controls):
                 if c.get("name") == tc.get("name"):
-                    break
-            else:
+                    continue
                 if tc.get("automatic", True):
-                    controls.append(deepcopy(tc))
+                    controls.insert(0, deepcopy(tc))
 
     return controls
 

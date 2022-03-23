@@ -584,3 +584,12 @@ def test_control_can_validate_itself():
 
     with pytest.raises(InvalidActivity):
         ensure_experiment_is_valid(exp)
+
+
+def test_activity_level_controls_are_merged_to_top_level_controls():
+    x = deepcopy(experiments.ExperimentWithTopLevelControlsAndActivityControl)
+    a = x["method"][0]
+    controls = get_context_controls("activity", x, a)
+    assert controls[0]["name"] == "tc1"
+    assert controls[1]["name"] == "tc3"
+    assert controls[2]["name"] == "lc1"
