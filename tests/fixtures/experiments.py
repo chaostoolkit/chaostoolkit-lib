@@ -902,7 +902,7 @@ ExperimentWithTopLevelControlsAndActivityControl = {
                     "name": "lc1",
                     "provider": {
                         "type": "python",
-                    "module": "fixtures.controls.dummy_sums",
+                        "module": "fixtures.controls.dummy_sums",
                         "arguments": {"values": [2, 3]},
                     },
                 }
@@ -918,7 +918,7 @@ ExperimentWithOnlyTopLevelControls["controls"] = [
         "name": "tc1",
         "provider": {
             "type": "python",
-                "module": "fixtures.controls.dummy_sums",
+            "module": "fixtures.controls.dummy_sums",
             "arguments": {"values": [1, 2]},
         },
     },
@@ -927,7 +927,7 @@ ExperimentWithOnlyTopLevelControls["controls"] = [
         "automatic": False,
         "provider": {
             "type": "python",
-                "module": "fixtures.controls.dummy_sums",
+            "module": "fixtures.controls.dummy_sums",
             "arguments": {"values": [3, 4]},
         },
     },
@@ -935,7 +935,7 @@ ExperimentWithOnlyTopLevelControls["controls"] = [
         "name": "tc3",
         "provider": {
             "type": "python",
-                "module": "fixtures.controls.dummy_sums",
+            "module": "fixtures.controls.dummy_sums",
             "arguments": {"values": [5, 6]},
         },
     },
