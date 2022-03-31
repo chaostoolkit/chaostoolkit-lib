@@ -4,6 +4,10 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.27.2...HEAD
 
+### Changed
+
+- Ensure experiment level controls are only played once
+
 ## [1.27.2][] - 2022-03-23
 
 [1.27.2]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.27.1...1.27.2

@@ -369,7 +369,7 @@ def get_context_controls(
             for tc in reversed(top_level_controls):
                 if c.get("name") == tc.get("name"):
                     continue
-                if tc.get("automatic", True):
+                if (level != "experiment") and tc.get("automatic", True):
                     controls.insert(0, deepcopy(tc))
 
     return controls

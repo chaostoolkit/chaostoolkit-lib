@@ -593,3 +593,9 @@ def test_activity_level_controls_are_merged_to_top_level_controls():
     assert controls[0]["name"] == "tc1"
     assert controls[1]["name"] == "tc3"
     assert controls[2]["name"] == "lc1"
+
+
+def test_experiment_level_controls_played_only_one_each_in_the_after_phase():
+    x = deepcopy(experiments.ExperimentWithOnlyTopLevelControls)
+    run_experiment(x)
+    assert x["result_after"] == 21
