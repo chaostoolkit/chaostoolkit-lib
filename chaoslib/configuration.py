@@ -66,6 +66,11 @@ def load_configuration(
     conf = {}
 
     for (key, value) in config_info.items():
+        # env var files can contain the full definition of the
+        # configuration's key, so we swap it. See #252
+        if key in extra_vars:
+            value = extra_vars.pop(key, None)
+
         if isinstance(value, dict) and "type" in value:
             if value["type"] == "env":
                 env_key = value["key"]
