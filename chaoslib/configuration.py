@@ -66,6 +66,11 @@ def load_configuration(
     conf = {}
 
     for (key, value) in config_info.items():
+        # ----------------FIX----------------
+        if extra_vars.get(key):
+            value = extra_vars[key]
+            del extra_vars[key]
+        # ------------------------------------
         if isinstance(value, dict) and "type" in value:
             if value["type"] == "env":
                 env_key = value["key"]
@@ -148,14 +153,13 @@ def load_dynamic_configuration(
     # from elsewhere
     from chaoslib.activity import run_activity
 
-    conf = {}
     secrets = secrets or {}
 
     had_errors = False
     logger.debug("Loading dynamic configuration...")
     for (key, value) in config.items():
         if not (isinstance(value, dict) and value.get("type") == "probe"):
-            conf[key] = config.get(key, value)
+            config[key] = config.get(key, value)
             continue
 
         # we have a dynamic config
@@ -163,14 +167,14 @@ def load_dynamic_configuration(
         provider_type = value["provider"]["type"]
         value["provider"]["secrets"] = deepcopy(secrets)
         try:
-            output = run_activity(value, conf, secrets)
+            output = run_activity(value, config, secrets)
         except Exception:
             had_errors = True
             logger.debug(f"Failed to load configuration '{name}'", exc_info=True)
             continue
 
         if provider_type == "python":
-            conf[key] = output
+            config[key] = output
         elif provider_type == "process":
             if output["status"] != 0:
                 had_errors = True
@@ -179,9 +183,9 @@ def load_dynamic_configuration(
                     f"from probe '{name}': {output['stderr']}"
                 )
             else:
-                conf[key] = output.get("stdout", "").strip()
+                config[key] = output.get("stdout", "").strip()
         elif provider_type == "http":
-            conf[key] = output.get("body")
+            config[key] = output.get("body")
 
     if had_errors:
         logger.warning(
@@ -189,4 +193,4 @@ def load_dynamic_configuration(
             "Please review the log file for understanding what happened."
         )
 
-    return conf
+    return config
