@@ -8,6 +8,10 @@
 
 [1.27.3]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.27.2...1.27.3
 
+### Fix
+
+- Fix bug in load_configurations
+
 ### Changed
 
 - Ensure experiment level controls are only played once
