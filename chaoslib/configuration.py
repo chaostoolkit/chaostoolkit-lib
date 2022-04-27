@@ -154,7 +154,7 @@ def load_dynamic_configuration(
     from chaoslib.activity import run_activity
 
     secrets = secrets or {}
-
+    # output = None
     had_errors = False
     logger.debug("Loading dynamic configuration...")
     for (key, value) in config.items():
@@ -168,10 +168,10 @@ def load_dynamic_configuration(
         value["provider"]["secrets"] = deepcopy(secrets)
         try:
             output = run_activity(value, config, secrets)
-        except Exception:
+        except Exception as err:
             had_errors = True
             logger.debug(f"Failed to load configuration '{name}'", exc_info=True)
-            continue
+            raise err
 
         if provider_type == "python":
             config[key] = output
