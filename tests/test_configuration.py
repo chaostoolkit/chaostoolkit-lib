@@ -306,22 +306,23 @@ def test_that_environment_variables_are_typed_correctly():
 
 
 def test_dynamic_configuration_exception_means_output_is_missing():
-    config = load_dynamic_configuration(
-        {
-            "somekey": "hello world",
-            "token": {
-                "type": "probe",
-                "provider": {
-                    "type": "python",
-                    "module": "fixtures.configprobe",
-                    "func": "raise_exception",
+    config = {"somekey": "hello world"}
+    with pytest.raises(Exception):
+        config = load_dynamic_configuration(
+            {
+                "somekey": "hello world",
+                "token": {
+                    "type": "probe",
+                    "provider": {
+                        "type": "python",
+                        "module": "fixtures.configprobe",
+                        "func": "raise_exception",
+                    },
                 },
-            },
-        }
-    )
+            }
+        )
 
     assert config["somekey"] == "hello world"
-    assert "token" not in config
 
 
 def test_dynamic_configuration_can_be_used_next_key():
@@ -350,3 +351,7 @@ def test_dynamic_configuration_can_be_used_next_key():
 
     assert config["capped"] == "Hello World From Earth"
     assert config["shorten"] == "Hello [...]"
+
+
+if __name__ == "__main__":
+    test_dynamic_configuration_exception_means_output_is_missing()

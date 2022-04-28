@@ -88,10 +88,13 @@ def validate_python_activity(activity: Activity):  # noqa: C901
 
     try:
         mod = importlib.import_module(mod_name)
-    except ImportError:
+    except ImportError as err:
         raise InvalidActivity(
-            "could not find Python module '{mod}' "
-            "in activity '{name}'".format(mod=mod_name, name=activity_name)
+            "could not find Python module '{mod}'"
+            "in activity '{name}'"
+            "\nerror traceback:\n{error}".format(
+                mod=mod_name, name=activity_name, error=err
+            )
         )
 
     found_func = False
