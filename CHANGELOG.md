@@ -11,6 +11,7 @@
 ### Changed
 
 - Ensure experiment level controls are only played once
+- Allow to substitute `pauses` values with configuration or secret values
 
 ## [1.27.2][] - 2022-03-23
 

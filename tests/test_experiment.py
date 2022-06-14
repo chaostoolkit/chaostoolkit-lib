@@ -1,4 +1,5 @@
 import json
+import os
 import signal
 import tempfile
 import types
@@ -9,7 +10,7 @@ import requests_mock
 import yaml
 from fixtures import experiments
 
-from chaoslib.activity import run_activities
+from chaoslib.activity import ensure_activity_is_valid, run_activities
 from chaoslib.exceptions import InterruptExecution, InvalidActivity, InvalidExperiment
 from chaoslib.experiment import (
     ensure_experiment_is_valid,
@@ -483,3 +484,78 @@ def test_pauseless_run_should_not_pause_before():
     pause_before_duration = int(experiment["method"][1]["pauses"]["before"])
 
     assert experiment_run_time < pause_before_duration
+
+
+def test_pauses_must_be_numbers_or_substitution_pattern():
+    try:
+        ensure_activity_is_valid(
+            {
+                "name": "can-use-numbers",
+                "type": "probe",
+                "provider": {
+                    "type": "python",
+                    "module": "os.path",
+                    "func": "exists",
+                    "arguments": {"path": os.getcwd()},
+                },
+                "pauses": {"before": 1, "after": 0.7},
+            }
+        )
+    except InvalidActivity:
+        pytest.fail("pauses should support numbers")
+
+    try:
+        ensure_activity_is_valid(
+            {
+                "name": "can-use-numbers",
+                "type": "probe",
+                "provider": {
+                    "type": "python",
+                    "module": "os.path",
+                    "func": "exists",
+                    "arguments": {"path": os.getcwd()},
+                },
+                "pauses": {
+                    "before": "${pause_before}",
+                    "after": "${pause_after}",
+                },
+            }
+        )
+    except InvalidActivity:
+        pytest.fail("pauses should support substitution patterns")
+
+    with pytest.raises(InvalidActivity):
+        ensure_activity_is_valid(
+            {
+                "name": "can-use-numbers",
+                "type": "probe",
+                "provider": {
+                    "type": "python",
+                    "module": "os.path",
+                    "func": "exists",
+                    "arguments": {"path": os.getcwd()},
+                },
+                "pauses": {
+                    "before": "hello",
+                    "after": 0.9,
+                },
+            }
+        )
+
+    with pytest.raises(InvalidActivity):
+        ensure_activity_is_valid(
+            {
+                "name": "can-use-numbers",
+                "type": "probe",
+                "provider": {
+                    "type": "python",
+                    "module": "os.path",
+                    "func": "exists",
+                    "arguments": {"path": os.getcwd()},
+                },
+                "pauses": {
+                    "before": 0.8,
+                    "after": "world",
+                },
+            }
+        )
