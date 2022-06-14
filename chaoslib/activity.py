@@ -7,6 +7,7 @@ from typing import Any, Iterator, List
 
 from logzero import logger
 
+from chaoslib import substitute
 from chaoslib.caching import lookup_activity
 from chaoslib.control import controls
 from chaoslib.exceptions import ActivityFailed, InvalidActivity
@@ -77,11 +78,25 @@ def ensure_activity_is_valid(activity: Activity):  # noqa: C901
     pauses = activity.get("pauses")
     if pauses is not None:
         before = pauses.get("before")
-        if before is not None and not isinstance(before, numbers.Number):
-            raise InvalidActivity("activity before pause must be a number")
+        if before is not None:
+            if isinstance(before, str):
+                if (
+                    not before.startswith("${") or not before.endswith("}")
+                ) or isinstance(before, numbers.Number):
+                    raise InvalidActivity(
+                        "activity before pause must be a number or a pattern "
+                        "to a variable from the configuration or secrets"
+                    )
         after = pauses.get("after")
-        if after is not None and not isinstance(after, numbers.Number):
-            raise InvalidActivity("activity after pause must be a number")
+        if after is not None:
+            if isinstance(after, str):
+                if (
+                    not after.startswith("${") or not after.endswith("}")
+                ) or isinstance(after, numbers.Number):
+                    raise InvalidActivity(
+                        "activity after pause must be a number or a pattern "
+                        "to a variable from the configuration or secrets"
+                    )
 
     if "background" in activity:
         if not isinstance(activity["background"], bool):
@@ -163,6 +178,7 @@ def execute_activity(
     ) as control:
         dry = activity.get("dry", dry)
         pauses = activity.get("pauses", {})
+        pauses = substitute(pauses, configuration, secrets)
         pause_before = pauses.get("before")
         is_dry = False
         activity_type = activity["type"]
