@@ -2,13 +2,18 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.27.3...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.28.0...HEAD
+
+## [1.28.0][] - 2022-06-15
+
+[1.28.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.27.3...1.28.0
 
 ### Changed
 
 - When env variables are provided, first take their values before loading the
   configuration. This allows to have different scenarios stored outside the
   experiment itself. [#252][252]
+- Allow to substitute `pauses` values with configuration or secret values
 
 [252]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/252
 
@@ -19,7 +24,6 @@
 ### Changed
 
 - Ensure experiment level controls are only played once
-- Allow to substitute `pauses` values with configuration or secret values
 
 ## [1.27.2][] - 2022-03-23
 
