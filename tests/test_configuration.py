@@ -350,3 +350,15 @@ def test_dynamic_configuration_can_be_used_next_key():
 
     assert config["capped"] == "Hello World From Earth"
     assert config["shorten"] == "Hello [...]"
+
+
+def test_env_var_can_be_used_with_loading_dynamic_config(fixtures_dir: str):
+    env_file = os.path.join(fixtures_dir, "env_vars_issue252.json")
+    cfg_vars, _ = merge_vars(None, [env_file])
+    cfg = load_configuration(
+        {"some_config_1": "hello", "some_config_2": "there"}, extra_vars=cfg_vars
+    )
+
+    dcfg = load_dynamic_configuration(cfg)
+    assert dcfg["some_config_1"] == os.getcwd()
+    assert dcfg["some_config_2"] is True

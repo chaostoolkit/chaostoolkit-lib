@@ -4,6 +4,14 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.27.3...HEAD
 
+### Changed
+
+- When env variables are provided, first take their values before loading the
+  configuration. This allows to have different scenarios stored outside the
+  experiment itself. [#252][252]
+
+[252]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/252
+
 ## [1.27.3][] - 2022-03-31
 
 [1.27.3]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.27.2...1.27.3
