@@ -1,4 +1,5 @@
 import json
+import os
 import tempfile
 
 import pytest
@@ -142,3 +143,25 @@ def test_https_with_verification():
         m.get("https://example.com/experiment.yaml", exc=requests.exceptions.SSLError)
         with pytest.raises(requests.exceptions.SSLError):
             load_experiment("https://example.com/experiment.yaml", verify_tls=True)
+
+
+def test_load_from_http_with_auth_from_env(settings: Settings, generic_experiment: str):
+    try:
+        os.environ["CHAOSTOOLKIT_LOADER_AUTH_BEARER_TOKEN"] = "XYZ"
+        with requests_mock.mock() as m:
+            m.get(
+                "http://example.com/experiment.json",
+                status_code=200,
+                request_headers={
+                    "Authorization": "bearer XYZ",
+                    "Accept": "application/json, application/x-yaml",
+                },
+                headers={"Content-Type": "application/json"},
+                json=json.dumps(generic_experiment),
+            )
+            try:
+                load_experiment("http://example.com/experiment.json")
+            except InvalidSource as x:
+                pytest.fail(str(x))
+    finally:
+        os.environ.pop("CHAOSTOOLKIT_LOADER_AUTH_BEARER_TOKEN", None)

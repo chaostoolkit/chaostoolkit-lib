@@ -4,6 +4,13 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.28.0...HEAD
 
+### Added
+
+- A new `CHAOSTOOLKIT_LOADER_AUTH_BEARER_TOKEN` environment variable used
+  when loading an experiment from http with an authorization bearer token.
+  It takes precedence over the same information in the settings file if it is
+  defined there too.
+
 ## [1.28.0][] - 2022-06-15
 
 [1.28.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.27.3...1.28.0

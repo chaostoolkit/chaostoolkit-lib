@@ -108,8 +108,11 @@ def load_experiment(
         if p.scheme not in ("http", "https"):
             raise InvalidSource(f"'{p.scheme}' is not a supported source scheme.")
 
+        ctk_bearer_token = os.getenv("CHAOSTOOLKIT_LOADER_AUTH_BEARER_TOKEN")
         headers = {"Accept": "application/json, application/x-yaml"}
-        if settings:
+        if ctk_bearer_token:
+            headers["Authorization"] = "bearer {}".format(ctk_bearer_token.strip())
+        elif settings:
             auths = settings.get("auths", [])
             for domain in auths:
                 if domain == p.netloc:
