@@ -60,8 +60,8 @@ jobs:
         pip install -U setuptools wheel twine
     - name: Build and publish
       env:
-        TWINE_USERNAME: chaostoolkit
-        TWINE_PASSWORD: ${{ secrets.PYPI_PWD }}
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
       run: |
         python3 setup.py release
         twine upload dist/*
