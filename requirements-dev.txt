@@ -7,10 +7,11 @@ freezegun
 hvac
 isort
 jsonpath2
-pytest~=6.2
+pytest
 pytest-cov
 pytest-sugar
 ply
 pyhcl
 requests-mock
 responses
+pyflakes==2.4.0
