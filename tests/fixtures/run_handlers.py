@@ -11,6 +11,9 @@ class FullRunEventHandler(RunEventHandler):
     def started(self, experiment: Experiment, journal: Journal) -> None:
         self.calls.append("started")
 
+    def running(self, experiment: Experiment, journal: Journal) -> None:
+        self.calls.append("running")
+
     def finish(self, journal: Journal) -> None:
         self.calls.append("finish")
 

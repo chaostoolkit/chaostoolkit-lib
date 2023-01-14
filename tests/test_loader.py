@@ -86,7 +86,7 @@ def test_yaml_safe_load_from_http():
             load_experiment("http://example.com/experiment.yaml")
 
 
-def test_can_load_json_from_plain_text_http():
+def test_can_load_yaml_from_plain_text_http():
     with requests_mock.mock() as m:
         m.get(
             "http://example.com/experiment.yaml",
@@ -100,7 +100,7 @@ def test_can_load_json_from_plain_text_http():
             pytest.fail(str(x))
 
 
-def test_can_load_yaml_from_plain_text_http(generic_experiment: str):
+def test_can_load_json_from_plain_text_http(generic_experiment: str):
     with requests_mock.mock() as m:
         m.get(
             "http://example.com/experiment.json",

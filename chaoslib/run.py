@@ -61,6 +61,9 @@ class RunEventHandler:
     def started(self, experiment: Experiment, journal: Journal) -> None:
         logger.debug("Experiment execution started")
 
+    def running(self, experiment: Experiment, journal: Journal) -> None:
+        logger.debug("Experiment execution started")
+
     def finish(self, journal: Journal) -> None:
         logger.debug("Experiment execution finished")
 
@@ -127,6 +130,13 @@ class EventHandlerRegistry:
         for h in self.handlers:
             try:
                 h.started(experiment, journal)
+            except Exception:
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+
+    def running(self, experiment: Experiment, journal: Journal) -> None:
+        for h in self.handlers:
+            try:
+                h.running(experiment, journal)
             except Exception:
                 logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
@@ -337,6 +347,7 @@ class Runner:
         initialize_controls(
             experiment, configuration, secrets, event_registry=event_registry
         )
+        event_registry.running(experiment, journal)
 
         if not strategy:
             strategy = Strategy.DEFAULT

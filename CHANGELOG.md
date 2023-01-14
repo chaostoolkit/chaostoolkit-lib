@@ -4,6 +4,11 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.29.0...HEAD
 
+### Added
+
+- A new `running` callback in the handler registry as the `started` callback
+  happens too soon in the control lifecycle.
+ 
 ## [1.29.0][] - 2022-09-28
 
 [1.29.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.28.0...1.29.0
