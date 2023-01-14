@@ -183,7 +183,7 @@ def test_run_handler_is_called_on_each_handler():
     registry.register(h)
 
     registry.started(None, None)
-    registry.running(None, None)
+    registry.running(None, None, None, None, None, None)
     registry.finish(None)
     registry.interrupted(None, None)
     registry.signal_exit()
@@ -230,7 +230,7 @@ def test_exceptions_does_not_stop_handler_registry():
     registry.register(h)
 
     registry.started(None, None)
-    registry.running(None, None)
+    registry.running(None, None, None, None, None, None)
     registry.finish(None)
     registry.interrupted(None, None)
     registry.signal_exit()

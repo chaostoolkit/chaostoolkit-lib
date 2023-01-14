@@ -1,7 +1,14 @@
 from typing import Any, Dict
 
 from chaoslib.run import RunEventHandler
-from chaoslib.types import Experiment, Journal
+from chaoslib.types import (
+    Configuration,
+    Experiment,
+    Journal,
+    Schedule,
+    Secrets,
+    Settings,
+)
 
 
 class FullRunEventHandler(RunEventHandler):
@@ -11,7 +18,15 @@ class FullRunEventHandler(RunEventHandler):
     def started(self, experiment: Experiment, journal: Journal) -> None:
         self.calls.append("started")
 
-    def running(self, experiment: Experiment, journal: Journal) -> None:
+    def running(
+        self,
+        experiment: Experiment,
+        journal: Journal,
+        configuration: Configuration,
+        secrets: Secrets,
+        schedule: Schedule,
+        settings: Settings,
+    ) -> None:
         self.calls.append("running")
 
     def finish(self, journal: Journal) -> None:
