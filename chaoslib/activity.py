@@ -3,7 +3,7 @@ import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-from typing import Any, Iterator, List
+from typing import TYPE_CHECKING, Any, Iterator, List
 
 from logzero import logger
 
@@ -15,6 +15,9 @@ from chaoslib.provider.http import run_http_activity, validate_http_activity
 from chaoslib.provider.process import run_process_activity, validate_process_activity
 from chaoslib.provider.python import run_python_activity, validate_python_activity
 from chaoslib.types import Activity, Configuration, Dry, Experiment, Run, Secrets
+
+if TYPE_CHECKING:
+    from chaoslib.run import EventHandlerRegistry
 
 __all__ = [
     "ensure_activity_is_valid",
@@ -116,6 +119,7 @@ def run_activities(
     secrets: Secrets,
     pool: ThreadPoolExecutor,
     dry: Dry = None,
+    event_registry: "EventHandlerRegistry" = None,
 ) -> Iterator[Run]:
     """
     Internal generator that iterates over all activities and execute them.
@@ -137,6 +141,7 @@ def run_activities(
                 configuration=configuration,
                 secrets=secrets,
                 dry=dry,
+                event_registry=event_registry,
             )
         else:
             yield execute_activity(
@@ -145,6 +150,7 @@ def run_activities(
                 configuration=configuration,
                 secrets=secrets,
                 dry=dry,
+                event_registry=event_registry,
             )
 
 
@@ -157,6 +163,7 @@ def execute_activity(
     configuration: Configuration,
     secrets: Secrets,
     dry: Dry,
+    event_registry: "EventHandlerRegistry" = None,
 ) -> Run:
     """
     Low-level wrapper around the actual activity provider call to collect
@@ -212,6 +219,8 @@ def execute_activity(
         result = None
         interrupted = False
         try:
+            if event_registry:
+                event_registry.start_activity(activity)
             # pause when one of the dry flags are set
             if not is_dry:
                 result = run_activity(activity, configuration, secrets)
@@ -233,6 +242,9 @@ def execute_activity(
             run["start"] = start.isoformat()
             run["end"] = end.isoformat()
             run["duration"] = (end - start).total_seconds()
+
+            if event_registry:
+                event_registry.activity_completed(activity, run)
 
             pause_after = pauses.get("after")
             if pause_after and not interrupted:

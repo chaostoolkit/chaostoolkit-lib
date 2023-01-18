@@ -1,3 +1,4 @@
+from abc import ABCMeta
 from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError
 
 try:
@@ -36,6 +37,7 @@ from chaoslib.rollback import run_rollbacks
 from chaoslib.secret import load_secrets
 from chaoslib.settings import get_loaded_settings
 from chaoslib.types import (
+    Activity,
     Configuration,
     Dry,
     Experiment,
@@ -50,7 +52,7 @@ from chaoslib.types import (
 __all__ = ["Runner", "RunEventHandler"]
 
 
-class RunEventHandler:
+class RunEventHandler(metaclass=ABCMeta):
     """
     Base class to react to certain, or all, events during an execution.
 
@@ -59,7 +61,7 @@ class RunEventHandler:
     """
 
     def started(self, experiment: Experiment, journal: Journal) -> None:
-        logger.debug("Experiment execution started")
+        pass
 
     def running(
         self,
@@ -70,61 +72,67 @@ class RunEventHandler:
         schedule: Schedule,
         settings: Settings,
     ) -> None:
-        logger.debug("Experiment execution running")
+        pass
 
     def finish(self, journal: Journal) -> None:
-        logger.debug("Experiment execution finished")
+        pass
 
     def interrupted(self, experiment: Experiment, journal: Journal) -> None:
-        logger.debug("Experiment execution was interrupted by a control")
+        pass
 
     def signal_exit(self) -> None:
-        logger.debug("Experiment execution caught a system signal")
+        pass
 
     def start_continuous_hypothesis(self, frequency: int) -> None:
-        logger.debug("Steady state will run continuously now")
+        pass
 
     def continuous_hypothesis_iteration(self, iteration_index: int, state: Any) -> None:
-        logger.debug(f"Steady state iteration {iteration_index}")
+        pass
 
     def continuous_hypothesis_completed(
         self, experiment: Experiment, journal: Journal, exception: Exception = None
     ) -> None:
-        logger.debug("Continuous steady state is now complete")
+        pass
 
     def start_hypothesis_before(self, experiment: Experiment) -> None:
-        logger.debug("Steady state hypothesis is now running before method")
+        pass
 
     def hypothesis_before_completed(
         self, experiment: Experiment, state: Dict[str, Any], journal: Journal
     ) -> None:
-        logger.debug("Steady state hypothesis before method completed")
+        pass
 
     def start_hypothesis_after(self, experiment: Experiment) -> None:
-        logger.debug("Steady state hypothesis is now running after method")
+        pass
 
     def hypothesis_after_completed(
         self, experiment: Experiment, state: Dict[str, Any], journal: Journal
     ) -> None:
-        logger.debug("Steady state hypothesis after method completed")
+        pass
 
     def start_method(self, experiment: Experiment) -> None:
-        logger.debug("Method has now started")
+        pass
 
     def method_completed(self, experiment: Experiment, state: Any) -> None:
-        logger.debug("Method has now completed")
+        pass
 
     def start_rollbacks(self, experiment: Experiment) -> None:
-        logger.debug("Rollbacks have now started")
+        pass
 
     def rollbacks_completed(self, experiment: Experiment, journal: Journal) -> None:
-        logger.debug("Rollbacks have now completed")
+        pass
 
     def start_cooldown(self, duration: int) -> None:
-        logger.debug("Cooldown period has now started")
+        pass
 
     def cooldown_completed(self) -> None:
-        logger.debug("Cooldown period has now completed")
+        pass
+
+    def start_activity(self, activity: Activity) -> None:
+        pass
+
+    def activity_completed(self, activity: Activity, run: Run) -> None:
+        pass
 
 
 class EventHandlerRegistry:
@@ -273,6 +281,20 @@ class EventHandlerRegistry:
         for h in self.handlers:
             try:
                 h.cooldown_completed()
+            except Exception:
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+
+    def start_activity(self, activity: Activity) -> None:
+        for h in self.handlers:
+            try:
+                h.start_activity(activity)
+            except Exception:
+                logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
+
+    def activity_completed(self, activity: Activity, run: Run) -> None:
+        for h in self.handlers:
+            try:
+                h.activity_completed(activity, run)
             except Exception:
                 logger.debug(f"Handler {h.__class__.__name__} failed", exc_info=True)
 
@@ -639,7 +661,13 @@ def run_method(
     event_registry.start_method(experiment)
     try:
         state = apply_activities(
-            experiment, configuration, secrets, activity_pool, journal, dry
+            experiment,
+            configuration,
+            secrets,
+            activity_pool,
+            journal,
+            dry,
+            event_registry,
         )
         event_registry.method_completed(experiment, state)
         return state
@@ -840,6 +868,7 @@ def apply_activities(
     pool: ThreadPoolExecutor,
     journal: Journal,
     dry: Dry,
+    event_registry: EventHandlerRegistry,
 ) -> List[Run]:
     with controls(
         level="method",
@@ -854,7 +883,9 @@ def apply_activities(
         wait_for_background_activities = True
 
         try:
-            for run in run_activities(experiment, configuration, secrets, pool, dry):
+            for run in run_activities(
+                experiment, configuration, secrets, pool, dry, event_registry
+            ):
                 runs.append(run)
                 if journal["status"] in ["aborted", "failed", "interrupted"]:
                     break

@@ -2,9 +2,11 @@ from typing import Any, Dict
 
 from chaoslib.run import RunEventHandler
 from chaoslib.types import (
+    Activity,
     Configuration,
     Experiment,
     Journal,
+    Run,
     Schedule,
     Secrets,
     Settings,
@@ -83,6 +85,12 @@ class FullRunEventHandler(RunEventHandler):
     def cooldown_completed(self) -> None:
         self.calls.append("cooldown_completed")
 
+    def start_activity(self, activity: Activity) -> None:
+        self.calls.append("start_activity")
+
+    def activity_completed(self, activity: Activity, run: Run) -> None:
+        self.calls.append("activity_completed")
+
 
 class FullExceptionRunEventHandler(RunEventHandler):
     def __init__(self):
@@ -124,7 +132,7 @@ class FullExceptionRunEventHandler(RunEventHandler):
         raise Exception()
 
     def start_hypothesis_after(self, experiment: Experiment) -> None:
-        self.calls.append("start_hypothesis_after")
+        raise Exception()
 
     def hypothesis_after_completed(
         self, experiment: Experiment, state: Dict[str, Any], journal: Journal
@@ -141,4 +149,10 @@ class FullExceptionRunEventHandler(RunEventHandler):
         raise Exception()
 
     def cooldown_completed(self) -> None:
+        raise Exception()
+
+    def start_activity(self, activity: Activity) -> None:
+        raise Exception()
+
+    def activity_completed(self, activity: Activity, run: Run) -> None:
         raise Exception()

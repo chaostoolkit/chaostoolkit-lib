@@ -4,6 +4,13 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.30.0...HEAD
 
+### Added
+
+- New `start_activity` and `activity_completed` callbackx in the handler
+  registry to wrap the activities when they run.
+- Stop logging from the default handler callbacks
+
+
 ## [1.30.0][] - 2023-01-14
 
 [1.30.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.29.0...1.30.0

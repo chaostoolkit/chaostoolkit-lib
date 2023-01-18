@@ -191,6 +191,8 @@ def test_run_handler_is_called_on_each_handler():
     registry.continuous_hypothesis_iteration(0, None)
     registry.continuous_hypothesis_completed(None, None)
     registry.start_method(None)
+    registry.start_activity(None)
+    registry.activity_completed(None, None)
     registry.method_completed(None, None)
     registry.start_rollbacks(None)
     registry.rollbacks_completed(None, None)
@@ -211,6 +213,8 @@ def test_run_handler_is_called_on_each_handler():
         "continuous_hypothesis_iteration",
         "continuous_hypothesis_completed",
         "start_method",
+        "start_activity",
+        "activity_completed",
         "method_completed",
         "start_rollbacks",
         "rollbacks_completed",
@@ -238,6 +242,8 @@ def test_exceptions_does_not_stop_handler_registry():
     registry.continuous_hypothesis_iteration(0, None)
     registry.continuous_hypothesis_completed(None, None)
     registry.start_method(None)
+    registry.start_activity(None)
+    registry.activity_completed(None, None)
     registry.method_completed(None, None)
     registry.start_rollbacks(None)
     registry.rollbacks_completed(None, None)
@@ -258,6 +264,8 @@ def test_exceptions_does_not_stop_handler_registry():
         "continuous_hypothesis_iteration",
         "continuous_hypothesis_completed",
         "start_method",
+        "start_activity",
+        "activity_completed",
         "method_completed",
         "start_rollbacks",
         "rollbacks_completed",
