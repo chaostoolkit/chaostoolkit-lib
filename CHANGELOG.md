@@ -4,6 +4,11 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.32.0...HEAD
 
+### Changed
+
+- Switched from a queue to a simple list for tracking method runs internally
+  as the list is thread-safe for insertions anyway
+
 ## [1.32.0][] - 2023-01-25
 
 [1.32.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.31.0...1.32.0

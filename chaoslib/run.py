@@ -1,6 +1,5 @@
 from abc import ABCMeta
 from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError
-from queue import Empty, SimpleQueue
 
 try:
     import ctypes
@@ -665,7 +664,8 @@ def run_method(
     logger.info("Playing your experiment's method now...")
     event_registry.start_method(experiment)
     try:
-        runs = SimpleQueue()
+        runs = []
+        journal["run"] = runs
         apply_activities(
             experiment,
             configuration,
@@ -676,9 +676,8 @@ def run_method(
             event_registry,
             runs=runs,
         )
-        state = journal["run"]
-        event_registry.method_completed(experiment, state)
-        return state
+        event_registry.method_completed(experiment, runs)
+        return runs
     except InterruptExecution:
         event_registry.method_completed(experiment)
         raise
@@ -879,8 +878,8 @@ def apply_activities(
     journal: Journal,
     dry: Dry,
     event_registry: EventHandlerRegistry,
-    runs: SimpleQueue,
-) -> List[Run]:
+    runs: List[Run],
+) -> None:
     with controls(
         level="method",
         experiment=experiment,
@@ -888,12 +887,11 @@ def apply_activities(
         configuration=configuration,
         secrets=secrets,
     ) as control:
-        result = []
         futures = []
         wait_for_background_activities = True
 
         try:
-            for run in run_activities(
+            for activity in run_activities(
                 experiment,
                 configuration,
                 secrets,
@@ -902,8 +900,8 @@ def apply_activities(
                 event_registry,
                 runs,
             ):
-                if isinstance(run, Future):
-                    futures.append(run)
+                if isinstance(activity, Future):
+                    futures.append(activity)
                 if journal["status"] in ["aborted", "failed", "interrupted"]:
                     break
         except SystemExit as x:
@@ -913,15 +911,7 @@ def apply_activities(
             wait_for_background_activities = x.code != 30  # see exit.py
             raise
         finally:
-            while True:
-                try:
-                    result.append(runs.get_nowait())
-                except Empty:
-                    break
-
-            journal["run"] = result
-
-            control.with_state(result)
+            control.with_state(runs)
 
             if wait_for_background_activities and pool:
                 logger.debug("Waiting for background activities to complete")
@@ -941,8 +931,6 @@ def apply_activities(
                         pass
 
                 pool.shutdown(wait=False)
-
-    return result
 
 
 def apply_rollbacks(

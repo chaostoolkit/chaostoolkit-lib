@@ -3,7 +3,6 @@ import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-from queue import SimpleQueue
 from typing import TYPE_CHECKING, Any, Iterator, List
 
 from logzero import logger
@@ -121,7 +120,7 @@ def run_activities(
     pool: ThreadPoolExecutor,
     dry: Dry = None,
     event_registry: "EventHandlerRegistry" = None,
-    runs: SimpleQueue = None,
+    runs: List[Run] = None,
 ) -> Iterator[Run]:
     """
     Internal generator that iterates over all activities and execute them.
@@ -168,7 +167,7 @@ def execute_activity(
     secrets: Secrets,
     dry: Dry,
     event_registry: "EventHandlerRegistry" = None,
-    runs: SimpleQueue = None,
+    runs: List[Run] = None,
 ) -> Run:
     """
     Low-level wrapper around the actual activity provider call to collect
@@ -219,8 +218,8 @@ def execute_activity(
 
         start = datetime.utcnow()
         run = {"activity": activity.copy(), "output": None, "start": start.isoformat()}
-        if runs:
-            runs.put(run)
+        if runs is not None:
+            runs.append(run)
 
         result = None
         interrupted = False
