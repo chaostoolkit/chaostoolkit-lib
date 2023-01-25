@@ -3,7 +3,7 @@ import re
 from decimal import Decimal, InvalidOperation
 from functools import singledispatch
 from numbers import Number
-from typing import Any, Dict
+from typing import TYPE_CHECKING, Any, Dict
 
 try:
     from jsonpath2.path import Path as JSONPath
@@ -19,6 +19,9 @@ from chaoslib.activity import ensure_activity_is_valid, execute_activity, run_ac
 from chaoslib.control import controls
 from chaoslib.exceptions import ActivityFailed, InvalidActivity, InvalidExperiment
 from chaoslib.types import Configuration, Dry, Experiment, Secrets, Tolerance
+
+if TYPE_CHECKING:
+    from chaoslib.run import EventHandlerRegistry
 
 __all__ = ["ensure_hypothesis_is_valid", "run_steady_state_hypothesis"]
 
@@ -168,6 +171,7 @@ def run_steady_state_hypothesis(
     configuration: Configuration,
     secrets: Secrets,
     dry: Dry,
+    event_registry: "EventHandlerRegistry",
 ) -> Dict[str, Any]:
     """
     Run all probes in the hypothesis and fail the experiment as soon as any of
@@ -198,6 +202,7 @@ def run_steady_state_hypothesis(
                 configuration=configuration,
                 secrets=secrets,
                 dry=dry,
+                event_registry=event_registry,
             )
 
             state["probes"].append(run)

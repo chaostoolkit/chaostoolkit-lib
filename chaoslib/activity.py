@@ -3,6 +3,7 @@ import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
+from queue import SimpleQueue
 from typing import TYPE_CHECKING, Any, Iterator, List
 
 from logzero import logger
@@ -120,6 +121,7 @@ def run_activities(
     pool: ThreadPoolExecutor,
     dry: Dry = None,
     event_registry: "EventHandlerRegistry" = None,
+    runs: SimpleQueue = None,
 ) -> Iterator[Run]:
     """
     Internal generator that iterates over all activities and execute them.
@@ -142,6 +144,7 @@ def run_activities(
                 secrets=secrets,
                 dry=dry,
                 event_registry=event_registry,
+                runs=runs,
             )
         else:
             yield execute_activity(
@@ -151,6 +154,7 @@ def run_activities(
                 secrets=secrets,
                 dry=dry,
                 event_registry=event_registry,
+                runs=runs,
             )
 
 
@@ -164,6 +168,7 @@ def execute_activity(
     secrets: Secrets,
     dry: Dry,
     event_registry: "EventHandlerRegistry" = None,
+    runs: SimpleQueue = None,
 ) -> Run:
     """
     Low-level wrapper around the actual activity provider call to collect
@@ -213,8 +218,9 @@ def execute_activity(
             )
 
         start = datetime.utcnow()
-
-        run = {"activity": activity.copy(), "output": None}
+        run = {"activity": activity.copy(), "output": None, "start": start.isoformat()}
+        if runs:
+            runs.put(run)
 
         result = None
         interrupted = False
@@ -239,7 +245,6 @@ def execute_activity(
         finally:
             # capture the end time before we pause
             end = datetime.utcnow()
-            run["start"] = start.isoformat()
             run["end"] = end.isoformat()
             run["duration"] = (end - start).total_seconds()
 

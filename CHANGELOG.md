@@ -4,6 +4,14 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.31.0...HEAD
 
+### Changed
+
+- Internal refactoring so that, when a termination signal is received, the
+  journal still contains the trace of runs that whappened so far. This is
+  essential or we were losing information. As this is internal only, this should
+  not have any side effect but, if you see strange behaviors from your runs,
+  please ping us.
+
 ## [1.31.0][] - 2023-01-20
 
 [1.31.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.30.0...1.31.0

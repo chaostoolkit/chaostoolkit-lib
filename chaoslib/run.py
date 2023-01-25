@@ -1,5 +1,6 @@
 from abc import ABCMeta
 from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError
+from queue import Empty, SimpleQueue
 
 try:
     import ctypes
@@ -558,7 +559,9 @@ def run_gate_hypothesis(
     """
     logger.debug("Running steady-state hypothesis before the method")
     event_registry.start_hypothesis_before(experiment)
-    state = run_steady_state_hypothesis(experiment, configuration, secrets, dry=dry)
+    state = run_steady_state_hypothesis(
+        experiment, configuration, secrets, dry=dry, event_registry=event_registry
+    )
     journal["steady_states"]["before"] = state
     event_registry.hypothesis_before_completed(experiment, state, journal)
     if state is not None and not state["steady_state_met"]:
@@ -588,7 +591,9 @@ def run_deviation_validation_hypothesis(
     """
     logger.debug("Running steady-state hypothesis after the method")
     event_registry.start_hypothesis_after(experiment)
-    state = run_steady_state_hypothesis(experiment, configuration, secrets, dry=dry)
+    state = run_steady_state_hypothesis(
+        experiment, configuration, secrets, dry=dry, event_registry=event_registry
+    )
     journal["steady_states"]["after"] = state
     event_registry.hypothesis_after_completed(experiment, state, journal)
     if state is not None and not state["steady_state_met"]:
@@ -660,7 +665,8 @@ def run_method(
     logger.info("Playing your experiment's method now...")
     event_registry.start_method(experiment)
     try:
-        state = apply_activities(
+        runs = SimpleQueue()
+        apply_activities(
             experiment,
             configuration,
             secrets,
@@ -668,7 +674,9 @@ def run_method(
             journal,
             dry,
             event_registry,
+            runs=runs,
         )
+        state = journal["run"]
         event_registry.method_completed(experiment, state)
         return state
     except InterruptExecution:
@@ -724,7 +732,7 @@ def run_rollback(
         event_registry.start_rollbacks(experiment)
         try:
             journal["rollbacks"] = apply_rollbacks(
-                experiment, configuration, secrets, rollback_pool, dry
+                experiment, configuration, secrets, rollback_pool, dry, event_registry
             )
         except InterruptExecution as i:
             journal["status"] = "interrupted"
@@ -830,7 +838,9 @@ def run_hypothesis_continuously(
         if journal["status"] in ["failed", "interrupted", "aborted"]:
             break
 
-        state = run_steady_state_hypothesis(experiment, configuration, secrets, dry=dry)
+        state = run_steady_state_hypothesis(
+            experiment, configuration, secrets, dry=dry, event_registry=event_registry
+        )
         journal["steady_states"]["during"].append(state)
         event_registry.continuous_hypothesis_iteration(iteration, state)
 
@@ -869,6 +879,7 @@ def apply_activities(
     journal: Journal,
     dry: Dry,
     event_registry: EventHandlerRegistry,
+    runs: SimpleQueue,
 ) -> List[Run]:
     with controls(
         level="method",
@@ -878,15 +889,21 @@ def apply_activities(
         secrets=secrets,
     ) as control:
         result = []
-        runs = []
-        method = experiment.get("method", [])
+        futures = []
         wait_for_background_activities = True
 
         try:
             for run in run_activities(
-                experiment, configuration, secrets, pool, dry, event_registry
+                experiment,
+                configuration,
+                secrets,
+                pool,
+                dry,
+                event_registry,
+                runs,
             ):
-                runs.append(run)
+                if isinstance(run, Future):
+                    futures.append(run)
                 if journal["status"] in ["aborted", "failed", "interrupted"]:
                     break
         except SystemExit as x:
@@ -896,7 +913,15 @@ def apply_activities(
             wait_for_background_activities = x.code != 30  # see exit.py
             raise
         finally:
-            background_activity_timeout = None
+            while True:
+                try:
+                    result.append(runs.get_nowait())
+                except Empty:
+                    break
+
+            journal["run"] = result
+
+            control.with_state(result)
 
             if wait_for_background_activities and pool:
                 logger.debug("Waiting for background activities to complete")
@@ -907,40 +932,15 @@ def apply_activities(
                     "Do not wait for the background activities to finish "
                     "as per signal"
                 )
-                background_activity_timeout = 0.2
-                pool.shutdown(wait=False)
 
-            for index, run in enumerate(runs):
-                if not run:
-                    continue
-
-                if isinstance(run, dict):
-                    result.append(run)
-                else:
+                for f in futures:
                     try:
-                        # background activities
-                        result.append(run.result(timeout=background_activity_timeout))
+                        if f.running():
+                            f.result(timeout=0.2)
                     except TimeoutError:
-                        # we want an entry for the background activity in our
-                        # results anyway, we won't have anything meaningful
-                        # to say about it
-                        result.append(
-                            {
-                                "activity": method[index],
-                                "status": "failed",
-                                "output": None,
-                                "duration": None,
-                                "start": None,
-                                "end": None,
-                                "exception": None,
-                            }
-                        )
+                        pass
 
-            # now let's ensure the journal has all activities in their correct
-            # order (background ones included)
-            journal["run"] = result
-
-            control.with_state(result)
+                pool.shutdown(wait=False)
 
     return result
 
@@ -951,6 +951,7 @@ def apply_rollbacks(
     secrets: Secrets,
     pool: ThreadPoolExecutor,
     dry: Dry,
+    event_registry: EventHandlerRegistry,
 ) -> List[Run]:
     logger.info("Let's rollback...")
     with controls(
@@ -960,7 +961,9 @@ def apply_rollbacks(
         configuration=configuration,
         secrets=secrets,
     ) as control:
-        rollbacks = list(run_rollbacks(experiment, configuration, secrets, pool, dry))
+        rollbacks = list(
+            run_rollbacks(experiment, configuration, secrets, pool, dry, event_registry)
+        )
 
         if pool:
             logger.debug("Waiting for background rollbacks to complete...")
