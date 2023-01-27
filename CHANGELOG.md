@@ -4,6 +4,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.32.1...HEAD
 
+### Added
+
+- Support for extra control files loaded as global controls. A control file
+  contains an object where the keys are control names and their values
+  are control definitions
+
 ## [1.32.1][] - 2023-01-25
 
 [1.32.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.32.0...1.32.1

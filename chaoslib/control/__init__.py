@@ -1,8 +1,17 @@
+import os.path
 from contextlib import contextmanager
 from copy import copy, deepcopy
-from typing import List, Union
+from typing import TYPE_CHECKING, List, Optional, Union
 
+import yaml
 from logzero import logger
+
+try:
+    import simplejson as json
+    from simplejson.errors import JSONDecodeError
+except ImportError:
+    import json
+    from json.decoder import JSONDecodeError
 
 from chaoslib.control.python import (
     apply_python_control,
@@ -16,6 +25,9 @@ from chaoslib.settings import get_loaded_settings
 from chaoslib.types import Activity, Configuration
 from chaoslib.types import Control as ControlType
 from chaoslib.types import Experiment, Hypothesis, Journal, Run, Secrets, Settings
+
+if TYPE_CHECKING:
+    from chaoslib.run import EventHandlerRegistry
 
 __all__ = [
     "controls",
@@ -179,7 +191,7 @@ def initialize_global_controls(
     set_global_controls(controls)
 
 
-def load_global_controls(settings: Settings):
+def load_global_controls(settings: Settings, control_files: Optional[List[str]] = None):
     """
     Import all controls declared in the settings and global to all experiments.
 
@@ -200,6 +212,45 @@ def load_global_controls(settings: Settings):
                 continue
 
         controls.append(control)
+
+    control_files = control_files or []
+    for control_file in control_files:
+        with open(control_file) as f:
+            content = f.read()
+
+        if not content:
+            continue
+
+        _, ext = os.path.splitext(control_file)
+        if ext in (".yaml", ".yml"):
+            try:
+                ctrls = yaml.safe_load(content)
+            except yaml.YAMLError as y:
+                logger.error(
+                    "Failed to parse control file '{}': {}".format(control_file, str(y))
+                )
+                continue
+        elif ext in (".json"):
+            try:
+                ctrls = json.loads(content)
+            except JSONDecodeError as x:
+                logger.error(
+                    "Failed to parse control file '{}': {}".format(control_file, str(x))
+                )
+                continue
+
+        logger.debug(f"Loading global control '{name}' from {control_file}")
+
+        for name, control in ctrls.items():
+            control["name"] = name
+            provider = control.get("provider")
+            if provider and provider["type"] == "python":
+                mod = import_control(control)
+                if not mod:
+                    continue
+
+        controls.append(control)
+
     set_global_controls(controls)
 
 

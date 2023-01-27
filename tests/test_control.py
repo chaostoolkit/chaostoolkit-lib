@@ -599,3 +599,36 @@ def test_experiment_level_controls_played_only_one_each_in_the_after_phase():
     x = deepcopy(experiments.ExperimentWithOnlyTopLevelControls)
     run_experiment(x)
     assert x["result_after"] == 21
+
+
+def test_loading_control_file():
+    try:
+        assert get_global_controls() == []
+        settings = {
+            "dummy-key": "hello there",
+            "controls": {
+                "dummy": {
+                    "provider": {"type": "python", "module": "fixtures.controls.dummy"}
+                }
+            },
+        }
+        with tempfile.NamedTemporaryFile() as f:
+            f.write(
+                json.dumps(
+                    {
+                        "dummy_sums": {
+                            "provider": {
+                                "type": "python",
+                                "module": "fixtures.controls.dummy_sums",
+                            }
+                        }
+                    }
+                ).encode("utf-8")
+            )
+            f.seek(0)
+
+            load_global_controls(settings, [f.name])
+
+        assert len(get_global_controls()) == 2
+    finally:
+        cleanup_global_controls()
