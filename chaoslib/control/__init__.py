@@ -239,9 +239,8 @@ def load_global_controls(settings: Settings, control_files: Optional[List[str]] 
                 )
                 continue
 
-        logger.debug(f"Loading global control '{name}' from {control_file}")
-
         for name, control in ctrls.items():
+            logger.debug(f"Loading global control '{name}' from {control_file}")
             control["name"] = name
             provider = control.get("provider")
             if provider and provider["type"] == "python":

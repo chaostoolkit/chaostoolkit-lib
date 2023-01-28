@@ -2,7 +2,15 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.33.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.33.1...HEAD
+
+## [1.33.1][] - 2023-01-29
+
+[1.33.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.33.0...1.33.1
+
+### Changed
+
+- Position log correctly in the load_global_controls function
 
 ## [1.33.0][] - 2023-01-27
 
