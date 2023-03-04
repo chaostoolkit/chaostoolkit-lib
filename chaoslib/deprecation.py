@@ -51,8 +51,8 @@ def warn_about_deprecated_features(experiment: Experiment):
 
     # vault now expects the path property
     # see https://github.com/chaostoolkit/chaostoolkit-lib/issues/77
-    for (target, keys) in experiment.get("secrets", {}).items():
-        for (key, value) in keys.items():
+    for target, keys in experiment.get("secrets", {}).items():
+        for key, value in keys.items():
             if isinstance(value, dict) and value.get("type") == "vault":
                 if "key" in value and "path" not in value:
                     warned_deprecations[DeprecatedVaultMissingPathMessage] = True

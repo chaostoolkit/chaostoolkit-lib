@@ -340,7 +340,6 @@ class Runner:
         experiment_vars: Dict[str, Any] = None,
         journal: Journal = None,
     ) -> Journal:
-
         self.configure(experiment, settings, experiment_vars)
         with exit_signals():
             journal = self._run(

@@ -65,7 +65,7 @@ def load_configuration(
     extra_vars = extra_vars or {}
     conf = {}
 
-    for (key, value) in config_info.items():
+    for key, value in config_info.items():
         # env var files can contain the full definition of the
         # configuration's key, so we swap it. See #252
         if key in extra_vars:
@@ -158,7 +158,7 @@ def load_dynamic_configuration(
 
     had_errors = False
     logger.debug("Loading dynamic configuration...")
-    for (key, value) in config.items():
+    for key, value in config.items():
         if not (isinstance(value, dict) and value.get("type") == "probe"):
             conf[key] = config.get(key, value)
             continue

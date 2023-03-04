@@ -81,9 +81,8 @@ def load_secrets(
 
     secrets = {}
 
-    for (key, value) in secrets_info.items():
+    for key, value in secrets_info.items():
         if isinstance(value, dict):
-
             if extra_vars.get(key, None) is not None:
                 secrets[key] = extra_vars.get(key)
 
@@ -110,7 +109,6 @@ def load_secret_from_env(secrets_info: Dict[str, Dict[str, str]]) -> Secrets:
     env = os.environ
 
     if isinstance(secrets_info, dict) and secrets_info.get("type") == "env":
-
         env_key = secrets_info["key"]
         if env_key not in env:
             raise InvalidExperiment(
@@ -178,7 +176,6 @@ def load_secrets_from_vault(
     client = create_vault_client(configuration)
 
     if isinstance(secrets_info, dict) and secrets_info.get("type") == "vault":
-
         if not HAS_HVAC:
             logger.error(
                 "Install the `hvac` package to fetch secrets "

@@ -99,7 +99,7 @@ def validate_python_activity(activity: Activity):  # noqa: C901
     candidates = set(inspect.getmembers(mod, inspect.isfunction)).union(
         inspect.getmembers(mod, inspect.isbuiltin)
     )
-    for (name, cb) in candidates:
+    for name, cb in candidates:
         if name == func:
             found_func = True
 

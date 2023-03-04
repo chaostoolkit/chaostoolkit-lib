@@ -219,7 +219,7 @@ def notify_via_plugin(channel: Dict[str, str], payload: EventPayload):
         )
     else:
         funcs = inspect.getmembers(mod, inspect.isfunction)
-        for (name, f) in funcs:
+        for name, f in funcs:
             if name == func_name:
                 try:
                     f(channel, payload)

@@ -62,7 +62,7 @@ def get_discover_function(package: object):
     Lookup the `discover` function from the given imported package.
     """
     funcs = inspect.getmembers(package, inspect.isfunction)
-    for (name, value) in funcs:
+    for name, value in funcs:
         if name == "discover":
             return value
 

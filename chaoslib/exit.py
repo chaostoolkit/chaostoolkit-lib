@@ -84,7 +84,6 @@ def exit_signals():
             signal.signal(signal.SIGUSR1, sigusr1_handler)
             signal.signal(signal.SIGUSR2, sigusr2_handler)
     else:
-
         # On a system that doesn't support SIGUSR signals
         # not much we can do...
         logger.debug(f"System '{platform.platform()}' does not expose SIGUSR signals")

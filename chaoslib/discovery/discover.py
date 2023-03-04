@@ -112,7 +112,7 @@ def discover_activities(
         return activities
 
     funcs = inspect.getmembers(mod, inspect.isfunction)
-    for (name, func) in funcs:
+    for name, func in funcs:
         if exported and name not in exported:
             # do not return "private" functions
             continue

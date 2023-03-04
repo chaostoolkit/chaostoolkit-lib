@@ -2,7 +2,6 @@ black
 callee
 chardet
 coverage
-flake8
 freezegun
 hvac
 isort
@@ -14,4 +13,4 @@ ply
 pyhcl
 requests-mock
 responses
-pyflakes==2.4.0
+ruff
