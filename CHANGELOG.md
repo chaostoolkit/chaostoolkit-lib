@@ -2,7 +2,15 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.34.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.34.1...HEAD
+
+## [1.34.1][] - 2023-03-04
+
+[1.34.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.34.0...1.34.1
+
+### Changed
+
+- Removed restriction on the `importlib-metadata` package
 
 ## [1.34.0][] - 2023-03-04
 
