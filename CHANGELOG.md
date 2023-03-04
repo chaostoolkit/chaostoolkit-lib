@@ -4,6 +4,10 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.33.1...HEAD
 
+### Changed
+
+- Use builtin `importlib-metadata` package for Python 3.8+
+
 ## [1.33.1][] - 2023-01-29
 
 [1.33.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.33.0...1.33.1
