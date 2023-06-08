@@ -4,6 +4,14 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.34.1...HEAD
 
+### Changed
+
+- Set the status of the experiment to `completed` when we deviated but tolerances
+  did not fail. Only set the status to `failed` if one of the tolerance
+  actually failed to execute. [#258][258]
+
+[258]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/258
+
 ## [1.34.1][] - 2023-03-04
 
 [1.34.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.34.0...1.34.1

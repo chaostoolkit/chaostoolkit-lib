@@ -564,7 +564,13 @@ def run_gate_hypothesis(
     event_registry.hypothesis_before_completed(experiment, state, journal)
     if state is not None and not state["steady_state_met"]:
         journal["steady_states"]["before"] = state
-        journal["status"] = "failed"
+        if all(
+            map(lambda r: r["status"] == "succeeded"),
+            journal["steady_states"]["before"],
+        ):
+            journal["status"] = "completed"
+        else:
+            journal["status"] = "failed"
 
         p = state["probes"][-1]
         logger.fatal(
@@ -596,7 +602,12 @@ def run_deviation_validation_hypothesis(
     event_registry.hypothesis_after_completed(experiment, state, journal)
     if state is not None and not state["steady_state_met"]:
         journal["deviated"] = True
-        journal["status"] = "failed"
+        if all(
+            map(lambda r: r["status"] == "succeeded"), journal["steady_states"]["after"]
+        ):
+            journal["status"] = "completed"
+        else:
+            journal["status"] = "failed"
         p = state["probes"][-1]
         logger.fatal(
             "Steady state probe '{p}' is not in the "
