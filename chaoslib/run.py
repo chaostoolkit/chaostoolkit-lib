@@ -565,8 +565,10 @@ def run_gate_hypothesis(
     if state is not None and not state["steady_state_met"]:
         journal["steady_states"]["before"] = state
         if all(
-            map(lambda r: r["status"] == "succeeded"),
-            journal["steady_states"]["before"],
+            map(
+                lambda r: r["status"] == "succeeded",
+                state.get("probes", []),
+            )
         ):
             journal["status"] = "completed"
         else:
@@ -603,7 +605,10 @@ def run_deviation_validation_hypothesis(
     if state is not None and not state["steady_state_met"]:
         journal["deviated"] = True
         if all(
-            map(lambda r: r["status"] == "succeeded"), journal["steady_states"]["after"]
+            map(
+                lambda r: r["status"] == "succeeded",
+                state.get("probes", []),
+            )
         ):
             journal["status"] = "completed"
         else:

@@ -241,7 +241,8 @@ def test_experiment_with_steady_state():
         m.get("http://example.com", status_code=404)
         journal = run_experiment(experiments.HTTPToleranceExperiment)
         assert isinstance(journal, dict)
-        assert journal["status"] == "failed"
+        assert journal["status"] == "completed"
+        assert journal["deviated"] is False  # because we failed on first hypo
 
 
 def test_experiment_with_failing_steady_state():
@@ -249,8 +250,9 @@ def test_experiment_with_failing_steady_state():
         m.get("http://example.com", status_code=500)
         journal = run_experiment(experiments.Experiment)
         assert isinstance(journal, dict)
-        assert journal["status"] == "failed"
-        assert len(journal["rollbacks"]) == 0
+        assert journal["status"] == "completed"
+        assert len(journal["rollbacks"]) == 1
+        assert journal["deviated"] is False
 
 
 def test_experiment_may_run_without_steady_state():
