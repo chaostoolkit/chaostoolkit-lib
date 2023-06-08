@@ -607,7 +607,7 @@ def run_deviation_validation_hypothesis(
         if all(
             map(
                 lambda r: r["status"] == "succeeded",
-                journal["steady_states"].get("after", {})
+                journal["steady_states"].get("after", {}),
             )
         ):
             journal["status"] = "completed"
