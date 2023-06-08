@@ -567,7 +567,7 @@ def run_gate_hypothesis(
         if all(
             map(
                 lambda r: r["status"] == "succeeded",
-                journal["steady_states"].get("before", {}),
+                state.get("probes", []),
             )
         ):
             journal["status"] = "completed"
@@ -607,7 +607,7 @@ def run_deviation_validation_hypothesis(
         if all(
             map(
                 lambda r: r["status"] == "succeeded",
-                journal["steady_states"].get("after", {}),
+                state.get("probes", []),
             )
         ):
             journal["status"] = "completed"
