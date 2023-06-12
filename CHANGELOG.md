@@ -10,6 +10,9 @@
 - Set the status of the experiment to `completed` when we deviated but tolerances
   did not fail. Only set the status to `failed` if one of the tolerance
   actually failed to execute. [#258][258]
+- The order of applying controls. Before, global controls were applied after
+  experiment controls. This has been changed so global controls get applied
+  first. This was never specified so let me know if you get errors.
 
 [258]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/258
 

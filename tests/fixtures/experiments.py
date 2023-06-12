@@ -255,6 +255,14 @@ ExperimentWithControls["controls"] = [
     }
 ]
 
+ExperimentWithControlsInPosition3 = deepcopy(ExperimentNoControls)
+ExperimentWithControlsInPosition3["controls"] = [
+    {
+        "name": "dummy_position_3",
+        "provider": {"type": "python", "module": "fixtures.controls.dummy_position_3"},
+    }
+]
+
 ExperimentWithDecoratedControls = deepcopy(ExperimentNoControls)
 ExperimentWithDecoratedControls["controls"] = [
     {

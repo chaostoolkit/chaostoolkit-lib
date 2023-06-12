@@ -632,3 +632,41 @@ def test_loading_control_file():
         assert len(get_global_controls()) == 2
     finally:
         cleanup_global_controls()
+
+
+def test_running_in_order():
+    try:
+        assert get_global_controls() == []
+        settings = {
+            "controls": {
+                "dummy_position_1": {
+                    "provider": {
+                        "type": "python",
+                        "module": "fixtures.controls.dummy_position_1",
+                    }
+                }
+            },
+        }
+        with tempfile.NamedTemporaryFile() as f:
+            f.write(
+                json.dumps(
+                    {
+                        "dummy_position_2": {
+                            "provider": {
+                                "type": "python",
+                                "module": "fixtures.controls.dummy_position_2",
+                            }
+                        }
+                    }
+                ).encode("utf-8")
+            )
+            f.seek(0)
+
+            load_global_controls(settings, [f.name])
+            assert len(get_global_controls()) == 2
+
+            exp = deepcopy(experiments.ExperimentWithControlsInPosition3)
+            run_experiment(exp, settings=settings)
+            assert exp["position"] == [1, 2, 3]
+    finally:
+        cleanup_global_controls()
