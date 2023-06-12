@@ -396,8 +396,9 @@ def get_context_controls(
         return glbl_controls
 
     top_level_controls = experiment.get("controls", [])
-    controls = copy(context.get("controls", []))
+    controls = []
     controls.extend(glbl_controls)
+    controls.extend(copy(context.get("controls", [])))
 
     # do we even have something at the top level to be merged?
     if not top_level_controls:
