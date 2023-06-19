@@ -3,7 +3,19 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.35.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.35.1...HEAD
+
+## [1.35.1][] - 2023-06-19
+
+[1.35.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.35.0...1.35.1
+
+### Fixed
+
+- When a var file has no extension, it couldn't be properly parsed because
+  we searched for an empty string into a string sequence, and that was
+  truthey [#263][263]
+
+[263]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/263
 
 ## [1.35.0][] - 2023-06-13
 
