@@ -41,7 +41,7 @@ __all__ = [
     "convert_vars",
     "PayloadEncoder",
 ]
-__version__ = "1.35.0"
+__version__ = "1.35.1"
 
 
 def substitute(
@@ -219,7 +219,7 @@ def merge_vars(
                         )
                     )
                     continue
-            elif ext in (".json"):
+            elif ext in (".json",):
                 try:
                     data = json.loads(content)
                 except JSONDecodeError as x:
