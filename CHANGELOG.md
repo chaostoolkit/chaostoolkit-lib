@@ -5,6 +5,22 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.35.1...HEAD
 
+### Added
+
+- When declaring an environment variable in a configuration block, you can
+  ask Chaos Toolkit to convert the value read (which is always a string) into
+  an appropriate type: int, float, str, bytes, bool and json
+
+  ```json
+  {
+    "my_var": {
+        "type": "env",
+        "key": "SOME_VAR",
+        "env_var_type": "int"
+    }
+  }
+  ```
+
 ## [1.35.1][] - 2023-06-19
 
 [1.35.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.35.0...1.35.1

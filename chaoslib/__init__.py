@@ -283,7 +283,7 @@ def convert_vars(value: List[str]) -> Dict[str, Any]:  # noqa: C901
     return var
 
 
-def convert_to_type(type: str, val: str) -> Union[str, int, float, bytes]:
+def convert_to_type(type: str, val: str) -> Union[str, int, float, bytes, bool, Any]:
     """
     Converts a value to a provided type. If `type` is None, then the original string is
     returned, else the val is coerced into the provided type. An exception is thrown
@@ -293,16 +293,26 @@ def convert_to_type(type: str, val: str) -> Union[str, int, float, bytes]:
     :param val: str representing the variable loaded in to configuration
     :returns: Union[str, int, float, bytes] representing the converted value
     """
-    if type is None or type == "str":
+    if type is None or type in ("str", "string"):
         return val
-    elif type == "int":
+    elif type in ("int", "integer"):
         return int(val)
-    elif type == "float":
+    elif type in ("float", "number"):
         return float(val)
     elif type == "bytes":
         return val.encode("utf-8")
+    elif type == "bool":
+        if isinstance(val, bool):
+            return val
+        return False if val.lower() in ("false", "0", "no") else True
+    elif type == "json":
+        if isinstance(val, str):
+            return json.loads(val)
+        return val
     else:
-        raise ValueError("variables can only be: str, int, float, or bytes")
+        raise ValueError(
+            "variable type can only be: bool, str, int, float, bytes or json"
+        )
 
 
 class PayloadEncoder(JSONEncoder):
