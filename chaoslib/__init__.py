@@ -41,7 +41,7 @@ __all__ = [
     "convert_vars",
     "PayloadEncoder",
 ]
-__version__ = "1.36.0"
+__version__ = "1.36.1"
 
 
 def substitute(
@@ -306,6 +306,8 @@ def convert_to_type(type: str, val: str) -> Union[str, int, float, bytes, bool, 
             return val
         return False if val.lower() in ("false", "0", "no") else True
     elif type == "json":
+        if val in ("", None):
+            return val
         if isinstance(val, str):
             return json.loads(val)
         return val

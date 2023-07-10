@@ -43,3 +43,7 @@ def test_no_type_is_bypass():
 def test_cannot_convert_unknown_type():
     with pytest.raises(ValueError):
         convert_to_type("yaml", "true") == "true"
+
+
+def test_can_convert_to_json_is_silent_when_no_value_given():
+    assert convert_to_type("json", "") == ""

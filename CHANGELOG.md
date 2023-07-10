@@ -3,7 +3,15 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.36.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.36.1...HEAD
+
+## [1.36.1][] - 2023-07-10
+
+[1.36.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.36.0...1.36.1
+
+### Fixed
+
+- Converting using JSON is a bypass when value is an empty string or `None`
 
 ## [1.36.0][] - 2023-06-29
 
