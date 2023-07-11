@@ -5,6 +5,11 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.36.1...HEAD
 
+### Changed
+
+- Allow for missing environment variable when `default` property is set, even
+  to a `None` value
+
 ## [1.36.1][] - 2023-07-10
 
 [1.36.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.36.0...1.36.1

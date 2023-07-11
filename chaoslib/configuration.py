@@ -77,7 +77,7 @@ def load_configuration(
                 env_default = value.get("default")
                 if (
                     (env_key not in env)
-                    and (env_default is None)
+                    and ("default" not in value)
                     and (key not in extra_vars)
                 ):
                     raise InvalidExperiment(

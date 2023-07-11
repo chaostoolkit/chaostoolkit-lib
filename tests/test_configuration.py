@@ -362,3 +362,26 @@ def test_env_var_can_be_used_with_loading_dynamic_config(fixtures_dir: str):
     dcfg = load_dynamic_configuration(cfg)
     assert dcfg["some_config_1"] == os.getcwd()
     assert dcfg["some_config_2"] is True
+
+
+def test_env_var_may_be_missing_but_not_fail_validation_if_default_key_is_present():  # noqa
+    cfg = load_configuration(
+        {"some_config_1": {"type": "env", "key": "MY_SUPER_KEY", "default": "hello"}},
+    )
+
+    assert cfg["some_config_1"] == "hello"
+
+
+def test_env_var_may_be_missing_but_not_fail_validation_if_default_key_is_present_but_None():  # noqa
+    cfg = load_configuration(
+        {"some_config_1": {"type": "env", "key": "MY_SUPER_KEY", "default": None}},
+    )
+
+    assert cfg["some_config_1"] is None
+
+
+def test_env_var_must_be_set_when_no_default_is_present():
+    with pytest.raises(InvalidExperiment):
+        load_configuration(
+            {"some_config_1": {"type": "env", "key": "MY_SUPER_KEY"}},
+        )
