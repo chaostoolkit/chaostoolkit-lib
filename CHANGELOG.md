@@ -5,6 +5,28 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.36.2...HEAD
 
+### Changed
+
+- When trying to substitute a single value in an argument but that value isn't
+  actually a variable, but instead a string to pass as-is to the function
+  of the activity, we failed with a `KeyError` because we were looking into
+  the configuration/secrets for a key that was not meant to be there. Now,
+  we properly handle this case and leave the string as it should be. This case
+  may easily happen for `process` activities where you make a reference to
+  an environment variable when the process is executed. For instance:
+
+  ```json
+  "provider": {
+        "type": "process",
+        "path": "cat",
+        "arguments": "$MY_FILE"
+    },
+  ```
+
+  Here `"$MY_FILE"` is not a pattern for chaos toolkit to replace with a value,
+  it's a literal string to be passed to the `cat` command.
+
+
 ## [1.36.2][] - 2023-07-11
 
 [1.36.2]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.36.1...1.36.2

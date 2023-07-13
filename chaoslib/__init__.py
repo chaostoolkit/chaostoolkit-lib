@@ -96,6 +96,14 @@ class TypedTemplate(Template):
             try:
                 _, _, key, _ = match.groups()
                 return mapping[key]
+            except KeyError:
+                logger.debug(
+                    f"The pattern {self.template} does not have a matching "
+                    "value in either the configuration or secrets. We don't "
+                    "know if that's because the pattern should be passed as-is "
+                    "down to the activity. We assume that's the case."
+                )
+                pass
             except ValueError:
                 pass
         return Template.safe_substitute(self, mapping)
