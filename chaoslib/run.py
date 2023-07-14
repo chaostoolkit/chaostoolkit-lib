@@ -406,8 +406,7 @@ class Runner:
             with_ssh = has_steady_state_hypothesis_with_probes(experiment)
             if not with_ssh:
                 logger.info(
-                    "No steady state hypothesis defined. "
-                    "That's ok, just exploring."
+                    "No steady state hypothesis defined. " "That's ok, just exploring."
                 )
         else:
             logger.info("Skipping Steady-State Hypothesis as requested")
