@@ -5,6 +5,10 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.36.3...HEAD
 
+### Added
+
+- A new `"skip"` strategy to explicitely dismiss the hypothesis entirely
+
 ## [1.36.3][] - 2023-07-13
 
 [1.36.3]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.36.2...1.36.3

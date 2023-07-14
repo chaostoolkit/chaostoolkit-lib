@@ -70,6 +70,7 @@ class Strategy(enum.Enum):
     DURING_METHOD = "during-method-only"
     DEFAULT = "default"
     CONTINUOUS = "continuous"
+    SKIP = "skip"
 
     @staticmethod
     def from_string(value: str) -> "Strategy":
@@ -83,6 +84,8 @@ class Strategy(enum.Enum):
             return Strategy.DURING_METHOD
         elif value == "continuously":
             return Strategy.CONTINUOUS
+        elif value == "skip":
+            return Strategy.SKIP
 
         raise ValueError("Unknown strategy")
 

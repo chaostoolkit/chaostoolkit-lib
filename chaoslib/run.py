@@ -400,11 +400,17 @@ class Runner:
         logger.info(f"Rollbacks strategy: {rollback_strategy}")
 
         exit_gracefully_with_rollbacks = True
-        with_ssh = has_steady_state_hypothesis_with_probes(experiment)
-        if not with_ssh:
-            logger.info(
-                "No steady state hypothesis defined. That's ok, just " "exploring."
-            )
+
+        with_ssh = False
+        if strategy != Strategy.SKIP:
+            with_ssh = has_steady_state_hypothesis_with_probes(experiment)
+            if not with_ssh:
+                logger.info(
+                    "No steady state hypothesis defined. "
+                    "That's ok, just exploring."
+                )
+        else:
+            logger.info("Skipping Steady-State Hypothesis as requested")
 
         try:
             try:
