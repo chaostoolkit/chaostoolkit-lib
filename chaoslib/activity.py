@@ -229,6 +229,8 @@ def execute_activity(
             # pause when one of the dry flags are set
             if not is_dry:
                 result = run_activity(activity, configuration, secrets)
+            else:
+                logger.debug(f"Activity {activity['name']} is in dry mode")
             run["output"] = result
             run["status"] = "succeeded"
             if result is not None:

@@ -8,6 +8,7 @@
 ### Added
 
 - A new `"skip"` strategy to explicitely dismiss the hypothesis entirely
+- A log message when an activity is in dry mode
 
 ## [1.36.3][] - 2023-07-13
 
