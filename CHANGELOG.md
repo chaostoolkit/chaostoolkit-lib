@@ -5,6 +5,11 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.37.0...HEAD
 
+### Changed
+
+- The http activity provider can now substitute its `timeout` field so it can
+  be read from the configuration
+
 ## [1.37.0][] - 2023-07-14
 
 [1.37.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.36.3...1.37.0
@@ -13,6 +18,7 @@
 
 - A new `"skip"` strategy to explicitely dismiss the hypothesis entirely
 - A log message when an activity is in dry mode
+- Bump dependencies
 
 ## [1.36.3][] - 2023-07-13
 

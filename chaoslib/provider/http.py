@@ -30,7 +30,7 @@ def run_http_activity(
     url = substitute(provider["url"], configuration, secrets)
     method = provider.get("method", "GET").upper()
     headers = substitute(provider.get("headers", None), configuration, secrets)
-    timeout = provider.get("timeout", None)
+    timeout = substitute(provider.get("timeout", None), configuration, secrets)
     arguments = provider.get("arguments", None)
     verify_tls = provider.get("verify_tls", True)
     max_retries = provider.get("max_retries", 0)

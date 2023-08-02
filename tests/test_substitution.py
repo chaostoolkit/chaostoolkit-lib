@@ -2,6 +2,7 @@ from fixtures import config
 
 from chaoslib import substitute
 from chaoslib.configuration import load_configuration
+from chaoslib.provider.http import run_http_activity
 
 
 def test_substitute_strings_from_configuration():
@@ -68,3 +69,12 @@ def test_always_return_to_string_when_pattern_is_not_alone():
     result = substitute("hello ${value}", configuration=config, secrets=None)
     assert isinstance(result, str)
     assert result == "hello 8"
+
+
+def test_http_activity_can_substitute_timeout() -> None:
+    c = {"my_timeout": 1}
+    run_http_activity(
+        {"provider": {"url": "https://www.google.com", "timeout": "${my_timeout}"}},
+        c,
+        {},
+    )
