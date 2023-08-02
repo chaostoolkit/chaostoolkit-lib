@@ -139,7 +139,7 @@ def substitute_in_sequence(data: List[Any], mapping: Mapping[str, Any]) -> List[
         if isinstance(v, str):
             new_value.append(substitute_string(v, mapping))
         elif isinstance(v, (list, tuple)):
-            new_value.extend(substitute_in_sequence(v, mapping))
+            new_value.append(substitute_in_sequence(v, mapping))
         elif isinstance(v, dict):
             new_value.append(substitute_dict(v, mapping))
         else:

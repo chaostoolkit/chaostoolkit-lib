@@ -9,6 +9,12 @@
 
 - The http activity provider can now substitute its `timeout` field so it can
   be read from the configuration
+- The `expect` field of a `jsonpath` tolerance can now be substituted with
+  configuration values [267][#267]
+- Substitution of list of lists now returns a list of lists instead of 
+  flattening
+
+[#267]: https://github.com/chaostoolkit/chaostoolkit-lib/issues/267
 
 ## [1.37.0][] - 2023-07-14
 

@@ -2,6 +2,7 @@ from fixtures import config
 
 from chaoslib import substitute
 from chaoslib.configuration import load_configuration
+from chaoslib.hypothesis import within_tolerance
 from chaoslib.provider.http import run_http_activity
 
 
@@ -78,3 +79,18 @@ def test_http_activity_can_substitute_timeout() -> None:
         c,
         {},
     )
+
+
+def test_jsonpath_can_substitute_expect() -> None:
+    r = within_tolerance(
+        {
+            "type": "jsonpath",
+            "path": "$.RecordData[0]",
+            "expect": ["my-other-cname.${env}.mysite.com"],
+        },
+        {"RecordData": ["my-other-cname.dev.mysite.com"]},
+        {"env": "dev"},
+        {},
+    )
+
+    assert r is True

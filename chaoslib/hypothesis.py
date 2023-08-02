@@ -367,6 +367,7 @@ def _(
 
         expect = tolerance.get("expect")
         if "expect" in tolerance:
+            expect = substitute(expect, configuration, secrets)
             if not isinstance(expect, list):
                 result = values == [expect]
             else:
