@@ -1,6 +1,5 @@
 black
 callee
-chardet
 coverage
 freezegun
 hvac

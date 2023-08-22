@@ -5,6 +5,13 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.38.0...HEAD
 
+### Changed
+
+- Dropped `chardet` and `cchardet` (optionals dependencies) in favour to the
+  faster and friendly-licenced
+  [charset-normalizer](https://pypi.org/project/charset-normalizer/) which will
+  be installed by default
+
 ## [1.38.0][] - 2023-08-02
 
 [1.38.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.37.0...1.38.0

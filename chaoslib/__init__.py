@@ -9,19 +9,11 @@ from string import Template
 from typing import Any, Dict, List, Mapping, Tuple, Union
 
 import yaml
+from charset_normalizer import detect
 from logzero import logger
 
 from chaoslib.exceptions import ActivityFailed
 from chaoslib.types import Configuration, ConfigVars, Experiment, Secrets, SecretVars
-
-HAS_CHARDET = True
-try:
-    import cchardet as chardet
-except ImportError:
-    try:
-        import chardet
-    except ImportError:
-        HAS_CHARDET = False
 
 try:
     import simplejson as json
@@ -152,20 +144,18 @@ def decode_bytes(data: bytes, default_encoding: str = "utf-8") -> str:
     Decode the given bytes and return the decoded unicode string or raises
     `ActivityFailed`.
 
-    When the chardet, or cchardet, packages are installed, we try to detect
-    the encoding and use that instead of the default one (when the confidence
-    is greater or equal than 50%).
+    We try to detect the encoding and use that instead of the default one
+    (when the confidence is greater or equal than 50%).
     """
     encoding = default_encoding
-    if HAS_CHARDET:
-        detected = chardet.detect(data) or {}
-        confidence = detected.get("confidence") or 0
-        if confidence >= 0.5:
-            encoding = detected["encoding"]
-            logger.debug(
-                "Data encoding detected as '{}' "
-                "with a confidence of {}".format(encoding, confidence)
-            )
+    detected = detect(data) or {}
+    confidence = detected.get("confidence") or 0
+    if confidence >= 0.5:
+        encoding = detected["encoding"]
+        logger.debug(
+            "Data encoding detected as '{}' "
+            "with a confidence of {}".format(encoding, confidence)
+        )
 
     try:
         return data.decode(encoding)
