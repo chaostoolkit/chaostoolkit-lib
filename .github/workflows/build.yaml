@@ -53,6 +53,8 @@ jobs:
           make install-dev
       - name: Run tests
         run: |
+          locale
+
           export LANG=en_US.UTF-8
           export LC_ALL=en_US.UTF-8
           make tests
