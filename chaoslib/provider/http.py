@@ -121,5 +121,5 @@ def validate_http_activity(activity: Activity):
         raise InvalidActivity("a HTTP activity must have a URL")
 
     headers = provider.get("headers")
-    if headers and not type(headers) == dict:
+    if headers and not isinstance(headers, dict):
         raise InvalidActivity("a HTTP activities expect headers as a mapping")

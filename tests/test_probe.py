@@ -99,7 +99,7 @@ def test_run_process_probe_should_return_raw_value():
     v = "Python {v}\n".format(v=sys.version.split(" ")[0])
 
     result = run_activity(probes.ProcProbe, config.EmptyConfig, experiments.Secrets)
-    assert type(result) is dict
+    assert isinstance(result, dict)
     assert result["status"] == 0
     assert result["stdout"] == v
     assert result["stderr"] == ""
@@ -114,7 +114,7 @@ def test_run_process_probe_should_pass_arguments_in_array():
     result = run_activity(
         probes.ProcEchoArrayProbe, config.EmptyConfig, experiments.Secrets
     )
-    assert type(result) is dict
+    assert isinstance(result, dict)
     assert result["status"] == 0
     assert result["stdout"] == args
     assert result["stderr"] == ""
@@ -129,7 +129,7 @@ def test_run_process_probe_can_pass_arguments_as_string():
     result = run_activity(
         probes.ProcEchoStrProbe, config.EmptyConfig, experiments.Secrets
     )
-    assert type(result) is dict
+    assert isinstance(result, dict)
     assert result["status"] == 0
     assert result["stdout"] == args
     assert result["stderr"] == ""
