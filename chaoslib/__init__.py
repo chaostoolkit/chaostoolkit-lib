@@ -1,9 +1,11 @@
 import decimal
 import hashlib
+import json
 import os.path
 import uuid
 from collections import ChainMap
 from datetime import date, datetime
+from json.decoder import JSONDecodeError
 from json.encoder import JSONEncoder
 from string import Template
 from typing import Any, Dict, List, Mapping, Tuple, Union
@@ -14,14 +16,6 @@ from logzero import logger
 
 from chaoslib.exceptions import ActivityFailed
 from chaoslib.types import Configuration, ConfigVars, Experiment, Secrets, SecretVars
-
-try:
-    import simplejson as json
-    from simplejson.errors import JSONDecodeError
-except ImportError:
-    import json
-    from json.decoder import JSONDecodeError
-
 
 __all__ = [
     "__version__",

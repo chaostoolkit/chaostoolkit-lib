@@ -1,21 +1,14 @@
+import json
 import os.path
+from json.decoder import JSONDecodeError
 from urllib.parse import urlparse
 
 import requests
 import yaml
 from logzero import logger
 
-from chaoslib.exceptions import InvalidSource
-
-try:
-    import simplejson as json
-    from simplejson.errors import JSONDecodeError
-except ImportError:
-    import json
-    from json.decoder import JSONDecodeError
-
 from chaoslib.control import controls
-from chaoslib.exceptions import InvalidExperiment
+from chaoslib.exceptions import InvalidExperiment, InvalidSource
 from chaoslib.types import Experiment, Settings
 
 __all__ = ["load_experiment"]

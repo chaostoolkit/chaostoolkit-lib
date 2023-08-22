@@ -1,17 +1,12 @@
+import json
 import os.path
 from contextlib import contextmanager
 from copy import copy, deepcopy
+from json.decoder import JSONDecodeError
 from typing import TYPE_CHECKING, List, Optional, Union
 
 import yaml
 from logzero import logger
-
-try:
-    import simplejson as json
-    from simplejson.errors import JSONDecodeError
-except ImportError:
-    import json
-    from json.decoder import JSONDecodeError
 
 from chaoslib.control.python import (
     apply_python_control,

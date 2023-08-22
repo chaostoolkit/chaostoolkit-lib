@@ -11,6 +11,9 @@
   faster and friendly-licenced
   [charset-normalizer](https://pypi.org/project/charset-normalizer/) which will
   be installed by default
+- Removed `simplejson` support entirely as this library doesn't seem to be
+  much updated anymore. Sticking with stdlib `json` and maybe one day we'll 
+  byte the bullet and migrate to `orjson`
 
 ## [1.38.0][] - 2023-08-02
 
