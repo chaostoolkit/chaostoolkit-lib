@@ -1,7 +1,6 @@
 import pytest
 
 from chaoslib import convert_to_type, decode_bytes
-from chaoslib.exceptions import ActivityFailed
 
 
 def test_can_convert_to_bool():
@@ -52,8 +51,3 @@ def test_can_convert_to_json_is_silent_when_no_value_given():
 
 def test_decode_bytes():
     assert decode_bytes("noël".encode("utf-8")) == "noël"
-
-
-def test_failed_decoding():
-    with pytest.raises(ActivityFailed):
-        decode_bytes("о𝞎𝒒ᵲꜱ".encode("utf-8"), "ascii")

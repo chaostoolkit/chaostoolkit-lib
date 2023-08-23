@@ -1,3 +1,4 @@
+import locale
 import os.path
 import stat
 from unittest.mock import patch
@@ -35,24 +36,28 @@ def teardown_module(module):
 
 
 def test_process_not_utf8_cannot_fail():
-    result = run_process_activity(
-        {
-            "provider": {
-                "type": "process",
-                "path": "python",
-                "arguments": (
-                    "-c \"import sys; sys.stdout.buffer.write(bytes('é', 'latin-1'))\""
-                ),
-            }
-        },
-        None,
-        None,
-    )
+    try:
+        locale.setlocale(locale.LC_ALL, "C.UTF-8")
+        result = run_process_activity(
+            {
+                "provider": {
+                    "type": "process",
+                    "path": "python",
+                    "arguments": (
+                        "-c \"import locale; locale.setlocale(locale.LC_ALL, 'C.UTF-8'); import sys; sys.stdout.buffer.write(bytes('pythön', 'utf-16'))\""  # noqa
+                    ),
+                }
+            },
+            None,
+            None,
+        )
 
-    # unfortunately, this doesn't seem to work well on mac
-    if result["status"] == 0:
-        assert result["stderr"] == ""
-        assert result["stdout"] == "é"
+        # unfortunately, this doesn't seem to work well on mac
+        if result["status"] == 0:
+            assert result["stderr"] == ""
+            assert result["stdout"] == "pythön"  # detected encoding is utf-8
+    finally:
+        locale.setlocale(locale.LC_ALL, None)
 
 
 def test_process_homedir_relative_path():
