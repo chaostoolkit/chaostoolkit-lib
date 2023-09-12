@@ -14,6 +14,7 @@
 - Removed `simplejson` support entirely as this library doesn't seem to be
   much updated anymore. Sticking with stdlib `json` and maybe one day we'll 
   byte the bullet and migrate to `orjson`
+- Fix different behaviors in checking status from steady-state in Python 3.7
 
 ## [1.38.0][] - 2023-08-02
 
