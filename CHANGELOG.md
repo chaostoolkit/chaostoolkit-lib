@@ -5,6 +5,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.39.0...HEAD
 
+### Changed:
+
+- When working with `jsonpath` tolerances and substitutions like `${myvalue}`
+  `chaostoolkit` now gives the user an error message with all substituted values when the 
+  `expect` block does not match the output of the `probe`.
+
 ## [1.39.0][] - 2023-09-12
 
 [1.39.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.38.0...1.39.0

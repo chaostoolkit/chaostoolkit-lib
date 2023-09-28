@@ -374,10 +374,10 @@ def _(
                 result = values == expect
 
         if result is False:
-            if "expect" in tolerance:
+            if expect:
                 logger.debug(
                     "jsonpath found '{}' but expected '{}'".format(
-                        str(values), str(tolerance["expect"])
+                        str(values), str(expect)
                     )
                 )
             else:
