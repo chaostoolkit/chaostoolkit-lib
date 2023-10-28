@@ -223,6 +223,8 @@ def run_steady_state_hypothesis(
                 continue
 
             tolerance = activity.get("tolerance")
+            if isinstance(tolerance, str):
+                tolerance = substitute(tolerance, configuration, secrets)
             logger.debug(f"allowed tolerance is {str(tolerance)}")
             checked = within_tolerance(
                 tolerance, run["output"], configuration=configuration, secrets=secrets

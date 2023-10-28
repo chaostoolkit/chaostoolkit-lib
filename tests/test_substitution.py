@@ -2,8 +2,9 @@ from fixtures import config
 
 from chaoslib import substitute
 from chaoslib.configuration import load_configuration
-from chaoslib.hypothesis import within_tolerance
+from chaoslib.hypothesis import run_steady_state_hypothesis, within_tolerance
 from chaoslib.provider.http import run_http_activity
+from chaoslib.run import EventHandlerRegistry
 
 
 def test_substitute_strings_from_configuration():
@@ -94,3 +95,63 @@ def test_jsonpath_can_substitute_expect() -> None:
     )
 
     assert r is True
+
+
+def test_tolerance_substitution() -> None:
+    registry = EventHandlerRegistry()
+    state = run_steady_state_hypothesis(
+        experiment={
+            "steady-state-hypothesis": {
+                "title": "",
+                "probes": [
+                    {
+                        "name": "check-stuff",
+                        "type": "probe",
+                        "tolerance": "${expected}",
+                        "provider": {
+                            "type": "python",
+                            "module": "statistics",
+                            "func": "mean",
+                            "arguments": {"data": [1, 3, 4, 4]},
+                        },
+                    }
+                ],
+            }
+        },
+        configuration={"expected": 3},
+        secrets={},
+        dry=False,
+        event_registry=registry,
+    )
+
+    assert state["steady_state_met"] is True
+
+
+def test_tolerance_substitution_is_noop_on_non_var() -> None:
+    registry = EventHandlerRegistry()
+    state = run_steady_state_hypothesis(
+        experiment={
+            "steady-state-hypothesis": {
+                "title": "",
+                "probes": [
+                    {
+                        "name": "check-stuff",
+                        "type": "probe",
+                        "tolerance": "6",
+                        "provider": {
+                            "type": "python",
+                            "module": "statistics",
+                            "func": "mean",
+                            "arguments": {"data": [1, 3, 4, 4]},
+                        },
+                    }
+                ],
+            }
+        },
+        configuration={"expected": 3},
+        secrets={},
+        dry=False,
+        event_registry=registry,
+    )
+
+    assert state["steady_state_met"] is False

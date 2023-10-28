@@ -10,6 +10,34 @@
 - When working with `jsonpath` tolerances and substitutions like `${myvalue}`
   `chaostoolkit` now gives the user an error message with all substituted values when the 
   `expect` block does not match the output of the `probe`.
+- Tolerance field can now be substitued with variables even when the tolerance
+  remains a native type. So this is now supported:
+
+  ```json
+  {
+        "configuration": {
+            "expected": 3
+        },
+        "steady-state-hypothesis": {
+            "title": "",
+            "probes": [
+                {
+                    "name": "check-stuff",
+                    "type": "probe",
+                    "tolerance": "${expected}",
+                    "provider": {
+                        "type": "python",
+                        "module": "statistics",
+                        "func": "mean",
+                        "arguments": {
+                            "data": [1, 3, 4, 4]
+                        }
+                    }
+                }
+            ]
+        }
+    }
+    ```
 
 ## [1.39.0][] - 2023-09-12
 
