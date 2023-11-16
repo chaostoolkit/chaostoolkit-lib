@@ -1,17 +1,16 @@
 import numbers
-import threading
 import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
-from typing import TYPE_CHECKING, Any, Dict, Iterator, List
+from typing import TYPE_CHECKING, Any, Iterator, List
 
 from logzero import logger
 
 from chaoslib import substitute
 from chaoslib.caching import lookup_activity
 from chaoslib.control import controls
-from chaoslib.exceptions import ActivityFailed, InterruptExecution, InvalidActivity
+from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.provider.http import run_http_activity, validate_http_activity
 from chaoslib.provider.process import run_process_activity, validate_process_activity
 from chaoslib.provider.python import run_python_activity, validate_python_activity
@@ -24,22 +23,7 @@ __all__ = [
     "ensure_activity_is_valid",
     "get_all_activities_in_experiment",
     "run_activities",
-    "get_interrupted_runs",
 ]
-interrupted_activities_lock = threading.Lock()
-interrupted_activities = {}  # type: Dict[str, Run]
-
-
-def track_interrupted_run(name: str, run: Run) -> None:
-    with interrupted_activities_lock:
-        interrupted_activities[name] = run
-
-
-def get_interrupted_runs() -> Dict[str, Run]:
-    with interrupted_activities_lock:
-        runs = interrupted_activities.copy()
-        interrupted_activities.clear()
-        return runs
 
 
 def ensure_activity_is_valid(activity: Activity):  # noqa: C901
@@ -253,9 +237,6 @@ def execute_activity(
                 logger.debug(f"  => succeeded with '{result}'")
             else:
                 logger.debug("  => succeeded without any result value")
-        except (InterruptExecution, SystemExit):
-            track_interrupted_run(run)
-            raise
         except ActivityFailed as x:
             error_msg = str(x)
             run["status"] = "failed"
