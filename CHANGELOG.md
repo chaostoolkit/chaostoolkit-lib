@@ -5,6 +5,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.40.0...HEAD
 
+### Changed
+
+- Interrupting a blocking rollback led to not having any rollbacks being
+  available to the journal. Now all rollbacks up to the one that gets
+  interrupted (inclusive) should be un the journal
+
 ## [1.40.0][] - 2023-10-28
 
 [1.40.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.39.0...1.40.0

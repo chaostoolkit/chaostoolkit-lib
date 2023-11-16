@@ -743,8 +743,16 @@ def run_rollback(
     if play_rollbacks:
         event_registry.start_rollbacks(experiment)
         try:
-            journal["rollbacks"] = apply_rollbacks(
-                experiment, configuration, secrets, rollback_pool, dry, event_registry
+            runs = []
+            journal["rollbacks"] = runs
+            apply_rollbacks(
+                experiment,
+                configuration,
+                secrets,
+                rollback_pool,
+                dry,
+                event_registry,
+                runs,
             )
         except InterruptExecution as i:
             journal["status"] = "interrupted"
@@ -953,7 +961,8 @@ def apply_rollbacks(
     pool: ThreadPoolExecutor,
     dry: Dry,
     event_registry: EventHandlerRegistry,
-) -> List[Run]:
+    runs: List[Run],
+) -> None:
     logger.info("Let's rollback...")
     with controls(
         level="rollback",
@@ -962,26 +971,26 @@ def apply_rollbacks(
         configuration=configuration,
         secrets=secrets,
     ) as control:
-        rollbacks = list(
-            run_rollbacks(experiment, configuration, secrets, pool, dry, event_registry)
-        )
+        futures = []
+        try:
+            for activity in run_rollbacks(
+                experiment, configuration, secrets, pool, dry, event_registry, runs
+            ):
+                if isinstance(activity, Future):
+                    futures.append(activity)
+        finally:
+            control.with_state(runs)
 
-        if pool:
-            logger.debug("Waiting for background rollbacks to complete...")
-            pool.shutdown(wait=True)
+            for f in futures:
+                try:
+                    if f.running():
+                        f.result(timeout=0.2)
+                except TimeoutError:
+                    pass
 
-        result = []
-        for rollback in rollbacks:
-            if not rollback:
-                continue
-            if isinstance(rollback, dict):
-                result.append(rollback)
-            else:
-                result.append(rollback.result())
-
-        control.with_state(result)
-
-    return result
+            if pool:
+                logger.debug("Waiting for background rollbacks to complete...")
+                pool.shutdown(wait=True)
 
 
 def has_steady_state_hypothesis_with_probes(experiment: Experiment) -> bool:

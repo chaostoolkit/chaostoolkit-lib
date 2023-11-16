@@ -1,5 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor
-from typing import TYPE_CHECKING, Iterator
+from typing import TYPE_CHECKING, Iterator, List
 
 from logzero import logger
 
@@ -19,6 +19,7 @@ def run_rollbacks(
     pool: ThreadPoolExecutor,
     dry: Dry,
     event_registry: "EventHandlerRegistry" = None,
+    runs: List[Run] = None,
 ) -> Iterator[Run]:
     """
     Run all rollbacks declared in the experiment in their order. Wait for
@@ -43,6 +44,7 @@ def run_rollbacks(
                 secrets=secrets,
                 dry=dry,
                 event_registry=event_registry,
+                runs=runs,
             )
         else:
             yield execute_activity(
@@ -52,4 +54,5 @@ def run_rollbacks(
                 secrets=secrets,
                 dry=dry,
                 event_registry=event_registry,
+                runs=runs,
             )

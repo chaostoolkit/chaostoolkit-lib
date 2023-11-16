@@ -197,6 +197,7 @@ def test_can_interrupt_rollbacks_on_SystemExit():
         journal = run_experiment(experiments.ExperimentWithRollbackLongPause)
         assert isinstance(journal, dict)
         assert journal["status"] == "interrupted"
+        assert journal["rollbacks"] != []
     except SystemExit:
         pytest.fail("we should have swallowed the SystemExit exception")
 
