@@ -5,6 +5,10 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.41.0...HEAD
 
+### Fixed
+
+- Fixed loading of multiple controls from a global control file.
+
 ## [1.41.0][] - 2023-11-16
 
 [1.41.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.40.0...1.41.0

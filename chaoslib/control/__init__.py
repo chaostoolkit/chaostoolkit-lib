@@ -243,7 +243,7 @@ def load_global_controls(settings: Settings, control_files: Optional[List[str]] 
                 if not mod:
                     continue
 
-        controls.append(control)
+            controls.append(control)
 
     set_global_controls(controls)
 
