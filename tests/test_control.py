@@ -634,6 +634,38 @@ def test_loading_control_file():
         cleanup_global_controls()
 
 
+def test_loading_multiple_controls_from_control_file():
+    try:
+        assert get_global_controls() == []
+        settings = {}
+        with tempfile.NamedTemporaryFile() as f:
+            f.write(
+                json.dumps(
+                    {
+                        "dummy_sums": {
+                            "provider": {
+                                "type": "python",
+                                "module": "fixtures.controls.dummy_sums",
+                            }
+                        },
+                        "dummy_sums_2": {
+                            "provider": {
+                                "type": "python",
+                                "module": "fixtures.controls.dummy_sums",
+                            }
+                        },
+                    }
+                ).encode("utf-8")
+            )
+            f.seek(0)
+
+            load_global_controls(settings, [f.name])
+
+        assert len(get_global_controls()) == 2
+    finally:
+        cleanup_global_controls()
+
+
 def test_running_in_order():
     try:
         assert get_global_controls() == []
