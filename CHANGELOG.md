@@ -5,7 +5,7 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.41.0...HEAD
 
-### Changed
+### Changed
 
 - Moved to PDM aways from setuptools as a more modern and robust approach
   to manage dependencies
