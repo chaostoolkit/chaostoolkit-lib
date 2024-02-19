@@ -1,9 +1,14 @@
 import locale
+import sys
 import os.path
 import stat
 from unittest.mock import patch
 
+import pytest
+
 from chaoslib.provider.process import run_process_activity
+
+pytestmark = pytest.mark.skipif(sys.platform != "linux", "only run these on Linux")
 
 settings_dir = os.path.join(os.path.dirname(__file__), "fixtures")
 
