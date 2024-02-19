@@ -8,7 +8,11 @@ from typing import Any
 from logzero import logger
 
 from chaoslib import __version__
-from chaoslib.discovery.package import get_discover_function, install, load_package
+from chaoslib.discovery.package import (
+    get_discover_function,
+    install,
+    load_package,
+)
 from chaoslib.exceptions import DiscoveryFailed
 from chaoslib.types import DiscoveredActivities, Discovery
 
@@ -24,7 +28,9 @@ __all__ = [
 
 
 def discover(
-    package_name: str, discover_system: bool = True, download_and_install: bool = True
+    package_name: str,
+    discover_system: bool = True,
+    download_and_install: bool = True,
 ) -> Discovery:
     """
     Discover the capabilities of an extension as well as the system it targets.
@@ -88,7 +94,8 @@ def discover_probes(extension_mod_name: str) -> DiscoveredActivities:
 
 
 def discover_activities(
-    extension_mod_name: str, activity_type: str  # noqa: C901
+    extension_mod_name: str,
+    activity_type: str,  # noqa: C901
 ) -> DiscoveredActivities:
     """
     Discover exported activities from the given extension module name.
@@ -185,7 +192,9 @@ def portable_type_name(python_type: Any) -> str:  # noqa: C901
     elif str(python_type).startswith("typing.Set"):
         return "set"
 
-    logger.debug(f"'{str(python_type)}' could not be ported to something meaningful")
+    logger.debug(
+        f"'{str(python_type)}' could not be ported to something meaningful"
+    )
 
     return "object"
 

@@ -1,7 +1,10 @@
 import pytest
 
 from chaoslib.exceptions import InvalidActivity
-from chaoslib.hypothesis import ensure_hypothesis_tolerance_is_valid, within_tolerance
+from chaoslib.hypothesis import (
+    ensure_hypothesis_tolerance_is_valid,
+    within_tolerance,
+)
 
 
 def test_tolerance_int():
@@ -98,7 +101,10 @@ def test_tolerance_jsonpath_must_match_expected_value():
         "expect": [["hello", "bonjour"]],
     }
     ensure_hypothesis_tolerance_is_valid(t)
-    assert within_tolerance(t, value={"foo": {"baz": ["hello", "bonjour"]}}) is True
+    assert (
+        within_tolerance(t, value={"foo": {"baz": ["hello", "bonjour"]}})
+        is True
+    )
 
     t = {
         "type": "jsonpath",
@@ -106,7 +112,10 @@ def test_tolerance_jsonpath_must_match_expected_value():
         "expect": [[["hello"], ["bonjour"]]],
     }
     ensure_hypothesis_tolerance_is_valid(t)
-    assert within_tolerance(t, value={"foo": {"baz": [["hello"], ["bonjour"]]}}) is True
+    assert (
+        within_tolerance(t, value={"foo": {"baz": [["hello"], ["bonjour"]]}})
+        is True
+    )
 
     t = {"type": "jsonpath", "path": "$.foo[?(@.baz)].baz", "expect": []}
     ensure_hypothesis_tolerance_is_valid(t)
@@ -156,13 +165,17 @@ def test_tolerance_jsonpath_must_find_items_with_a_given_value_to_succeed():
 def test_tolerance_jsonpath_from_jsonstring():
     t = {"type": "jsonpath", "path": "$.foo[*].baz"}
     ensure_hypothesis_tolerance_is_valid(t)
-    assert within_tolerance(t, value='{"foo": [{"baz": 1}, {"baz": 2}]}') is True
+    assert (
+        within_tolerance(t, value='{"foo": [{"baz": 1}, {"baz": 2}]}') is True
+    )
 
 
 def test_tolerance_jsonpath_from_bytes():
     t = {"type": "jsonpath", "path": "$.foo[*].baz"}
     ensure_hypothesis_tolerance_is_valid(t)
-    assert within_tolerance(t, value=b'{"foo": [{"baz": 1}, {"baz": 2}]}') is True
+    assert (
+        within_tolerance(t, value=b'{"foo": [{"baz": 1}, {"baz": 2}]}') is True
+    )
 
 
 def test_tolerance_jsonpath_cannot_be_empty():
@@ -250,7 +263,9 @@ def test_tolerance_regex_body_http():
 
 def test_tolerance_regex_must_have_a_pattern():
     with pytest.raises(InvalidActivity) as e:
-        ensure_hypothesis_tolerance_is_valid({"type": "regex", "target": "stdout"})
+        ensure_hypothesis_tolerance_is_valid(
+            {"type": "regex", "target": "stdout"}
+        )
     assert "tolerance must have a `pattern` key" in str(e.value)
 
 
@@ -281,7 +296,9 @@ def test_tolerance_missing_jsonpath_backend():
 
     hypothesis.HAS_JSONPATH = False
     with pytest.raises(InvalidActivity) as e:
-        ensure_hypothesis_tolerance_is_valid({"type": "jsonpath", "path": "whatever"})
+        ensure_hypothesis_tolerance_is_valid(
+            {"type": "jsonpath", "path": "whatever"}
+        )
     hypothesis.HAS_JSONPATH = True
     assert "Install the `jsonpath2` package to use a JSON path" in str(e.value)
 

@@ -5,6 +5,12 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.41.0...HEAD
 
+### Changed
+
+- Moved to PDM aways from setuptools as a more modern and robust approach
+  to manage dependencies
+- Moved to ruff away from flake8 for linter
+
 ### Fixed
 
 - Fixed loading of multiple controls from a global control file.

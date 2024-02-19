@@ -63,7 +63,9 @@ def test_process_not_utf8_cannot_fail():
 def test_process_homedir_relative_path():
     path = os.path.abspath(dummy_script).replace(os.path.expanduser("~"), "~")
     result = run_process_activity(
-        {"provider": {"type": "process", "path": path, "arguments": ""}}, None, None
+        {"provider": {"type": "process", "path": path, "arguments": ""}},
+        None,
+        None,
     )
     assert result["status"] == 0
 
@@ -85,7 +87,13 @@ def test_process_absolute_path():
 
 def test_process_cwd_relative_path():
     result = run_process_activity(
-        {"provider": {"type": "process", "path": dummy_script, "arguments": ""}},
+        {
+            "provider": {
+                "type": "process",
+                "path": dummy_script,
+                "arguments": "",
+            }
+        },
         None,
         None,
     )
@@ -108,5 +116,6 @@ def test_process_non_exit_zero_warning(logger):
 
     assert logger.warning.call_count == 1
     assert (
-        "This process returned a non-zero exit code." in logger.warning.call_args[0][0]
+        "This process returned a non-zero exit code."
+        in logger.warning.call_args[0][0]
     )

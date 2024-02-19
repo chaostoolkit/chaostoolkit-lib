@@ -42,9 +42,9 @@ def warn_about_deprecated_features(experiment: Experiment):
         provider_type = provider.get("type")
         if provider_type == "process":
             arguments = provider.get("arguments")
-            if not warned_deprecations[DeprecatedDictArgsMessage] and isinstance(
-                arguments, dict
-            ):
+            if not warned_deprecations[
+                DeprecatedDictArgsMessage
+            ] and isinstance(arguments, dict):
                 warned_deprecations[DeprecatedDictArgsMessage] = True
                 warnings.warn(DeprecatedDictArgsMessage, DeprecationWarning)
                 logger.warning(DeprecatedDictArgsMessage)
@@ -55,8 +55,12 @@ def warn_about_deprecated_features(experiment: Experiment):
         for key, value in keys.items():
             if isinstance(value, dict) and value.get("type") == "vault":
                 if "key" in value and "path" not in value:
-                    warned_deprecations[DeprecatedVaultMissingPathMessage] = True
-                    warnings.warn(DeprecatedVaultMissingPathMessage, DeprecationWarning)
+                    warned_deprecations[
+                        DeprecatedVaultMissingPathMessage
+                    ] = True
+                    warnings.warn(
+                        DeprecatedVaultMissingPathMessage, DeprecationWarning
+                    )
                     logger.warning(DeprecatedVaultMissingPathMessage)
 
 

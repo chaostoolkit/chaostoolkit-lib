@@ -135,17 +135,26 @@ def test_https_no_verification():
             text="body {}",
         )
         with pytest.raises(InvalidExperiment):
-            load_experiment("https://example.com/experiment.yaml", verify_tls=False)
+            load_experiment(
+                "https://example.com/experiment.yaml", verify_tls=False
+            )
 
 
 def test_https_with_verification():
     with requests_mock.mock() as m:
-        m.get("https://example.com/experiment.yaml", exc=requests.exceptions.SSLError)
+        m.get(
+            "https://example.com/experiment.yaml",
+            exc=requests.exceptions.SSLError,
+        )
         with pytest.raises(requests.exceptions.SSLError):
-            load_experiment("https://example.com/experiment.yaml", verify_tls=True)
+            load_experiment(
+                "https://example.com/experiment.yaml", verify_tls=True
+            )
 
 
-def test_load_from_http_with_auth_from_env(settings: Settings, generic_experiment: str):
+def test_load_from_http_with_auth_from_env(
+    settings: Settings, generic_experiment: str
+):
     try:
         os.environ["CHAOSTOOLKIT_LOADER_AUTH_BEARER_TOKEN"] = "XYZ"
         with requests_mock.mock() as m:

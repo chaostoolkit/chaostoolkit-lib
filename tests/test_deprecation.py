@@ -38,7 +38,9 @@ def test_vault_secrets_require_path():
     warn_counts = 0
     with warnings.catch_warnings(record=True) as w:
         warnings.simplefilter("module")
-        warn_about_deprecated_features(experiments.ExperimentWithDeprecatedVaultPayload)
+        warn_about_deprecated_features(
+            experiments.ExperimentWithDeprecatedVaultPayload
+        )
         for warning in w:
             if (
                 issubclass(warning.category, DeprecationWarning)

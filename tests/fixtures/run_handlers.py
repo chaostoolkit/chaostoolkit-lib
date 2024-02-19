@@ -43,11 +43,16 @@ class FullRunEventHandler(RunEventHandler):
     def start_continuous_hypothesis(self, frequency: int) -> None:
         self.calls.append("start_continuous_hypothesis")
 
-    def continuous_hypothesis_iteration(self, iteration_index: int, state: Any) -> None:
+    def continuous_hypothesis_iteration(
+        self, iteration_index: int, state: Any
+    ) -> None:
         self.calls.append("continuous_hypothesis_iteration")
 
     def continuous_hypothesis_completed(
-        self, experiment: Experiment, journal: Journal, exception: Exception = None
+        self,
+        experiment: Experiment,
+        journal: Journal,
+        exception: Exception = None,
     ) -> None:
         self.calls.append("continuous_hypothesis_completed")
 
@@ -111,7 +116,9 @@ class FullExceptionRunEventHandler(RunEventHandler):
     def start_continuous_hypothesis(self, frequency: int) -> None:
         raise Exception()
 
-    def continuous_hypothesis_iteration(self, iteration_index: int, state: Any) -> None:
+    def continuous_hypothesis_iteration(
+        self, iteration_index: int, state: Any
+    ) -> None:
         raise Exception()
 
     def continuous_hypothesis_completed(self) -> None:

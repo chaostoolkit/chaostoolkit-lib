@@ -173,7 +173,9 @@ def notify_with_http(channel: Dict[str, str], payload: EventPayload):
     if url:
         try:
             if forward_event_payload:
-                payload_encoded = json.loads(json.dumps(payload, cls=PayloadEncoder))
+                payload_encoded = json.loads(
+                    json.dumps(payload, cls=PayloadEncoder)
+                )
 
                 resp = requests.post(
                     url,
@@ -214,8 +216,9 @@ def notify_via_plugin(channel: Dict[str, str], payload: EventPayload):
         mod = importlib.import_module(mod_name)
     except ImportError:
         logger.debug(
-            "could not find Python plugin '{mod}' "
-            "for notification".format(mod=mod_name)
+            "could not find Python plugin '{mod}' " "for notification".format(
+                mod=mod_name
+            )
         )
     else:
         funcs = inspect.getmembers(mod, inspect.isfunction)
@@ -224,7 +227,9 @@ def notify_via_plugin(channel: Dict[str, str], payload: EventPayload):
                 try:
                     f(channel, payload)
                 except Exception as err:
-                    logger.debug("failed calling notification plugin", exc_info=err)
+                    logger.debug(
+                        "failed calling notification plugin", exc_info=err
+                    )
                 break
         else:
             logger.debug(

@@ -7,7 +7,10 @@ import pytest
 import yaml
 
 from chaoslib import convert_vars, merge_vars
-from chaoslib.configuration import load_configuration, load_dynamic_configuration
+from chaoslib.configuration import (
+    load_configuration,
+    load_dynamic_configuration,
+)
 from chaoslib.exceptions import InvalidExperiment
 
 
@@ -150,7 +153,9 @@ def test_merge_vars_from_keys_only_for_configs():
 def test_merge_config_vars_from_json_file():
     with tempfile.NamedTemporaryFile(suffix=".json") as f:
         f.write(
-            json.dumps({"configuration": {"otherstuff": "tobedone"}}).encode("utf-8")
+            json.dumps({"configuration": {"otherstuff": "tobedone"}}).encode(
+                "utf-8"
+            )
         )
         f.seek(0)
         assert merge_vars({"stuff": "todo"}, [f.name]) == (
@@ -161,14 +166,21 @@ def test_merge_config_vars_from_json_file():
 
 def test_merge_config_vars_from_cli_override_from_file():
     with tempfile.NamedTemporaryFile(suffix=".json") as f:
-        f.write(json.dumps({"configuration": {"stuff": "tobedone"}}).encode("utf-8"))
+        f.write(
+            json.dumps({"configuration": {"stuff": "tobedone"}}).encode("utf-8")
+        )
         f.seek(0)
-        assert merge_vars({"stuff": "todo"}, [f.name]) == ({"stuff": "todo"}, {})
+        assert merge_vars({"stuff": "todo"}, [f.name]) == (
+            {"stuff": "todo"},
+            {},
+        )
 
 
 def test_merge_secret_vars_from_json_file():
     with tempfile.NamedTemporaryFile(suffix=".json") as f:
-        f.write(json.dumps({"secrets": {"otherstuff": "tobedone"}}).encode("utf-8"))
+        f.write(
+            json.dumps({"secrets": {"otherstuff": "tobedone"}}).encode("utf-8")
+        )
         f.seek(0)
         assert merge_vars({"stuff": "todo"}, [f.name]) == (
             {"stuff": "todo"},
@@ -179,7 +191,9 @@ def test_merge_secret_vars_from_json_file():
 def test_merge_config_vars_from_yaml_file():
     with tempfile.NamedTemporaryFile(suffix=".yaml") as f:
         f.write(
-            yaml.dump({"configuration": {"otherstuff": "tobedone"}}).encode("utf-8")
+            yaml.dump({"configuration": {"otherstuff": "tobedone"}}).encode(
+                "utf-8"
+            )
         )
         f.seek(0)
         assert merge_vars({"stuff": "todo"}, [f.name]) == (
@@ -190,7 +204,9 @@ def test_merge_config_vars_from_yaml_file():
 
 def test_merge_secret_vars_from_yaml_file():
     with tempfile.NamedTemporaryFile(suffix=".yaml") as f:
-        f.write(yaml.dump({"secrets": {"otherstuff": "tobedone"}}).encode("utf-8"))
+        f.write(
+            yaml.dump({"secrets": {"otherstuff": "tobedone"}}).encode("utf-8")
+        )
         f.seek(0)
         assert merge_vars({"stuff": "todo"}, [f.name]) == (
             {"stuff": "todo"},
@@ -284,7 +300,11 @@ def test_that_environment_variables_are_typed_correctly():
                 "key": "TEST_ENV_VAR_STRING",
                 "env_var_type": "str",
             },
-            "token3": {"type": "env", "key": "TEST_ENV_VAR_INT", "env_var_type": "int"},
+            "token3": {
+                "type": "env",
+                "key": "TEST_ENV_VAR_INT",
+                "env_var_type": "int",
+            },
             "token4": {
                 "type": "env",
                 "key": "TEST_ENV_VAR_FLOAT",
@@ -356,7 +376,8 @@ def test_env_var_can_be_used_with_loading_dynamic_config(fixtures_dir: str):
     env_file = os.path.join(fixtures_dir, "env_vars_issue252.json")
     cfg_vars, _ = merge_vars(None, [env_file])
     cfg = load_configuration(
-        {"some_config_1": "hello", "some_config_2": "there"}, extra_vars=cfg_vars
+        {"some_config_1": "hello", "some_config_2": "there"},
+        extra_vars=cfg_vars,
     )
 
     dcfg = load_dynamic_configuration(cfg)
@@ -366,7 +387,13 @@ def test_env_var_can_be_used_with_loading_dynamic_config(fixtures_dir: str):
 
 def test_env_var_may_be_missing_but_not_fail_validation_if_default_key_is_present():  # noqa
     cfg = load_configuration(
-        {"some_config_1": {"type": "env", "key": "MY_SUPER_KEY", "default": "hello"}},
+        {
+            "some_config_1": {
+                "type": "env",
+                "key": "MY_SUPER_KEY",
+                "default": "hello",
+            }
+        },
     )
 
     assert cfg["some_config_1"] == "hello"
@@ -374,7 +401,13 @@ def test_env_var_may_be_missing_but_not_fail_validation_if_default_key_is_presen
 
 def test_env_var_may_be_missing_but_not_fail_validation_if_default_key_is_present_but_None():  # noqa
     cfg = load_configuration(
-        {"some_config_1": {"type": "env", "key": "MY_SUPER_KEY", "default": None}},
+        {
+            "some_config_1": {
+                "type": "env",
+                "key": "MY_SUPER_KEY",
+                "default": None,
+            }
+        },
     )
 
     assert cfg["some_config_1"] is None

@@ -1,4 +1,4 @@
-name: Build, Test, and Lint
+name: Build
 
 on:
   push:
@@ -8,53 +8,35 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.7'
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip setuptools wheel
-      - name: Build the choastoolkit-lib package
-        run : |
-          make build
-
-  lint:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.7'
-      - name: Install dependencies
-        run: |
-          make install-dev
-      - name: Lint chaoslib
-        run: |
-          make lint
-
-  test:
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9, "3.10", "3.11", "3.12"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        os: ["ubuntu-latest", "macos-latest"]
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up PDM
+        uses: pdm-project/setup-pdm@v3
         with:
           python-version: ${{ matrix.python-version }}
+          cache: true
+          prerelease: true
+
+      - name: Ensure lock file is up to date
+        run: |
+          pdm lock --check
+
       - name: Install dependencies
         run: |
-          make install-dev
-      - name: Run tests
-        run: |
-          locale
+          pdm sync -d
 
-          export LANG=en_US.UTF-8
-          export LC_ALL=en_US.UTF-8
-          make tests
+      - name: Run Lint
+        run: |
+          pdm run lint
+
+      - name: Run Tests
+        run: |
+          pdm run pytest

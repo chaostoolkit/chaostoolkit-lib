@@ -76,7 +76,12 @@ def test_always_return_to_string_when_pattern_is_not_alone():
 def test_http_activity_can_substitute_timeout() -> None:
     c = {"my_timeout": 1}
     run_http_activity(
-        {"provider": {"url": "https://www.google.com", "timeout": "${my_timeout}"}},
+        {
+            "provider": {
+                "url": "https://www.google.com",
+                "timeout": "${my_timeout}",
+            }
+        },
         c,
         {},
     )

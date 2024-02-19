@@ -19,7 +19,14 @@ from chaoslib.exceptions import InterruptExecution, InvalidControl
 from chaoslib.settings import get_loaded_settings
 from chaoslib.types import Activity, Configuration
 from chaoslib.types import Control as ControlType
-from chaoslib.types import Experiment, Hypothesis, Journal, Run, Secrets, Settings
+from chaoslib.types import (
+    Experiment,
+    Hypothesis,
+    Journal,
+    Run,
+    Secrets,
+    Settings,
+)
 
 if TYPE_CHECKING:
     from chaoslib.run import EventHandlerRegistry
@@ -119,7 +126,9 @@ def validate_controls(experiment: Experiment):
     """
     controls = get_controls(experiment)
     references = [
-        c["name"] for c in get_controls(experiment) if "ref" not in c and "name" in c
+        c["name"]
+        for c in get_controls(experiment)
+        if "ref" not in c and "name" in c
     ]
     for c in controls:
         if "ref" in c:
@@ -133,7 +142,9 @@ def validate_controls(experiment: Experiment):
 
         name = c["name"]
         if "provider" not in c:
-            raise InvalidControl(f"Control '{name}' must have a `provider` property")
+            raise InvalidControl(
+                f"Control '{name}' must have a `provider` property"
+            )
 
         scope = c.get("scope")
         if scope and scope not in ("before", "after"):
@@ -186,7 +197,9 @@ def initialize_global_controls(
     set_global_controls(controls)
 
 
-def load_global_controls(settings: Settings, control_files: Optional[List[str]] = None):
+def load_global_controls(
+    settings: Settings, control_files: Optional[List[str]] = None
+):
     """
     Import all controls declared in the settings and global to all experiments.
 
@@ -222,7 +235,9 @@ def load_global_controls(settings: Settings, control_files: Optional[List[str]] 
                 ctrls = yaml.safe_load(content)
             except yaml.YAMLError as y:
                 logger.error(
-                    "Failed to parse control file '{}': {}".format(control_file, str(y))
+                    "Failed to parse control file '{}': {}".format(
+                        control_file, str(y)
+                    )
                 )
                 continue
         elif ext in (".json"):
@@ -230,7 +245,9 @@ def load_global_controls(settings: Settings, control_files: Optional[List[str]] 
                 ctrls = json.loads(content)
             except JSONDecodeError as x:
                 logger.error(
-                    "Failed to parse control file '{}': {}".format(control_file, str(x))
+                    "Failed to parse control file '{}': {}".format(
+                        control_file, str(x)
+                    )
                 )
                 continue
 
@@ -265,7 +282,8 @@ def cleanup_global_controls():
                 cleanup_control(control)
             except Exception:
                 logger.debug(
-                    "Control cleanup '{}' failed".format(control["name"]), exc_info=True
+                    "Control cleanup '{}' failed".format(control["name"]),
+                    exc_info=True,
                 )
 
 
@@ -343,7 +361,9 @@ def controls(
 ###############################################################################
 def get_all_activities(experiment: Experiment) -> List[Activity]:
     activities = []
-    activities.extend(experiment.get("steady-state-hypothesis", {}).get("probes", []))
+    activities.extend(
+        experiment.get("steady-state-hypothesis", {}).get("probes", [])
+    )
     activities.extend(experiment.get("method", []))
     activities.extend(experiment.get("rollbacks", []))
     return activities
@@ -352,7 +372,9 @@ def get_all_activities(experiment: Experiment) -> List[Activity]:
 def get_controls(experiment: Experiment) -> List[Control]:
     controls = []
     controls.extend(experiment.get("controls", []))
-    controls.extend(experiment.get("steady-state-hypothesis", {}).get("controls", []))
+    controls.extend(
+        experiment.get("steady-state-hypothesis", {}).get("controls", [])
+    )
 
     for activity in get_all_activities(experiment):
         controls.extend(activity.get("controls", []))
@@ -400,10 +422,14 @@ def get_context_controls(
         return controls
 
     if not controls:
-        return [deepcopy(c) for c in top_level_controls if c.get("automatic", True)]
+        return [
+            deepcopy(c) for c in top_level_controls if c.get("automatic", True)
+        ]
 
     if level in ["method", "rollback"]:
-        return [deepcopy(c) for c in top_level_controls if c.get("automatic", True)]
+        return [
+            deepcopy(c) for c in top_level_controls if c.get("automatic", True)
+        ]
 
     for c in controls[:]:
         if "ref" in c:

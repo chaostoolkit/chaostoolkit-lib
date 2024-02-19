@@ -115,3 +115,11 @@ junit-test-results.xml
 
 # Pycharm
 .idea
+
+# PDM
+.pdm-build/
+.pdm-python
+
+
+# Ruff
+.ruff_cache/

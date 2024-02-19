@@ -12,7 +12,11 @@ from chaoslib.secret import create_vault_client, load_secrets
 @patch.dict(os.environ, {"KUBE_API_URL": "http://1.2.3.4"})
 def test_should_load_environment():
     secrets = load_secrets(
-        {"kubernetes": {"api_server_url": {"type": "env", "key": "KUBE_API_URL"}}},
+        {
+            "kubernetes": {
+                "api_server_url": {"type": "env", "key": "KUBE_API_URL"}
+            }
+        },
         config.EmptyConfig,
     )
     assert secrets["kubernetes"]["api_server_url"] == "http://1.2.3.4"
@@ -170,7 +174,10 @@ def test_read_secrets_from_vault_with_kv_version_1(hvac):
     # secret at secret/foo
     vault_secret_payload = {
         "auth": None,
-        "data": {"my-important-secret": "bar", "my-less-important-secret": "baz"},
+        "data": {
+            "my-important-secret": "bar",
+            "my-less-important-secret": "baz",
+        },
         "lease_duration": 2764800,
         "lease_id": "",
         "renewable": False,
@@ -213,7 +220,10 @@ def test_read_secrets_from_vault_with_kv_version_2(hvac):
     # secret at secret/foo
     vault_secret_payload = {
         "data": {
-            "data": {"my-important-secret": "bar", "my-less-important-secret": "baz"},
+            "data": {
+                "my-important-secret": "bar",
+                "my-less-important-secret": "baz",
+            },
             "metadata": {
                 "auth": None,
                 "lease_duration": 2764800,
@@ -225,7 +235,9 @@ def test_read_secrets_from_vault_with_kv_version_2(hvac):
 
     fake_client = MagicMock()
     hvac.Client.return_value = fake_client
-    fake_client.secrets.kv.v2.read_secret_version.return_value = vault_secret_payload
+    fake_client.secrets.kv.v2.read_secret_version.return_value = (
+        vault_secret_payload
+    )
 
     secrets = load_secrets(secrets_info, config)
     assert secrets["k8s"]["a-secret"] == {
@@ -250,7 +262,11 @@ def test_read_secrets_from_vault_with_kv_version_2(hvac):
 @patch.dict(os.environ, {"KUBE_API_URL": "http://1.2.3.4"})
 def test_override_load_environmen_with_var():
     secrets = load_secrets(
-        {"kubernetes": {"api_server_url": {"type": "env", "key": "KUBE_API_URL"}}},
+        {
+            "kubernetes": {
+                "api_server_url": {"type": "env", "key": "KUBE_API_URL"}
+            }
+        },
         config.EmptyConfig,
         {"kubernetes": {"api_server_url": "http://elsewhere"}},
     )
@@ -288,10 +304,13 @@ def test_vault_add_subkeys(hvac):
 
     fake_client = MagicMock()
     hvac.Client.return_value = fake_client
-    fake_client.secrets.kv.v2.read_secret_version.return_value = vault_secret_payload
+    fake_client.secrets.kv.v2.read_secret_version.return_value = (
+        vault_secret_payload
+    )
 
     secrets = load_secrets(
-        {"myapp": {"token": {"type": "vault", "path": "secrets/something"}}}, config
+        {"myapp": {"token": {"type": "vault", "path": "secrets/something"}}},
+        config,
     )
     assert secrets["myapp"]["token"]["foo"] == "bar"
     assert secrets["myapp"]["token"]["baz"] == "hello"
@@ -319,12 +338,18 @@ def test_vault_replace_entire_declare(hvac):
 
     fake_client = MagicMock()
     hvac.Client.return_value = fake_client
-    fake_client.secrets.kv.v2.read_secret_version.return_value = vault_secret_payload
+    fake_client.secrets.kv.v2.read_secret_version.return_value = (
+        vault_secret_payload
+    )
 
     secrets = load_secrets(
         {
             "myapp": {
-                "token": {"type": "vault", "path": "secrets/something", "key": "foo"}
+                "token": {
+                    "type": "vault",
+                    "path": "secrets/something",
+                    "key": "foo",
+                }
             }
         },
         config,
@@ -354,12 +379,18 @@ def test_override_vault_with_vars(hvac):
 
     fake_client = MagicMock()
     hvac.Client.return_value = fake_client
-    fake_client.secrets.kv.v2.read_secret_version.return_value = vault_secret_payload
+    fake_client.secrets.kv.v2.read_secret_version.return_value = (
+        vault_secret_payload
+    )
 
     secrets = load_secrets(
         {
             "myapp": {
-                "token": {"type": "vault", "path": "secrets/something", "key": "foo"}
+                "token": {
+                    "type": "vault",
+                    "path": "secrets/something",
+                    "key": "foo",
+                }
             }
         },
         config,

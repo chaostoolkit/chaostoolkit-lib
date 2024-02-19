@@ -12,9 +12,22 @@ from chaoslib.caching import lookup_activity
 from chaoslib.control import controls
 from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.provider.http import run_http_activity, validate_http_activity
-from chaoslib.provider.process import run_process_activity, validate_process_activity
-from chaoslib.provider.python import run_python_activity, validate_python_activity
-from chaoslib.types import Activity, Configuration, Dry, Experiment, Run, Secrets
+from chaoslib.provider.process import (
+    run_process_activity,
+    validate_process_activity,
+)
+from chaoslib.provider.python import (
+    run_python_activity,
+    validate_python_activity,
+)
+from chaoslib.types import (
+    Activity,
+    Configuration,
+    Dry,
+    Experiment,
+    Run,
+    Secrets,
+)
 
 if TYPE_CHECKING:
     from chaoslib.run import EventHandlerRegistry
@@ -46,7 +59,9 @@ def ensure_activity_is_valid(activity: Activity):  # noqa: C901
     ref = activity.get("ref")
     if ref is not None:
         if not isinstance(ref, str) or ref == "":
-            raise InvalidActivity("reference to activity must be non-empty strings")
+            raise InvalidActivity(
+                "reference to activity must be non-empty strings"
+            )
         return
 
     activity_type = activity.get("type")
@@ -54,7 +69,9 @@ def ensure_activity_is_valid(activity: Activity):  # noqa: C901
         raise InvalidActivity("an activity must have a type")
 
     if activity_type not in ("probe", "action"):
-        raise InvalidActivity(f"'{activity_type}' is not a supported activity type")
+        raise InvalidActivity(
+            f"'{activity_type}' is not a supported activity type"
+        )
 
     if not activity.get("name"):
         raise InvalidActivity("an activity must have a name")
@@ -213,11 +230,17 @@ def execute_activity(
             )
         else:
             logger.info(
-                "{t}: {n}".format(t=activity["type"].title(), n=activity.get("name"))
+                "{t}: {n}".format(
+                    t=activity["type"].title(), n=activity.get("name")
+                )
             )
 
         start = datetime.utcnow()
-        run = {"activity": activity.copy(), "output": None, "start": start.isoformat()}
+        run = {
+            "activity": activity.copy(),
+            "output": None,
+            "start": start.isoformat(),
+        }
         if runs is not None:
             runs.append(run)
 

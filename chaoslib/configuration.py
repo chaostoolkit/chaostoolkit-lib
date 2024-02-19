@@ -171,7 +171,9 @@ def load_dynamic_configuration(
             output = run_activity(value, conf, secrets)
         except Exception:
             had_errors = True
-            logger.debug(f"Failed to load configuration '{name}'", exc_info=True)
+            logger.debug(
+                f"Failed to load configuration '{name}'", exc_info=True
+            )
             continue
 
         if provider_type == "python":

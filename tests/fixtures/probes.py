@@ -21,7 +21,11 @@ UnknownProviderTypeProbe = {
     "provider": {"type": "pizza"},
 }
 
-MissingModuleProbe = {"type": "probe", "name": "a name", "provider": {"type": "python"}}
+MissingModuleProbe = {
+    "type": "probe",
+    "name": "a name",
+    "provider": {"type": "python"},
+}
 
 NotImportableModuleProbe = {
     "type": "probe",

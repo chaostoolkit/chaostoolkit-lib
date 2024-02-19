@@ -189,11 +189,15 @@ def load_func(control: Control, func_name: str) -> Callable:
 
     func = getattr(mod, func_name, None)
     if not func:
-        logger.debug(f"Control module '{mod.__file__}' does not declare '{func_name}'")
+        logger.debug(
+            f"Control module '{mod.__file__}' does not declare '{func_name}'"
+        )
         return
 
     try:
-        logger.debug(f"Control '{func_name}' loaded from '{inspect.getfile(func)}'")
+        logger.debug(
+            f"Control '{func_name}' loaded from '{inspect.getfile(func)}'"
+        )
     except TypeError:
         pass
 

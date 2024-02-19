@@ -24,7 +24,9 @@ def parse_experiment_from_file(path: str) -> Experiment:
             try:
                 return yaml.safe_load(f)
             except yaml.YAMLError as ye:
-                raise InvalidSource(f"Failed parsing YAML experiment: {str(ye)}")
+                raise InvalidSource(
+                    f"Failed parsing YAML experiment: {str(ye)}"
+                )
         elif ext == ".json":
             return json.load(f)
 
@@ -99,12 +101,16 @@ def load_experiment(
             raise InvalidSource(f'Path "{p.path}" does not exist.')
 
         if p.scheme not in ("http", "https"):
-            raise InvalidSource(f"'{p.scheme}' is not a supported source scheme.")
+            raise InvalidSource(
+                f"'{p.scheme}' is not a supported source scheme."
+            )
 
         ctk_bearer_token = os.getenv("CHAOSTOOLKIT_LOADER_AUTH_BEARER_TOKEN")
         headers = {"Accept": "application/json, application/x-yaml"}
         if ctk_bearer_token:
-            headers["Authorization"] = "bearer {}".format(ctk_bearer_token.strip())
+            headers["Authorization"] = "bearer {}".format(
+                ctk_bearer_token.strip()
+            )
         elif settings:
             auths = settings.get("auths", [])
             for domain in auths:

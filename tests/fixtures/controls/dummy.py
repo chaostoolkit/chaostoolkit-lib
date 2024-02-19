@@ -41,7 +41,9 @@ def before_hypothesis_control(context: Hypothesis, **kwargs):
     context["before_hypothesis_control"] = True
 
 
-def after_hypothesis_control(context: Hypothesis, state: Dict[str, Any], **kwargs):
+def after_hypothesis_control(
+    context: Hypothesis, state: Dict[str, Any], **kwargs
+):
     context["after_hypothesis_control"] = True
     state["after_hypothesis_control"] = True
 

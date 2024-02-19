@@ -78,7 +78,9 @@ def test_process_probe_have_a_path():
 def test_process_probe_path_must_exist():
     with pytest.raises(InvalidActivity) as exc:
         ensure_activity_is_valid(probes.ProcessPathDoesNotExistProbe)
-    assert "path 'somewhere/not/here' cannot be found, in activity" in str(exc.value)
+    assert "path 'somewhere/not/here' cannot be found, in activity" in str(
+        exc.value
+    )
 
 
 def test_http_probe_must_have_a_url():
@@ -90,7 +92,9 @@ def test_http_probe_must_have_a_url():
 def test_run_python_probe_should_return_raw_value():
     # our probe checks a file exists
     assert (
-        run_activity(probes.PythonModuleProbe, config.EmptyConfig, experiments.Secrets)
+        run_activity(
+            probes.PythonModuleProbe, config.EmptyConfig, experiments.Secrets
+        )
         is True
     )
 
@@ -98,7 +102,9 @@ def test_run_python_probe_should_return_raw_value():
 def test_run_process_probe_should_return_raw_value():
     v = "Python {v}\n".format(v=sys.version.split(" ")[0])
 
-    result = run_activity(probes.ProcProbe, config.EmptyConfig, experiments.Secrets)
+    result = run_activity(
+        probes.ProcProbe, config.EmptyConfig, experiments.Secrets
+    )
     assert isinstance(result, dict)
     assert result["status"] == 0
     assert result["stdout"] == v
@@ -140,9 +146,9 @@ def test_run_process_probe_can_timeout():
     probe["provider"]["timeout"] = 0.0001
 
     with pytest.raises(ActivityFailed) as exc:
-        run_activity(probes.ProcProbe, config.EmptyConfig, experiments.Secrets).decode(
-            "utf-8"
-        )
+        run_activity(
+            probes.ProcProbe, config.EmptyConfig, experiments.Secrets
+        ).decode("utf-8")
     assert "activity took too long to complete" in str(exc.value)
 
 
@@ -150,7 +156,9 @@ def test_run_http_probe_should_return_parsed_json_value():
     with requests_mock.mock() as m:
         headers = {"Content-Type": "application/json"}
         m.post("http://example.com", json=["well done"], headers=headers)
-        result = run_activity(probes.HTTPProbe, config.EmptyConfig, experiments.Secrets)
+        result = run_activity(
+            probes.HTTPProbe, config.EmptyConfig, experiments.Secrets
+        )
         assert result["body"] == ["well done"]
 
 
@@ -158,14 +166,18 @@ def test_run_http_probe_must_be_serializable_to_json():
     with requests_mock.mock() as m:
         headers = {"Content-Type": "application/json"}
         m.post("http://example.com", json=["well done"], headers=headers)
-        result = run_activity(probes.HTTPProbe, config.EmptyConfig, experiments.Secrets)
+        result = run_activity(
+            probes.HTTPProbe, config.EmptyConfig, experiments.Secrets
+        )
         assert json.dumps(result) is not None
 
 
 def test_run_http_probe_should_return_raw_text_value():
     with requests_mock.mock() as m:
         m.post("http://example.com", text="['well done']")
-        result = run_activity(probes.HTTPProbe, config.EmptyConfig, experiments.Secrets)
+        result = run_activity(
+            probes.HTTPProbe, config.EmptyConfig, experiments.Secrets
+        )
         assert result["body"] == "['well done']"
 
 

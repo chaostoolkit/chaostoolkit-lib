@@ -1,8 +1,97 @@
 [build-system]
-requires = [
-    "setuptools>=51.0",
-    "wheel",
-    "setuptools_scm>=1.15",
-    "setuptools_scm_git_archive>=1.0",
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[project]
+name = "chaostoolkit-lib"
+dynamic = ["version"]
+description = "Chaos Toolkit core library"
+authors = [
+    {name = "Chaos Toolkit", email = "contact@chaostoolkit.org"},
+    {name = "Sylvain Hellegouarch", email = "sh@defuze.org"},
 ]
-build-backend = "setuptools.build_meta"
+dependencies = [
+    "logzero>=1.7.0",
+    "requests>=2.31.0",
+    "pyyaml>=6.0.1",
+    "importlib-metadata>=6.7.0",
+    "charset-normalizer>=3.3.2",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: Freely Distributable",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: Implementation",
+    "Programming Language :: Python :: Implementation :: CPython"
+]
+requires-python = ">=3.7"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+
+[project.urls]
+Homepage = "https://chaostoolkit.org/"
+Repository = "https://github.com/chaostoolkit/chaostoolkit-lib"
+Documentation = "https://chaostoolkit.org"
+Changelog = "https://github.com/chaostoolkit/chaostoolkit-lib/blob/main/CHANGELOG.md"
+
+[tool]
+
+[tool.pdm]
+version = { source = "scm" }
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "requests-mock>=1.11.0",
+    "coverage>=7.2.7",
+    "pytest>=7.4.4",
+    "pytest-cov>=4.1.0",
+    "pytest-sugar>=1.0.0",
+    "ply>=3.11",
+    "pyhcl>=0.4.5",
+    "hvac>=1.2.1",
+    "jsonpath2>=0.4.5",
+    "charset-normalizer>=3.3.2",
+    "ruff>=0.2.2",
+]
+
+[tool.pdm.scripts]
+lint = {composite = ["ruff check ."]}
+format = {composite = ["ruff check --fix .", "ruff format ."]}
+test = {cmd = "pytest"}
+
+[tool.ruff]
+line-length = 80
+exclude = [
+    ".eggs",
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "build",
+    "dist",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = false
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = "tests"
+addopts = "-v -rxs --cov chaoslib --cov-report term-missing:skip-covered -p no:warnings"

@@ -7,7 +7,11 @@ EmptyAction = {}
 DoNothingAction = {
     "name": "a name",
     "type": "action",
-    "provider": {"type": "python", "module": "fixtures.fakeext", "func": "do_nothing"},
+    "provider": {
+        "type": "python",
+        "module": "fixtures.fakeext",
+        "func": "do_nothing",
+    },
 }
 
 EchoAction = {

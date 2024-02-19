@@ -69,7 +69,9 @@ def ensure_experiment_is_valid(experiment: Experiment):
     tags = experiment.get("tags")
     if tags:
         if list(filter(lambda t: t == "" or not isinstance(t, str), tags)):
-            raise InvalidExperiment("experiment tags must be a non-empty string")
+            raise InvalidExperiment(
+                "experiment tags must be a non-empty string"
+            )
 
     validate_extensions(experiment)
 
@@ -162,7 +164,8 @@ def apply_activities(
     dry: Dry,
 ) -> List[Run]:
     warn_about_moved_function(
-        "The 'apply_activities' function has now moved to the " "'chaoslib.run' package"
+        "The 'apply_activities' function has now moved to the "
+        "'chaoslib.run' package"
     )
     return apply_act(experiment, configuration, secrets, pool, journal, dry)
 
@@ -175,6 +178,7 @@ def apply_rollbacks(
     dry: Dry,
 ) -> List[Run]:
     warn_about_moved_function(
-        "The 'apply_rollbacks' function has now moved to the " "'chaoslib.run' package"
+        "The 'apply_rollbacks' function has now moved to the "
+        "'chaoslib.run' package"
     )
     return apply_roll(experiment, configuration, secrets, pool, dry)

@@ -46,7 +46,7 @@ def after_hypothesis_control(
     experiment: Experiment,
     state: Dict[str, Any],
     secrets: Secrets,
-    **kwargs
+    **kwargs,
 ):
     experiment["after_hypothesis_control_secrets"] = secrets
 
@@ -78,6 +78,10 @@ def before_activity_control(
 
 
 def after_activity_control(
-    context: Activity, experiment: Experiment, state: Run, secrets: Secrets, **kwargs
+    context: Activity,
+    experiment: Experiment,
+    state: Run,
+    secrets: Secrets,
+    **kwargs,
 ):
     experiment["after_activity_control_secrets"] = secrets

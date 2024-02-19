@@ -15,9 +15,17 @@ except ImportError:
 from logzero import logger
 
 from chaoslib import substitute
-from chaoslib.activity import ensure_activity_is_valid, execute_activity, run_activity
+from chaoslib.activity import (
+    ensure_activity_is_valid,
+    execute_activity,
+    run_activity,
+)
 from chaoslib.control import controls
-from chaoslib.exceptions import ActivityFailed, InvalidActivity, InvalidExperiment
+from chaoslib.exceptions import (
+    ActivityFailed,
+    InvalidActivity,
+    InvalidExperiment,
+)
 from chaoslib.types import Configuration, Dry, Experiment, Secrets, Tolerance
 
 if TYPE_CHECKING:
@@ -44,7 +52,9 @@ def ensure_hypothesis_is_valid(experiment: Experiment):
             ensure_activity_is_valid(probe)
 
             if "tolerance" not in probe:
-                raise InvalidActivity("hypothesis probe must have a tolerance entry")
+                raise InvalidActivity(
+                    "hypothesis probe must have a tolerance entry"
+                )
 
             ensure_hypothesis_tolerance_is_valid(probe["tolerance"])
 
@@ -134,7 +144,9 @@ def check_json_path(tolerance: Tolerance):
             )
         JSONPath.parse_str(path)
     except ValueError:
-        raise InvalidActivity(f"hypothesis probe tolerance JSON path {path} is invalid")
+        raise InvalidActivity(
+            f"hypothesis probe tolerance JSON path {path} is invalid"
+        )
     except TypeError:
         raise InvalidActivity(
             "hypothesis probe tolerance JSON path {} has an invalid "
@@ -157,13 +169,19 @@ def check_range(tolerance: Tolerance):
         raise InvalidActivity("hypothesis range must be a sequence")
 
     if len(the_range) != 2:
-        raise InvalidActivity("hypothesis range sequence must be made of two values")
+        raise InvalidActivity(
+            "hypothesis range sequence must be made of two values"
+        )
 
     if not isinstance(the_range[0], Number):
-        raise InvalidActivity("hypothesis range lower boundary must be a number")
+        raise InvalidActivity(
+            "hypothesis range lower boundary must be a number"
+        )
 
     if not isinstance(the_range[1], Number):
-        raise InvalidActivity("hypothesis range upper boundary must be a number")
+        raise InvalidActivity(
+            "hypothesis range upper boundary must be a number"
+        )
 
 
 def run_steady_state_hypothesis(
@@ -227,7 +245,10 @@ def run_steady_state_hypothesis(
                 tolerance = substitute(tolerance, configuration, secrets)
             logger.debug(f"allowed tolerance is {str(tolerance)}")
             checked = within_tolerance(
-                tolerance, run["output"], configuration=configuration, secrets=secrets
+                tolerance,
+                run["output"],
+                configuration=configuration,
+                secrets=secrets,
             )
             if not checked:
                 run["tolerance_met"] = False

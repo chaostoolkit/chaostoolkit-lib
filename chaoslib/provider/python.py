@@ -148,6 +148,9 @@ def validate_python_activity(activity: Activity):  # noqa: C901
         raise InvalidActivity(
             "The python module '{mod}' does not expose a function called "
             "'{func}' in {type} '{name}'".format(
-                mod=mod_name, func=func, type=activity["type"], name=activity_name
+                mod=mod_name,
+                func=func,
+                type=activity["type"],
+                name=activity_name,
             )
         )

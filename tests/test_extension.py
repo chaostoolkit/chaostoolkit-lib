@@ -54,7 +54,9 @@ def test_merge_extension():
     assert ext is not None
     assert ext["somekey"] == "blah"
 
-    merge_extension(exp, {"name": "myext", "somekey": "burp", "otherkey": "oneday"})
+    merge_extension(
+        exp, {"name": "myext", "somekey": "burp", "otherkey": "oneday"}
+    )
 
     ext = get_extension(exp, "myext")
     assert ext is not None

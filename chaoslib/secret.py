@@ -195,12 +195,16 @@ def load_secrets_from_vault(
         if is_kv1:
             vault_payload = kv.v1.read_secret(
                 path=vault_path,
-                mount_point=configuration.get("vault_secrets_mount_point", "secret"),
+                mount_point=configuration.get(
+                    "vault_secrets_mount_point", "secret"
+                ),
             )
         else:
             vault_payload = kv.v2.read_secret_version(
                 path=vault_path,
-                mount_point=configuration.get("vault_secrets_mount_point", "secret"),
+                mount_point=configuration.get(
+                    "vault_secrets_mount_point", "secret"
+                ),
             )
 
         if not vault_payload:
@@ -245,7 +249,10 @@ def create_vault_client(configuration: Configuration = None):
 
         if "vault_token" in configuration:
             client.token = configuration.get("vault_token")
-        elif "vault_role_id" in configuration and "vault_role_secret" in configuration:
+        elif (
+            "vault_role_id" in configuration
+            and "vault_role_secret" in configuration
+        ):
             role_id = configuration.get("vault_role_id")
             role_secret = configuration.get("vault_role_secret")
 
@@ -263,14 +270,19 @@ def create_vault_client(configuration: Configuration = None):
                 or "/var/run/secrets/kubernetes.io/serviceaccount/token"
             )
 
-            mount_point = configuration.get("vault_k8s_mount_point", "kubernetes")
+            mount_point = configuration.get(
+                "vault_k8s_mount_point", "kubernetes"
+            )
 
             try:
                 with open(sa_token_path) as sa_token:
                     jwt = sa_token.read()
                     role = configuration.get("vault_sa_role")
                     client.auth_kubernetes(
-                        role=role, jwt=jwt, use_token=True, mount_point=mount_point
+                        role=role,
+                        jwt=jwt,
+                        use_token=True,
+                        mount_point=mount_point,
                     )
             except OSError:
                 raise InvalidExperiment(

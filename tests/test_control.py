@@ -98,7 +98,9 @@ def test_controls_are_applied_before_and_after_hypothesis():
 
     assert "after_hypothesis_control" in hypo
     assert hypo["after_hypothesis_control"] is True
-    assert journal["steady_states"]["before"]["after_hypothesis_control"] is True
+    assert (
+        journal["steady_states"]["before"]["after_hypothesis_control"] is True
+    )
 
 
 def test_controls_are_applied_before_and_after_method():
@@ -286,7 +288,10 @@ def test_load_global_controls_from_settings():
         "dummy-key": "hello there",
         "controls": {
             "dummy": {
-                "provider": {"type": "python", "module": "fixtures.controls.dummy"}
+                "provider": {
+                    "type": "python",
+                    "module": "fixtures.controls.dummy",
+                }
             }
         },
     }
@@ -308,7 +313,10 @@ def test_get_globally_loaded_controls_from_settings():
     settings = {
         "controls": {
             "dummy": {
-                "provider": {"type": "python", "module": "fixtures.controls.dummy"}
+                "provider": {
+                    "type": "python",
+                    "module": "fixtures.controls.dummy",
+                }
             }
         }
     }
@@ -338,7 +346,10 @@ def test_load_global_controls_from_settings_configured_via_exp_config():
     settings = {
         "controls": {
             "dummy": {
-                "provider": {"type": "python", "module": "fixtures.controls.dummy"}
+                "provider": {
+                    "type": "python",
+                    "module": "fixtures.controls.dummy",
+                }
             }
         }
     }
@@ -369,7 +380,10 @@ def test_apply_controls_even_on_background_activity():
         "dummy-key": "hello there",
         "controls": {
             "dummy": {
-                "provider": {"type": "python", "module": "fixtures.controls.dummy"}
+                "provider": {
+                    "type": "python",
+                    "module": "fixtures.controls.dummy",
+                }
             }
         },
     }
@@ -439,7 +453,10 @@ def test_control_failing_its_initialization_must_not_be_registered():
                 }
             },
             "dummy": {
-                "provider": {"type": "python", "module": "fixtures.controls.dummy"}
+                "provider": {
+                    "type": "python",
+                    "module": "fixtures.controls.dummy",
+                }
             },
         },
     }
@@ -530,7 +547,9 @@ def test_controls_on_loaded_experiment():
 
     with tempfile.NamedTemporaryFile(suffix=".json") as f:
         try:
-            f.write(json.dumps(experiments.ExperimentNoControls).encode("utf-8"))
+            f.write(
+                json.dumps(experiments.ExperimentNoControls).encode("utf-8")
+            )
             f.seek(0)
             experiment = load_experiment(f.name)
             assert experiment["title"] == "BOOM I changed it"
@@ -608,7 +627,10 @@ def test_loading_control_file():
             "dummy-key": "hello there",
             "controls": {
                 "dummy": {
-                    "provider": {"type": "python", "module": "fixtures.controls.dummy"}
+                    "provider": {
+                        "type": "python",
+                        "module": "fixtures.controls.dummy",
+                    }
                 }
             },
         }

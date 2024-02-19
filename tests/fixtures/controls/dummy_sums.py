@@ -3,7 +3,9 @@ from typing import Sequence
 from chaoslib.types import Experiment, Journal
 
 
-def before_experiment_control(context: Experiment, values: Sequence[int]) -> None:
+def before_experiment_control(
+    context: Experiment, values: Sequence[int]
+) -> None:
     context["result_after"] = 0
 
 

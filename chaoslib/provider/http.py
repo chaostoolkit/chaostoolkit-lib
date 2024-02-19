@@ -91,7 +91,11 @@ def run_http_activity(
                 "what you expected. Please have a look at the logs."
             )
 
-        return {"status": r.status_code, "headers": dict(**r.headers), "body": body}
+        return {
+            "status": r.status_code,
+            "headers": dict(**r.headers),
+            "body": body,
+        }
     except requests.exceptions.ConnectionError as cex:
         raise ActivityFailed(f"failed to connect to {url}: {str(cex)}")
     except requests.exceptions.Timeout:

@@ -71,7 +71,7 @@ def many_args_with_rich_types(
     count: int = 1,
     logit: bool = False,
     other: Whatever = None,
-    **kwargs
+    **kwargs,
 ) -> str:
     """
     Many arguments with rich types.

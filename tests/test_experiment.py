@@ -11,7 +11,11 @@ import yaml
 from fixtures import experiments
 
 from chaoslib.activity import ensure_activity_is_valid, run_activities
-from chaoslib.exceptions import InterruptExecution, InvalidActivity, InvalidExperiment
+from chaoslib.exceptions import (
+    InterruptExecution,
+    InvalidActivity,
+    InvalidExperiment,
+)
 from chaoslib.experiment import (
     ensure_experiment_is_valid,
     load_experiment,
@@ -88,7 +92,8 @@ def test_experiment_title_substitution():
     journal = run_experiment(experiments.ExperimentWithInterpolatedTitle)
 
     assert (
-        journal["experiment"]["title"] in "Cats in space: do cats live in the Internet?"
+        journal["experiment"]["title"]
+        in "Cats in space: do cats live in the Internet?"
     )
 
 
@@ -99,7 +104,10 @@ def test_experiment_must_have_a_description():
 
 
 def test_experiment_may_not_have_a_hypothesis():
-    assert ensure_experiment_is_valid(experiments.MissingHypothesisExperiment) is None
+    assert (
+        ensure_experiment_is_valid(experiments.MissingHypothesisExperiment)
+        is None
+    )
 
 
 def test_experiment_hypothesis_must_have_a_title():
@@ -136,7 +144,11 @@ def test_valid_experiment_from_yaml():
 
 def test_can_iterate_over_activities():
     g = run_activities(
-        experiments.Experiment, configuration=None, secrets=None, pool=None, dry=None
+        experiments.Experiment,
+        configuration=None,
+        secrets=None,
+        pool=None,
+        dry=None,
     )
     assert isinstance(g, types.GeneratorType)
 

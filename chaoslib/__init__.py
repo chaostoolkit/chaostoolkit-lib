@@ -15,7 +15,13 @@ from charset_normalizer import detect
 from logzero import logger
 
 from chaoslib.exceptions import ActivityFailed
-from chaoslib.types import Configuration, ConfigVars, Experiment, Secrets, SecretVars
+from chaoslib.types import (
+    Configuration,
+    ConfigVars,
+    Experiment,
+    Secrets,
+    SecretVars,
+)
 
 __all__ = [
     "__version__",
@@ -99,7 +105,9 @@ def substitute_string(data: str, mapping: Mapping[str, Any]) -> Any:
     return TypedTemplate(data).safe_substitute(mapping)
 
 
-def substitute_dict(data: Dict[str, Any], mapping: Mapping[str, Any]) -> Dict[str, Any]:
+def substitute_dict(
+    data: Dict[str, Any], mapping: Mapping[str, Any]
+) -> Dict[str, Any]:
     if not data:
         return data
 
@@ -116,7 +124,9 @@ def substitute_dict(data: Dict[str, Any], mapping: Mapping[str, Any]) -> Dict[st
     return args
 
 
-def substitute_in_sequence(data: List[Any], mapping: Mapping[str, Any]) -> List[Any]:
+def substitute_in_sequence(
+    data: List[Any], mapping: Mapping[str, Any]
+) -> List[Any]:
     if not data:
         return data
 
@@ -147,14 +157,17 @@ def decode_bytes(data: bytes, default_encoding: str = "utf-8") -> str:
     if confidence >= 0.5:
         encoding = detected["encoding"]
         logger.debug(
-            "Data encoding detected as '{}' "
-            "with a confidence of {}".format(encoding, confidence)
+            "Data encoding detected as '{}' " "with a confidence of {}".format(
+                encoding, confidence
+            )
         )
 
     try:
         return data.decode(encoding)
     except UnicodeDecodeError:
-        raise ActivityFailed(f"Failed to decode bytes using encoding '{encoding}'")
+        raise ActivityFailed(
+            f"Failed to decode bytes using encoding '{encoding}'"
+        )
 
 
 def merge_vars(
@@ -265,7 +278,9 @@ def convert_vars(value: List[str]) -> Dict[str, Any]:  # noqa: C901
                 try:
                     v = convert_to_type(typ, v)
                 except (TypeError, UnicodeEncodeError):
-                    raise ValueError("var cannot convert value to required type")
+                    raise ValueError(
+                        "var cannot convert value to required type"
+                    )
             var[k] = v
         except ValueError:
             raise
@@ -275,7 +290,9 @@ def convert_vars(value: List[str]) -> Dict[str, Any]:  # noqa: C901
     return var
 
 
-def convert_to_type(type: str, val: str) -> Union[str, int, float, bytes, bool, Any]:
+def convert_to_type(
+    type: str, val: str
+) -> Union[str, int, float, bytes, bool, Any]:
     """
     Converts a value to a provided type. If `type` is None, then the original string is
     returned, else the val is coerced into the provided type. An exception is thrown
@@ -343,9 +360,9 @@ def canonical_json(experiment: Experiment) -> bytes:
 
     This is mostly useful for hashing the experiment.
     """
-    return json.dumps(experiment, skipkeys=True, sort_keys=True, indent=None).encode(
-        "utf-8"
-    )
+    return json.dumps(
+        experiment, skipkeys=True, sort_keys=True, indent=None
+    ).encode("utf-8")
 
 
 def experiment_hash(experiment: Experiment, hash_algo: str = None) -> str:
@@ -363,4 +380,6 @@ def experiment_hash(experiment: Experiment, hash_algo: str = None) -> str:
             raise ValueError(f"Unsupported hashlib algorithm: '{hash_algo}'")
         return hashlib.new(hash_algo, canonical_json(experiment)).hexdigest()
 
-    return hashlib.blake2b(canonical_json(experiment), digest_size=12).hexdigest()
+    return hashlib.blake2b(
+        canonical_json(experiment), digest_size=12
+    ).hexdigest()

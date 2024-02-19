@@ -32,7 +32,9 @@ def after_experiment_control(context: Experiment, state: Journal, **kwargs):
     state["after_experiment_control"] = True
 
 
-def before_hypothesis_control(experiment: Experiment, context: Hypothesis, **kwargs):
+def before_hypothesis_control(
+    experiment: Experiment, context: Hypothesis, **kwargs
+):
     context["before_hypothesis_control"] = True
     context["has_experiment_before"] = experiment is not None
 
@@ -63,7 +65,9 @@ def after_rollback_control(context: Experiment, state: List[Run], **kwargs):
     state.append("after_rollback_control")
 
 
-def before_activity_control(experiment: Experiment, context: Activity, **kwargs):
+def before_activity_control(
+    experiment: Experiment, context: Activity, **kwargs
+):
     context["before_activity_control"] = True
     context["has_experiment_before"] = experiment is not None
 

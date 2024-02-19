@@ -66,7 +66,9 @@ def test_locate_root_level_entry():
 
 def test_locate_dotted_entry():
     settings = {"auths": {"chaos.example.com": {"type": "bearer"}}}
-    parent, entry, k, i = locate_settings_entry(settings, "auths.chaos\\.example\\.com")
+    parent, entry, k, i = locate_settings_entry(
+        settings, "auths.chaos\\.example\\.com"
+    )
     assert parent == settings["auths"]
     assert entry == {"type": "bearer"}
     assert k == "chaos.example.com"

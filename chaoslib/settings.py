@@ -42,7 +42,9 @@ def load_settings(settings_path: str = CHAOSTOOLKIT_CONFIG_PATH) -> Settings:
             logger.error(f"Failed parsing YAML settings: {str(ye)}")
 
 
-def save_settings(settings: Settings, settings_path: str = CHAOSTOOLKIT_CONFIG_PATH):
+def save_settings(
+    settings: Settings, settings_path: str = CHAOSTOOLKIT_CONFIG_PATH
+):
     """
     Save chaostoolkit settings as a mapping of key/values, overwriting any file
     that may already be present.
@@ -65,7 +67,9 @@ def get_loaded_settings() -> Settings:
 
 def locate_settings_entry(
     settings: Settings, key: str
-) -> Optional[Tuple[Union[Dict[str, Any], List], Any, Optional[str], Optional[int]]]:
+) -> Optional[
+    Tuple[Union[Dict[str, Any], List], Any, Optional[str], Optional[int]]
+]:
     """
     Lookup the entry at the given dotted key in the provided settings and
     return a a tuple as follows:

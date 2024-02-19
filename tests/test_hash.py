@@ -9,7 +9,9 @@ from chaoslib import experiment_hash
 def test_with_default():
     assert (
         experiment_hash({})
-        == hashlib.blake2b(json.dumps({}).encode("utf-8"), digest_size=12).hexdigest()
+        == hashlib.blake2b(
+            json.dumps({}).encode("utf-8"), digest_size=12
+        ).hexdigest()
     )
 
 

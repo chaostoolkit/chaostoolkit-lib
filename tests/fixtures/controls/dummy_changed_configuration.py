@@ -6,7 +6,7 @@ def after_activity_control(
     state: Run,
     configuration: Configuration = None,
     secrets: Secrets = None,
-    **kwargs
+    **kwargs,
 ):
     if context["name"] == "generate-token":
         configuration["my_token"] = state["output"]
