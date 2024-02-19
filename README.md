@@ -150,14 +150,11 @@ the rules of the DCO before submitting a PR.
 ### Develop
 
 If you wish to develop on this project, make sure to install the development
-dependencies. But first, [create a virtual environment][venv] and then install
-those dependencies.
-
-[venv]: http://chaostoolkit.org/reference/usage/install/#create-a-virtual-environment
+dependencies. To do so, first install [pdm](https://pdm-project.org/latest/).
 
 
 ```console
-$ make install-dev
+$ pdm install --dev
 ```
 
 Now, you can edit the files and they will be automatically be seen by your
@@ -168,23 +165,20 @@ environment, even when running from the `chaos` command locally.
 To run the tests for the project execute the following:
 
 ```
-$ make tests
+$ pdm run test
 ```
 
 ### Formatting and Linting
 
-We use a combination of [`black`][black], [`flake8`][flake8], and [`isort`][isort]
-to both lint and format this repositories code.
+We use [ruff]() to perform linting and code style.
 
-[black]: https://github.com/psf/black
-[flake8]: https://github.com/PyCQA/flake8
-[isort]: https://github.com/PyCQA/isort
+[ruff]: https://astral.sh/ruff
 
 Before raising a Pull Request, we recommend you run formatting against your
 code with:
 
 ```console
-$ make format
+$ pdm run format
 ```
 
 This will automatically format any code that doesn't adhere to the formatting
@@ -193,7 +187,7 @@ standards.
 As some things are not picked up by the formatting, we also recommend you run:
 
 ```console
-$ make lint
+$ pdm run lint
 ```
 
 To ensure that any unused import statements/strings that are too long, etc.
