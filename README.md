@@ -1,26 +1,36 @@
-# Chaos Toolkit Core Library
 
-[![Version](https://img.shields.io/pypi/v/chaostoolkit-lib.svg)](https://img.shields.io/pypi/v/chaostoolkit-lib.svg)
-[![License](https://img.shields.io/pypi/l/chaostoolkit-lib.svg)](https://img.shields.io/pypi/l/chaostoolkit-lib.svg)
+<h2 align="center">
+  <br>
+  <p align="center"><img src="https://avatars.githubusercontent.com/u/32068152?s=200&v=4"></p>
+</h2>
 
-[![Build](https://github.com/chaostoolkit/chaostoolkit-lib/actions/workflows/build.yaml/badge.svg)](https://github.com/chaostoolkit/chaostoolkit-lib/actions/workflows/build.yaml)
-[![codecov](https://codecov.io/gh/chaostoolkit/chaostoolkit-lib/branch/master/graph/badge.svg)](https://codecov.io/gh/chaostoolkit/chaostoolkit-lib)
-[![Python versions](https://img.shields.io/pypi/pyversions/chaostoolkit-lib.svg)](https://www.python.org/)
+<h4 align="center">Chaos Toolkit - Chaos Engineering for Everyone</h4>
 
+<p align="center">
+   <a href="https://github.com/chaostoolkit/chaostoolkit-lib/releases">
+   <img alt="Release" src="https://img.shields.io/pypi/v/chaostoolkit-lib.svg">
+   <a href="#">
+   <img alt="Build" src="https://github.com/chaostoolkit/chaostoolkit-lib/actions/workflows/build.yaml/badge.svg">
+   <a href="https://github.com/chaostoolkit/chaostoolkit-lib/issues">
+   <img alt="GitHub issues" src="https://img.shields.io/github/issues/chaostoolkit/chaostoolkit-lib?style=flat-square&logo=github&logoColor=white">
+   <a href="https://github.com/chaostoolkit/chaostoolkit-lib/blob/master/LICENSE.md">
+   <img alt="License" src="https://img.shields.io/github/license/chaostoolkit/chaostoolkit-lib">
+   <a href="#">
+   <img alt="Python version" src="https://img.shields.io/pypi/pyversions/chaostoolkit-lib.svg">
+   <a href="https://pkg.go.dev/github.com/chaostoolkit/chaostoolkit-lib">
+</p>
 
-The Chaos Toolkit core library implementing the [Open Chaos Initiative][oci].
+<p align="center">
+  <a href="https://join.slack.com/t/chaostoolkit/shared_invite/zt-22c5isqi9-3YjYzucVTNFFVIG~Kzns8g">Community</a> •
+  <a href="https://github.com/chaostoolkit/chaostoolkit-lib/blob/master/CHANGELOG.md">ChangeLog</a>
+</p>
 
-[oci]: https://openchaos.io/
-
-[![Chaos Toolkit](https://avatars1.githubusercontent.com/u/32068152?s=200&v=4)](https://chaostoolkit.org/)
+---
 
 ## Purpose
 
 The purpose of this library is to provide the core of the Chaos Toolkit 
 [model][concepts] and functions it needs to render its services.
-
-Unless you wish to create your own toolkit, you will likely not use directly
-this library.
 
 [concepts]: https://docs.chaostoolkit.org/reference/concepts/
 
