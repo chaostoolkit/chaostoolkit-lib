@@ -45,6 +45,13 @@ Repository = "https://github.com/chaostoolkit/chaostoolkit-lib"
 Documentation = "https://chaostoolkit.org"
 Changelog = "https://github.com/chaostoolkit/chaostoolkit-lib/blob/main/CHANGELOG.md"
 
+[project.optional-dependencies]
+jsonpath = [
+    "jsonpath2>=0.4.5",
+]
+vault = [
+    "hvac>=1.2.1",
+]
 [tool]
 
 [tool.pdm]

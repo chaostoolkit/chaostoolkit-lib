@@ -2,16 +2,16 @@
 # It is not intended for manual editing.
 
 [metadata]
-groups = ["default", "dev"]
+groups = ["default", "dev", "jsonpath", "vault"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:2f0a99703780fc1f838565196262adb791173c3b2211b4c73999a90957fa07ba"
+content_hash = "sha256:4df72afe9af147e7b72bfd27caa9701440c19788f09582d41b6f949e6f9e4882"
 
 [[package]]
 name = "antlr4-python3-runtime"
 version = "4.10"
 summary = "ANTLR 4.10 runtime for Python 2.7.12"
-groups = ["dev"]
+groups = ["dev", "jsonpath"]
 files = [
     {file = "antlr4-python3-runtime-4.10.tar.gz", hash = "sha256:061a49bc72ae05a35d9b61c0ba0ac36c0397708819f02fbfb20a80e47d287a1b"},
 ]
@@ -30,7 +30,7 @@ name = "certifi"
 version = "2024.2.2"
 requires_python = ">=3.6"
 summary = "Python package for providing Mozilla's CA Bundle."
-groups = ["default", "dev"]
+groups = ["default", "dev", "vault"]
 files = [
     {file = "certifi-2024.2.2-py3-none-any.whl", hash = "sha256:dc383c07b76109f368f6106eee2b593b04a011ea4d55f652c6ca24a754d1cdd1"},
     {file = "certifi-2024.2.2.tar.gz", hash = "sha256:0569859f95fc761b18b45ef421b1290a0f65f147e92a1e5eb3e635f9a5e4e66f"},
@@ -41,7 +41,7 @@ name = "charset-normalizer"
 version = "3.3.2"
 requires_python = ">=3.7.0"
 summary = "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet."
-groups = ["default", "dev"]
+groups = ["default", "dev", "vault"]
 files = [
     {file = "charset-normalizer-3.3.2.tar.gz", hash = "sha256:f30c3cb33b24454a82faecaf01b19c18562b1e89558fb6c56de4d9118a032fd5"},
     {file = "charset_normalizer-3.3.2-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:25baf083bf6f6b341f4121c2f3c548875ee6f5339300e08be3f2b2ba1721cdd3"},
@@ -321,7 +321,7 @@ name = "hvac"
 version = "1.2.1"
 requires_python = ">=3.6.2,<4.0.0"
 summary = "HashiCorp Vault API client"
-groups = ["dev"]
+groups = ["dev", "vault"]
 dependencies = [
     "pyhcl<0.5.0,>=0.4.4",
     "requests<3.0.0,>=2.27.1",
@@ -336,7 +336,7 @@ name = "idna"
 version = "3.6"
 requires_python = ">=3.5"
 summary = "Internationalized Domain Names in Applications (IDNA)"
-groups = ["default", "dev"]
+groups = ["default", "dev", "vault"]
 files = [
     {file = "idna-3.6-py3-none-any.whl", hash = "sha256:c05567e9c24a6b9faaa835c4821bad0590fbb9d5779e7caa6e1cc4978e7eb24f"},
     {file = "idna-3.6.tar.gz", hash = "sha256:9ecdbbd083b06798ae1e86adcbfe8ab1479cf864e4ee30fe4e46a003d12491ca"},
@@ -372,7 +372,7 @@ files = [
 name = "jsonpath2"
 version = "0.4.5"
 summary = "JSONPath implementation for Python"
-groups = ["dev"]
+groups = ["dev", "jsonpath"]
 dependencies = [
     "antlr4-python3-runtime==4.10",
 ]
@@ -420,7 +420,7 @@ files = [
 name = "pyhcl"
 version = "0.4.5"
 summary = "HCL configuration parser for python"
-groups = ["dev"]
+groups = ["dev", "vault"]
 files = [
     {file = "pyhcl-0.4.5-py3-none-any.whl", hash = "sha256:30ee337d330d1f90c9f5ed8f49c468f66c8e6e43192bdc7c6ece1420beb3070c"},
     {file = "pyhcl-0.4.5.tar.gz", hash = "sha256:c47293a51ccdd25e18bb5c8c0ab0ffe355b37c87f8d6f9d3280dc41efd4740bc"},
@@ -560,7 +560,7 @@ name = "requests"
 version = "2.31.0"
 requires_python = ">=3.7"
 summary = "Python HTTP for Humans."
-groups = ["default", "dev"]
+groups = ["default", "dev", "vault"]
 dependencies = [
     "certifi>=2017.4.17",
     "charset-normalizer<4,>=2",
@@ -691,7 +691,7 @@ name = "urllib3"
 version = "2.0.7"
 requires_python = ">=3.7"
 summary = "HTTP library with thread-safe connection pooling, file post, and more."
-groups = ["default", "dev"]
+groups = ["default", "dev", "vault"]
 files = [
     {file = "urllib3-2.0.7-py3-none-any.whl", hash = "sha256:fdb6d215c776278489906c2f8916e6e7d4f5a9b602ccbcfdf7f016fc8da0596e"},
     {file = "urllib3-2.0.7.tar.gz", hash = "sha256:c97dfde1f7bd43a71c8d2a58e369e9b2bf692d1334ea9f9cae55add7d0dd0f84"},
