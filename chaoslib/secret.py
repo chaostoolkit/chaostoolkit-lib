@@ -1,7 +1,6 @@
+import logging
 import os
 from typing import Any, Dict
-
-from logzero import logger
 
 try:
     import hvac
@@ -14,6 +13,8 @@ from chaoslib.exceptions import InvalidExperiment
 from chaoslib.types import Configuration, Secrets
 
 __all__ = ["load_secrets", "create_vault_client"]
+
+logger = logging.getLogger("chaostoolkit")
 
 
 def load_secrets(

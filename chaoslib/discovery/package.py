@@ -1,8 +1,7 @@
 import importlib
 import inspect
+import logging
 import subprocess
-
-from logzero import logger
 
 try:
     import importlib.metadata as importlib_metadata
@@ -12,6 +11,7 @@ except ImportError:
 from chaoslib.exceptions import DiscoveryFailed
 
 __all__ = ["get_discover_function", "install", "load_package"]
+logger = logging.getLogger("chaostoolkit")
 
 
 def install(package_name: str):

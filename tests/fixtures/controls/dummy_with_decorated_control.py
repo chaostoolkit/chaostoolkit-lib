@@ -1,11 +1,11 @@
+import logging
 from functools import wraps
 from itertools import count
 from typing import Callable
 
-from logzero import logger
-
 from chaoslib.types import Journal
 
+logger = logging.getLogger("chaostoolkit")
 counter = None
 
 

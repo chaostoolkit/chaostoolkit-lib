@@ -1,6 +1,8 @@
-from logzero import logger
+import logging
 
 __all__ = ["notify", "notify_other", "notify_broken"]
+
+logger = logging.getLogger("chaostoolkit")
 
 
 def notify(settings, event_payload):

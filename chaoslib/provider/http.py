@@ -1,14 +1,15 @@
+import logging
 from typing import Any
 
 import requests
 import urllib3
-from logzero import logger
 
 from chaoslib import substitute
 from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.types import Activity, Configuration, Secrets
 
 __all__ = ["run_http_activity", "validate_http_activity"]
+logger = logging.getLogger("chaostoolkit")
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 

@@ -1,11 +1,10 @@
 import importlib
 import inspect
+import logging
 import platform
 import uuid
 from datetime import datetime
 from typing import Any
-
-from logzero import logger
 
 from chaoslib import __version__
 from chaoslib.discovery.package import (
@@ -25,6 +24,7 @@ __all__ = [
     "portable_type_name",
     "portable_type_name_to_python_type",
 ]
+logger = logging.getLogger("chaostoolkit")
 
 
 def discover(

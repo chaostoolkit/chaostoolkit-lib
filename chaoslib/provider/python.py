@@ -1,16 +1,16 @@
 import importlib
 import inspect
+import logging
 import sys
 import traceback
 from typing import Any
-
-from logzero import logger
 
 from chaoslib import substitute
 from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.types import Activity, Configuration, Secrets
 
 __all__ = ["run_python_activity", "validate_python_activity"]
+logger = logging.getLogger("chaostoolkit")
 
 
 def run_python_activity(

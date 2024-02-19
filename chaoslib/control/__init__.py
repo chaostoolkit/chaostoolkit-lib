@@ -1,4 +1,5 @@
 import json
+import logging
 import os.path
 from contextlib import contextmanager
 from copy import copy, deepcopy
@@ -6,7 +7,6 @@ from json.decoder import JSONDecodeError
 from typing import TYPE_CHECKING, List, Optional, Union
 
 import yaml
-from logzero import logger
 
 from chaoslib.control.python import (
     apply_python_control,
@@ -41,6 +41,7 @@ __all__ = [
     "cleanup_global_controls",
     "load_global_controls",
 ]
+logger = logging.getLogger("chaostoolkit")
 
 # Should this be protected in some fashion? chaoslib isn't meant to be used
 # concurrently so there is little promise we can support several instances

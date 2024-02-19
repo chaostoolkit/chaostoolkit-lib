@@ -1,14 +1,15 @@
+import logging
 import os
 from copy import deepcopy
 from typing import Any, Dict
-
-from logzero import logger
 
 from chaoslib import convert_to_type
 from chaoslib.exceptions import InvalidExperiment
 from chaoslib.types import Configuration, Secrets
 
 __all__ = ["load_configuration", "load_dynamic_configuration"]
+
+logger = logging.getLogger("chaostoolkit")
 
 
 def load_configuration(

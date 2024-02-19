@@ -1,12 +1,12 @@
 import importlib
 import inspect
 import json
+import logging
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict
 
 import requests
-from logzero import logger
 from requests.exceptions import HTTPError
 
 from chaoslib import PayloadEncoder
@@ -19,6 +19,8 @@ __all__ = [
     "ValidateFlowEvent",
     "notify",
 ]
+
+logger = logging.getLogger("chaostoolkit")
 
 
 class FlowEvent(Enum):

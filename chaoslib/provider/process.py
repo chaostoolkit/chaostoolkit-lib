@@ -1,17 +1,17 @@
 import itertools
+import logging
 import os
 import os.path
 import shutil
 import subprocess
 from typing import Any
 
-from logzero import logger
-
 from chaoslib import decode_bytes, substitute
 from chaoslib.exceptions import ActivityFailed, InvalidActivity
 from chaoslib.types import Activity, Configuration, Secrets
 
 __all__ = ["run_process_activity", "validate_process_activity"]
+logger = logging.getLogger("chaostoolkit")
 
 
 def run_process_activity(

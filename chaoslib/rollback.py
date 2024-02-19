@@ -1,7 +1,6 @@
+import logging
 from concurrent.futures import ThreadPoolExecutor
 from typing import TYPE_CHECKING, Iterator, List
-
-from logzero import logger
 
 from chaoslib.activity import execute_activity
 from chaoslib.types import Configuration, Dry, Experiment, Run, Secrets
@@ -10,6 +9,8 @@ if TYPE_CHECKING:
     from chaoslib.run import EventHandlerRegistry
 
 __all__ = ["run_rollbacks"]
+
+logger = logging.getLogger("chaostoolkit")
 
 
 def run_rollbacks(

@@ -1,10 +1,9 @@
 # Builds an in-memory cache of all declared activities so they can be
 # referenced from other places in the experiment
 import inspect
+import logging
 from functools import wraps
 from typing import Any, Dict, List, Union
-
-from logzero import logger
 
 import chaoslib
 from chaoslib.types import Activity, Experiment, Schedule, Settings, Strategy
@@ -15,6 +14,7 @@ __all__ = ["cache_activities", "clear_cache", "lookup_activity", "with_cache"]
 # global objects are frown upon but as we write to it once
 # (from a single place) and we only read afterwards, that's likely okay.
 _cache = {}
+logger = logging.getLogger("chaostoolkit")
 
 
 def cache_activities(experiment: Experiment) -> List[Activity]:

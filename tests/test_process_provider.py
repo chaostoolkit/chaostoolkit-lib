@@ -8,7 +8,9 @@ import pytest
 
 from chaoslib.provider.process import run_process_activity
 
-pytestmark = pytest.mark.skipif(sys.platform != "linux", reason="only run these on Linux")
+pytestmark = pytest.mark.skipif(
+    sys.platform != "linux", reason="only run these on Linux"
+)
 
 settings_dir = os.path.join(os.path.dirname(__file__), "fixtures")
 

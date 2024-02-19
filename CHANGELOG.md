@@ -12,6 +12,7 @@
 - Moved to ruff away from flake8 for linter
 - Switched to a Pypi trusted publisher
 - Upgraded pdm and checkout actions to clean out nodejs deprecation warnings
+- Removed `logzero` dependency
 
 ### Fixed
 

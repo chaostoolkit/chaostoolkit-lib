@@ -1,4 +1,5 @@
 import json
+import logging
 import re
 from decimal import Decimal, InvalidOperation
 from functools import singledispatch
@@ -11,8 +12,6 @@ try:
     HAS_JSONPATH = True
 except ImportError:
     HAS_JSONPATH = False
-
-from logzero import logger
 
 from chaoslib import substitute
 from chaoslib.activity import (
@@ -32,6 +31,8 @@ if TYPE_CHECKING:
     from chaoslib.run import EventHandlerRegistry
 
 __all__ = ["ensure_hypothesis_is_valid", "run_steady_state_hypothesis"]
+
+logger = logging.getLogger("chaostoolkit")
 
 
 def ensure_hypothesis_is_valid(experiment: Experiment):

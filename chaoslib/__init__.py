@@ -1,6 +1,7 @@
 import decimal
 import hashlib
 import json
+import logging
 import os.path
 import uuid
 from collections import ChainMap
@@ -12,7 +13,6 @@ from typing import Any, Dict, List, Mapping, Tuple, Union
 
 import yaml
 from charset_normalizer import detect
-from logzero import logger
 
 from chaoslib.exceptions import ActivityFailed
 from chaoslib.types import (
@@ -34,6 +34,7 @@ __all__ = [
     "PayloadEncoder",
 ]
 __version__ = "1.41.0"
+logger = logging.getLogger("chaostoolkit")
 
 
 def substitute(

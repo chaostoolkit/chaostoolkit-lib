@@ -1,17 +1,19 @@
 import json
+import logging
 import os.path
 from json.decoder import JSONDecodeError
 from urllib.parse import urlparse
 
 import requests
 import yaml
-from logzero import logger
 
 from chaoslib.control import controls
 from chaoslib.exceptions import InvalidExperiment, InvalidSource
 from chaoslib.types import Experiment, Settings
 
 __all__ = ["load_experiment"]
+
+logger = logging.getLogger("chaostoolkit")
 
 
 def parse_experiment_from_file(path: str) -> Experiment:

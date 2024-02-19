@@ -1,11 +1,11 @@
 import contextvars
+import logging
 import os
 import os.path
 import re
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import yaml
-from logzero import logger
 
 from chaoslib.types import Settings
 
@@ -19,6 +19,7 @@ CHAOSTOOLKIT_CONFIG_PATH = os.path.abspath(
     os.path.expanduser("~/.chaostoolkit/settings.yaml")
 )
 loaded_settings = contextvars.ContextVar("loaded_settings", default={})
+logger = logging.getLogger("chaostoolkit")
 
 
 def load_settings(settings_path: str = CHAOSTOOLKIT_CONFIG_PATH) -> Settings:

@@ -1,7 +1,6 @@
+import logging
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, List
-
-from logzero import logger
 
 from chaoslib.activity import ensure_activity_is_valid
 from chaoslib.caching import lookup_activity, with_cache
@@ -33,6 +32,8 @@ from chaoslib.types import (
 )
 
 __all__ = ["ensure_experiment_is_valid", "load_experiment"]
+
+logger = logging.getLogger("chaostoolkit")
 
 
 @with_cache

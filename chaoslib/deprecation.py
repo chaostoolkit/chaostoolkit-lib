@@ -1,11 +1,12 @@
+import logging
 import warnings
-
-from logzero import logger
 
 from chaoslib.activity import get_all_activities_in_experiment
 from chaoslib.types import Experiment
 
 __all__ = ["warn_about_deprecated_features", "warn_about_moved_function"]
+logger = logging.getLogger("chaostoolkit")
+
 DeprecatedDictArgsMessage = (
     "Process arguments should now be a list to keep the ordering "
     "of the arguments. Dictionary arguments are deprecated for "

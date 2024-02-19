@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:64b87de63d14cae27061d0677b95665e319474f91afba05a04b08e6de4eaf202"
+content_hash = "sha256:2f0a99703780fc1f838565196262adb791173c3b2211b4c73999a90957fa07ba"
 
 [[package]]
 name = "antlr4-python3-runtime"
@@ -382,19 +382,6 @@ files = [
 ]
 
 [[package]]
-name = "logzero"
-version = "1.7.0"
-summary = "Robust and effective logging for Python 2 and 3"
-groups = ["default"]
-dependencies = [
-    "colorama; sys_platform == \"win32\"",
-]
-files = [
-    {file = "logzero-1.7.0-py2.py3-none-any.whl", hash = "sha256:23eb1f717a2736f9ab91ca0d43160fd2c996ad49ae6bad34652d47aba908769d"},
-    {file = "logzero-1.7.0.tar.gz", hash = "sha256:7f73ddd3ae393457236f081ffebd044a3aa2e423a47ae6ddb5179ab90d0ad082"},
-]
-
-[[package]]
 name = "packaging"
 version = "23.2"
 requires_python = ">=3.7"
@@ -501,6 +488,17 @@ dependencies = [
 files = [
     {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},
     {file = "python_dateutil-2.8.2-py2.py3-none-any.whl", hash = "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"},
+]
+
+[[package]]
+name = "python-json-logger"
+version = "2.0.7"
+requires_python = ">=3.6"
+summary = "A python library adding a json log formatter"
+groups = ["default"]
+files = [
+    {file = "python-json-logger-2.0.7.tar.gz", hash = "sha256:23e7ec02d34237c5aa1e29a070193a4ea87583bb4e7f8fd06d3de8264c4b2e1c"},
+    {file = "python_json_logger-2.0.7-py3-none-any.whl", hash = "sha256:f380b826a991ebbe3de4d897aeec42760035ac760345e57b812938dc8b35e2bd"},
 ]
 
 [[package]]

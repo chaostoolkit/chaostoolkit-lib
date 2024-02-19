@@ -7,8 +7,14 @@ from typing import Generator
 import pytest
 from fixtures import experiments
 
+from chaoslib.log import configure_logger
 from chaoslib.settings import load_settings
 from chaoslib.types import Settings
+
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_logger() -> None:
+    configure_logger()
 
 
 @pytest.fixture

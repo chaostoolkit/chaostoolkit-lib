@@ -41,17 +41,18 @@ This will start your probe in the background.
 WARNING: Only available on Unix/Linux systems.
 """
 import inspect
+import logging
 import os
 import platform
 import signal
 from contextlib import contextmanager
 from types import FrameType
 
-from logzero import logger
-
 from chaoslib.exceptions import InterruptExecution
 
 __all__ = ["exit_gracefully", "exit_ungracefully", "exit_signals"]
+
+logger = logging.getLogger("chaostoolkit")
 
 
 @contextmanager

@@ -1,9 +1,8 @@
 import importlib
 import inspect
+import logging
 from copy import deepcopy
 from typing import Any, Callable, List, Optional, Union
-
-from logzero import logger
 
 from chaoslib import substitute
 from chaoslib.exceptions import InvalidActivity
@@ -25,6 +24,7 @@ __all__ = [
     "validate_python_control",
     "import_control",
 ]
+logger = logging.getLogger("chaostoolkit")
 _level_mapping = {
     "experiment-before": "before_experiment_control",
     "experiment-after": "after_experiment_control",

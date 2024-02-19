@@ -1,3 +1,4 @@
+import logging
 from abc import ABCMeta
 from concurrent.futures import Future, ThreadPoolExecutor, TimeoutError
 
@@ -12,8 +13,6 @@ import threading
 import time
 from datetime import datetime
 from typing import Any, Dict, List, Optional
-
-from logzero import logger
 
 from chaoslib import __version__, substitute
 from chaoslib.activity import run_activities
@@ -53,6 +52,8 @@ from chaoslib.types import (
 )
 
 __all__ = ["Runner", "RunEventHandler"]
+
+logger = logging.getLogger("chaostoolkit")
 
 
 class RunEventHandler(metaclass=ABCMeta):

@@ -1,11 +1,10 @@
+import logging
 import numbers
 import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Iterator, List
-
-from logzero import logger
 
 from chaoslib import substitute
 from chaoslib.caching import lookup_activity
@@ -37,6 +36,7 @@ __all__ = [
     "get_all_activities_in_experiment",
     "run_activities",
 ]
+logger = logging.getLogger("chaostoolkit")
 
 
 def ensure_activity_is_valid(activity: Activity):  # noqa: C901
