@@ -62,6 +62,9 @@ dev = [
     "jsonpath2>=0.4.5",
     "charset-normalizer>=3.3.2",
     "ruff>=0.2.2",
+    "callee>=0.3.1",
+    "responses>=0.23.3",
+    "freezegun>=1.4.0",
 ]
 
 [tool.pdm.scripts]

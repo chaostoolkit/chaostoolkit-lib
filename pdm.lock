@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:b5b2a3e2c9308e1ddfee39da4339a26825774aaa1712048399aea82da11d1be5"
+content_hash = "sha256:64b87de63d14cae27061d0677b95665e319474f91afba05a04b08e6de4eaf202"
 
 [[package]]
 name = "antlr4-python3-runtime"
@@ -14,6 +14,15 @@ summary = "ANTLR 4.10 runtime for Python 2.7.12"
 groups = ["dev"]
 files = [
     {file = "antlr4-python3-runtime-4.10.tar.gz", hash = "sha256:061a49bc72ae05a35d9b61c0ba0ac36c0397708819f02fbfb20a80e47d287a1b"},
+]
+
+[[package]]
+name = "callee"
+version = "0.3.1"
+summary = "Argument matchers for unittest.mock"
+groups = ["dev"]
+files = [
+    {file = "callee-0.3.1.tar.gz", hash = "sha256:056f95d7760c87ce470aa4ab83bab5f9bdf090d4ecf77d52efe9c4559c0aefd3"},
 ]
 
 [[package]]
@@ -294,6 +303,20 @@ files = [
 ]
 
 [[package]]
+name = "freezegun"
+version = "1.4.0"
+requires_python = ">=3.7"
+summary = "Let your Python tests travel through time"
+groups = ["dev"]
+dependencies = [
+    "python-dateutil>=2.7",
+]
+files = [
+    {file = "freezegun-1.4.0-py3-none-any.whl", hash = "sha256:55e0fc3c84ebf0a96a5aa23ff8b53d70246479e9a68863f1fcac5a3e52f19dd6"},
+    {file = "freezegun-1.4.0.tar.gz", hash = "sha256:10939b0ba0ff5adaecf3b06a5c2f73071d9678e507c5eaedb23c761d56ac774b"},
+]
+
+[[package]]
 name = "hvac"
 version = "1.2.1"
 requires_python = ">=3.6.2,<4.0.0"
@@ -467,11 +490,25 @@ files = [
 ]
 
 [[package]]
+name = "python-dateutil"
+version = "2.8.2"
+requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
+summary = "Extensions to the standard Python datetime module"
+groups = ["dev"]
+dependencies = [
+    "six>=1.5",
+]
+files = [
+    {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},
+    {file = "python_dateutil-2.8.2-py2.py3-none-any.whl", hash = "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"},
+]
+
+[[package]]
 name = "pyyaml"
 version = "6.0.1"
 requires_python = ">=3.6"
 summary = "YAML parser and emitter for Python"
-groups = ["default"]
+groups = ["default", "dev"]
 files = [
     {file = "PyYAML-6.0.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:d858aa552c999bc8a8d57426ed01e40bef403cd8ccdd0fc5f6f04a00414cac2a"},
     {file = "PyYAML-6.0.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:fd66fc5d0da6d9815ba2cebeb4205f95818ff4b79c3ebe268e75d961704af52f"},
@@ -552,6 +589,24 @@ files = [
 ]
 
 [[package]]
+name = "responses"
+version = "0.23.3"
+requires_python = ">=3.7"
+summary = "A utility library for mocking out the `requests` Python library."
+groups = ["dev"]
+dependencies = [
+    "pyyaml",
+    "requests<3.0,>=2.30.0",
+    "types-PyYAML",
+    "typing-extensions; python_version < \"3.8\"",
+    "urllib3<3.0,>=1.25.10",
+]
+files = [
+    {file = "responses-0.23.3-py3-none-any.whl", hash = "sha256:e6fbcf5d82172fecc0aa1860fd91e58cbfd96cee5e96da5b63fa6eb3caa10dd3"},
+    {file = "responses-0.23.3.tar.gz", hash = "sha256:205029e1cb334c21cb4ec64fc7599be48b859a0fd381a42443cdd600bfe8b16a"},
+]
+
+[[package]]
 name = "ruff"
 version = "0.2.2"
 requires_python = ">=3.7"
@@ -609,6 +664,16 @@ marker = "python_version < \"3.11\""
 files = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
     {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
+]
+
+[[package]]
+name = "types-pyyaml"
+version = "6.0.12.12"
+summary = "Typing stubs for PyYAML"
+groups = ["dev"]
+files = [
+    {file = "types-PyYAML-6.0.12.12.tar.gz", hash = "sha256:334373d392fde0fdf95af5c3f1661885fa10c52167b14593eb856289e1855062"},
+    {file = "types_PyYAML-6.0.12.12-py3-none-any.whl", hash = "sha256:c05bc6c158facb0676674b7f11fe3960db4f389718e19e62bd2b84d6205cfd24"},
 ]
 
 [[package]]
