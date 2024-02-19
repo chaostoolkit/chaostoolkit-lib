@@ -5,7 +5,7 @@
 groups = ["default", "dev", "jsonpath", "vault"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:4df72afe9af147e7b72bfd27caa9701440c19788f09582d41b6f949e6f9e4882"
+content_hash = "sha256:1d4642405cdd62521aba6aa5d3e83a727a66ed325d9c8e53e2a79e3c39a33735"
 
 [[package]]
 name = "antlr4-python3-runtime"
@@ -347,9 +347,8 @@ name = "importlib-metadata"
 version = "6.7.0"
 requires_python = ">=3.7"
 summary = "Read metadata from Python packages"
-groups = ["default", "dev"]
+groups = ["default"]
 dependencies = [
-    "typing-extensions>=3.6.4; python_version < \"3.8\"",
     "zipp>=0.5",
 ]
 files = [
@@ -398,9 +397,6 @@ version = "1.2.0"
 requires_python = ">=3.7"
 summary = "plugin and hook calling mechanisms for python"
 groups = ["dev"]
-dependencies = [
-    "importlib-metadata>=0.12; python_version < \"3.8\"",
-]
 files = [
     {file = "pluggy-1.2.0-py3-none-any.whl", hash = "sha256:c2fd55a7d7a3863cba1a013e4e2414658b1d07b6bc57b3919e0c63c9abb99849"},
     {file = "pluggy-1.2.0.tar.gz", hash = "sha256:d12f0c4b579b15f5e054301bb226ee85eeeba08ffec228092f8defbaa3a4c4b3"},
@@ -435,7 +431,6 @@ groups = ["dev"]
 dependencies = [
     "colorama; sys_platform == \"win32\"",
     "exceptiongroup>=1.0.0rc8; python_version < \"3.11\"",
-    "importlib-metadata>=0.12; python_version < \"3.8\"",
     "iniconfig",
     "packaging",
     "pluggy<2.0,>=0.12",
@@ -596,7 +591,6 @@ dependencies = [
     "pyyaml",
     "requests<3.0,>=2.30.0",
     "types-PyYAML",
-    "typing-extensions; python_version < \"3.8\"",
     "urllib3<3.0,>=1.25.10",
 ]
 files = [
@@ -675,18 +669,6 @@ files = [
 ]
 
 [[package]]
-name = "typing-extensions"
-version = "4.7.1"
-requires_python = ">=3.7"
-summary = "Backported and Experimental Type Hints for Python 3.7+"
-groups = ["default", "dev"]
-marker = "python_version < \"3.8\""
-files = [
-    {file = "typing_extensions-4.7.1-py3-none-any.whl", hash = "sha256:440d5dd3af93b060174bf433bccd69b0babc3b15b1a8dca43789fd7f61514b36"},
-    {file = "typing_extensions-4.7.1.tar.gz", hash = "sha256:b75ddc264f0ba5615db7ba217daeb99701ad295353c45f9e95963337ceeeffb2"},
-]
-
-[[package]]
 name = "urllib3"
 version = "2.0.7"
 requires_python = ">=3.7"
@@ -702,7 +684,7 @@ name = "zipp"
 version = "3.15.0"
 requires_python = ">=3.7"
 summary = "Backport of pathlib-compatible object wrapper for zip files"
-groups = ["default", "dev"]
+groups = ["default"]
 files = [
     {file = "zipp-3.15.0-py3-none-any.whl", hash = "sha256:48904fc76a60e542af151aded95726c1a5c34ed43ab4134b597665c86d7ad556"},
     {file = "zipp-3.15.0.tar.gz", hash = "sha256:112929ad649da941c23de50f356a2b5570c954b65150642bccdd66bf194d224b"},

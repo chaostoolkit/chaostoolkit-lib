@@ -13,6 +13,7 @@
 - Switched to a Pypi trusted publisher
 - Upgraded pdm and checkout actions to clean out nodejs deprecation warnings
 - Removed `logzero` dependency
+- Dropped Python 3.7 support as it has been EOL since June 2023
 
 ### Fixed
 
