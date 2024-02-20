@@ -12,6 +12,7 @@ from string import Template
 from typing import Any, Dict, List, Mapping, Tuple, Union
 
 import yaml
+from importlib.metadata import PackageNotFoundError, version
 from charset_normalizer import detect
 
 from chaoslib.exceptions import ActivityFailed
@@ -33,8 +34,12 @@ __all__ = [
     "convert_vars",
     "PayloadEncoder",
 ]
-__version__ = "1.41.0"
-logger = logging.getLogger("chaostoolkit")
+logger = logging.getLogger("chaostoolkit-lib")
+
+try:
+    __version__ = version("chaostoolkit-lib")
+except PackageNotFoundError:
+    __version__ = "unknown"
 
 
 def substitute(
