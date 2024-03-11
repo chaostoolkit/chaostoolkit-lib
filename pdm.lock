@@ -5,7 +5,7 @@
 groups = ["default", "dev", "jsonpath", "vault"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.1"
-content_hash = "sha256:1d4642405cdd62521aba6aa5d3e83a727a66ed325d9c8e53e2a79e3c39a33735"
+content_hash = "sha256:3649914275c901f0a8f6744c18c4b6bd7ff09e57bd023b419c6439c1f40548df"
 
 [[package]]
 name = "antlr4-python3-runtime"

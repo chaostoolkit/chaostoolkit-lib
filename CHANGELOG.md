@@ -3,7 +3,16 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.42.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.42.1...HEAD
+
+## [1.42.1][] - 2024-03-11
+
+[1.42.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.42.0...1.42.1
+
+### Changed
+
+* Tolerate `colorama` down to 0.4.4 to satisfy
+  [awscli](https://github.com/aws/aws-cli/issues/8571)
 
 ## [1.42.0][] - 2024-02-20
 
