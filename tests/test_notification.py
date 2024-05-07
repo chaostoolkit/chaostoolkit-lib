@@ -34,7 +34,7 @@ def test_notify_calls_notify_with_http_when_type_is_http(
 ) -> None:
     now = (
         datetime.now(timezone.utc)
-        .replace(tzinfo=timezone.timezone.utc)
+        .replace(tzinfo=timezone.utc)
         .timestamp()
     )
     payload = {"test-key": "test-value", "test-dict": {"test-dict-key": "test"}}
@@ -238,7 +238,7 @@ def test_notify_correctly_assigns_phase_from_event_class(
                 "payload": None,
                 "phase": phase,
                 "ts": datetime.now(timezone.utc)
-                .replace(tzinfo=timezone.timezone.utc)
+                .replace(tzinfo=timezone.utc)
                 .timestamp(),
             },
         )
@@ -264,7 +264,7 @@ def test_notify_appends_error_to_event_payload_if_provided(
             "payload": None,
             "phase": "discovery",
             "ts": datetime.now(timezone.utc)
-            .replace(tzinfo=timezone.timezone.utc)
+            .replace(tzinfo=timezone.utc)
             .timestamp(),
             "error": exception,
         },
@@ -296,7 +296,7 @@ def test_notify_calls_notify_via_plugin_when_type_is_plugin(
 ) -> None:
     now = (
         datetime.now(timezone.utc)
-        .replace(tzinfo=timezone.timezone.utc)
+        .replace(tzinfo=timezone.utc)
         .timestamp()
     )
     payload = {"test-key": "test-value", "test-dict": {"test-dict-key": "test"}}
