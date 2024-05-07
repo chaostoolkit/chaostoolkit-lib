@@ -5,6 +5,11 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.43.0...HEAD
 
+### Fixed
+
+* We cannot change all extensions signatures for discovering capabilities so
+  we remove arguments after the collection. Less efficient but more transparent
+
 ## [1.43.0][] - 2024-05-07
 
 [1.43.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.42.1...1.43.0

@@ -47,10 +47,14 @@ def discover(
     package = load_package(package_name)
     discover_func = get_discover_function(package)
 
-    return discover_func(
-        discover_system=discover_system,
-        keep_activities_arguments=keep_activities_arguments,
-    )
+    discovery = discover_func(discover_system=discover_system)
+
+    if not keep_activities_arguments:
+        for activity in discovery["activities"]:
+            activity.pop("arguments", None)
+            activity.pop("return_type", None)
+
+    return discovery
 
 
 def initialize_discovery_result(
@@ -84,34 +88,25 @@ def initialize_discovery_result(
     }
 
 
-def discover_actions(
-    extension_mod_name: str, keep_activities_arguments: bool = True
-) -> DiscoveredActivities:
+def discover_actions(extension_mod_name: str) -> DiscoveredActivities:
     """
     Discover actions from the given extension named `extension_mod_name`.
     """
     logger.debug(f"Searching for actions in {extension_mod_name}")
-    return discover_activities(
-        extension_mod_name, "action", keep_activities_arguments
-    )
+    return discover_activities(extension_mod_name, "action")
 
 
-def discover_probes(
-    extension_mod_name: str, keep_activities_arguments: bool = True
-) -> DiscoveredActivities:
+def discover_probes(extension_mod_name: str) -> DiscoveredActivities:
     """
     Discover probes from the given extension named `extension_mod_name`.
     """
     logger.debug(f"Searching for probes in {extension_mod_name}")
-    return discover_activities(
-        extension_mod_name, "probe", keep_activities_arguments
-    )
+    return discover_activities(extension_mod_name, "probe")
 
 
 def discover_activities(
     extension_mod_name: str,
     activity_type: str,  # noqa: C901
-    keep_activities_arguments: bool = True,
 ) -> DiscoveredActivities:
     """
     Discover exported activities from the given extension module name.
@@ -146,29 +141,25 @@ def discover_activities(
             "name": name,
             "mod": mod.__name__,
             "doc": inspect.getdoc(func),
+            "arguments": [],
         }
 
-        if keep_activities_arguments:
-            activity["arguments"] = []
+        if sig.return_annotation is not inspect.Signature.empty:
+            activity["return_type"] = portable_type_name(sig.return_annotation)
 
-            if sig.return_annotation is not inspect.Signature.empty:
-                activity["return_type"] = portable_type_name(
-                    sig.return_annotation
-                )
+        for param in sig.parameters.values():
+            if param.kind in (param.KEYWORD_ONLY, param.VAR_KEYWORD):
+                continue
 
-            for param in sig.parameters.values():
-                if param.kind in (param.KEYWORD_ONLY, param.VAR_KEYWORD):
-                    continue
+            arg = {
+                "name": param.name,
+            }
 
-                arg = {
-                    "name": param.name,
-                }
-
-                if param.default is not inspect.Parameter.empty:
-                    arg["default"] = param.default
-                if param.annotation is not inspect.Parameter.empty:
-                    arg["type"] = portable_type_name(param.annotation)
-                activity["arguments"].append(arg)
+            if param.default is not inspect.Parameter.empty:
+                arg["default"] = param.default
+            if param.annotation is not inspect.Parameter.empty:
+                arg["type"] = portable_type_name(param.annotation)
+            activity["arguments"].append(arg)
 
         activities.append(activity)
 
