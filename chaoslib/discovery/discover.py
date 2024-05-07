@@ -3,7 +3,7 @@ import inspect
 import logging
 import platform
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from chaoslib import __version__
@@ -69,7 +69,7 @@ def initialize_discovery_result(
         "chaoslib_version": __version__,
         "id": str(uuid.uuid4()),
         "target": discovery_type,
-        "date": f"{datetime.utcnow().isoformat()}Z",
+        "date": f"{datetime.now(timezone.utc).isoformat()}Z",
         "platform": {
             "system": plt.system,
             "node": plt.node,

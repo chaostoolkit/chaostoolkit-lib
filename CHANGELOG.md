@@ -9,6 +9,7 @@
 
 * We cannot change all extensions signatures for discovering capabilities so
   we remove arguments after the collection. Less efficient but more transparent
+* Switched from `utcnow()` to `now(timezone.utc)` as `utcnow` has been deprecated
 
 ## [1.43.0][] - 2024-05-07
 

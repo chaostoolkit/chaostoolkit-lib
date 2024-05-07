@@ -127,7 +127,9 @@ def notify(
         "name": event.value,
         "payload": payload,
         "phase": "unknown",
-        "ts": datetime.utcnow().replace(tzinfo=timezone.utc).timestamp(),
+        "ts": datetime.now(timezone.utc)
+        .replace(tzinfo=timezone.utc)
+        .timestamp(),
     }
 
     if error:

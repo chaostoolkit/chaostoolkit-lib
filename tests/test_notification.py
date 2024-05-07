@@ -32,7 +32,11 @@ def test_no_notifications_in_settings_is_okay() -> None:
 def test_notify_calls_notify_with_http_when_type_is_http(
     mock_notify_with_http: MagicMock,
 ) -> None:
-    now = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
+    now = (
+        datetime.now(timezone.utc)
+        .replace(tzinfo=timezone.timezone.utc)
+        .timestamp()
+    )
     payload = {"test-key": "test-value", "test-dict": {"test-dict-key": "test"}}
     channel = {"type": "http", "url": "http://example.com"}
 
@@ -233,8 +237,8 @@ def test_notify_correctly_assigns_phase_from_event_class(
                 "name": event_class.value,
                 "payload": None,
                 "phase": phase,
-                "ts": datetime.utcnow()
-                .replace(tzinfo=timezone.utc)
+                "ts": datetime.now(timezone.utc)
+                .replace(tzinfo=timezone.timezone.utc)
                 .timestamp(),
             },
         )
@@ -259,7 +263,9 @@ def test_notify_appends_error_to_event_payload_if_provided(
             "name": DiscoverFlowEvent.DiscoverStarted.value,
             "payload": None,
             "phase": "discovery",
-            "ts": datetime.utcnow().replace(tzinfo=timezone.utc).timestamp(),
+            "ts": datetime.now(timezone.utc)
+            .replace(tzinfo=timezone.timezone.utc)
+            .timestamp(),
             "error": exception,
         },
     )
@@ -288,7 +294,11 @@ def test_notify_only_notifies_on_events_specified(
 def test_notify_calls_notify_via_plugin_when_type_is_plugin(
     mock_notify_via_plugin: MagicMock,
 ) -> None:
-    now = datetime.utcnow().replace(tzinfo=timezone.utc).timestamp()
+    now = (
+        datetime.now(timezone.utc)
+        .replace(tzinfo=timezone.timezone.utc)
+        .timestamp()
+    )
     payload = {"test-key": "test-value", "test-dict": {"test-dict-key": "test"}}
     channel = {"type": "plugin", "module": "fixtures.notifier"}
 

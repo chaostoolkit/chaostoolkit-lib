@@ -11,7 +11,7 @@ except ImportError:
 import platform
 import threading
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from chaoslib import __version__, substitute
@@ -580,7 +580,7 @@ class Runner:
                     dry,
                 )
 
-            journal["end"] = datetime.utcnow().isoformat()
+            journal["end"] = datetime.now(timezone.utc).isoformat()
             journal["duration"] = time.time() - started_at
 
             # the spec only allows these statuses, so if it's anything else
@@ -876,7 +876,7 @@ def initialize_run_journal(experiment: Experiment) -> Journal:
         "platform": platform.platform(),
         "node": platform.node(),
         "experiment": experiment.copy(),
-        "start": datetime.utcnow().isoformat(),
+        "start": datetime.now(timezone.utc).isoformat(),
         "status": None,
         "deviated": False,
         "steady_states": {"before": None, "after": None, "during": []},
