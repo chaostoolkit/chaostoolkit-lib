@@ -12,6 +12,7 @@
   should be more reliable
 * Switched log level to debug during discovery to keep output less noisy
 * Allow to ignore arguments during discovery for a lighter output
+* Update dependencies
 
 ## [1.42.1][] - 2024-03-11
 
