@@ -10,6 +10,7 @@
 * Switching to `importlib.metadata` builtin function to reverse lookup the
   package name (import name) from the distribution name during discovery. This
   should be more reliable
+* Switched log level to debug during discovery to keep output less noisy
 
 ## [1.42.1][] - 2024-03-11
 
