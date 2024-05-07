@@ -31,19 +31,26 @@ def discover(
     package_name: str,
     discover_system: bool = True,
     download_and_install: bool = True,
+    keep_activities_arguments: bool = True,
 ) -> Discovery:
     """
     Discover the capabilities of an extension as well as the system it targets.
 
     Then apply any post discovery hook that are declared in the chaostoolkit
     settings under the `discovery/post-hook` section.
+
+    By default, returns the arguments for each activity discovered unless
+    `keep_activities_arguments` is set to `False`.
     """
     if download_and_install:
         install(package_name)
     package = load_package(package_name)
     discover_func = get_discover_function(package)
 
-    return discover_func(discover_system=discover_system)
+    return discover_func(
+        discover_system=discover_system,
+        keep_activities_arguments=keep_activities_arguments,
+    )
 
 
 def initialize_discovery_result(
@@ -77,25 +84,34 @@ def initialize_discovery_result(
     }
 
 
-def discover_actions(extension_mod_name: str) -> DiscoveredActivities:
+def discover_actions(
+    extension_mod_name: str, keep_activities_arguments: bool = True
+) -> DiscoveredActivities:
     """
     Discover actions from the given extension named `extension_mod_name`.
     """
     logger.debug(f"Searching for actions in {extension_mod_name}")
-    return discover_activities(extension_mod_name, "action")
+    return discover_activities(
+        extension_mod_name, "action", keep_activities_arguments
+    )
 
 
-def discover_probes(extension_mod_name: str) -> DiscoveredActivities:
+def discover_probes(
+    extension_mod_name: str, keep_activities_arguments: bool = True
+) -> DiscoveredActivities:
     """
     Discover probes from the given extension named `extension_mod_name`.
     """
     logger.debug(f"Searching for probes in {extension_mod_name}")
-    return discover_activities(extension_mod_name, "probe")
+    return discover_activities(
+        extension_mod_name, "probe", keep_activities_arguments
+    )
 
 
 def discover_activities(
     extension_mod_name: str,
     activity_type: str,  # noqa: C901
+    keep_activities_arguments: bool = True,
 ) -> DiscoveredActivities:
     """
     Discover exported activities from the given extension module name.
@@ -130,25 +146,29 @@ def discover_activities(
             "name": name,
             "mod": mod.__name__,
             "doc": inspect.getdoc(func),
-            "arguments": [],
         }
 
-        if sig.return_annotation is not inspect.Signature.empty:
-            activity["return_type"] = portable_type_name(sig.return_annotation)
+        if keep_activities_arguments:
+            activity["arguments"] = []
 
-        for param in sig.parameters.values():
-            if param.kind in (param.KEYWORD_ONLY, param.VAR_KEYWORD):
-                continue
+            if sig.return_annotation is not inspect.Signature.empty:
+                activity["return_type"] = portable_type_name(
+                    sig.return_annotation
+                )
 
-            arg = {
-                "name": param.name,
-            }
+            for param in sig.parameters.values():
+                if param.kind in (param.KEYWORD_ONLY, param.VAR_KEYWORD):
+                    continue
 
-            if param.default is not inspect.Parameter.empty:
-                arg["default"] = param.default
-            if param.annotation is not inspect.Parameter.empty:
-                arg["type"] = portable_type_name(param.annotation)
-            activity["arguments"].append(arg)
+                arg = {
+                    "name": param.name,
+                }
+
+                if param.default is not inspect.Parameter.empty:
+                    arg["default"] = param.default
+                if param.annotation is not inspect.Parameter.empty:
+                    arg["type"] = portable_type_name(param.annotation)
+                activity["arguments"].append(arg)
 
         activities.append(activity)
 
