@@ -32,11 +32,7 @@ def test_no_notifications_in_settings_is_okay() -> None:
 def test_notify_calls_notify_with_http_when_type_is_http(
     mock_notify_with_http: MagicMock,
 ) -> None:
-    now = (
-        datetime.now(timezone.utc)
-        .replace(tzinfo=timezone.utc)
-        .timestamp()
-    )
+    now = datetime.now(timezone.utc).replace(tzinfo=timezone.utc).timestamp()
     payload = {"test-key": "test-value", "test-dict": {"test-dict-key": "test"}}
     channel = {"type": "http", "url": "http://example.com"}
 
@@ -294,11 +290,7 @@ def test_notify_only_notifies_on_events_specified(
 def test_notify_calls_notify_via_plugin_when_type_is_plugin(
     mock_notify_via_plugin: MagicMock,
 ) -> None:
-    now = (
-        datetime.now(timezone.utc)
-        .replace(tzinfo=timezone.utc)
-        .timestamp()
-    )
+    now = datetime.now(timezone.utc).replace(tzinfo=timezone.utc).timestamp()
     payload = {"test-key": "test-value", "test-dict": {"test-dict-key": "test"}}
     channel = {"type": "plugin", "module": "fixtures.notifier"}
 

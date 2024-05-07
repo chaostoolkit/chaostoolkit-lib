@@ -3,7 +3,15 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.43.1...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.43.2...HEAD
+
+## [1.43.2][] - 2024-05-07
+
+[1.43.2]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.43.1...1.43.2
+
+#### Fixed
+
+* Remove `Z` suffix when datetime is timezone aware in discovery payload
 
 ## [1.43.1][] - 2024-05-07
 

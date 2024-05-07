@@ -69,7 +69,7 @@ def initialize_discovery_result(
         "chaoslib_version": __version__,
         "id": str(uuid.uuid4()),
         "target": discovery_type,
-        "date": f"{datetime.now(timezone.utc).isoformat()}Z",
+        "date": datetime.now(timezone.utc).isoformat(),
         "platform": {
             "system": plt.system,
             "node": plt.node,
