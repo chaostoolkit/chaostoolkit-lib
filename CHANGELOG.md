@@ -5,6 +5,9 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.43.2...HEAD
 
+* Refactored to the `secrets.py` to split out its functionality for env vars and vault into separate modules now bundled
+  under a new secretmanagers package
+
 ## [1.43.2][] - 2024-05-07
 
 [1.43.2]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.43.1...1.43.2

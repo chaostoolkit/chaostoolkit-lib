@@ -1,5 +1,4 @@
 import logging
-import os
 from typing import Any, Dict
 
 from chaoslib.types import Configuration, Secrets
