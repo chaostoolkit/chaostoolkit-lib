@@ -127,9 +127,9 @@ ExperimentWithRollbackLongPause = {
 }
 
 ExperimentWithLongPauseBefore = deepcopy(ExperimentWithLongPause)
-ExperimentWithLongPauseBefore["method"][
-    1
-] = BackgroundPythonModuleProbeWithLongPauseBefore
+ExperimentWithLongPauseBefore["method"][1] = (
+    BackgroundPythonModuleProbeWithLongPauseBefore
+)
 
 RefProbeExperiment = {
     "title": "do cats live in the Internet?",
@@ -284,9 +284,9 @@ ExperimentWithControlsRequiringSecrets = deepcopy(ExperimentWithControls)
 ExperimentWithControlsRequiringSecrets["secrets"] = {
     "mystuff": {"somesecret": "somevalue"}
 }
-ExperimentWithControlsRequiringSecrets["controls"][0]["provider"][
-    "module"
-] = "fixtures.controls.dummy_with_secrets"
+ExperimentWithControlsRequiringSecrets["controls"][0]["provider"]["module"] = (
+    "fixtures.controls.dummy_with_secrets"
+)
 ExperimentWithControlsRequiringSecrets["controls"][0]["provider"]["secrets"] = [
     "mystuff"
 ]
