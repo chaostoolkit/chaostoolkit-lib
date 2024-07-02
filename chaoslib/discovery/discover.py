@@ -3,7 +3,7 @@ import inspect
 import logging
 import platform
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from chaoslib import __version__
@@ -31,19 +31,30 @@ def discover(
     package_name: str,
     discover_system: bool = True,
     download_and_install: bool = True,
+    keep_activities_arguments: bool = True,
 ) -> Discovery:
     """
     Discover the capabilities of an extension as well as the system it targets.
 
     Then apply any post discovery hook that are declared in the chaostoolkit
     settings under the `discovery/post-hook` section.
+
+    By default, returns the arguments for each activity discovered unless
+    `keep_activities_arguments` is set to `False`.
     """
     if download_and_install:
         install(package_name)
     package = load_package(package_name)
     discover_func = get_discover_function(package)
 
-    return discover_func(discover_system=discover_system)
+    discovery = discover_func(discover_system=discover_system)
+
+    if not keep_activities_arguments:
+        for activity in discovery["activities"]:
+            activity.pop("arguments", None)
+            activity.pop("return_type", None)
+
+    return discovery
 
 
 def initialize_discovery_result(
@@ -58,7 +69,7 @@ def initialize_discovery_result(
         "chaoslib_version": __version__,
         "id": str(uuid.uuid4()),
         "target": discovery_type,
-        "date": f"{datetime.utcnow().isoformat()}Z",
+        "date": datetime.now(timezone.utc).isoformat(),
         "platform": {
             "system": plt.system,
             "node": plt.node,
@@ -81,7 +92,7 @@ def discover_actions(extension_mod_name: str) -> DiscoveredActivities:
     """
     Discover actions from the given extension named `extension_mod_name`.
     """
-    logger.info(f"Searching for actions in {extension_mod_name}")
+    logger.debug(f"Searching for actions in {extension_mod_name}")
     return discover_activities(extension_mod_name, "action")
 
 
@@ -89,7 +100,7 @@ def discover_probes(extension_mod_name: str) -> DiscoveredActivities:
     """
     Discover probes from the given extension named `extension_mod_name`.
     """
-    logger.info(f"Searching for probes in {extension_mod_name}")
+    logger.debug(f"Searching for probes in {extension_mod_name}")
     return discover_activities(extension_mod_name, "probe")
 
 

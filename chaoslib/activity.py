@@ -3,7 +3,7 @@ import numbers
 import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, Iterator, List
 
 from chaoslib import substitute
@@ -235,7 +235,7 @@ def execute_activity(
                 )
             )
 
-        start = datetime.utcnow()
+        start = datetime.now(timezone.utc)
         run = {
             "activity": activity.copy(),
             "output": None,
@@ -268,7 +268,7 @@ def execute_activity(
             logger.error(f"  => failed: {error_msg}")
         finally:
             # capture the end time before we pause
-            end = datetime.utcnow()
+            end = datetime.now(timezone.utc)
             run["end"] = end.isoformat()
             run["duration"] = (end - start).total_seconds()
 

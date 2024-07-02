@@ -56,9 +56,9 @@ def warn_about_deprecated_features(experiment: Experiment):
         for key, value in keys.items():
             if isinstance(value, dict) and value.get("type") == "vault":
                 if "key" in value and "path" not in value:
-                    warned_deprecations[
-                        DeprecatedVaultMissingPathMessage
-                    ] = True
+                    warned_deprecations[DeprecatedVaultMissingPathMessage] = (
+                        True
+                    )
                     warnings.warn(
                         DeprecatedVaultMissingPathMessage, DeprecationWarning
                     )

@@ -76,23 +76,6 @@ def get_discover_function(package: object):
 ###############################################################################
 # Private functions
 ###############################################################################
-class PathDistribution(importlib_metadata.PathDistribution):
-    """
-    Extends the class for easier retrieval of top-level package names
-    for a distribution installed package
-    """
-
-    @property
-    def top_level(self):
-        text = self.read_text("top_level.txt")
-        return text and text.splitlines()
-
-
-# Replace the original class with the extended one
-# until this is officially supported in the API
-importlib_metadata.PathDistribution = PathDistribution
-
-
 def get_importname_from_package(package_name: str) -> str:
     """
     Try to fetch the name of the top-level import name for the given
@@ -106,17 +89,8 @@ def get_importname_from_package(package_name: str) -> str:
     except importlib_metadata.PackageNotFoundError:
         raise DiscoveryFailed(f"Package {package_name} not found ")
 
-    try:
-        packages = dist.top_level
-    except FileNotFoundError:
-        raise DiscoveryFailed(
-            "failed to load package {p} metadata. "
-            "Was the package installed properly?".format(p=package_name)
-        )
+    packages = importlib_metadata._top_level_declared(dist)
+    if not packages:
+        packages = importlib_metadata._top_level_inferred(dist)
 
-    if len(packages) > 1:
-        raise DiscoveryFailed(
-            "Package {p} contains multiple top-level packages. "
-            "Unable to discover from multiple packages.".format(p=package_name)
-        )
-    return packages[0]
+    return packages.pop()

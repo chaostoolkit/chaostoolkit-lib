@@ -3,7 +3,38 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.42.1...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.43.2...HEAD
+
+## [1.43.2][] - 2024-05-07
+
+[1.43.2]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.43.1...1.43.2
+
+#### Fixed
+
+* Remove `Z` suffix when datetime is timezone aware in discovery payload
+
+## [1.43.1][] - 2024-05-07
+
+[1.43.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.43.0...1.43.1
+
+### Fixed
+
+* We cannot change all extensions signatures for discovering capabilities so
+  we remove arguments after the collection. Less efficient but more transparent
+* Switched from `utcnow()` to `now(timezone.utc)` as `utcnow` has been deprecated
+
+## [1.43.0][] - 2024-05-07
+
+[1.43.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.42.1...1.43.0
+
+### Changed
+
+* Switching to `importlib.metadata` builtin function to reverse lookup the
+  package name (import name) from the distribution name during discovery. This
+  should be more reliable
+* Switched log level to debug during discovery to keep output less noisy
+* Allow to ignore arguments during discovery for a lighter output
+* Update dependencies
 
 ## [1.42.1][] - 2024-03-11
 
