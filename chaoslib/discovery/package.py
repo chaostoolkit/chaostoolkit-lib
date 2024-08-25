@@ -84,13 +84,20 @@ def get_importname_from_package(package_name: str) -> str:
     For now, we do not support distribution packages that contains
     multiple top-level packages.
     """
+    # do we even have a distribution matching the one requested?
     try:
-        dist = importlib_metadata.distribution(package_name)
+        importlib_metadata.distribution(package_name)
     except importlib_metadata.PackageNotFoundError:
-        raise DiscoveryFailed(f"Package {package_name} not found ")
+        raise DiscoveryFailed(f"Package {package_name} not found")
 
-    packages = importlib_metadata._top_level_declared(dist)
-    if not packages:
-        packages = importlib_metadata._top_level_inferred(dist)
+    # we have a distribution, now we still need to iterate over all
+    # distributions to hopefully locate the top-level package name
+    packages = importlib_metadata.packages_distributions()
+    for name in packages:
+        if package_name in packages[name]:
+            return name
 
-    return packages.pop()
+    raise DiscoveryFailed(
+        f"Distribution {package_name} exists but no top-level package name "
+        "could be determined"
+    )

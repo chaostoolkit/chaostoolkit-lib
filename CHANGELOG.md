@@ -5,6 +5,11 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.43.2...HEAD
 
+### Fixed
+
+* We have to iterate over all existing distributions in the current environment
+  to hopefully locate the package name of the distribution we are discovering
+
 ## [1.43.2][] - 2024-05-07
 
 [1.43.2]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.43.1...1.43.2
