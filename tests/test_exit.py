@@ -11,7 +11,7 @@ from chaoslib.exit import exit_gracefully, exit_ungracefully
 from chaoslib.run import Runner
 from chaoslib.types import Strategy
 
-pytestmark = pytest.mark.skipif(os.getenv("CI") is not None, reason="Skip CI")
+#pytestmark = pytest.mark.skipif(os.getenv("CI") is not None, reason="Skip CI")
 
 
 def run_http_server_in_background():
@@ -27,40 +27,48 @@ def run_http_server_in_background():
         server.set_app(app)
         return server
 
+    # the bind is done here, synchronously, so the port is listening before
+    # the serving thread starts and before the experiment makes its request
     httpd = make_server("", 8700, slow_app)
-    httpd.handle_request()
+    server = threading.Thread(target=httpd.serve_forever, daemon=True)
+    server.start()
+    return httpd, server
+
+
+def stop_http_server(httpd, server):
+    httpd.shutdown()
+    httpd.server_close()
+    server.join()
 
 
 def test_play_rollbacks_on_graceful_exit_with_http_action():
-    server = threading.Thread(target=run_http_server_in_background)
-    server.start()
+    httpd, server = run_http_server_in_background()
+    try:
+        x = deepcopy(experiments.ExperimentGracefulExitLongHTTPCall)
+        with Runner(Strategy.DEFAULT) as runner:
+            journal = runner.run(
+                x, settings={"runtime": {"rollbacks": {"strategy": "always"}}}
+            )
 
-    x = deepcopy(experiments.ExperimentGracefulExitLongHTTPCall)
-    with Runner(Strategy.DEFAULT) as runner:
-        journal = runner.run(
-            x, settings={"runtime": {"rollbacks": {"strategy": "always"}}}
-        )
-
-        assert journal["status"] == "interrupted"
-        assert len(journal["rollbacks"]) == 1
-
-    server.join()
+            assert journal["status"] == "interrupted"
+            assert len(journal["rollbacks"]) == 1
+    finally:
+        stop_http_server(httpd, server)
 
 
-def test_do_not_play_rollbacks_on_graceful_exit_with_http_action():
-    server = threading.Thread(target=run_http_server_in_background)
-    server.start()
+def test_do_not_play_rollbacks_on_ungraceful_exit_with_http_action():
+    httpd, server = run_http_server_in_background()
+    try:
+        x = deepcopy(experiments.ExperimentUngracefulExitLongHTTPCall)
+        with Runner(Strategy.DEFAULT) as runner:
+            journal = runner.run(
+                x, settings={"runtime": {"rollbacks": {"strategy": "always"}}}
+            )
 
-    x = deepcopy(experiments.ExperimentUngracefulExitLongHTTPCall)
-    with Runner(Strategy.DEFAULT) as runner:
-        journal = runner.run(
-            x, settings={"runtime": {"rollbacks": {"strategy": "always"}}}
-        )
-
-        assert journal["status"] == "interrupted"
-        assert len(journal["rollbacks"]) == 0
-
-    server.join()
+            assert journal["status"] == "interrupted"
+            assert len(journal["rollbacks"]) == 0
+    finally:
+        stop_http_server(httpd, server)
 
 
 def test_play_rollbacks_on_graceful_exit_with_process_action():
@@ -74,7 +82,7 @@ def test_play_rollbacks_on_graceful_exit_with_process_action():
         assert len(journal["rollbacks"]) == 1
 
 
-def test_do_not_play_rollbacks_on_graceful_exit_with_process_action():
+def test_do_not_play_rollbacks_on_ungraceful_exit_with_process_action():
     x = deepcopy(experiments.ExperimentUngracefulExitLongProcessCall)
     with Runner(Strategy.DEFAULT) as runner:
         journal = runner.run(
@@ -96,11 +104,8 @@ def test_play_rollbacks_on_graceful_exit_with_python_action():
         assert len(journal["rollbacks"]) == 1
 
 
-def test_do_not_play_rollbacks_on_graceful_exit_with_python_action():
-    server = threading.Thread(target=run_http_server_in_background)
-    server.start()
-
-    x = deepcopy(experiments.ExperimentUngracefulExitLongHTTPCall)
+def test_do_not_play_rollbacks_on_ungraceful_exit_with_python_action():
+    x = deepcopy(experiments.ExperimentUngracefulExitLongPythonCall)
     with Runner(Strategy.DEFAULT) as runner:
         journal = runner.run(
             x, settings={"runtime": {"rollbacks": {"strategy": "always"}}}
@@ -109,21 +114,18 @@ def test_do_not_play_rollbacks_on_graceful_exit_with_python_action():
         assert journal["status"] == "interrupted"
         assert len(journal["rollbacks"]) == 0
 
-    server.join()
-
 
 def test_wait_for_background_activity_on_graceful_exit():
-    server = threading.Thread(target=run_http_server_in_background)
-    server.start()
+    httpd, server = run_http_server_in_background()
+    try:
+        x = deepcopy(experiments.ExperimentGracefulExitLongHTTPCall)
+        with Runner(Strategy.DEFAULT) as runner:
+            journal = runner.run(x)
 
-    x = deepcopy(experiments.ExperimentGracefulExitLongHTTPCall)
-    with Runner(Strategy.DEFAULT) as runner:
-        journal = runner.run(x)
-
-        assert journal["status"] == "interrupted"
-        assert 3.0 < journal["run"][0]["duration"] < 3.2
-
-    server.join()
+            assert journal["status"] == "interrupted"
+            assert 3.0 < journal["run"][0]["duration"] < 3.2
+    finally:
+        stop_http_server(httpd, server)
 
 
 def test_do_not_wait_for_background_activity_on_ungraceful_exit():
