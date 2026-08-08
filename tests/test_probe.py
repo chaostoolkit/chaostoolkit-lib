@@ -219,7 +219,6 @@ def test_run_http_probe_can_retry():
                 raise ConnectionAbortedError
             self.send_response(200)
             self.end_headers()
-            return
 
     # get a free port to listen on
     s = socket.socket(socket.AF_INET, type=socket.SOCK_STREAM)

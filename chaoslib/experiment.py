@@ -1,6 +1,6 @@
 import logging
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Dict, List
+from typing import Any
 
 from chaoslib.activity import ensure_activity_is_valid
 from chaoslib.caching import lookup_activity, with_cache
@@ -97,8 +97,8 @@ def ensure_experiment_is_valid(experiment: Experiment):
         ref = activity.get("ref")
         if ref and not lookup_activity(ref):
             raise InvalidActivity(
-                "referenced activity '{r}' could not be "
-                "found in the experiment".format(r=ref)
+                f"referenced activity '{ref}' could not be "
+                "found in the experiment"
             )
 
     rollbacks = experiment.get("rollbacks", [])
@@ -116,10 +116,10 @@ def ensure_experiment_is_valid(experiment: Experiment):
 def run_experiment(
     experiment: Experiment,
     settings: Settings = None,
-    experiment_vars: Dict[str, Any] = None,
+    experiment_vars: dict[str, Any] = None,
     strategy: Strategy = Strategy.DEFAULT,
     schedule: Schedule = None,
-    event_handlers: List[RunEventHandler] = None,
+    event_handlers: list[RunEventHandler] = None,
 ) -> Journal:
     """
     Run the given `experiment` method step by step, in the following sequence:
@@ -163,7 +163,7 @@ def apply_activities(
     pool: ThreadPoolExecutor,
     journal: Journal,
     dry: Dry,
-) -> List[Run]:
+) -> list[Run]:
     warn_about_moved_function(
         "The 'apply_activities' function has now moved to the "
         "'chaoslib.run' package"
@@ -177,7 +177,7 @@ def apply_rollbacks(
     secrets: Secrets,
     pool: ThreadPoolExecutor,
     dry: Dry,
-) -> List[Run]:
+) -> list[Run]:
     warn_about_moved_function(
         "The 'apply_rollbacks' function has now moved to the "
         "'chaoslib.run' package"

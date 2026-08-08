@@ -1,6 +1,6 @@
 import logging
 import os
-from typing import Any, Dict
+from typing import Any
 
 try:
     import hvac
@@ -12,15 +12,15 @@ except ImportError:
 from chaoslib.exceptions import InvalidExperiment
 from chaoslib.types import Configuration, Secrets
 
-__all__ = ["load_secrets", "create_vault_client"]
+__all__ = ["create_vault_client", "load_secrets"]
 
 logger = logging.getLogger("chaostoolkit")
 
 
 def load_secrets(
-    secrets_info: Dict[str, Dict[str, str]],
+    secrets_info: dict[str, dict[str, str]],
     configuration: Configuration = None,
-    extra_vars: Dict[str, Any] = None,
+    extra_vars: dict[str, Any] = None,
 ) -> Secrets:
     """
     Takes the the secrets definition from an experiment and tries to load
@@ -106,7 +106,7 @@ def load_secrets(
     return secrets
 
 
-def load_secret_from_env(secrets_info: Dict[str, Dict[str, str]]) -> Secrets:
+def load_secret_from_env(secrets_info: dict[str, dict[str, str]]) -> Secrets:
     env = os.environ
 
     if isinstance(secrets_info, dict) and secrets_info.get("type") == "env":
@@ -114,7 +114,7 @@ def load_secret_from_env(secrets_info: Dict[str, Dict[str, str]]) -> Secrets:
         if env_key not in env:
             raise InvalidExperiment(
                 "Secrets make reference to an environment key "
-                "that does not exist: {}".format(env_key)
+                f"that does not exist: {env_key}"
             )
         else:
             secret = env[env_key]
@@ -123,7 +123,7 @@ def load_secret_from_env(secrets_info: Dict[str, Dict[str, str]]) -> Secrets:
 
 
 def load_secrets_from_vault(
-    secrets_info: Dict[str, Dict[str, str]],  # noqa: C901
+    secrets_info: dict[str, dict[str, str]],
     configuration: Configuration = None,
 ) -> Secrets:
     """
@@ -243,9 +243,7 @@ def create_vault_client(configuration: Configuration = None):
             configuration.get("vault_kv_version", "2")
         )
         logger.debug(
-            "Using Vault secrets KV version {}".format(
-                client.secrets.kv.default_kv_version
-            )
+            f"Using Vault secrets KV version {client.secrets.kv.default_kv_version}"
         )
 
         if "vault_token" in configuration:
@@ -261,7 +259,7 @@ def create_vault_client(configuration: Configuration = None):
                 app_role = client.auth_approle(role_id, role_secret)
             except Exception as ve:
                 raise InvalidExperiment(
-                    f"Failed to connect to Vault with the AppRole: {str(ve)}"
+                    f"Failed to connect to Vault with the AppRole: {ve!s}"
                 )
 
             client.token = app_role["auth"]["client_token"]
@@ -287,14 +285,12 @@ def create_vault_client(configuration: Configuration = None):
                     )
             except OSError:
                 raise InvalidExperiment(
-                    "Failed to get service account token at: {path}".format(
-                        path=sa_token_path
-                    )
+                    f"Failed to get service account token at: {sa_token_path}"
                 )
             except Exception as e:
                 raise InvalidExperiment(
                     "Failed to connect to Vault using service account with "
-                    "errors: '{errors}'".format(errors=str(e))
+                    f"errors: '{e!s}'"
                 )
 
     return client

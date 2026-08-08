@@ -3,7 +3,7 @@ import logging
 import os
 import os.path
 import re
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any
 
 import yaml
 
@@ -12,8 +12,8 @@ from chaoslib.types import Settings
 __all__ = [
     "get_loaded_settings",
     "load_settings",
-    "save_settings",
     "locate_settings_entry",
+    "save_settings",
 ]
 CHAOSTOOLKIT_CONFIG_PATH = os.path.abspath(
     os.path.expanduser("~/.chaostoolkit/settings.yaml")
@@ -30,7 +30,7 @@ def load_settings(settings_path: str = CHAOSTOOLKIT_CONFIG_PATH) -> Settings:
     if not os.path.exists(settings_path):
         logger.debug(
             "The Chaos Toolkit settings file could not be found at "
-            "'{c}'.".format(c=settings_path)
+            f"'{settings_path}'."
         )
         return
 
@@ -40,7 +40,7 @@ def load_settings(settings_path: str = CHAOSTOOLKIT_CONFIG_PATH) -> Settings:
             loaded_settings.set(settings)
             return settings
         except yaml.YAMLError as ye:
-            logger.error(f"Failed parsing YAML settings: {str(ye)}")
+            logger.error(f"Failed parsing YAML settings: {ye!s}")
 
 
 def save_settings(
@@ -68,9 +68,7 @@ def get_loaded_settings() -> Settings:
 
 def locate_settings_entry(
     settings: Settings, key: str
-) -> Optional[
-    Tuple[Union[Dict[str, Any], List], Any, Optional[str], Optional[int]]
-]:
+) -> tuple[dict[str, Any] | list, Any, str | None, int | None] | None:
     """
     Lookup the entry at the given dotted key in the provided settings and
     return a a tuple as follows:

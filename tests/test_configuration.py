@@ -320,7 +320,7 @@ def test_that_environment_variables_are_typed_correctly():
 
     assert config["token1"] == "should_be_a_string"
     assert config["token2"] == "should_also_be_a_string"
-    assert config["token3"] == int(1000)
+    assert config["token3"] == 1000
     assert config["token4"] == 30.54321
     assert config["token5"] == b"these_are_bytes"
 
@@ -385,7 +385,7 @@ def test_env_var_can_be_used_with_loading_dynamic_config(fixtures_dir: str):
     assert dcfg["some_config_2"] is True
 
 
-def test_env_var_may_be_missing_but_not_fail_validation_if_default_key_is_present():  # noqa
+def test_env_var_may_be_missing_but_not_fail_validation_if_default_key_is_present():
     cfg = load_configuration(
         {
             "some_config_1": {
@@ -399,7 +399,7 @@ def test_env_var_may_be_missing_but_not_fail_validation_if_default_key_is_presen
     assert cfg["some_config_1"] == "hello"
 
 
-def test_env_var_may_be_missing_but_not_fail_validation_if_default_key_is_present_but_None():  # noqa
+def test_env_var_may_be_missing_but_not_fail_validation_if_default_key_is_present_but_None():
     cfg = load_configuration(
         {
             "some_config_1": {

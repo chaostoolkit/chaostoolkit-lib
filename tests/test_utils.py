@@ -50,4 +50,4 @@ def test_can_convert_to_json_is_silent_when_no_value_given():
 
 
 def test_decode_bytes():
-    assert decode_bytes("noël".encode("utf-8")) == "noël"
+    assert decode_bytes("noël".encode()) == "noël"

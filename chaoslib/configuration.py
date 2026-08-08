@@ -1,7 +1,7 @@
 import logging
 import os
 from copy import deepcopy
-from typing import Any, Dict
+from typing import Any
 
 from chaoslib import convert_to_type
 from chaoslib.exceptions import InvalidExperiment
@@ -13,7 +13,7 @@ logger = logging.getLogger("chaostoolkit")
 
 
 def load_configuration(
-    config_info: Dict[str, str], extra_vars: Dict[str, Any] = None
+    config_info: dict[str, str], extra_vars: dict[str, Any] = None
 ) -> Configuration:
     """
     Load the configuration. The `config_info` parameter is a mapping from
@@ -83,7 +83,7 @@ def load_configuration(
                 ):
                     raise InvalidExperiment(
                         "Configuration makes reference to an environment key"
-                        " that does not exist: {}".format(env_key)
+                        f" that does not exist: {env_key}"
                     )
                 env_var_type = value.get("env_var_type")
                 env_var_value = convert_to_type(

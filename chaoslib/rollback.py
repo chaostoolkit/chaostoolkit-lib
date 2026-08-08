@@ -1,6 +1,7 @@
 import logging
+from collections.abc import Iterator
 from concurrent.futures import ThreadPoolExecutor
-from typing import TYPE_CHECKING, Iterator, List
+from typing import TYPE_CHECKING
 
 from chaoslib.activity import execute_activity
 from chaoslib.types import Configuration, Dry, Experiment, Run, Secrets
@@ -20,7 +21,7 @@ def run_rollbacks(
     pool: ThreadPoolExecutor,
     dry: Dry,
     event_registry: "EventHandlerRegistry" = None,
-    runs: List[Run] = None,
+    runs: list[Run] = None,
 ) -> Iterator[Run]:
     """
     Run all rollbacks declared in the experiment in their order. Wait for

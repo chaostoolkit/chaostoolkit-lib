@@ -27,7 +27,7 @@ def parse_experiment_from_file(path: str) -> Experiment:
                 return yaml.safe_load(f)
             except yaml.YAMLError as ye:
                 raise InvalidSource(
-                    f"Failed parsing YAML experiment: {str(ye)}"
+                    f"Failed parsing YAML experiment: {ye!s}"
                 )
         elif ext == ".json":
             return json.load(f)
@@ -49,7 +49,7 @@ def parse_experiment_from_http(response: requests.Response) -> Experiment:
         try:
             return yaml.safe_load(response.text)
         except yaml.YAMLError as ye:
-            raise InvalidSource(f"Failed parsing YAML experiment: {str(ye)}")
+            raise InvalidSource(f"Failed parsing YAML experiment: {ye!s}")
     elif "text/plain" in content_type:
         content = response.text
         try:
@@ -110,9 +110,7 @@ def load_experiment(
         ctk_bearer_token = os.getenv("CHAOSTOOLKIT_LOADER_AUTH_BEARER_TOKEN")
         headers = {"Accept": "application/json, application/x-yaml"}
         if ctk_bearer_token:
-            headers["Authorization"] = "bearer {}".format(
-                ctk_bearer_token.strip()
-            )
+            headers["Authorization"] = f"bearer {ctk_bearer_token.strip()}"
         elif settings:
             auths = settings.get("auths", [])
             for domain in auths:

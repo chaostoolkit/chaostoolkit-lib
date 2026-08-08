@@ -2,9 +2,10 @@ import logging
 import numbers
 import time
 import traceback
+from collections.abc import Iterator
 from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Any, Iterator, List
+from datetime import UTC, datetime
+from typing import TYPE_CHECKING, Any
 
 from chaoslib import substitute
 from chaoslib.caching import lookup_activity
@@ -39,7 +40,7 @@ __all__ = [
 logger = logging.getLogger("chaostoolkit")
 
 
-def ensure_activity_is_valid(activity: Activity):  # noqa: C901
+def ensure_activity_is_valid(activity: Activity):
     """
     Goes through the activity and checks certain of its properties and raise
     :exc:`InvalidActivity` whenever one does not respect the expectations.
@@ -137,7 +138,7 @@ def run_activities(
     pool: ThreadPoolExecutor,
     dry: Dry = None,
     event_registry: "EventHandlerRegistry" = None,
-    runs: List[Run] = None,
+    runs: list[Run] = None,
 ) -> Iterator[Run]:
     """
     Internal generator that iterates over all activities and execute them.
@@ -184,7 +185,7 @@ def execute_activity(
     secrets: Secrets,
     dry: Dry,
     event_registry: "EventHandlerRegistry" = None,
-    runs: List[Run] = None,
+    runs: list[Run] = None,
 ) -> Run:
     """
     Low-level wrapper around the actual activity provider call to collect
@@ -235,7 +236,7 @@ def execute_activity(
                 )
             )
 
-        start = datetime.now(timezone.utc)
+        start = datetime.now(UTC)
         run = {
             "activity": activity.copy(),
             "output": None,
@@ -268,7 +269,7 @@ def execute_activity(
             logger.error(f"  => failed: {error_msg}")
         finally:
             # capture the end time before we pause
-            end = datetime.now(timezone.utc)
+            end = datetime.now(UTC)
             run["end"] = end.isoformat()
             run["duration"] = (end - start).total_seconds()
 
@@ -320,7 +321,7 @@ def run_activity(
     return result
 
 
-def get_all_activities_in_experiment(experiment: Experiment) -> List[Activity]:
+def get_all_activities_in_experiment(experiment: Experiment) -> list[Activity]:
     """
     Handy function to return all activities from a given experiment. Useful
     when you need to iterate over all the activities.

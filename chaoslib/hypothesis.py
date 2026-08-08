@@ -4,7 +4,7 @@ import re
 from decimal import Decimal, InvalidOperation
 from functools import singledispatch
 from numbers import Number
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Any
 
 try:
     from jsonpath2.path import Path as JSONPath
@@ -87,9 +87,7 @@ def ensure_hypothesis_tolerance_is_valid(tolerance: Tolerance):
             check_range(tolerance)
         else:
             raise InvalidActivity(
-                "hypothesis probe tolerance type '{}' is unsupported".format(
-                    tolerance_type
-                )
+                f"hypothesis probe tolerance type '{tolerance_type}' is unsupported"
             )
 
 
@@ -113,9 +111,7 @@ def check_regex_pattern(tolerance: Tolerance):
         )
     except re.error as e:
         raise InvalidActivity(
-            "hypothesis probe tolerance pattern {} seems invalid: {}".format(
-                e.pattern, e.msg
-            )
+            f"hypothesis probe tolerance pattern {e.pattern} seems invalid: {e.msg}"
         )
 
 
@@ -150,8 +146,8 @@ def check_json_path(tolerance: Tolerance):
         )
     except TypeError:
         raise InvalidActivity(
-            "hypothesis probe tolerance JSON path {} has an invalid "
-            "type".format(path)
+            f"hypothesis probe tolerance JSON path {path} has an invalid "
+            "type"
         )
 
 
@@ -191,7 +187,7 @@ def run_steady_state_hypothesis(
     secrets: Secrets,
     dry: Dry,
     event_registry: "EventHandlerRegistry",
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Run all probes in the hypothesis and fail the experiment as soon as any of
     the probe fails or is outside the tolerance zone.
@@ -244,7 +240,7 @@ def run_steady_state_hypothesis(
             tolerance = activity.get("tolerance")
             if isinstance(tolerance, str):
                 tolerance = substitute(tolerance, configuration, secrets)
-            logger.debug(f"allowed tolerance is {str(tolerance)}")
+            logger.debug(f"allowed tolerance is {tolerance!s}")
             checked = within_tolerance(
                 tolerance,
                 run["output"],
@@ -281,7 +277,6 @@ def within_tolerance(
     the probe's result `value` as an argument, returning a success when the
     `value` is within range.
     """
-    pass
 
 
 @within_tolerance.register(bool)
@@ -335,11 +330,11 @@ def _(
     return value in tolerance
 
 
-@within_tolerance.register(dict)  # noqa: C901
+@within_tolerance.register(dict)
 def _(
     tolerance: dict,
     value: Any,
-    configuration: Configuration = None,  # noqa: C901
+    configuration: Configuration = None,
     secrets: Secrets = None,
 ) -> bool:
     tolerance_type = tolerance.get("type")
@@ -400,12 +395,10 @@ def _(
         if result is False:
             if expect:
                 logger.debug(
-                    "jsonpath found '{}' but expected '{}'".format(
-                        str(values), str(expect)
-                    )
+                    f"jsonpath found '{values!s}' but expected '{expect!s}'"
                 )
             else:
-                logger.debug(f"jsonpath found '{str(values)}'")
+                logger.debug(f"jsonpath found '{values!s}'")
 
         return result
     elif tolerance_type == "range":

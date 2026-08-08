@@ -1,5 +1,4 @@
 from collections import namedtuple
-from typing import List
 
 try:
     import importlib.metadata as importlib_metadata
@@ -16,7 +15,7 @@ class ExtensionInfo(namedtuple("ExtensionInfo", info_fields)):
     __slots__ = ()
 
 
-def list_extensions() -> List[ExtensionInfo]:
+def list_extensions() -> list[ExtensionInfo]:
     """
     List all installed Chaos Toolkit extensions in the current environment.
 

@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import MagicMock, patch
 
 import callee
@@ -32,7 +32,7 @@ def test_no_notifications_in_settings_is_okay() -> None:
 def test_notify_calls_notify_with_http_when_type_is_http(
     mock_notify_with_http: MagicMock,
 ) -> None:
-    now = datetime.now(timezone.utc).replace(tzinfo=timezone.utc).timestamp()
+    now = datetime.now(UTC).replace(tzinfo=UTC).timestamp()
     payload = {"test-key": "test-value", "test-dict": {"test-dict-key": "test"}}
     channel = {"type": "http", "url": "http://example.com"}
 
@@ -97,10 +97,10 @@ def test_notify_with_http_handles_400_500_responses(
         payload={},
     )
     mock_logger.debug.assert_called_with(
-        (
+        
             f"notification sent to {test_400_url} failed with: "
             "400 Client Error: Bad Request for url: http://test-400-url.com/"
-        )
+        
     )
     notify_with_http(
         channel={
@@ -111,10 +111,10 @@ def test_notify_with_http_handles_400_500_responses(
         payload={},
     )
     mock_logger.debug.assert_called_with(
-        (
+        
             f"notification sent to {test_500_url} failed with: "
             "500 Server Error: Internal Server Error for url: http://test-500-url.com/"
-        )
+        
     )
 
 
@@ -233,8 +233,8 @@ def test_notify_correctly_assigns_phase_from_event_class(
                 "name": event_class.value,
                 "payload": None,
                 "phase": phase,
-                "ts": datetime.now(timezone.utc)
-                .replace(tzinfo=timezone.utc)
+                "ts": datetime.now(UTC)
+                .replace(tzinfo=UTC)
                 .timestamp(),
             },
         )
@@ -259,8 +259,8 @@ def test_notify_appends_error_to_event_payload_if_provided(
             "name": DiscoverFlowEvent.DiscoverStarted.value,
             "payload": None,
             "phase": "discovery",
-            "ts": datetime.now(timezone.utc)
-            .replace(tzinfo=timezone.utc)
+            "ts": datetime.now(UTC)
+            .replace(tzinfo=UTC)
             .timestamp(),
             "error": exception,
         },
@@ -290,7 +290,7 @@ def test_notify_only_notifies_on_events_specified(
 def test_notify_calls_notify_via_plugin_when_type_is_plugin(
     mock_notify_via_plugin: MagicMock,
 ) -> None:
-    now = datetime.now(timezone.utc).replace(tzinfo=timezone.utc).timestamp()
+    now = datetime.now(UTC).replace(tzinfo=UTC).timestamp()
     payload = {"test-key": "test-value", "test-dict": {"test-dict-key": "test"}}
     channel = {"type": "plugin", "module": "fixtures.notifier"}
 

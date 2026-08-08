@@ -51,7 +51,7 @@ from types import FrameType
 
 from chaoslib.exceptions import InterruptExecution
 
-__all__ = ["exit_gracefully", "exit_ungracefully", "exit_signals"]
+__all__ = ["exit_gracefully", "exit_signals", "exit_ungracefully"]
 
 logger = logging.getLogger("chaostoolkit")
 
@@ -108,9 +108,9 @@ def exit_gracefully():
         frames = inspect.getouterframes(inspect.currentframe())
         info = frames[1]
         logger.error(
-            "Cannot call 'chaoslib.exit.exit_ungracefully() [{} - line {}] "
+            f"Cannot call 'chaoslib.exit.exit_ungracefully() [{info.filename} - line {info.lineno}] "
             "as it relies on the SIGUSR1 signal which is not available on "
-            "your platform".format(info.filename, info.lineno)
+            "your platform"
         )
         return
 
@@ -131,9 +131,9 @@ def exit_ungracefully():
         frames = inspect.getouterframes(inspect.currentframe())
         info = frames[1]
         logger.error(
-            "Cannot call 'chaoslib.exit.exit_ungracefully() [{} - line {}] "
+            f"Cannot call 'chaoslib.exit.exit_ungracefully() [{info.filename} - line {info.lineno}] "
             "as it relies on the SIGUSR2 signal which is not available on "
-            "your platform".format(info.filename, info.lineno)
+            "your platform"
         )
         return
 

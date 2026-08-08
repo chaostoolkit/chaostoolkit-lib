@@ -3,7 +3,15 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.44.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.45.0...HEAD
+
+## [1.45.0][] - 2026-08-08
+
+[1.45.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.44.0...1.45.0
+
+### Changed
+
+* Requires Python 3.12 minimum now
 
 ## [1.44.0][] - 2024-08-25
 

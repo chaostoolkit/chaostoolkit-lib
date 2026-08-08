@@ -98,7 +98,7 @@ def run_http_activity(
             "body": body,
         }
     except requests.exceptions.ConnectionError as cex:
-        raise ActivityFailed(f"failed to connect to {url}: {str(cex)}")
+        raise ActivityFailed(f"failed to connect to {url}: {cex!s}")
     except requests.exceptions.Timeout:
         raise ActivityFailed("activity took too long to complete")
 

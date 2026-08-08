@@ -1,6 +1,6 @@
 import logging
 
-__all__ = ["notify", "notify_other", "notify_broken"]
+__all__ = ["notify", "notify_broken", "notify_other"]
 
 logger = logging.getLogger("chaostoolkit")
 

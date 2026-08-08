@@ -1,8 +1,9 @@
 import importlib
 import inspect
 import logging
+from collections.abc import Callable
 from copy import deepcopy
-from typing import Any, Callable, List, Optional, Union
+from typing import Any
 
 from chaoslib import substitute
 from chaoslib.exceptions import InvalidActivity
@@ -20,9 +21,9 @@ from chaoslib.types import (
 __all__ = [
     "apply_python_control",
     "cleanup_control",
+    "import_control",
     "initialize_control",
     "validate_python_control",
-    "import_control",
 ]
 logger = logging.getLogger("chaostoolkit")
 _level_mapping = {
@@ -41,7 +42,7 @@ _level_mapping = {
 }
 
 
-def import_control(control: Control) -> Optional[Any]:
+def import_control(control: Control) -> Any | None:
     """
     Import the module implementing a control.
     """
@@ -51,8 +52,8 @@ def import_control(control: Control) -> Optional[Any]:
         return importlib.import_module(mod_path)
     except ImportError:
         logger.debug(
-            "Control module '{}' could not be loaded. "
-            "Have you installed it?".format(mod_path)
+            f"Control module '{mod_path}' could not be loaded. "
+            "Have you installed it?"
         )
 
 
@@ -117,10 +118,10 @@ def validate_python_control(control: Control):
         importlib.import_module(mod_name)
     except ImportError:
         logger.warning(
-            "Could not find Python module '{mod}' "
-            "in control '{name}'. Did you install the Python "
+            f"Could not find Python module '{mod_name}' "
+            f"in control '{name}'. Did you install the Python "
             "module? The experiment will carry on running "
-            "nonetheless.".format(mod=mod_name, name=name)
+            "nonetheless."
         )
 
     # a control can validate itself too
@@ -134,10 +135,10 @@ def validate_python_control(control: Control):
 
 def apply_python_control(
     level: str,
-    control: Control,  # noqa: C901
+    control: Control,
     experiment: Experiment,
-    context: Union[Activity, Experiment],
-    state: Union[Journal, Run, List[Run]] = None,
+    context: Activity | Experiment,
+    state: Journal | Run | list[Run] = None,
     configuration: Configuration = None,
     secrets: Secrets = None,
     settings: Settings = None,

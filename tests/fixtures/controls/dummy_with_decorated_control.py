@@ -1,7 +1,7 @@
 import logging
+from collections.abc import Callable
 from functools import wraps
 from itertools import count
-from typing import Callable
 
 from chaoslib.types import Journal
 

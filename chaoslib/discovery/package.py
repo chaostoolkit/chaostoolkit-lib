@@ -35,9 +35,7 @@ def install(package_name: str):
         msg = f"failed to install `{package_name}`"
         logger.debug(
             msg
-            + "\n=================\n{o}\n=================\n{e}\n".format(
-                o=stdout, e=stderr
-            )
+            + f"\n=================\n{stdout}\n=================\n{stderr}\n"
         )
         raise DiscoveryFailed(msg)
 
@@ -67,9 +65,7 @@ def get_discover_function(package: object):
             return value
 
     raise DiscoveryFailed(
-        "package '{name}' does not export a `discover` function".format(
-            name=package.__name__
-        )
+        f"package '{package.__name__}' does not export a `discover` function"
     )
 
 

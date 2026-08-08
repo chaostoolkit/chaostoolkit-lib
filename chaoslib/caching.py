@@ -3,7 +3,7 @@
 import inspect
 import logging
 from functools import wraps
-from typing import Any, Dict, List, Union
+from typing import Any
 
 import chaoslib
 from chaoslib.types import Activity, Experiment, Schedule, Settings, Strategy
@@ -17,7 +17,7 @@ _cache = {}
 logger = logging.getLogger("chaostoolkit")
 
 
-def cache_activities(experiment: Experiment) -> List[Activity]:
+def cache_activities(experiment: Experiment) -> list[Activity]:
     """
     Cache all activities into a map so we can quickly lookup ref.
     """
@@ -53,10 +53,10 @@ def with_cache(f):
     def wrapped(
         experiment: Experiment,
         settings: Settings = None,
-        experiment_vars: Dict[str, Any] = None,
+        experiment_vars: dict[str, Any] = None,
         strategy: Strategy = Strategy.DEFAULT,
         schedule: Schedule = None,
-        event_handlers: List[chaoslib.run.RunEventHandler] = None,
+        event_handlers: list[chaoslib.run.RunEventHandler] = None,
     ):
         try:
             if experiment:
@@ -82,7 +82,7 @@ def with_cache(f):
     return wrapped
 
 
-def lookup_activity(ref: str) -> Union[Activity, None]:
+def lookup_activity(ref: str) -> Activity | None:
     """
     Lookup an activity by name and return it or `None`.
     """

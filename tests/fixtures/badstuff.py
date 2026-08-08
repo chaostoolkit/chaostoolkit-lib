@@ -3,10 +3,10 @@ from itertools import count
 from chaoslib.exceptions import InterruptExecution
 
 __all__ = [
-    "interrupt_me",
-    "raise_exception",
     "check_under_treshold",
     "count_generator",
+    "interrupt_me",
+    "raise_exception",
 ]
 
 

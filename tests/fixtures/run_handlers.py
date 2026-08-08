@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from chaoslib.run import RunEventHandler
 from chaoslib.types import (
@@ -72,7 +72,7 @@ class FullRunEventHandler(RunEventHandler):
         self.calls.append("start_hypothesis_before")
 
     def hypothesis_before_completed(
-        self, experiment: Experiment, state: Dict[str, Any], journal: Journal
+        self, experiment: Experiment, state: dict[str, Any], journal: Journal
     ) -> None:
         self.calls.append("hypothesis_before_completed")
 
@@ -80,7 +80,7 @@ class FullRunEventHandler(RunEventHandler):
         self.calls.append("start_hypothesis_after")
 
     def hypothesis_after_completed(
-        self, experiment: Experiment, state: Dict[str, Any], journal: Journal
+        self, experiment: Experiment, state: dict[str, Any], journal: Journal
     ) -> None:
         self.calls.append("hypothesis_after_completed")
 
@@ -134,7 +134,7 @@ class FullExceptionRunEventHandler(RunEventHandler):
         raise Exception()
 
     def hypothesis_before_completed(
-        self, experiment: Experiment, state: Dict[str, Any], journal: Journal
+        self, experiment: Experiment, state: dict[str, Any], journal: Journal
     ) -> None:
         raise Exception()
 
@@ -142,7 +142,7 @@ class FullExceptionRunEventHandler(RunEventHandler):
         raise Exception()
 
     def hypothesis_after_completed(
-        self, experiment: Experiment, state: Dict[str, Any], journal: Journal
+        self, experiment: Experiment, state: dict[str, Any], journal: Journal
     ) -> None:
         raise Exception()
 

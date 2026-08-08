@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from chaoslib.types import (
     Activity,
@@ -42,7 +42,7 @@ def before_hypothesis_control(context: Hypothesis, **kwargs):
 
 
 def after_hypothesis_control(
-    context: Hypothesis, state: Dict[str, Any], **kwargs
+    context: Hypothesis, state: dict[str, Any], **kwargs
 ):
     context["after_hypothesis_control"] = True
     state["after_hypothesis_control"] = True
@@ -52,7 +52,7 @@ def before_method_control(context: Experiment, **kwargs):
     context["before_method_control"] = True
 
 
-def after_method_control(context: Experiment, state: List[Run], **kwargs):
+def after_method_control(context: Experiment, state: list[Run], **kwargs):
     context["after_method_control"] = True
     state.append("after_method_control")
 
@@ -61,7 +61,7 @@ def before_rollback_control(context: Experiment, **kwargs):
     context["before_rollback_control"] = True
 
 
-def after_rollback_control(context: Experiment, state: List[Run], **kwargs):
+def after_rollback_control(context: Experiment, state: list[Run], **kwargs):
     context["after_rollback_control"] = True
     state.append("after_rollback_control")
 

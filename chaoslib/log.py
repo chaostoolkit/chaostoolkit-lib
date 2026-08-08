@@ -11,10 +11,8 @@ import uuid
 from datetime import date, datetime
 from logging.handlers import RotatingFileHandler
 from types import ModuleType
-from typing import Dict
 
 from pythonjsonlogger import jsonlogger
-
 
 if os.name == "nt":
     from colorama import init as colorama_init
@@ -36,9 +34,7 @@ def encoder(o: object) -> str:
         # we do not meddle with the timezone and assume the date was
         # stored with the right information of timezone as +-HH:MM
         return o.isoformat()
-    elif isinstance(o, decimal.Decimal):
-        return str(o)
-    elif isinstance(o, uuid.UUID):
+    elif isinstance(o, decimal.Decimal) or isinstance(o, uuid.UUID):
         return str(o)
 
     raise TypeError(f"Object of type '{type(o)}' is not JSON serializable")
@@ -157,7 +153,7 @@ class ChaosToolkitContextFilter(logging.Filter):
 
 class LogFormatter(logging.Formatter):
     # adjusted from logzero
-    def __init__(self, fmt: str, datefmt: str, colors: Dict[str, str]) -> None:
+    def __init__(self, fmt: str, datefmt: str, colors: dict[str, str]) -> None:
         logging.Formatter.__init__(self, datefmt=datefmt)
 
         self._fmt = fmt

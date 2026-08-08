@@ -60,7 +60,7 @@ def run_python_activity(
         ).with_traceback(sys.exc_info()[2])
 
 
-def validate_python_activity(activity: Activity):  # noqa: C901
+def validate_python_activity(activity: Activity):
     """
     Validate a Python activity.
 
@@ -90,8 +90,8 @@ def validate_python_activity(activity: Activity):  # noqa: C901
         mod = importlib.import_module(mod_name)
     except ImportError:
         raise InvalidActivity(
-            "could not find Python module '{mod}' "
-            "in activity '{name}'".format(mod=mod_name, name=activity_name)
+            f"could not find Python module '{mod_name}' "
+            f"in activity '{activity_name}'"
         )
 
     found_func = False
@@ -128,16 +128,14 @@ def validate_python_activity(activity: Activity):  # noqa: C901
                 if "missing" in msg:
                     arg = msg.rsplit(":", 1)[1].strip()
                     raise InvalidActivity(
-                        "required argument {arg} is missing from "
-                        "activity '{name}'".format(arg=arg, name=name)
+                        f"required argument {arg} is missing from "
+                        f"activity '{name}'"
                     )
                 elif "unexpected" in msg:
                     arg = msg.rsplit(" ", 1)[1].strip()
                     raise InvalidActivity(
-                        "argument {arg} is not part of the "
-                        "function signature in activity '{name}'".format(
-                            arg=arg, name=name
-                        )
+                        f"argument {arg} is not part of the "
+                        f"function signature in activity '{name}'"
                     )
                 else:
                     # another error? let's fail fast

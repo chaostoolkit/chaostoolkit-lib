@@ -2,9 +2,9 @@ import importlib
 import inspect
 import json
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Dict
+from typing import Any
 
 import requests
 from requests.exceptions import HTTPError
@@ -55,7 +55,7 @@ class ValidateFlowEvent(FlowEvent):
 def notify(
     settings: Settings,
     event: FlowEvent,
-    payload: Any = None,  # noqa: C901
+    payload: Any = None,
     error: Any = None,
 ):
     """
@@ -127,8 +127,8 @@ def notify(
         "name": event.value,
         "payload": payload,
         "phase": "unknown",
-        "ts": datetime.now(timezone.utc)
-        .replace(tzinfo=timezone.utc)
+        "ts": datetime.now(UTC)
+        .replace(tzinfo=UTC)
         .timestamp(),
     }
 
@@ -157,7 +157,7 @@ def notify(
             notify_via_plugin(channel, event_payload)
 
 
-def notify_with_http(channel: Dict[str, str], payload: EventPayload):
+def notify_with_http(channel: dict[str, str], payload: EventPayload):
     """
     Call a notification endpoint over HTTP.
 
@@ -202,7 +202,7 @@ def notify_with_http(channel: Dict[str, str], payload: EventPayload):
         logger.debug("missing url in notification channel")
 
 
-def notify_via_plugin(channel: Dict[str, str], payload: EventPayload):
+def notify_via_plugin(channel: dict[str, str], payload: EventPayload):
     """
     Call a notification plugin as a Python function.
 
@@ -220,9 +220,7 @@ def notify_via_plugin(channel: Dict[str, str], payload: EventPayload):
         mod = importlib.import_module(mod_name)
     except ImportError:
         logger.debug(
-            "could not find Python plugin '{mod}' " "for notification".format(
-                mod=mod_name
-            )
+            f"could not find Python plugin '{mod_name}' " "for notification"
         )
     else:
         funcs = inspect.getmembers(mod, inspect.isfunction)
@@ -237,6 +235,6 @@ def notify_via_plugin(channel: Dict[str, str], payload: EventPayload):
                 break
         else:
             logger.debug(
-                "could not find function '{f}' in plugin '{mod}' "
-                "for notification".format(mod=mod_name, f=func_name)
+                f"could not find function '{func_name}' in plugin '{mod_name}' "
+                "for notification"
             )

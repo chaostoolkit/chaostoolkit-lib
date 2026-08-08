@@ -3,7 +3,7 @@ import inspect
 import logging
 import platform
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 from chaoslib import __version__
@@ -17,8 +17,8 @@ from chaoslib.types import DiscoveredActivities, Discovery
 
 __all__ = [
     "discover",
-    "discover_activities",
     "discover_actions",
+    "discover_activities",
     "discover_probes",
     "initialize_discovery_result",
     "portable_type_name",
@@ -69,7 +69,7 @@ def initialize_discovery_result(
         "chaoslib_version": __version__,
         "id": str(uuid.uuid4()),
         "target": discovery_type,
-        "date": datetime.now(timezone.utc).isoformat(),
+        "date": datetime.now(UTC).isoformat(),
         "platform": {
             "system": plt.system,
             "node": plt.node,
@@ -106,7 +106,7 @@ def discover_probes(extension_mod_name: str) -> DiscoveredActivities:
 
 def discover_activities(
     extension_mod_name: str,
-    activity_type: str,  # noqa: C901
+    activity_type: str,
 ) -> DiscoveredActivities:
     """
     Discover exported activities from the given extension module name.
@@ -120,12 +120,12 @@ def discover_activities(
 
     activities = []
     try:
-        exported = getattr(mod, "__all__")
+        exported = mod.__all__
     except AttributeError:
         logger.warning(
-            "'{m}' does not expose the __all__ attribute. "
+            f"'{extension_mod_name}' does not expose the __all__ attribute. "
             "It is required to determine what functions are actually "
-            "exported as activities.".format(m=extension_mod_name)
+            "exported as activities."
         )
         return activities
 
@@ -166,7 +166,7 @@ def discover_activities(
     return activities
 
 
-def portable_type_name(python_type: Any) -> str:  # noqa: C901
+def portable_type_name(python_type: Any) -> str:
     """
     Return a fairly portable name for a Python type. The idea is to make it
     easy for consumer to read without caring for actual Python types
@@ -194,9 +194,7 @@ def portable_type_name(python_type: Any) -> str:  # noqa: C901
         return "tuple"
     elif python_type is list:
         return "list"
-    elif python_type is dict:
-        return "mapping"
-    elif str(python_type).startswith("typing.Dict"):
+    elif python_type is dict or str(python_type).startswith("typing.Dict"):
         return "mapping"
     elif str(python_type).startswith("typing.List"):
         return "list"
@@ -204,13 +202,13 @@ def portable_type_name(python_type: Any) -> str:  # noqa: C901
         return "set"
 
     logger.debug(
-        f"'{str(python_type)}' could not be ported to something meaningful"
+        f"'{python_type!s}' could not be ported to something meaningful"
     )
 
     return "object"
 
 
-def portable_type_name_to_python_type(name: str) -> Any:  # noqa: C901
+def portable_type_name_to_python_type(name: str) -> Any:
     """
     Return the Python type associated to the given portable name.
     """

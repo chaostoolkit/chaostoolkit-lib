@@ -5,14 +5,15 @@ import logging
 import os.path
 import uuid
 from collections import ChainMap
+from collections.abc import Mapping
 from datetime import date, datetime
+from importlib.metadata import PackageNotFoundError, version
 from json.decoder import JSONDecodeError
 from json.encoder import JSONEncoder
 from string import Template
-from typing import Any, Dict, List, Mapping, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 import yaml
-from importlib.metadata import PackageNotFoundError, version
 from charset_normalizer import detect
 
 from chaoslib.exceptions import ActivityFailed
@@ -25,14 +26,14 @@ from chaoslib.types import (
 )
 
 __all__ = [
+    "PayloadEncoder",
     "__version__",
     "canonical_json",
+    "convert_vars",
     "decode_bytes",
     "experiment_hash",
-    "substitute",
     "merge_vars",
-    "convert_vars",
-    "PayloadEncoder",
+    "substitute",
 ]
 logger = logging.getLogger("chaostoolkit-lib")
 
@@ -43,10 +44,10 @@ except PackageNotFoundError:
 
 
 def substitute(
-    data: Union[None, str, Dict[str, Any], List],
+    data: None | str | dict[str, Any] | list,
     configuration: Configuration,
     secrets: Secrets,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Replace forms such as `${name}` with the first value found in either the
     `configuration` or `secrets` mappings within the given `data`.
@@ -80,7 +81,7 @@ def substitute(
 
 
 class TypedTemplate(Template):
-    def safe_substitute(self, mapping: Dict[str, Any]) -> Any:
+    def safe_substitute(self, mapping: dict[str, Any]) -> Any:
         """
         We trick the substitution so that, if the template is made
         of a single pattern, we returns its value in the type found
@@ -101,7 +102,6 @@ class TypedTemplate(Template):
                     "know if that's because the pattern should be passed as-is "
                     "down to the activity. We assume that's the case."
                 )
-                pass
             except ValueError:
                 pass
         return Template.safe_substitute(self, mapping)
@@ -112,8 +112,8 @@ def substitute_string(data: str, mapping: Mapping[str, Any]) -> Any:
 
 
 def substitute_dict(
-    data: Dict[str, Any], mapping: Mapping[str, Any]
-) -> Dict[str, Any]:
+    data: dict[str, Any], mapping: Mapping[str, Any]
+) -> dict[str, Any]:
     if not data:
         return data
 
@@ -131,8 +131,8 @@ def substitute_dict(
 
 
 def substitute_in_sequence(
-    data: List[Any], mapping: Mapping[str, Any]
-) -> List[Any]:
+    data: list[Any], mapping: Mapping[str, Any]
+) -> list[Any]:
     if not data:
         return data
 
@@ -163,9 +163,7 @@ def decode_bytes(data: bytes, default_encoding: str = "utf-8") -> str:
     if confidence >= 0.5:
         encoding = detected["encoding"]
         logger.debug(
-            "Data encoding detected as '{}' " "with a confidence of {}".format(
-                encoding, confidence
-            )
+            f"Data encoding detected as '{encoding}' " f"with a confidence of {confidence}"
         )
 
     try:
@@ -177,9 +175,9 @@ def decode_bytes(data: bytes, default_encoding: str = "utf-8") -> str:
 
 
 def merge_vars(
-    var: Dict[str, Union[str, float, int, bytes]] = None,  # noqa: C901
-    var_files: List[str] = None,
-) -> Tuple[ConfigVars, SecretVars]:
+    var: dict[str, str | float | int | bytes] = None,
+    var_files: list[str] = None,
+) -> tuple[ConfigVars, SecretVars]:
     """
     Load configuration and secret values from the given set of variables.
     These values are applicable for substitution when the experiment runs.
@@ -225,9 +223,7 @@ def merge_vars(
                     data = yaml.safe_load(content)
                 except yaml.YAMLError as y:
                     logger.error(
-                        "Failed to parse variable file '{}': {}".format(
-                            var_file, str(y)
-                        )
+                        f"Failed to parse variable file '{var_file}': {y!s}"
                     )
                     continue
             elif ext in (".json",):
@@ -235,9 +231,7 @@ def merge_vars(
                     data = json.loads(content)
                 except JSONDecodeError as x:
                     logger.error(
-                        "Failed to parse variable file '{}': {}".format(
-                            var_file, str(x)
-                        )
+                        f"Failed to parse variable file '{var_file}': {x!s}"
                     )
                     continue
 
@@ -251,8 +245,8 @@ def merge_vars(
                     k, v = line.split("=", 1)
                     os.environ[k] = v
                     logger.debug(
-                        "Inject environment variable '{}' from "
-                        "file '{}'".format(k, var_file)
+                        f"Inject environment variable '{k}' from "
+                        f"file '{var_file}'"
                     )
             else:
                 logger.debug(f"Reading configuration/secrets from {f.name}")
@@ -267,7 +261,7 @@ def merge_vars(
     return (config_vars, secret_vars)
 
 
-def convert_vars(value: List[str]) -> Dict[str, Any]:  # noqa: C901
+def convert_vars(value: list[str]) -> dict[str, Any]:
     """
     Process all variables and return a dictionnary of them with the
     value converted to the appropriate type.
@@ -298,7 +292,7 @@ def convert_vars(value: List[str]) -> Dict[str, Any]:  # noqa: C901
 
 def convert_to_type(
     type: str, val: str
-) -> Union[str, int, float, bytes, bool, Any]:
+) -> str | int | float | bytes | bool | Any:
     """
     Converts a value to a provided type. If `type` is None, then the original string is
     returned, else the val is coerced into the provided type. An exception is thrown
@@ -347,12 +341,10 @@ class PayloadEncoder(JSONEncoder):
     def default(self, obj) -> str:
         if isinstance(obj, (datetime, date)):
             return obj.isoformat()
-        elif isinstance(obj, uuid.UUID):
-            return str(obj)
-        elif isinstance(obj, decimal.Decimal):
+        elif isinstance(obj, uuid.UUID) or isinstance(obj, decimal.Decimal):
             return str(obj)
         elif isinstance(obj, Exception):
-            return f"An exception was raised: {obj.__class__.__name__}('{str(obj)}')"
+            return f"An exception was raised: {obj.__class__.__name__}('{obj!s}')"
         return JSONEncoder.default(self, obj)
 
 

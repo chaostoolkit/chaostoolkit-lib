@@ -1,4 +1,3 @@
-from typing import Optional
 
 from chaoslib.exceptions import InvalidExperiment
 from chaoslib.types import Experiment, Extension
@@ -6,9 +5,9 @@ from chaoslib.types import Experiment, Extension
 __all__ = [
     "get_extension",
     "has_extension",
-    "set_extension",
     "merge_extension",
     "remove_extension",
+    "set_extension",
     "validate_extensions",
 ]
 
@@ -27,7 +26,7 @@ def validate_extensions(experiment: Experiment):
             raise InvalidExperiment("All extensions require a non-empty name")
 
 
-def get_extension(experiment: Experiment, name: str) -> Optional[Extension]:
+def get_extension(experiment: Experiment, name: str) -> Extension | None:
     """
     Get an extension by its name.
 
@@ -76,7 +75,7 @@ def remove_extension(experiment: Experiment, name: str):
     Remove an extension from this experiment.
     """
     if "extensions" not in experiment:
-        return None
+        return
 
     for ext in experiment["extensions"]:
         ext_name = ext.get("name")

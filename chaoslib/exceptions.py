@@ -1,13 +1,13 @@
 __all__ = [
-    "ChaosException",
-    "InvalidExperiment",
-    "InvalidActivity",
     "ActivityFailed",
-    "DiscoveryFailed",
-    "InvalidSource",
-    "InterruptExecution",
+    "ChaosException",
     "ControlPythonFunctionLoadingError",
+    "DiscoveryFailed",
+    "InterruptExecution",
+    "InvalidActivity",
     "InvalidControl",
+    "InvalidExperiment",
+    "InvalidSource",
 ]
 
 
@@ -62,4 +62,3 @@ class ExperimentExitedException(ChaosException):
     quickly terminate.
     """
 
-    pass

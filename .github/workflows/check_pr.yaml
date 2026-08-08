@@ -5,7 +5,7 @@ on:
 
 jobs:
   check-changelog:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Check Changelog modified
@@ -15,7 +15,7 @@ jobs:
           missingUpdateErrorMessage: |
             Please include an entry into `CHANGELOG.md` to describe what happened in the PR
   check-tests:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Get changed files

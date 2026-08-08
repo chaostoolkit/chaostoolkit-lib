@@ -1,6 +1,7 @@
 import os
 from copy import deepcopy
 
+from chaoslib.types import Dry
 from fixtures.actions import (
     DoNothingAction,
     EchoAction,
@@ -28,8 +29,6 @@ from fixtures.probes import (
     ReadSecretTokenFromSecretsProbe,
     ReadSecretTokenProbe,
 )
-
-from chaoslib.types import Dry
 
 Secrets = {}
 
@@ -410,7 +409,7 @@ UnsafeYamlExperiment = """
 !!python/object/apply:os.system\nargs: ['Hello shell!']
 """
 
-YamlExperiment = """
+YamlExperiment = f"""
 ---
 title: do cats live in the Internet?
 description: an experiment of importance
@@ -425,9 +424,9 @@ method:
     module: os.path
     func: exists
     arguments:
-      path: {}
+      path: {os.path.abspath(__file__)}
     timeout: 30
-""".format(os.path.abspath(__file__))
+"""
 
 
 SimpleExperiment = {

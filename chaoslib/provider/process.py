@@ -49,7 +49,7 @@ def run_process_activity(
         arguments.insert(0, path)
 
     try:
-        logger.debug(f"Running: {str(arguments)}")
+        logger.debug(f"Running: {arguments!s}")
         proc = subprocess.run(
             arguments,
             timeout=timeout,
@@ -102,14 +102,10 @@ def validate_process_activity(activity: Activity):
     path = shutil.which(path)
     if not path:
         raise InvalidActivity(
-            "path '{path}' cannot be found, in activity '{name}'".format(
-                path=raw_path, name=name
-            )
+            f"path '{raw_path}' cannot be found, in activity '{name}'"
         )
 
     if not os.access(path, os.X_OK):
         raise InvalidActivity(
-            "no access permission to '{path}', in activity '{name}'".format(
-                path=raw_path, name=name
-            )
+            f"no access permission to '{raw_path}', in activity '{name}'"
         )

@@ -11,8 +11,8 @@ except ImportError:
 import platform
 import threading
 import time
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from chaoslib import __version__, substitute
 from chaoslib.activity import run_activities
@@ -51,7 +51,7 @@ from chaoslib.types import (
     Strategy,
 )
 
-__all__ = ["Runner", "RunEventHandler"]
+__all__ = ["RunEventHandler", "Runner"]
 
 logger = logging.getLogger("chaostoolkit")
 
@@ -107,7 +107,7 @@ class RunEventHandler(metaclass=ABCMeta):
         pass
 
     def hypothesis_before_completed(
-        self, experiment: Experiment, state: Dict[str, Any], journal: Journal
+        self, experiment: Experiment, state: dict[str, Any], journal: Journal
     ) -> None:
         pass
 
@@ -115,7 +115,7 @@ class RunEventHandler(metaclass=ABCMeta):
         pass
 
     def hypothesis_after_completed(
-        self, experiment: Experiment, state: Dict[str, Any], journal: Journal
+        self, experiment: Experiment, state: dict[str, Any], journal: Journal
     ) -> None:
         pass
 
@@ -259,7 +259,7 @@ class EventHandlerRegistry:
                 )
 
     def hypothesis_before_completed(
-        self, experiment: Experiment, state: Dict[str, Any], journal: Journal
+        self, experiment: Experiment, state: dict[str, Any], journal: Journal
     ) -> None:
         for h in self.handlers:
             try:
@@ -279,7 +279,7 @@ class EventHandlerRegistry:
                 )
 
     def hypothesis_after_completed(
-        self, experiment: Experiment, state: Dict[str, Any], journal: Journal
+        self, experiment: Experiment, state: dict[str, Any], journal: Journal
     ) -> None:
         for h in self.handlers:
             try:
@@ -385,7 +385,7 @@ class Runner:
         self,
         experiment: Experiment,
         settings: Settings,
-        experiment_vars: Dict[str, Any],
+        experiment_vars: dict[str, Any],
     ) -> None:
         config_vars, secret_vars = experiment_vars or (None, None)
         self.settings = (
@@ -406,7 +406,7 @@ class Runner:
         self,
         experiment: Experiment,
         settings: Settings = None,
-        experiment_vars: Dict[str, Any] = None,
+        experiment_vars: dict[str, Any] = None,
         journal: Journal = None,
     ) -> Journal:
         self.configure(experiment, settings, experiment_vars)
@@ -426,7 +426,7 @@ class Runner:
     def _run(
         self,
         strategy: Strategy,
-        schedule: Schedule,  # noqa: C901
+        schedule: Schedule,
         experiment: Experiment,
         journal: Journal,
         configuration: Configuration,
@@ -580,7 +580,7 @@ class Runner:
                     dry,
                 )
 
-            journal["end"] = datetime.now(timezone.utc).isoformat()
+            journal["end"] = datetime.now(UTC).isoformat()
             journal["duration"] = time.time() - started_at
 
             # the spec only allows these statuses, so if it's anything else
@@ -646,7 +646,7 @@ def run_gate_hypothesis(
     secrets: Secrets,
     event_registry: EventHandlerRegistry,
     dry: Dry,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Run the hypothesis before the method and bail the execution if it did
     not pass.
@@ -688,7 +688,7 @@ def run_deviation_validation_hypothesis(
     secrets: Secrets,
     event_registry: EventHandlerRegistry,
     dry: Dry,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Run the hypothesis after the method and report to the journal if the
     experiment has deviated.
@@ -774,7 +774,7 @@ def run_method(
     secrets: Secrets,
     event_registry: EventHandlerRegistry,
     dry: Dry,
-) -> Optional[List[Run]]:
+) -> list[Run] | None:
     logger.info("Playing your experiment's method now...")
     event_registry.start_method(experiment)
     try:
@@ -876,7 +876,7 @@ def initialize_run_journal(experiment: Experiment) -> Journal:
         "platform": platform.platform(),
         "node": platform.node(),
         "experiment": experiment.copy(),
-        "start": datetime.now(timezone.utc).isoformat(),
+        "start": datetime.now(UTC).isoformat(),
         "status": None,
         "deviated": False,
         "steady_states": {"before": None, "after": None, "during": []},
@@ -901,9 +901,7 @@ def get_background_pools(experiment: Experiment) -> ThreadPoolExecutor:
     activity_pool = None
     if activity_background_count:
         logger.debug(
-            "{c} activities will be run in the background".format(
-                c=activity_background_count
-            )
+            f"{activity_background_count} activities will be run in the background"
         )
         activity_pool = ThreadPoolExecutor(activity_background_count)
 
@@ -915,9 +913,7 @@ def get_background_pools(experiment: Experiment) -> ThreadPoolExecutor:
     rollback_pool = None
     if rollback_background_pool:
         logger.debug(
-            "{c} rollbacks will be run in the background".format(
-                c=rollback_background_pool
-            )
+            f"{rollback_background_pool} rollbacks will be run in the background"
         )
         rollback_pool = ThreadPoolExecutor(rollback_background_pool)
 
@@ -949,7 +945,7 @@ def run_hypothesis_continuously(
     event_registry.start_continuous_hypothesis(frequency)
     logger.info(
         "Executing the steady-state hypothesis continuously "
-        "every {} seconds".format(frequency)
+        f"every {frequency} seconds"
     )
 
     failed_iteration = 0
@@ -983,9 +979,7 @@ def run_hypothesis_continuously(
                 if failed_ratio >= fail_fast_ratio:
                     m = "Terminating immediately the experiment"
                     if failed_ratio != 0.0:
-                        m = "{} after {:.1f}% hypothesis deviated".format(
-                            m, failed_ratio
-                        )
+                        m = f"{m} after {failed_ratio:.1f}% hypothesis deviated"
                     logger.info(m)
                     journal["status"] = "failed"
                     break
@@ -1005,7 +999,7 @@ def apply_activities(
     journal: Journal,
     dry: Dry,
     event_registry: EventHandlerRegistry,
-    runs: List[Run],
+    runs: list[Run],
 ) -> None:
     with controls(
         level="method",
@@ -1067,7 +1061,7 @@ def apply_rollbacks(
     pool: ThreadPoolExecutor,
     dry: Dry,
     event_registry: EventHandlerRegistry,
-    runs: List[Run],
+    runs: list[Run],
 ) -> None:
     logger.info("Let's rollback...")
     with controls(

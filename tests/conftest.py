@@ -1,8 +1,8 @@
 import json
 import os
 import os.path
+from collections.abc import Generator
 from tempfile import NamedTemporaryFile
-from typing import Generator
 
 import pytest
 from fixtures import experiments

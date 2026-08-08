@@ -17,9 +17,9 @@ from chaoslib.control.python import (
 )
 from chaoslib.exceptions import InterruptExecution, InvalidControl
 from chaoslib.settings import get_loaded_settings
-from chaoslib.types import Activity, Configuration
-from chaoslib.types import Control as ControlType
 from chaoslib.types import (
+    Activity,
+    Configuration,
     Experiment,
     Hypothesis,
     Journal,
@@ -27,19 +27,20 @@ from chaoslib.types import (
     Secrets,
     Settings,
 )
+from chaoslib.types import Control as ControlType
 
 if TYPE_CHECKING:
     from chaoslib.run import EventHandlerRegistry
 
 __all__ = [
+    "Control",
+    "cleanup_controls",
+    "cleanup_global_controls",
     "controls",
     "initialize_controls",
-    "cleanup_controls",
-    "validate_controls",
-    "Control",
     "initialize_global_controls",
-    "cleanup_global_controls",
     "load_global_controls",
+    "validate_controls",
 ]
 logger = logging.getLogger("chaostoolkit")
 
@@ -53,7 +54,7 @@ def initialize_controls(
     experiment: Experiment,
     configuration: Configuration = None,
     secrets: Secrets = None,
-    event_registry: "EventHandlerRegistry" = None,  # noqa: F821
+    event_registry: "EventHandlerRegistry" = None,
 ):
     """
     Initialize all declared controls in the experiment.
@@ -150,8 +151,8 @@ def validate_controls(experiment: Experiment):
         scope = c.get("scope")
         if scope and scope not in ("before", "after"):
             raise InvalidControl(
-                "Control '{}' scope property must be 'before' or "
-                "'after' only".format(name)
+                f"Control '{name}' scope property must be 'before' or "
+                "'after' only"
             )
 
         provider_type = c.get("provider", {}).get("type")
@@ -164,7 +165,7 @@ def initialize_global_controls(
     configuration: Configuration,
     secrets: Secrets,
     settings: Settings,
-    event_registry: "EventHandlerRegistry" = None,  # noqa: F821
+    event_registry: "EventHandlerRegistry" = None,
 ):
     """
     Load and initialize controls declared in the settings.
@@ -199,7 +200,7 @@ def initialize_global_controls(
 
 
 def load_global_controls(
-    settings: Settings, control_files: Optional[List[str]] = None
+    settings: Settings, control_files: list[str] | None = None
 ):
     """
     Import all controls declared in the settings and global to all experiments.
@@ -236,9 +237,7 @@ def load_global_controls(
                 ctrls = yaml.safe_load(content)
             except yaml.YAMLError as y:
                 logger.error(
-                    "Failed to parse control file '{}': {}".format(
-                        control_file, str(y)
-                    )
+                    f"Failed to parse control file '{control_file}': {y!s}"
                 )
                 continue
         elif ext in (".json"):
@@ -246,9 +245,7 @@ def load_global_controls(
                 ctrls = json.loads(content)
             except JSONDecodeError as x:
                 logger.error(
-                    "Failed to parse control file '{}': {}".format(
-                        control_file, str(x)
-                    )
+                    f"Failed to parse control file '{control_file}': {x!s}"
                 )
                 continue
 
@@ -288,7 +285,7 @@ def cleanup_global_controls():
                 )
 
 
-def get_global_controls() -> List[ControlType]:
+def get_global_controls() -> list[ControlType]:
     """
     All the controls loaded from the settings.
     """
@@ -300,7 +297,7 @@ class Control:
         self,
         level: str,
         experiment: Experiment,
-        context: Union[Activity, Hypothesis, Experiment],
+        context: Activity | Hypothesis | Experiment,
         configuration: Configuration = None,
         secrets: Secrets = None,
     ):
@@ -321,7 +318,7 @@ class Control:
         self,
         level: str,
         experiment: Experiment,
-        context: Union[Activity, Hypothesis, Experiment],
+        context: Activity | Hypothesis | Experiment,
         configuration: Configuration = None,
         secrets: Secrets = None,
     ):
@@ -342,7 +339,7 @@ class Control:
 def controls(
     level: str,
     experiment: Experiment = None,
-    context: Union[Activity, Hypothesis, Experiment, str] = None,
+    context: Activity | Hypothesis | Experiment | str = None,
     configuration: Configuration = None,
     secrets: Secrets = None,
 ):
@@ -360,7 +357,7 @@ def controls(
 ###############################################################################
 # Internals
 ###############################################################################
-def get_all_activities(experiment: Experiment) -> List[Activity]:
+def get_all_activities(experiment: Experiment) -> list[Activity]:
     activities = []
     activities.extend(
         experiment.get("steady-state-hypothesis", {}).get("probes", [])
@@ -370,7 +367,7 @@ def get_all_activities(experiment: Experiment) -> List[Activity]:
     return activities
 
 
-def get_controls(experiment: Experiment) -> List[Control]:
+def get_controls(experiment: Experiment) -> list[Control]:
     controls = []
     controls.extend(experiment.get("controls", []))
     controls.extend(
@@ -382,7 +379,7 @@ def get_controls(experiment: Experiment) -> List[Control]:
     return controls
 
 
-def set_global_controls(controls: List[ControlType]):
+def set_global_controls(controls: list[ControlType]):
     """
     Set the controls loaded from the settings.
     """
@@ -399,9 +396,9 @@ def reset_global_controls():
 
 def get_context_controls(
     level: str,
-    experiment: Experiment = None,  # noqa: C901
-    context: Union[Activity, Experiment] = None,
-) -> List[Control]:
+    experiment: Experiment = None,
+    context: Activity | Experiment = None,
+) -> list[Control]:
     """
     Get the controls at the given level by merging those declared at the
     experiment level with the current's context.
@@ -451,9 +448,9 @@ def get_context_controls(
 def apply_controls(
     level: str,
     experiment: Experiment,
-    context: Union[Activity, Hypothesis, Experiment],
+    context: Activity | Hypothesis | Experiment,
     scope: str,
-    state: Union[Journal, Run, List[Run]] = None,
+    state: Journal | Run | list[Run] = None,
     configuration: Configuration = None,
     secrets: Secrets = None,
 ):
@@ -497,9 +494,7 @@ def apply_controls(
                 )
         except InterruptExecution:
             logger.debug(
-                "{}-control '{}' interrupted the execution".format(
-                    scope.title(), control_name
-                ),
+                f"{scope.title()}-control '{control_name}' interrupted the execution",
                 exc_info=True,
             )
             raise

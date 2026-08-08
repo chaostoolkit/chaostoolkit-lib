@@ -1,7 +1,7 @@
 import locale
-import sys
 import os.path
 import stat
+import sys
 from unittest.mock import patch
 
 import pytest
@@ -51,7 +51,7 @@ def test_process_not_utf8_cannot_fail():
                     "type": "process",
                     "path": "python",
                     "arguments": (
-                        "-c \"import locale; locale.setlocale(locale.LC_ALL, 'C.UTF-8'); import sys; sys.stdout.buffer.write(bytes('pythön', 'utf-16'))\""  # noqa
+                        "-c \"import locale; locale.setlocale(locale.LC_ALL, 'C.UTF-8'); import sys; sys.stdout.buffer.write(bytes('pythön', 'utf-16'))\""
                     ),
                 }
             },
