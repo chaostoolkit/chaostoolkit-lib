@@ -97,10 +97,8 @@ def test_notify_with_http_handles_400_500_responses(
         payload={},
     )
     mock_logger.debug.assert_called_with(
-        
-            f"notification sent to {test_400_url} failed with: "
-            "400 Client Error: Bad Request for url: http://test-400-url.com/"
-        
+        f"notification sent to {test_400_url} failed with: "
+        "400 Client Error: Bad Request for url: http://test-400-url.com/"
     )
     notify_with_http(
         channel={
@@ -111,10 +109,8 @@ def test_notify_with_http_handles_400_500_responses(
         payload={},
     )
     mock_logger.debug.assert_called_with(
-        
-            f"notification sent to {test_500_url} failed with: "
-            "500 Server Error: Internal Server Error for url: http://test-500-url.com/"
-        
+        f"notification sent to {test_500_url} failed with: "
+        "500 Server Error: Internal Server Error for url: http://test-500-url.com/"
     )
 
 
@@ -233,9 +229,7 @@ def test_notify_correctly_assigns_phase_from_event_class(
                 "name": event_class.value,
                 "payload": None,
                 "phase": phase,
-                "ts": datetime.now(UTC)
-                .replace(tzinfo=UTC)
-                .timestamp(),
+                "ts": datetime.now(UTC).replace(tzinfo=UTC).timestamp(),
             },
         )
 
@@ -259,9 +253,7 @@ def test_notify_appends_error_to_event_payload_if_provided(
             "name": DiscoverFlowEvent.DiscoverStarted.value,
             "payload": None,
             "phase": "discovery",
-            "ts": datetime.now(UTC)
-            .replace(tzinfo=UTC)
-            .timestamp(),
+            "ts": datetime.now(UTC).replace(tzinfo=UTC).timestamp(),
             "error": exception,
         },
     )

@@ -87,7 +87,9 @@ def configure_logger(
         fmt=fmt, datefmt="%Y-%m-%d %H:%M:%S", colors=colors
     )
     if log_format == "json":
-        fmt = "%(process) %(asctime) %(levelname) %(module) %(lineno) %(message)"
+        fmt = (
+            "%(process) %(asctime) %(levelname) %(module) %(lineno) %(message)"
+        )
         if context_id:
             fmt = f"(context_id) {fmt}"
         formatter = jsonlogger.JsonFormatter(

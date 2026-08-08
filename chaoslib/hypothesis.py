@@ -146,8 +146,7 @@ def check_json_path(tolerance: Tolerance):
         )
     except TypeError:
         raise InvalidActivity(
-            f"hypothesis probe tolerance JSON path {path} has an invalid "
-            "type"
+            f"hypothesis probe tolerance JSON path {path} has an invalid type"
         )
 
 

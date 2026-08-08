@@ -127,9 +127,7 @@ def notify(
         "name": event.value,
         "payload": payload,
         "phase": "unknown",
-        "ts": datetime.now(UTC)
-        .replace(tzinfo=UTC)
-        .timestamp(),
+        "ts": datetime.now(UTC).replace(tzinfo=UTC).timestamp(),
     }
 
     if error:
@@ -220,7 +218,7 @@ def notify_via_plugin(channel: dict[str, str], payload: EventPayload):
         mod = importlib.import_module(mod_name)
     except ImportError:
         logger.debug(
-            f"could not find Python plugin '{mod_name}' " "for notification"
+            f"could not find Python plugin '{mod_name}' for notification"
         )
     else:
         funcs = inspect.getmembers(mod, inspect.isfunction)

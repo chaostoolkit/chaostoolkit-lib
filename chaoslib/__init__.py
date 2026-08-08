@@ -163,7 +163,8 @@ def decode_bytes(data: bytes, default_encoding: str = "utf-8") -> str:
     if confidence >= 0.5:
         encoding = detected["encoding"]
         logger.debug(
-            f"Data encoding detected as '{encoding}' " f"with a confidence of {confidence}"
+            f"Data encoding detected as '{encoding}' "
+            f"with a confidence of {confidence}"
         )
 
     try:
@@ -342,7 +343,9 @@ class PayloadEncoder(JSONEncoder):
         elif isinstance(obj, (uuid.UUID, decimal.Decimal)):
             return str(obj)
         elif isinstance(obj, Exception):
-            return f"An exception was raised: {obj.__class__.__name__}('{obj!s}')"
+            return (
+                f"An exception was raised: {obj.__class__.__name__}('{obj!s}')"
+            )
         return JSONEncoder.default(self, obj)
 
 
@@ -361,7 +364,9 @@ def canonical_json(experiment: Experiment) -> bytes:
     ).encode("utf-8")
 
 
-def experiment_hash(experiment: Experiment, hash_algo: str | None = None) -> str:
+def experiment_hash(
+    experiment: Experiment, hash_algo: str | None = None
+) -> str:
     """
     Create a hash (using the blake2b algorithm by default) of the
     experiment's cnanonical view.

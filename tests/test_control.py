@@ -587,9 +587,9 @@ def test_secrets_are_passed_to_all_control_hookpoints():
         "before_activity_control",
         "after_activity_control",
     ):
-        assert (
-            exp[f"{hookpoint}_secrets"] == secrets
-        ), f"{hookpoint} was not provided the secrets"
+        assert exp[f"{hookpoint}_secrets"] == secrets, (
+            f"{hookpoint} was not provided the secrets"
+        )
 
 
 def test_control_can_be_decorated_functions():

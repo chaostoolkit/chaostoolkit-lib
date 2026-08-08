@@ -68,12 +68,8 @@ def ensure_experiment_is_valid(experiment: Experiment):
         raise InvalidExperiment("experiment requires a description")
 
     tags = experiment.get("tags")
-    if tags and list(
-        filter(lambda t: t == "" or not isinstance(t, str), tags)
-    ):
-        raise InvalidExperiment(
-            "experiment tags must be a non-empty string"
-        )
+    if tags and list(filter(lambda t: t == "" or not isinstance(t, str), tags)):
+        raise InvalidExperiment("experiment tags must be a non-empty string")
 
     validate_extensions(experiment)
 

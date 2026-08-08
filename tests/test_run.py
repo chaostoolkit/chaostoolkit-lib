@@ -168,9 +168,7 @@ def test_do_not_exit_when_continuous_ssh_fails_and_no_failfast():
 
 
 def test_exit_immediately_when_continuous_ssh_fails_and_failfast_when_background_activity():
-    experiment = (
-        experiments.SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity.copy()
-    )
+    experiment = experiments.SimpleExperimentWithSSHFailingAtSomePointWithBackgroundActivity.copy()
     journal = run_experiment(
         experiment,
         strategy=Strategy.CONTINUOUS,

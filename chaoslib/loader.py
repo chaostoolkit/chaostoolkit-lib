@@ -26,9 +26,7 @@ def parse_experiment_from_file(path: str) -> Experiment:
             try:
                 return yaml.safe_load(f)
             except yaml.YAMLError as ye:
-                raise InvalidSource(
-                    f"Failed parsing YAML experiment: {ye!s}"
-                )
+                raise InvalidSource(f"Failed parsing YAML experiment: {ye!s}")
         elif ext == ".json":
             return json.load(f)
 

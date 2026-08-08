@@ -61,4 +61,3 @@ class ExperimentExitedException(ChaosException):
     really raise another exception again to let the Chaos Toolkit
     quickly terminate.
     """
-

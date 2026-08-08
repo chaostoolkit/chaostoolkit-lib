@@ -805,7 +805,7 @@ def run_method(
         journal["status"] = "aborted"
         event_registry.method_completed(experiment)
         logger.critical(
-            "Experiment ran into an un expected fatal error, " "aborting now.",
+            "Experiment ran into an un expected fatal error, aborting now.",
             exc_info=True,
         )
 
@@ -837,8 +837,7 @@ def run_rollback(
     elif rollback_strategy == "deviated":
         if has_deviated:
             logger.warning(
-                "Rollbacks will be played only because the experiment "
-                "deviated"
+                "Rollbacks will be played only because the experiment deviated"
             )
             play_rollbacks = True
         else:
