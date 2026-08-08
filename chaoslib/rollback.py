@@ -21,7 +21,7 @@ def run_rollbacks(
     pool: ThreadPoolExecutor,
     dry: Dry,
     event_registry: "EventHandlerRegistry" = None,
-    runs: list[Run] = None,
+    runs: list[Run] | None = None,
 ) -> Iterator[Run]:
     """
     Run all rollbacks declared in the experiment in their order. Wait for

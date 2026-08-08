@@ -11,7 +11,7 @@ from importlib.metadata import PackageNotFoundError, version
 from json.decoder import JSONDecodeError
 from json.encoder import JSONEncoder
 from string import Template
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any
 
 import yaml
 from charset_normalizer import detect
@@ -175,8 +175,8 @@ def decode_bytes(data: bytes, default_encoding: str = "utf-8") -> str:
 
 
 def merge_vars(
-    var: dict[str, str | float | int | bytes] = None,
-    var_files: list[str] = None,
+    var: dict[str, str | float | int | bytes] | None = None,
+    var_files: list[str] | None = None,
 ) -> tuple[ConfigVars, SecretVars]:
     """
     Load configuration and secret values from the given set of variables.
@@ -254,9 +254,9 @@ def merge_vars(
                 secret_vars.update(data.get("secrets", {}))
 
     if var:
-        for k in var:
+        for k, value in var.items():
             logger.debug(f"Using configuration variable '{k}'")
-            config_vars[k] = var[k]
+            config_vars[k] = value
 
     return (config_vars, secret_vars)
 
@@ -282,9 +282,7 @@ def convert_vars(value: list[str]) -> dict[str, Any]:
                         "var cannot convert value to required type"
                     )
             var[k] = v
-        except ValueError:
-            raise
-        except Exception:
+        except (AttributeError, TypeError):
             raise ValueError("var needs to be in the format name[:type]=value")
 
     return var
@@ -313,7 +311,7 @@ def convert_to_type(
     elif type == "bool":
         if isinstance(val, bool):
             return val
-        return False if val.lower() in ("false", "0", "no") else True
+        return val.lower() not in ("false", "0", "no")
     elif type == "json":
         if val in ("", None):
             return val
@@ -341,7 +339,7 @@ class PayloadEncoder(JSONEncoder):
     def default(self, obj) -> str:
         if isinstance(obj, (datetime, date)):
             return obj.isoformat()
-        elif isinstance(obj, uuid.UUID) or isinstance(obj, decimal.Decimal):
+        elif isinstance(obj, (uuid.UUID, decimal.Decimal)):
             return str(obj)
         elif isinstance(obj, Exception):
             return f"An exception was raised: {obj.__class__.__name__}('{obj!s}')"
@@ -363,7 +361,7 @@ def canonical_json(experiment: Experiment) -> bytes:
     ).encode("utf-8")
 
 
-def experiment_hash(experiment: Experiment, hash_algo: str = None) -> str:
+def experiment_hash(experiment: Experiment, hash_algo: str | None = None) -> str:
     """
     Create a hash (using the blake2b algorithm by default) of the
     experiment's cnanonical view.

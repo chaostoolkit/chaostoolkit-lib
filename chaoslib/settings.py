@@ -18,7 +18,7 @@ __all__ = [
 CHAOSTOOLKIT_CONFIG_PATH = os.path.abspath(
     os.path.expanduser("~/.chaostoolkit/settings.yaml")
 )
-loaded_settings = contextvars.ContextVar("loaded_settings", default={})
+loaded_settings = contextvars.ContextVar("loaded_settings", default=None)
 logger = logging.getLogger("chaostoolkit")
 
 
@@ -63,7 +63,7 @@ def get_loaded_settings() -> Settings:
     """
     Settings that have been loaded in the current context.
     """
-    return loaded_settings.get()
+    return loaded_settings.get() or {}
 
 
 def locate_settings_entry(

@@ -223,7 +223,7 @@ def test_run_http_probe_can_retry():
     # get a free port to listen on
     s = socket.socket(socket.AF_INET, type=socket.SOCK_STREAM)
     s.bind(("localhost", 0))
-    address, port = s.getsockname()
+    _, port = s.getsockname()
     s.close()
 
     # start the fake HTTP server in a dedicated thread on the selected port

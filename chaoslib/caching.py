@@ -53,10 +53,10 @@ def with_cache(f):
     def wrapped(
         experiment: Experiment,
         settings: Settings = None,
-        experiment_vars: dict[str, Any] = None,
+        experiment_vars: dict[str, Any] | None = None,
         strategy: Strategy = Strategy.DEFAULT,
         schedule: Schedule = None,
-        event_handlers: list[chaoslib.run.RunEventHandler] = None,
+        event_handlers: list[chaoslib.run.RunEventHandler] | None = None,
     ):
         try:
             if experiment:

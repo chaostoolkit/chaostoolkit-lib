@@ -13,7 +13,7 @@ logger = logging.getLogger("chaostoolkit")
 
 
 def load_configuration(
-    config_info: dict[str, str], extra_vars: dict[str, Any] = None
+    config_info: dict[str, str], extra_vars: dict[str, Any] | None = None
 ) -> Configuration:
     """
     Load the configuration. The `config_info` parameter is a mapping from

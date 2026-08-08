@@ -171,7 +171,7 @@ def test_notify_with_http_handles_datetimes_present_in_payload(
     mock_logger: MagicMock,
 ) -> None:
     test_url = "http://test-datetime-url.com"
-    now = datetime.now()
+    now = datetime.now(UTC)
     now_timestamp = now.isoformat()
     test_payload = {"test-key": "test-val", "test-datetime": now}
     test_json_payload = {"test-key": "test-val", "test-datetime": now_timestamp}

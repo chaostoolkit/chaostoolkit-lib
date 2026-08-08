@@ -52,7 +52,7 @@ class FullRunEventHandler(RunEventHandler):
         self,
         experiment: Experiment,
         journal: Journal,
-        exception: Exception = None,
+        exception: Exception | None = None,
     ) -> None:
         self.calls.append("continuous_hypothesis_completed")
 
@@ -97,69 +97,73 @@ class FullRunEventHandler(RunEventHandler):
         self.calls.append("activity_completed")
 
 
+class RunEventHandlerError(Exception):
+    pass
+
+
 class FullExceptionRunEventHandler(RunEventHandler):
     def __init__(self):
         self.calls = []
 
     def started(self, experiment: Experiment, journal: Journal) -> None:
-        raise Exception()
+        raise RunEventHandlerError()
 
     def finish(self, journal: Journal) -> None:
-        raise Exception()
+        raise RunEventHandlerError()
 
     def interrupted(self, experiment: Experiment, journal: Journal) -> None:
-        raise Exception()
+        raise RunEventHandlerError()
 
     def signal_exit(self) -> None:
-        raise Exception()
+        raise RunEventHandlerError()
 
     def start_continuous_hypothesis(self, frequency: int) -> None:
-        raise Exception()
+        raise RunEventHandlerError()
 
     def continuous_hypothesis_iteration(
         self, iteration_index: int, state: Any
     ) -> None:
-        raise Exception()
+        raise RunEventHandlerError()
 
     def continuous_hypothesis_completed(self) -> None:
-        raise Exception()
+        raise RunEventHandlerError()
 
     def start_rollbacks(self, experiment: Experiment) -> None:
-        raise Exception()
+        raise RunEventHandlerError()
 
     def rollbacks_completed(self, experiment: Experiment, state: Any) -> None:
-        raise Exception()
+        raise RunEventHandlerError()
 
     def start_hypothesis_before(self, experiment: Experiment) -> None:
-        raise Exception()
+        raise RunEventHandlerError()
 
     def hypothesis_before_completed(
         self, experiment: Experiment, state: dict[str, Any], journal: Journal
     ) -> None:
-        raise Exception()
+        raise RunEventHandlerError()
 
     def start_hypothesis_after(self, experiment: Experiment) -> None:
-        raise Exception()
+        raise RunEventHandlerError()
 
     def hypothesis_after_completed(
         self, experiment: Experiment, state: dict[str, Any], journal: Journal
     ) -> None:
-        raise Exception()
+        raise RunEventHandlerError()
 
     def start_method(self, iteration_index: int = 0) -> None:
-        raise Exception()
+        raise RunEventHandlerError()
 
     def method_completed(self, state: Any, iteration_index: int = 0) -> None:
-        raise Exception()
+        raise RunEventHandlerError()
 
     def start_cooldown(self, duration: int) -> None:
-        raise Exception()
+        raise RunEventHandlerError()
 
     def cooldown_completed(self) -> None:
-        raise Exception()
+        raise RunEventHandlerError()
 
     def start_activity(self, activity: Activity) -> None:
-        raise Exception()
+        raise RunEventHandlerError()
 
     def activity_completed(self, activity: Activity, run: Run) -> None:
-        raise Exception()
+        raise RunEventHandlerError()

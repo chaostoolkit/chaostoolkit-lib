@@ -416,7 +416,7 @@ def test_control_cleanup_cannot_fail_the_experiment():
                 },
             },
         )
-    except Exception:
+    except Exception:  # noqa: BLE001 - fail if any exception is raised
         pytest.fail("Failed to run experiment with a broken cleanup control")
 
 
@@ -437,7 +437,7 @@ def test_control_initialization_cannot_fail_the_experiment():
                 },
             },
         )
-    except Exception:
+    except Exception:  # noqa: BLE001 - fail if any exception is raised
         pytest.fail("Failed to run experiment with a broken init control")
 
 

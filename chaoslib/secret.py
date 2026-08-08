@@ -20,7 +20,7 @@ logger = logging.getLogger("chaostoolkit")
 def load_secrets(
     secrets_info: dict[str, dict[str, str]],
     configuration: Configuration = None,
-    extra_vars: dict[str, Any] = None,
+    extra_vars: dict[str, Any] | None = None,
 ) -> Secrets:
     """
     Takes the the secrets definition from an experiment and tries to load
@@ -257,7 +257,7 @@ def create_vault_client(configuration: Configuration = None):
 
             try:
                 app_role = client.auth_approle(role_id, role_secret)
-            except Exception as ve:
+            except Exception as ve:  # noqa: BLE001 - wrap any Vault error
                 raise InvalidExperiment(
                     f"Failed to connect to Vault with the AppRole: {ve!s}"
                 )
@@ -287,7 +287,7 @@ def create_vault_client(configuration: Configuration = None):
                 raise InvalidExperiment(
                     f"Failed to get service account token at: {sa_token_path}"
                 )
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001 - wrap any Vault error
                 raise InvalidExperiment(
                     "Failed to connect to Vault using service account with "
                     f"errors: '{e!s}'"

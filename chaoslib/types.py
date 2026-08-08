@@ -1,5 +1,5 @@
 import enum
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 __all__ = [
     "Action",
@@ -34,7 +34,7 @@ Action = dict[str, Any]
 Experiment = dict[str, Any]
 Probe = dict[str, Any]
 
-Activity = Union[Probe, Action]
+Activity = Probe | Action
 
 Layer = Any
 TargetLayers = dict[str, list[dict[str, Any]]]
@@ -54,7 +54,7 @@ DiscoveredSystemInfo = dict[str, Any]
 Settings = dict[str, Any]
 EventPayload = dict[str, Any]
 
-Tolerance = Union[int, str, bool, list, dict[str, Any]]
+Tolerance = int | str | bool | list | dict[str, Any]
 
 Extension = dict[str, Any]
 Hypothesis = dict[str, Any]

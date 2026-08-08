@@ -12,7 +12,8 @@ import platform
 import threading
 import time
 from datetime import UTC, datetime
-from typing import Any
+from types import TracebackType
+from typing import Any, Self
 
 from chaoslib import __version__, substitute
 from chaoslib.activity import run_activities
@@ -99,7 +100,7 @@ class RunEventHandler(metaclass=ABCMeta):
         self,
         experiment: Experiment,
         journal: Journal,
-        exception: Exception = None,
+        exception: Exception | None = None,
     ) -> None:
         pass
 
@@ -237,7 +238,7 @@ class EventHandlerRegistry:
         self,
         experiment: Experiment,
         journal: Journal,
-        exception: Exception = None,
+        exception: Exception | None = None,
     ) -> None:
         for h in self.handlers:
             try:
@@ -372,10 +373,15 @@ class Runner:
         self.schedule = schedule or Schedule()
         self.event_registry = EventHandlerRegistry()
 
-    def __enter__(self) -> "Runner":
+    def __enter__(self) -> Self:
         return self
 
-    def __exit__(self, exc_type: Any, exc_value: Any, tb: Any) -> None:
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_value: BaseException | None,
+        tb: TracebackType | None,
+    ) -> None:
         self.cleanup()
 
     def register_event_handler(self, handler: RunEventHandler) -> None:
@@ -406,7 +412,7 @@ class Runner:
         self,
         experiment: Experiment,
         settings: Settings = None,
-        experiment_vars: dict[str, Any] = None,
+        experiment_vars: dict[str, Any] | None = None,
         journal: Journal = None,
     ) -> Journal:
         self.configure(experiment, settings, experiment_vars)
@@ -533,20 +539,20 @@ class Runner:
                     )
 
                     continuous_hypo_event.set()
-                    if journal["status"] not in ["interrupted", "aborted"]:
-                        if (
-                            with_ssh
-                            and (state is not None)
-                            and should_run_after_method(strategy)
-                        ):
-                            run_deviation_validation_hypothesis(
-                                experiment,
-                                journal,
-                                configuration,
-                                secrets,
-                                event_registry,
-                                dry,
-                            )
+                    if (
+                        journal["status"] not in ["interrupted", "aborted"]
+                        and with_ssh
+                        and (state is not None)
+                        and should_run_after_method(strategy)
+                    ):
+                        run_deviation_validation_hypothesis(
+                            experiment,
+                            journal,
+                            configuration,
+                            secrets,
+                            event_registry,
+                            dry,
+                        )
             except InterruptExecution as i:
                 journal["status"] = "interrupted"
                 logger.fatal(str(i))
@@ -798,7 +804,7 @@ def run_method(
     except Exception:
         journal["status"] = "aborted"
         event_registry.method_completed(experiment)
-        logger.fatal(
+        logger.critical(
             "Experiment ran into an un expected fatal error, " "aborting now.",
             exc_info=True,
         )
@@ -975,14 +981,13 @@ def run_hypothesis_continuously(
                 "tolerance".format(p=p["activity"]["name"])
             )
 
-            if schedule.fail_fast:
-                if failed_ratio >= fail_fast_ratio:
-                    m = "Terminating immediately the experiment"
-                    if failed_ratio != 0.0:
-                        m = f"{m} after {failed_ratio:.1f}% hypothesis deviated"
-                    logger.info(m)
-                    journal["status"] = "failed"
-                    break
+            if schedule.fail_fast and failed_ratio >= fail_fast_ratio:
+                m = "Terminating immediately the experiment"
+                if failed_ratio != 0.0:
+                    m = f"{m} after {failed_ratio:.1f}% hypothesis deviated"
+                logger.info(m)
+                journal["status"] = "failed"
+                break
         iteration += 1
 
         # we do not adjust the frequency based on the time taken by probes

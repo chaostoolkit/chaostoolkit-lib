@@ -8,6 +8,7 @@ import logging
 import os
 import sys
 import uuid
+from contextlib import suppress
 from datetime import date, datetime
 from logging.handlers import RotatingFileHandler
 from types import ModuleType
@@ -34,7 +35,7 @@ def encoder(o: object) -> str:
         # we do not meddle with the timezone and assume the date was
         # stored with the right information of timezone as +-HH:MM
         return o.isoformat()
-    elif isinstance(o, decimal.Decimal) or isinstance(o, uuid.UUID):
+    elif isinstance(o, (decimal.Decimal, uuid.UUID)):
         return str(o)
 
     raise TypeError(f"Object of type '{type(o)}' is not JSON serializable")
@@ -43,10 +44,10 @@ def encoder(o: object) -> str:
 def configure_logger(
     verbose: bool = False,
     log_format: str = "string",
-    log_file: str = None,
+    log_file: str | None = None,
     log_file_level: str = "debug",
     logger_name: str = "chaostoolkit",
-    context_id: str = None,
+    context_id: str | None = None,
     override_logzero_if_present: bool = True,
 ):
     """
@@ -86,10 +87,7 @@ def configure_logger(
         fmt=fmt, datefmt="%Y-%m-%d %H:%M:%S", colors=colors
     )
     if log_format == "json":
-        if sys.version_info < (3, 8):
-            fmt = "(process) (asctime) (levelname) (module) (lineno) (message)"
-        else:
-            fmt = "%(process) %(asctime) %(levelname) %(module) %(lineno) %(message)"
+        fmt = "%(process) %(asctime) %(levelname) %(module) %(lineno) %(message)"
         if context_id:
             fmt = f"(context_id) {fmt}"
         formatter = jsonlogger.JsonFormatter(
@@ -142,7 +140,7 @@ def override_logzero_module() -> None:
 
 
 class ChaosToolkitContextFilter(logging.Filter):
-    def __init__(self, name: str = "", context_id: str = None):
+    def __init__(self, name: str = "", context_id: str | None = None):
         logging.Filter.__init__(self, name)
         self.context_id = context_id or str(uuid.uuid4())
 
@@ -175,9 +173,8 @@ class LogFormatter(logging.Formatter):
 
         formatted = self._fmt % record.__dict__
 
-        if record.exc_info:
-            if not record.exc_text:
-                record.exc_text = self.formatException(record.exc_info)
+        if record.exc_info and not record.exc_text:
+            record.exc_text = self.formatException(record.exc_info)
 
         if record.exc_text:
             lines = [formatted.rstrip()]
@@ -193,12 +190,9 @@ def terminal_has_colors() -> bool:
         return True
 
     if curses and hasattr(sys.stderr, "isatty") and sys.stderr.isatty():
-        try:
+        with suppress(curses.error):
             curses.setupterm()
             if curses.tigetnum("colors") > 0:
                 return True
-
-        except Exception:
-            pass
 
     return False

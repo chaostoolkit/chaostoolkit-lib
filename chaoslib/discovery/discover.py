@@ -2,6 +2,7 @@ import importlib
 import inspect
 import logging
 import platform
+import typing
 import uuid
 from datetime import UTC, datetime
 from typing import Any
@@ -194,12 +195,18 @@ def portable_type_name(python_type: Any) -> str:
         return "tuple"
     elif python_type is list:
         return "list"
-    elif python_type is dict or str(python_type).startswith("typing.Dict"):
+    elif python_type is dict:
         return "mapping"
-    elif str(python_type).startswith("typing.List"):
+
+    origin = typing.get_origin(python_type)
+    if origin is list:
         return "list"
-    elif str(python_type).startswith("typing.Set"):
+    elif origin is dict:
+        return "mapping"
+    elif origin is set:
         return "set"
+    elif origin is tuple:
+        return "tuple"
 
     logger.debug(
         f"'{python_type!s}' could not be ported to something meaningful"

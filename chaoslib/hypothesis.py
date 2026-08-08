@@ -306,9 +306,8 @@ def _(
     configuration: Configuration = None,
     secrets: Secrets = None,
 ) -> bool:
-    if isinstance(value, dict):
-        if "status" in value:
-            return value["status"] == tolerance
+    if isinstance(value, dict) and "status" in value:
+        return value["status"] == tolerance
 
     return value == tolerance
 
@@ -320,9 +319,8 @@ def _(
     configuration: Configuration = None,
     secrets: Secrets = None,
 ) -> bool:
-    if isinstance(value, dict):
-        if "status" in value:
-            return value["status"] in tolerance
+    if isinstance(value, dict) and "status" in value:
+        return value["status"] in tolerance
 
     if len(tolerance) == 2:
         return tolerance[0] <= value <= tolerance[1]
@@ -343,10 +341,7 @@ def _(
         tolerance["provider"]["arguments"]["value"] = value
         try:
             rtn = run_activity(tolerance, configuration, secrets)
-            if rtn:
-                return True
-            else:
-                return False
+            return bool(rtn)
         except ActivityFailed:
             return False
     elif tolerance_type == "regex":
@@ -379,7 +374,7 @@ def _(
             except json.decoder.JSONDecodeError:
                 pass
 
-        values = list(map(lambda m: m.current_value, px.match(value)))
+        values = [m.current_value for m in px.match(value)]
         result = len(values) > 0
         if count_value is not None:
             result = len(values) == count_value

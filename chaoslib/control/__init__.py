@@ -4,7 +4,7 @@ import os.path
 from contextlib import contextmanager
 from copy import copy, deepcopy
 from json.decoder import JSONDecodeError
-from typing import TYPE_CHECKING, List, Optional, Union
+from typing import TYPE_CHECKING
 
 import yaml
 
@@ -133,11 +133,10 @@ def validate_controls(experiment: Experiment):
         if "ref" not in c and "name" in c
     ]
     for c in controls:
-        if "ref" in c:
-            if c["ref"] not in references:
-                raise InvalidControl(
-                    "Control reference '{}' declaration cannot be found"
-                )
+        if "ref" in c and c["ref"] not in references:
+            raise InvalidControl(
+                "Control reference '{}' declaration cannot be found"
+            )
 
         if "name" not in c:
             raise InvalidControl("A control must have a `name` property")

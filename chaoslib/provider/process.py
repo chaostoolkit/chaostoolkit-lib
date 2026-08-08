@@ -45,7 +45,7 @@ def run_process_activity(
         if isinstance(arguments, dict):
             arguments = itertools.chain.from_iterable(arguments.items())
 
-        arguments = list(str(p) for p in arguments if p not in (None, ""))
+        arguments = [str(p) for p in arguments if p not in (None, "")]
         arguments.insert(0, path)
 
     try:
@@ -53,8 +53,8 @@ def run_process_activity(
         proc = subprocess.run(
             arguments,
             timeout=timeout,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            capture_output=True,
+            check=False,
             env=os.environ,
             shell=shell,
         )

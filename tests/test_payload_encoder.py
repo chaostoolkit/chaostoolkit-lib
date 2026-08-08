@@ -1,7 +1,7 @@
 import decimal
 import json
 import uuid
-from datetime import date, datetime
+from datetime import UTC, datetime
 
 import pytest
 
@@ -10,14 +10,14 @@ from chaoslib.exceptions import ChaosException
 
 
 def test_that_payload_encoder_handles_datetime_objects():
-    now = datetime.now()
+    now = datetime.now(UTC)
     payload = {"test-datetime": now}
     payload_encoded = json.dumps(payload, cls=PayloadEncoder)
     assert now.isoformat() in payload_encoded
 
 
 def test_that_payload_encoder_handles_date_objects():
-    now = date.today()
+    now = datetime.now(UTC).date()
     payload = {"test-datetime": now}
     payload_encoded = json.dumps(payload, cls=PayloadEncoder)
     assert now.isoformat() in payload_encoded
@@ -31,7 +31,7 @@ def test_that_payload_encoder_handles_uuid_objects():
 
 
 def test_that_payload_encoder_handles_decimal_objects():
-    number = decimal.Decimal(6.12)
+    number = decimal.Decimal("6.12")
     payload = {"test-decimal": number}
     payload_encoded = json.dumps(payload, cls=PayloadEncoder)
     assert str(number) in payload_encoded

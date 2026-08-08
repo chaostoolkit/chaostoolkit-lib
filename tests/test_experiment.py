@@ -194,7 +194,7 @@ def test_can_interrupt_rollbacks():
         journal = run_experiment(experiments.ExperimentWithRollbackLongPause)
         assert isinstance(journal, dict)
         assert journal["status"] == "interrupted"
-    except Exception:
+    except Exception:  # noqa: BLE001 - fail if any exception is raised
         pytest.fail("we should have swallowed the InterruptExecution exception")
 
 
@@ -233,7 +233,7 @@ def test_probes_can_reference_each_other():
     experiment = experiments.RefProbeExperiment.copy()
     try:
         run_experiment(experiment)
-    except Exception:
+    except Exception:  # noqa: BLE001 - fail if any exception is raised
         pytest.fail("experiment should not have failed")
 
 

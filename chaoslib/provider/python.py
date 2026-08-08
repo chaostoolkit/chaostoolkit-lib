@@ -54,7 +54,7 @@ def run_python_activity(
 
     try:
         return func(**arguments)
-    except Exception as x:
+    except Exception as x:  # noqa: BLE001 - wrap any user-code exception
         raise ActivityFailed(
             traceback.format_exception_only(type(x), x)[0].strip()
         ).with_traceback(sys.exc_info()[2])

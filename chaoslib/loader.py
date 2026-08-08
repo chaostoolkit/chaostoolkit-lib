@@ -21,7 +21,7 @@ def parse_experiment_from_file(path: str) -> Experiment:
     Parse the given experiment from `path` and return it.
     """
     with open(path) as f:
-        p, ext = os.path.splitext(path)
+        _, ext = os.path.splitext(path)
         if ext in (".yaml", ".yml"):
             try:
                 return yaml.safe_load(f)

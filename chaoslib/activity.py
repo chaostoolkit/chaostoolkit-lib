@@ -92,36 +92,36 @@ def ensure_activity_is_valid(activity: Activity):
         raise InvalidActivity("activity must have a name (cannot be empty)")
 
     timeout = activity.get("timeout")
-    if timeout is not None:
-        if not isinstance(timeout, numbers.Number):
-            raise InvalidActivity("activity timeout must be a number")
+    if timeout is not None and not isinstance(timeout, numbers.Number):
+        raise InvalidActivity("activity timeout must be a number")
 
     pauses = activity.get("pauses")
     if pauses is not None:
         before = pauses.get("before")
-        if before is not None:
-            if isinstance(before, str):
-                if (
-                    not before.startswith("${") or not before.endswith("}")
-                ) or isinstance(before, numbers.Number):
-                    raise InvalidActivity(
-                        "activity before pause must be a number or a pattern "
-                        "to a variable from the configuration or secrets"
-                    )
+        if (
+            before is not None
+            and isinstance(before, str)
+            and not (before.startswith("${") and before.endswith("}"))
+        ):
+            raise InvalidActivity(
+                "activity before pause must be a number or a pattern "
+                "to a variable from the configuration or secrets"
+            )
         after = pauses.get("after")
-        if after is not None:
-            if isinstance(after, str):
-                if (
-                    not after.startswith("${") or not after.endswith("}")
-                ) or isinstance(after, numbers.Number):
-                    raise InvalidActivity(
-                        "activity after pause must be a number or a pattern "
-                        "to a variable from the configuration or secrets"
-                    )
+        if (
+            after is not None
+            and isinstance(after, str)
+            and not (after.startswith("${") and after.endswith("}"))
+        ):
+            raise InvalidActivity(
+                "activity after pause must be a number or a pattern "
+                "to a variable from the configuration or secrets"
+            )
 
-    if "background" in activity:
-        if not isinstance(activity["background"], bool):
-            raise InvalidActivity("activity background must be a boolean")
+    if "background" in activity and not isinstance(
+        activity["background"], bool
+    ):
+        raise InvalidActivity("activity background must be a boolean")
 
     if provider_type == "python":
         validate_python_activity(activity)
@@ -138,7 +138,7 @@ def run_activities(
     pool: ThreadPoolExecutor,
     dry: Dry = None,
     event_registry: "EventHandlerRegistry" = None,
-    runs: list[Run] = None,
+    runs: list[Run] | None = None,
 ) -> Iterator[Run]:
     """
     Internal generator that iterates over all activities and execute them.
@@ -185,7 +185,7 @@ def execute_activity(
     secrets: Secrets,
     dry: Dry,
     event_registry: "EventHandlerRegistry" = None,
-    runs: list[Run] = None,
+    runs: list[Run] | None = None,
 ) -> Run:
     """
     Low-level wrapper around the actual activity provider call to collect

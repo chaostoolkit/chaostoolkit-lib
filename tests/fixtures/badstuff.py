@@ -15,7 +15,7 @@ def interrupt_me():
 
 
 def raise_exception():
-    raise Exception("oops")
+    raise RuntimeError("oops")
 
 
 g = None
@@ -35,7 +35,4 @@ def cleanup_counter():
 
 
 def check_under_treshold(value: int = 0, target: int = 5) -> bool:
-    global g
-    if value >= target:
-        return False
-    return True
+    return not value >= target

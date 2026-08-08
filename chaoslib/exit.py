@@ -143,7 +143,7 @@ def exit_ungracefully():
 ###############################################################################
 # Internals
 ###############################################################################
-def _leave_now(signum: int, frame: FrameType = None) -> None:
+def _leave_now(signum: int, frame: FrameType | None = None) -> None:
     """
     Signal handler only interested in SIGUSR1 and SIGUSR2 to indicate
     requested termination of the experiment.
@@ -155,7 +155,7 @@ def _leave_now(signum: int, frame: FrameType = None) -> None:
         raise SystemExit(30)
 
 
-def _terminate_now(signum: int, frame: FrameType = None) -> None:
+def _terminate_now(signum: int, frame: FrameType | None = None) -> None:
     """
     Signal handler for the SIGTERM event. Raises an `InterruptExecution`.
     """

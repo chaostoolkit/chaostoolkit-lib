@@ -68,11 +68,12 @@ def ensure_experiment_is_valid(experiment: Experiment):
         raise InvalidExperiment("experiment requires a description")
 
     tags = experiment.get("tags")
-    if tags:
-        if list(filter(lambda t: t == "" or not isinstance(t, str), tags)):
-            raise InvalidExperiment(
-                "experiment tags must be a non-empty string"
-            )
+    if tags and list(
+        filter(lambda t: t == "" or not isinstance(t, str), tags)
+    ):
+        raise InvalidExperiment(
+            "experiment tags must be a non-empty string"
+        )
 
     validate_extensions(experiment)
 
@@ -116,10 +117,10 @@ def ensure_experiment_is_valid(experiment: Experiment):
 def run_experiment(
     experiment: Experiment,
     settings: Settings = None,
-    experiment_vars: dict[str, Any] = None,
+    experiment_vars: dict[str, Any] | None = None,
     strategy: Strategy = Strategy.DEFAULT,
     schedule: Schedule = None,
-    event_handlers: list[RunEventHandler] = None,
+    event_handlers: list[RunEventHandler] | None = None,
 ) -> Journal:
     """
     Run the given `experiment` method step by step, in the following sequence:
