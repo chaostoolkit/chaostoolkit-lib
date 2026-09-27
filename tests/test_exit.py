@@ -155,3 +155,69 @@ def test_wait_for_background_activity_to_finish_on_graceful_exit():
         journal = runner.run(x)
         assert journal["status"] == "interrupted"
         assert journal["run"][0]["status"] == "succeeded"
+
+
+def _interrupted_python_experiment(module: str, func: str, arguments=None):
+    return {
+        "title": "interrupted while a python activity runs",
+        "description": "n/a",
+        "method": [
+            {
+                "type": "action",
+                "name": "long-python-call",
+                "provider": {
+                    "type": "python",
+                    "module": module,
+                    "func": func,
+                    "arguments": arguments or {},
+                },
+            },
+            {
+                "type": "action",
+                "name": "must-not-run",
+                "provider": {"type": "process", "path": "echo"},
+            },
+        ],
+        "rollbacks": [
+            {
+                "type": "action",
+                "name": "rollback",
+                "provider": {"type": "process", "path": "echo"},
+            }
+        ],
+    }
+
+
+def test_sigterm_during_python_activity_interrupts_the_run():
+    import os
+    import signal
+
+    x = _interrupted_python_experiment(
+        "fixtures.longpythonfunc", "pause", {"howlong": 5}
+    )
+    timer = threading.Timer(0.5, os.kill, (os.getpid(), signal.SIGTERM))
+    with Runner(Strategy.DEFAULT) as runner:
+        timer.start()
+        journal = runner.run(
+            x, settings={"runtime": {"rollbacks": {"strategy": "always"}}}
+        )
+
+    assert journal["status"] == "interrupted"
+    assert [r["activity"]["name"] for r in journal["run"]] == [
+        "long-python-call"
+    ]
+    assert journal["run"][0].get("status") != "failed"
+    assert len(journal["rollbacks"]) == 1
+
+
+def test_interruption_raised_by_python_activity_interrupts_the_run():
+    x = _interrupted_python_experiment(
+        "fixtures.interrupter", "raise_interruption"
+    )
+    with Runner(Strategy.DEFAULT) as runner:
+        journal = runner.run(
+            x, settings={"runtime": {"rollbacks": {"strategy": "always"}}}
+        )
+
+    assert journal["status"] == "interrupted"
+    assert len(journal["run"]) == 1
