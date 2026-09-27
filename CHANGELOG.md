@@ -3,7 +3,11 @@
 
 ## [Unreleased][]
 
-[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.45.0...HEAD
+[Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.45.1...HEAD
+
+## [1.45.1][] - 2026-09-27
+
+[1.45.1]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.45.0...1.45.1
 
 ### Fixed
 
