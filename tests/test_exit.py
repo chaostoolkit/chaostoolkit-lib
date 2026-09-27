@@ -121,7 +121,9 @@ def test_wait_for_background_activity_on_graceful_exit():
             journal = runner.run(x)
 
             assert journal["status"] == "interrupted"
-            assert 3.0 < journal["run"][0]["duration"] < 3.2
+            # the background activity ran its full 3s: the upper bound only
+            # tells it apart from the 5s HTTP call, with room for slow runners
+            assert 3.0 < journal["run"][0]["duration"] < 4.0
     finally:
         stop_http_server(httpd, server)
 
