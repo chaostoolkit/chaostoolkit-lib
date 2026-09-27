@@ -5,6 +5,13 @@
 
 [Unreleased]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.45.0...HEAD
 
+### Fixed
+
+* An interruption raised while a Python activity runs, for instance on
+  SIGTERM, is no longer turned into a failure of that activity. The run is
+  now interrupted and reported as such, instead of carrying on and possibly
+  completing
+
 ## [1.45.0][] - 2026-08-08
 
 [1.45.0]: https://github.com/chaostoolkit/chaostoolkit-lib/compare/1.44.0...1.45.0

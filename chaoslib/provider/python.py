@@ -6,7 +6,11 @@ import traceback
 from typing import Any
 
 from chaoslib import substitute
-from chaoslib.exceptions import ActivityFailed, InvalidActivity
+from chaoslib.exceptions import (
+    ActivityFailed,
+    InterruptExecution,
+    InvalidActivity,
+)
 from chaoslib.types import Activity, Configuration, Secrets
 
 __all__ = ["run_python_activity", "validate_python_activity"]
@@ -54,6 +58,11 @@ def run_python_activity(
 
     try:
         return func(**arguments)
+    except InterruptExecution:
+        # the whole execution is being interrupted, by SIGTERM or a control
+        # for instance, while this activity ran: that is not a failure of
+        # the activity and must reach the runner as is
+        raise
     except Exception as x:  # noqa: BLE001 - wrap any user-code exception
         raise ActivityFailed(
             traceback.format_exception_only(type(x), x)[0].strip()
